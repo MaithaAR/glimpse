@@ -1,0 +1,20 @@
+== alpha 100
+Carb accuracy (target): n=611 MAE 31.8 g (constant baseline 27.2 g) | bias +0.2 g | median AE 23.4 g | Spearman 0.30 | mean reference 52.6 g
+Carb accuracy (all): n=867 MAE 31.1 g (constant baseline 26.8 g) | bias +0.3 g | median AE 23.0 g | Spearman 0.34 | mean reference 53.1 g
+AUROC none       0.675
+AUROC reference  0.752
+AUROC photo      0.705
+gain_reference               +0.077  95% CI [+0.044, +0.117]  width 0.073
+gain_photo                   +0.030  95% CI [+0.009, +0.051]  width 0.041
+delta_photo_minus_reference  -0.047  95% CI [-0.085, -0.016]  width 0.069
+RQ1 non-inferiority (margin 0.03): inconclusive | incremental value of photo: positive
+== alpha 1000
+Carb accuracy (target): n=611 MAE 23.1 g (constant baseline 27.2 g) | bias -6.9 g | median AE 18.2 g | Spearman 0.44 | mean reference 52.6 g
+Carb accuracy (all): n=867 MAE 22.8 g (constant baseline 26.8 g) | bias -7.3 g | median AE 18.1 g | Spearman 0.46 | mean reference 53.1 g
+AUROC none       0.675
+AUROC reference  0.752
+AUROC photo      0.724
+gain_reference               +0.077  95% CI [+0.044, +0.117]  width 0.073
+gain_photo                   +0.050  95% CI [+0.019, +0.082]  width 0.063
+delta_photo_minus_reference  -0.027  95% CI [-0.064, +0.007]  width 0.071
+RQ1 non-inferiority (margin 0.03): inconclusive | incremental value of photo: positive

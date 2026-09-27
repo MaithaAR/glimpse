@@ -1,0 +1,56 @@
+{
+  "n_meals": 611,
+  "n_people": 31,
+  "spike_rate": 0.3502454991816694,
+  "auroc": {
+    "none": 0.6748864144636173,
+    "reference": 0.7517361519809789,
+    "photo": 0.7221568304338615
+  },
+  "delta_photo_minus_reference": {
+    "point": -0.0295793215471174,
+    "boot_mean": -0.03036361083172227,
+    "lo": -0.0642341038587698,
+    "hi": 0.002251667745838399,
+    "width": 0.06648577160460821
+  },
+  "gain_photo": {
+    "point": 0.04727041597024417,
+    "boot_mean": 0.04745677055231513,
+    "lo": 0.019175933363240378,
+    "hi": 0.07685127093993226,
+    "width": 0.05767533757669188
+  },
+  "gain_reference": {
+    "point": 0.07684973751736157,
+    "boot_mean": 0.07782038138403741,
+    "lo": 0.04350029520415512,
+    "hi": 0.1166854839866842,
+    "width": 0.07318518878252908
+  },
+  "carb_accuracy": {
+    "target": {
+      "n": 611,
+      "people": 31,
+      "mae": 26.224047964671502,
+      "bias": -4.51831380643288,
+      "median_ae": 20.5912659962972,
+      "mae_constant_baseline": 27.22403793212218,
+      "spearman": 0.3694745324236969,
+      "mean_reference_carbs": 52.568057828696126
+    },
+    "all": {
+      "n": 867,
+      "people": 45,
+      "mae": 25.695792307663126,
+      "bias": -4.586957052004939,
+      "median_ae": 19.669629414876304,
+      "mae_constant_baseline": 26.820524504487334,
+      "spearman": 0.3986895504023902,
+      "mean_reference_carbs": 53.124352355321214
+    }
+  },
+  "notes": "Exploratory: includes the 8 locked people; personal prior uses all target people; frozen backbone + ridge head.",
+  "rq1_noninferiority": "inconclusive",
+  "rq1_incremental": "positive"
+}

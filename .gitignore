@@ -4,3 +4,4 @@ meals.csv
 wandb/
 __pycache__/
 .DS_Store
+results/photo_features.npz
