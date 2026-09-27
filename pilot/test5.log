@@ -1,0 +1,13 @@
+meals 896 (634 target), people 45
+fold-seed 0 done
+fold-seed 1 done
+
+AUROC on TARGET-cohort meals (people held out; mean of 2 fold-seeds, 3 net seeds each)
+  A GBM (logged served macros, engineered trend)   0.734
+  B NN learned sequence, no engineered trend       0.702
+  C NN engineered trend, no sequence               0.723
+  D NN sequence + trend + monotone carbs           0.722
+  D + A ensemble                                   0.740
+  RQ2 pilot: learned (B) - engineered (C)    diff -0.021  95% person-bootstrap CI [-0.042, +0.005]
+  fusion D - GBM A                           diff -0.013  95% person-bootstrap CI [-0.051, +0.028]
+  ensemble - GBM A                           diff +0.006  95% person-bootstrap CI [-0.013, +0.025]
