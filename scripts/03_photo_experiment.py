@@ -74,10 +74,18 @@ YP = np.log1p(P[[f"{m}_served" for m in MAC]].clip(lower=0).fillna(0).values)
 
 PKEY = P[["carbs_consumed", "protein_consumed", "fat_consumed"]].round(1).astype(str).agg("|".join, axis=1).values
 
-def fit_predict(train_sids, test_rows_mask):
+def train_mask(train_sids, test_rows_mask):
     tr = P.sid.isin(train_sids).values.copy()
     if a.profile_excluded:  # standardised study meals recur across people: block memorising identical meals
         tr &= ~np.isin(PKEY, PKEY[test_rows_mask])
+    return tr
+
+def const_baseline(train_sids, test_rows_mask):
+    """Constant carb predictor: median served carbs of exactly the rows the photo head may train on."""
+    return float(np.median(np.expm1(YP[train_mask(train_sids, test_rows_mask), 0])))
+
+def fit_predict(train_sids, test_rows_mask):
+    tr = train_mask(train_sids, test_rows_mask)
     sc = StandardScaler().fit(XP[tr]); r = Ridge(alpha=a.alpha).fit(sc.transform(XP[tr]), YP[tr])
     return np.expm1(r.predict(sc.transform(XP[test_rows_mask]))).clip(min=0)
 
@@ -101,7 +109,7 @@ n_on = ON.groupby("sid").size()
 FEW = [s_ for s_ in E.sid.unique() if n_on.get(s_, 0) < cfg["onboarding"]["min_meals_for_personal_prior"]]
 print(f"population-prior fallback: {len(FEW)} person(s) {FEW}, {int(E.sid.isin(FEW).sum())} of {len(E)} evaluated meals")
 preds = {k: np.zeros((3, len(E))) for k in ["none", "reference", "photo"]}
-photo_oof = np.zeros((3, len(E), len(MAC)))
+photo_oof = np.zeros((3, len(E), len(MAC))); const_oof = np.zeros((3, len(E)))
 for seed in cfg["cv"]["seeds"]:
     for test_people in folds(sids, 5, seed):
         te = np.isin(sids, test_people); train_people = sorted(set(P.sid) - set(test_people))
@@ -114,6 +122,7 @@ for seed in cfg["cv"]["seeds"]:
             if rows.any():
                 ph[rows] = fit_predict(sorted(set(train_people) - set(inner)), np.isin(np.arange(len(P)), e2p[rows]))[np.argsort(np.argsort(e2p[rows]))]
         D = E.copy(); D[PH] = ph; photo_oof[seed][te] = ph[te]
+        const_oof[seed][te] = const_baseline(train_people, np.isin(np.arange(len(P)), e2p[te]))
         # population-prior fallback recomputed from this fold's TRAINING target people only (no held-out outcomes)
         pool = ON[ON.sid.isin(train_people) & ON.group.isin(cfg["cohort"]["target_groups"])]
         D.loc[D.sid.isin(FEW), "prior_rate"] = pool[f"spike{thr}"].mean()
@@ -126,7 +135,7 @@ ph_test = photo_oof.mean(0)
 # ---------------- photo-model accuracy (outer-test predictions only) ----------------
 def err(mask):
     t, q = E.carbs_served.values[mask], ph_test[mask, 0]
-    base = np.array([E.carbs_served[~np.isin(sids, [s])].mean() for s in sids[mask]])  # predict the other people's mean
+    base = const_oof.mean(0)[mask]  # fold-fitted training median, same training rows as the photo head
     from scipy.stats import spearmanr
     return dict(n=int(mask.sum()), people=int(len(set(sids[mask]))), mae=float(np.mean(abs(q - t))), bias=float(np.mean(q - t)),
                 median_ae=float(np.median(abs(q - t))), mae_constant_baseline=float(np.mean(abs(base - t))),

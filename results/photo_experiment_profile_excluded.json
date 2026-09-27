@@ -35,7 +35,7 @@
       "mae": 30.04446127098633,
       "bias": -11.909863099594032,
       "median_ae": 24.955524444580078,
-      "mae_constant_baseline": 27.22403793212218,
+      "mae_constant_baseline": 29.07733224222586,
       "spearman": 0.2894871584967653,
       "mean_reference_carbs": 52.568057828696126
     },
@@ -45,7 +45,7 @@
       "mae": 29.890206756177303,
       "bias": -11.555387263667223,
       "median_ae": 24.998859405517578,
-      "mae_constant_baseline": 26.820524504487334,
+      "mae_constant_baseline": 29.29909283975028,
       "spearman": 0.30674256183477955,
       "mean_reference_carbs": 53.124352355321214
     }

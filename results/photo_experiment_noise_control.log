@@ -2,8 +2,8 @@ meal rows 1540 | with photo file 1486
 population-prior fallback: 1 person(s) [np.int64(18)], 24 of 867 evaluated meals
 
 Matched isolated target-cohort meals with photo: n=611, people=31, spike rate 0.350
-Carb accuracy (target): n=611 MAE 29.0 g (constant baseline 27.2 g) | bias -10.0 g | median AE 25.6 g | Spearman 0.03 | mean reference 52.6 g
-Carb accuracy (all): n=867 MAE 29.1 g (constant baseline 26.8 g) | bias -10.5 g | median AE 25.7 g | Spearman 0.01 | mean reference 53.1 g
+Carb accuracy (target): n=611 MAE 29.0 g (constant baseline 27.4 g) | bias -10.0 g | median AE 25.6 g | Spearman 0.03 | mean reference 52.6 g
+Carb accuracy (all): n=867 MAE 29.1 g (constant baseline 27.0 g) | bias -10.5 g | median AE 25.7 g | Spearman 0.01 | mean reference 53.1 g
 AUROC none       0.677
 AUROC reference  0.754
 AUROC photo      0.669
