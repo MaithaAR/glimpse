@@ -1,0 +1,3 @@
+none       cost 0.658 vs best trivial 0.650 (reduction -1.3%) | cleared 7.0% (spiking 16.3%) | abstain 7.9% | ECE 0.076 | meets targets: False
+photo      cost 0.648 vs best trivial 0.650 (reduction +0.3%) | cleared 10.5% (spiking 14.1%) | abstain 10.1% | ECE 0.071 | meets targets: False
+reference  cost 0.588 vs best trivial 0.650 (reduction +9.6%) | cleared 16.7% (spiking 11.8%) | abstain 10.0% | ECE 0.056 | meets targets: False

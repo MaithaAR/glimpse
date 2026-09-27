@@ -155,6 +155,7 @@ res["rq1_noninferiority"] = noninferiority(res["delta_photo_minus_reference"]["l
 g = res["gain_photo"]; res["rq1_incremental"] = "positive" if g["lo"] > 0 else ("degradation" if g["hi"] < 0 else "inconclusive")
 tag = "_noise_control" if a.noise_control else "_profile_excluded" if a.profile_excluded else ("" if a.alpha == 300 else f"_alpha{int(a.alpha)}")
 json.dump(res, open(f"results/photo_experiment{tag}.json", "w"), indent=2)
+np.savez(f"results/photo_experiment{tag}_oof.npz", y=y, sids=sids, target=tgt, **{k: v for k, v in p.items()})  # out-of-fold spike probabilities
 
 print(f"\nMatched isolated target-cohort meals with photo: n={res['n_meals']}, people={res['n_people']}, spike rate {res['spike_rate']:.3f}")
 for k in ["target", "all"]:

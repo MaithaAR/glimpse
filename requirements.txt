@@ -9,3 +9,7 @@ pyyaml
 wandb
 gradio
 pytest
+scipy
+pillow
+efficientnet_pytorch
+remotezip
