@@ -1,0 +1,7 @@
+target cohort n=634, people=31
+no meal information (sensor+profile+prior) AUROC 0.660
++ carbs only                                AUROC 0.729
++ all served macros                         AUROC 0.741
+meal-information gain (served - none): +0.083 95% CI [+0.050, +0.122]
++ consumed macros (retrospective)           AUROC 0.740
+served macros, fully consumed meals only    AUROC 0.741 (n=623); no-meal on same meals 0.665
