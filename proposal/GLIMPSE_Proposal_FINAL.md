@@ -17,7 +17,7 @@
 | Fusion: spike logit, 10/50/90% rise quantiles | MLP, non-negative carb weight | <1M | From scratch; class-weighted cross-entropy + pinball loss |
 | Photo OOD (kNN distance to training embeddings) | DINOv2-S | 22M | Frozen |
 
-**Budget:** about 29M parameters, offline PyTorch/Docker, p95 latency ≤300 ms on a laptop CPU. **Why deep learning:** macro estimation needs learned visual representations of foods and portions; for the sensor sequence it is tested (RQ2), keeping engineered trends if the CNN loses.
+**Budget:** about 29M parameters, offline PyTorch/Docker, p95 latency ≤300 ms on the author's MacBook Pro CPU (Apple silicon). **Why deep learning:** macro estimation needs learned visual representations of foods and portions; for the sensor sequence it is tested (RQ2), keeping engineered trends if the CNN loses.
 
 ## 3. Data and learning plan
 
@@ -29,7 +29,7 @@
 
 - **Primary:** nested person-grouped cross-validation (CV) on the 37 development people (23 target, plus 14 type 2 diabetes used for training only).
 - **Fit within folds:** every learned stage (photo model, population prior, fusion, calibration, conformal, thresholds) uses only outer-fold training people; fusion uses inner out-of-fold photo predictions.
-- **Repeated meals:** 62% of target meals share an exact macro profile with another person's (standardised meals), so photo models are also tested with test-fold profiles excluded from training.
+- **Repeated meals:** 62% of target meals share an exact macro profile with another person's (standardised meals), so photo models are also tested with test-fold profiles excluded from training; near-duplicate photos (perceptual hash) stay in one fold.
 - **Locked set:** 8 target people (hashed in `splits/`) run once in week 11, descriptively.
 
 **Research questions.** Three models differ only in meal information (*none*, *photo-predicted*, *reference* macros); intervals are paired person-bootstrap 95% CIs.
@@ -52,7 +52,7 @@ Frozen ImageNet EfficientNet-B0 features feed a ridge head (α = 300, default) p
 | Photo, also profile-excluded | 0.710 | +0.033 (+0.003, +0.066) | 30.0 g (29.1 g), bias −11.9 g |
 | Noise images (control) | 0.669 | −0.008 (−0.022, +0.006) | 29.0 g (27.4 g) |
 
-**What this shows.** The photo adds spike signal under both splits, *consistent with* nutritional ranking (carb Spearman 0.37) despite weak gram accuracy, plus some reliance on recurring meal profiles (not isolated, since profile exclusion shrinks training data). **RQ1 pilot answers:** incremental value is **positive** (G_photo lower bound +0.018 > 0); non-inferiority is **inconclusive**, with Δ = −0.031 (−0.067, +0.000; unrounded −0.0673 to +0.0004, width 0.068), so it needs Δ ≳ 0, and 23 development people are likely to reduce precision. Gains stay positive at α = 100 and 1,000; noise images show no clear gain.
+**What this shows.** The photo adds spike signal under both splits, *consistent with* nutritional ranking (carb Spearman 0.37) despite weak gram accuracy, plus some reliance on recurring meal profiles (not isolated, since profile exclusion shrinks training data). **RQ1 pilot answers:** incremental value is **positive** (G_photo lower bound +0.018 > 0); non-inferiority is **inconclusive**, with Δ = −0.031 (−0.067, +0.000; unrounded −0.0673 to +0.0004, width 0.068), so at the current interval width it needs Δ ≳ 0, and 23 development people are likely to reduce precision. Gains stay positive at α = 100 and 1,000; noise images show no clear gain.
 
 **Success criteria (target cohort).**
 
