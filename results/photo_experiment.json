@@ -3,30 +3,30 @@
   "n_people": 31,
   "spike_rate": 0.3502454991816694,
   "auroc": {
-    "none": 0.6748864144636173,
-    "reference": 0.7517361519809789,
-    "photo": 0.7221568304338615
+    "none": 0.676958026318887,
+    "reference": 0.7539254690552979,
+    "photo": 0.7233809647119753
   },
   "delta_photo_minus_reference": {
-    "point": -0.0295793215471174,
-    "boot_mean": -0.03036361083172227,
-    "lo": -0.0642341038587698,
-    "hi": 0.002251667745838399,
-    "width": 0.06648577160460821
+    "point": -0.030544504343322565,
+    "boot_mean": -0.03154612060864046,
+    "lo": -0.06729770259662861,
+    "hi": 0.000430855772181769,
+    "width": 0.06772855836881038
   },
   "gain_photo": {
-    "point": 0.04727041597024417,
-    "boot_mean": 0.04745677055231513,
-    "lo": 0.019175933363240378,
-    "hi": 0.07685127093993226,
-    "width": 0.05767533757669188
+    "point": 0.04642293839308831,
+    "boot_mean": 0.04659926525300167,
+    "lo": 0.01796996574427406,
+    "hi": 0.07657364078160266,
+    "width": 0.05860367503732859
   },
   "gain_reference": {
-    "point": 0.07684973751736157,
-    "boot_mean": 0.07782038138403741,
-    "lo": 0.04350029520415512,
-    "hi": 0.1166854839866842,
-    "width": 0.07318518878252908
+    "point": 0.07696744273641087,
+    "boot_mean": 0.07814538586164213,
+    "lo": 0.0426219113180153,
+    "hi": 0.11797434802522613,
+    "width": 0.07535243670721084
   },
   "carb_accuracy": {
     "target": {
@@ -50,7 +50,7 @@
       "mean_reference_carbs": 53.124352355321214
     }
   },
-  "notes": "Exploratory: includes the 8 locked people; personal prior uses all target people; frozen backbone + ridge head.",
+  "notes": "Exploratory: includes the 8 locked people; population-prior fallback fit on each fold's training people; frozen backbone + ridge head.",
   "rq1_noninferiority": "inconclusive",
   "rq1_incremental": "positive"
 }

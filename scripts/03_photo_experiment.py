@@ -95,6 +95,11 @@ REF = [f"{m}_served" for m in MAC]; PH = [f"{m}_photo" for m in MAC]
 y = E.spike50.values; sids = E.sid.values; tgt = E.group.isin(cfg["cohort"]["target_groups"]).values
 gbm = lambda: HGB(max_depth=3, learning_rate=.05, max_iter=200)
 
+thr = cfg["label"]["spike_threshold_mgdl"]
+ON = M[M.onboarding & M.usable]                                      # onboarding meals end before evaluation meals begin
+n_on = ON.groupby("sid").size()
+FEW = [s_ for s_ in E.sid.unique() if n_on.get(s_, 0) < cfg["onboarding"]["min_meals_for_personal_prior"]]
+print(f"population-prior fallback: {len(FEW)} person(s) {FEW}, {int(E.sid.isin(FEW).sum())} of {len(E)} evaluated meals")
 preds = {k: np.zeros((3, len(E))) for k in ["none", "reference", "photo"]}
 photo_oof = np.zeros((3, len(E), len(MAC)))
 for seed in cfg["cv"]["seeds"]:
@@ -109,6 +114,10 @@ for seed in cfg["cv"]["seeds"]:
             if rows.any():
                 ph[rows] = fit_predict(sorted(set(train_people) - set(inner)), np.isin(np.arange(len(P)), e2p[rows]))[np.argsort(np.argsort(e2p[rows]))]
         D = E.copy(); D[PH] = ph; photo_oof[seed][te] = ph[te]
+        # population-prior fallback recomputed from this fold's TRAINING target people only (no held-out outcomes)
+        pool = ON[ON.sid.isin(train_people) & ON.group.isin(cfg["cohort"]["target_groups"])]
+        D.loc[D.sid.isin(FEW), "prior_rate"] = pool[f"spike{thr}"].mean()
+        D.loc[D.sid.isin(FEW), "prior_rise"] = pool.rise.mean()
         for k, cols in [("none", REST), ("reference", REF + REST), ("photo", PH + REST)]:
             preds[k][seed, te] = gbm().fit(D[cols][~te], y[~te]).predict_proba(D[cols][te])[:, 1]
 p = {k: v.mean(0) for k, v in preds.items()}
@@ -132,7 +141,7 @@ def ci(a_, b_):
 res = dict(n_meals=int(tgt.sum()), n_people=int(len(set(st))), spike_rate=float(yt.mean()), auroc=auc,
            delta_photo_minus_reference=ci(p["photo"], p["reference"]), gain_photo=ci(p["photo"], p["none"]),
            gain_reference=ci(p["reference"], p["none"]), carb_accuracy=acc,
-           notes="Exploratory: includes the 8 locked people; personal prior uses all target people; frozen backbone + ridge head.")
+           notes="Exploratory: includes the 8 locked people; population-prior fallback fit on each fold's training people; frozen backbone + ridge head.")
 res["rq1_noninferiority"] = noninferiority(res["delta_photo_minus_reference"]["lo"], res["delta_photo_minus_reference"]["hi"], cfg["targets"]["rq1_noninferiority_margin"])
 g = res["gain_photo"]; res["rq1_incremental"] = "positive" if g["lo"] > 0 else ("degradation" if g["hi"] < 0 else "inconclusive")
 tag = "_noise_control" if a.noise_control else "_profile_excluded" if a.profile_excluded else ("" if a.alpha == 300 else f"_alpha{int(a.alpha)}")
