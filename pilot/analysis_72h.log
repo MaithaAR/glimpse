@@ -1,0 +1,9 @@
+onboarding meals per person: min 2 median 11.0 people with <5: 1
+meals with share < 100%: 0.088
+counts: total 1640 | onboarding 479 | after 72h 1142 | after & no overlap 967 | window crosses boundary 19
+all 45: n=967, people=45, spike rate=0.427
+   consumed macros  GBM+trend AUROC 0.798
+   served macros    GBM+trend AUROC 0.792
+target cohort (healthy+prediabetes): n=697, people=31, spike rate=0.366
+   consumed macros  GBM+trend AUROC 0.739
+   served macros    GBM+trend AUROC 0.731

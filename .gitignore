@@ -1,0 +1,6 @@
+data/
+*.parquet
+meals.csv
+wandb/
+__pycache__/
+.DS_Store

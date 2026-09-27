@@ -1,0 +1,29 @@
+sensor used: {'dexcom': 45, 'libre': 0}; meals parsed 1640; eval meals 961 from 45 people
+spike prevalence  >=30: 65%   >=50: 42%   median rise 43 mg/dL
+eval meals by group: {'prediabetes': 362, 'healthy': 326, 'T2D': 273} | spike50 by group: {'healthy': 0.26, 'prediabetes': 0.45, 'T2D': 0.58}
+
+Spike >=50 mg/dL, person-level 5-fold x3 seeds, AUROC [95% person-bootstrap CI]
+  B0 carbs only (logistic)               0.614 [0.58-0.65]
+  B1 macros+pre-glucose+hour             0.707 [0.67-0.74]
+  B2 +HR+labs                            0.733 [0.70-0.77]
+  B3 +personal prior (oracle ref)        0.774 [0.73-0.82]
+  B4 B3 + pre-meal trajectory shape      0.797 [0.75-0.84]
+
+Per-group AUROC (B4) — does it work within each group, not just between groups?
+  healthy      n= 326  AUROC 0.756
+  prediabetes  n= 362  AUROC 0.750
+  T2D          n= 273  AUROC 0.811
+
+Fair baseline simulation: photo-estimated macros = true macros x lognormal error
+  macro error ~25%  B3 +personal prior (oracle ref)      AUROC 0.756
+  macro error ~25%  B4 B3 + pre-meal trajectory shape    AUROC 0.784
+  macro error ~40%  B3 +personal prior (oracle ref)      AUROC 0.752
+  macro error ~40%  B4 B3 + pre-meal trajectory shape    AUROC 0.779
+
+Rise regression (MAE, mg/dL)
+  B1 macros+pre-glucose+hour             MAE 28.3
+  B3 +personal prior (oracle ref)        MAE 25.5
+  B4 B3 + pre-meal trajectory shape      MAE 24.9
+  predict-person-mean (prior_rise)       MAE 29.8
+
+meals with photo path in eval set: 97%; 'Amount Consumed' non-null: 93%, values: {100.0: 612, 1.0: 122, 300.0: 21, 200.0: 19, 2.0: 18}

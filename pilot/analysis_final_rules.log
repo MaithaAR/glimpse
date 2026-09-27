@@ -1,0 +1,11 @@
+meals with 70% window: 1640 -> after baseline>=3, max gap<=20 min, share>=10%: 1526
+onboarding 453 | crosses boundary 19 | after 1054 | evaluated 896 | people with <5 onboarding meals 1
+all 45: n=896, people=45, spike rate=0.420
+   consumed  macros AUROC 0.786
+   served    macros AUROC 0.783
+target cohort: n=634, people=31, spike rate=0.352
+   consumed  macros AUROC 0.725
+   served    macros AUROC 0.727
+target cohort, fully consumed only: n=623, people=31, spike rate=0.350
+   consumed  macros AUROC 0.721
+   served    macros AUROC 0.721

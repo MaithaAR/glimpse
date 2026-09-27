@@ -1,0 +1,40 @@
+# GLIMPSE default configuration (mirrors the proposal's prespecified rules)
+data:
+  cgmacros_root: data/cgmacros/CGMacros      # folder containing CGMacros-0XX/ and bio.csv
+  nutrition5k_root: data/nutrition5k
+  reference_sensor: dexcom                   # libre only for sensor-shift tests
+label:
+  spike_threshold_mgdl: 50
+  sensitivity_thresholds: [30, 70]
+  horizon_min: 120
+  baseline_window_min: 30
+window_rules:
+  min_baseline_readings: 3
+  min_post_coverage: 0.70
+  max_gap_min: 20
+  strict: {min_post_coverage: 0.90, max_gap_min: 10}
+meals:
+  min_share_eaten_pct: 10                     # below this, served-macro reconstruction is unusable
+  exclude_next_meal_within_min: 120           # also reported separately
+onboarding:
+  hours: 72
+  min_meals_for_personal_prior: 5             # else population prior from training target cohort
+cohort:
+  target_groups: [healthy, prediabetes]       # A1c < 5.7 healthy, 5.7-6.4 prediabetes, >= 6.5 T2D
+cv:
+  outer_folds: 5
+  inner_folds: 4
+  seeds: [0, 1, 2]
+costs:                                        # (spike, no_spike); assumptions, swept in sensitivity analysis
+  low_risk: [5, 0]
+  caution: [0, 1]
+  abstain: [2, 0.5]
+  sweep_missed_spike: [3, 5, 7, 10]
+  sweep_abstain_multiplier: [0.5, 1, 2, 4]
+targets:
+  rq1_noninferiority_margin: 0.03
+  ece_max: 0.05
+  ece_bins: 15
+  conformal_nominal: 0.80
+  usefulness: {min_cost_reduction: 0.10, min_cleared: 0.20, max_missed_among_cleared: 0.10, max_abstain: 0.20}
+  latency_p95_ms: 300

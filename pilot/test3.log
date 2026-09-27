@@ -1,0 +1,18 @@
+meals 961 from 45 people, spike rate 42%
+
+T1  AUROC per seed (mean)  — same meals, same person folds
+  GBM tabular (B3)                                     0.763  (seeds 0.760, 0.763, 0.766)
+  GBM + hand-crafted trend (B4)                        0.784  (seeds 0.775, 0.788, 0.790)
+  DL from scratch: CNN on raw 2-h sequence + tabular   0.757  (seeds 0.740, 0.776, 0.756)
+  Ensemble DL + B4                                     0.788  (seeds 0.773, 0.804, 0.787)
+
+T2  ECE raw 0.040 -> after cross-fitted Platt scaling 0.037  (target <= 0.05)
+
+T3  Decision policy on calibrated risk: clear if p<lo, caution if p>=hi, dietitian queue in between
+    (cost: missed spike 5, unnecessary caution 1, dietitian 0.5; per meal)
+    best: lo=0.15 hi=0.30 -> cleared 18%, dietitian 20%, missed spikes among cleared 7%, cost/meal 0.422
+    same model without the dietitian tier: best cost/meal 0.460;  'always caution' cost/meal 0.578
+
+T4  unconstrained GBM                    risk lower after halving carbs: 65%, unchanged 24%, higher 12%
+
+T4  GBM with monotone carbs constraint   risk lower after halving carbs: 70%, unchanged 30%, higher 0%

@@ -1,0 +1,11 @@
+meals 961 from 45 people, spike rate 42%
+
+AUROC (spike >= 50 mg/dL), people held out, mean of 2 fold-seeds
+  B4 GBM                                        0.782  (0.775, 0.788)
+  V1 CNN+trend+multitask x5                     0.786  (0.775, 0.797)
+  V2 = V1 + self-supervised CGM pretraining     0.785  (0.775, 0.794)
+  V3 = V2 + monotone-carbs head                 0.787  (0.780, 0.793)
+  V2 + B4 ensemble                              0.796  (0.787, 0.805)
+  V3 + B4 ensemble                              0.797  (0.789, 0.804)
+
+Swap test, monotone DL head (held-out meals, halve carbs): risk lower 98%, unchanged 2%, higher 0%; median drop 7.9 pp

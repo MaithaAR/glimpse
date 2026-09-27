@@ -1,0 +1,17 @@
+{
+  "healthy": [
+    2,
+    17,
+    18,
+    48
+  ],
+  "prediabetes": [
+    7,
+    22,
+    29,
+    44
+  ],
+  "seed": 20260927,
+  "rule": "A1c<5.7 healthy; 5.7-6.4 prediabetes; >=6.5 T2D (excluded from locked set)",
+  "sha256": "71dc337acfe8c9bddaab80ef3a7858c16b25496832a11c84fac2f163668cd3e7"
+}
