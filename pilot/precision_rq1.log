@@ -1,0 +1,4 @@
+macro error 25%: Delta (31 target people) -0.001, 95% CI [-0.020, +0.016] -> non-inferior
+   8-person subsets: median CI width 0.056; non-inferior in 58%, inferior 0%, inconclusive 42%
+macro error 40%: Delta (31 target people) -0.015, 95% CI [-0.033, +0.003] -> inconclusive
+   8-person subsets: median CI width 0.071; non-inferior in 12%, inferior 0%, inconclusive 88%
