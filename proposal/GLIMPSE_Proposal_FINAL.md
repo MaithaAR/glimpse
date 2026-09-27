@@ -17,7 +17,7 @@
 | Fusion: spike logit, 10/50/90% rise quantiles | MLP, non-negative carb weight | <1M | From scratch; class-weighted cross-entropy + pinball loss |
 | Photo OOD (kNN distance to training embeddings) | DINOv2-S | 22M | Frozen |
 
-**Budget:** about 29M parameters, offline PyTorch/Docker, p95 latency ≤300 ms on the author's MacBook Pro CPU (Apple silicon). **Why deep learning:** macro estimation needs learned visual representations of foods and portions; for the sensor sequence it is tested (RQ2), keeping engineered trends if the CNN loses.
+**Budget:** about 29M parameters, offline PyTorch/Docker, p95 ≤300 ms on the author's MacBook Pro CPU. **Why deep learning:** macro estimation needs learned visual representations of foods and portions; for the sensor sequence it is tested (RQ2), keeping engineered trends if the CNN loses.
 
 ## 3. Data and learning plan
 
@@ -29,7 +29,7 @@
 
 - **Primary:** nested person-grouped cross-validation (CV) on the 37 development people (23 target, plus 14 type 2 diabetes used for training only).
 - **Fit within folds:** every learned stage (photo model, population prior, fusion, calibration, conformal, thresholds) uses only outer-fold training people; fusion uses inner out-of-fold photo predictions.
-- **Repeated meals:** 62% of target meals share an exact macro profile with another person's (standardised meals), so photo models are also tested with test-fold profiles excluded from training; near-duplicate photos (perceptual hash) stay in one fold.
+- **Repeated meals:** 62% of target meals share an exact macro profile with another person's (standardised meals), so photo models are also tested with test-fold profiles excluded from training; near-duplicate photos (perceptual hash) share a fold.
 - **Locked set:** 8 target people (hashed in `splits/`) run once in week 11, descriptively.
 
 **Research questions.** Three models differ only in meal information (*none*, *photo-predicted*, *reference* macros); intervals are paired person-bootstrap 95% CIs.
