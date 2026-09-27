@@ -26,6 +26,8 @@ from sklearn.ensemble import HistGradientBoostingClassifier as HGB
 ap = argparse.ArgumentParser()
 ap.add_argument("--photos", default="data/photos"); ap.add_argument("--weights", default="data/efficientnet-b0-355c32eb.pth")
 ap.add_argument("--config", default="configs/default.yaml"); ap.add_argument("--alpha", type=float, default=300.0)
+ap.add_argument("--profile-excluded", action="store_true", help="photo head never trains on a logged macro profile that occurs among the rows it predicts")
+ap.add_argument("--noise-control", action="store_true", help="negative control: replace every photo by seeded random noise")
 a = ap.parse_args()
 cfg = yaml.safe_load(open(a.config)); os.makedirs("results", exist_ok=True)
 MAC = ["carbs", "protein", "fat", "fiber", "kcal"]
@@ -39,7 +41,7 @@ M["has_photo"] = [isinstance(f, str) and os.path.exists(f) for f in M.photo_file
 print(f"meal rows {len(M)} | with photo file {int(M.has_photo.sum())}")
 
 # ---------------- frozen EfficientNet-B0 features (cached) ----------------
-cache = "results/photo_features.npz"
+cache = "results/photo_features_noise.npz" if a.noise_control else "results/photo_features.npz"
 files = sorted(set(M.photo_file[M.has_photo]))
 if os.path.exists(cache) and list(np.load(cache, allow_pickle=True)["files"]) == files:
     F = np.load(cache, allow_pickle=True)["X"]
@@ -57,7 +59,9 @@ else:
     F = []
     with torch.no_grad():
         for i in range(0, len(files), 32):
-            x = torch.stack([tf(ImageOps.exif_transpose(Image.open(f)).convert("RGB")) for f in files[i:i + 32]])
+            load = (lambda f: Image.fromarray(np.random.default_rng(int(__import__("zlib").crc32(f.encode()))).integers(0, 256, (300, 400, 3), dtype=np.uint8))) if a.noise_control \
+                else (lambda f: ImageOps.exif_transpose(Image.open(f)).convert("RGB"))
+            x = torch.stack([tf(load(f)) for f in files[i:i + 32]])
             z = [net._avg_pooling(net.extract_features(v)).flatten(1) for v in (x, torch.flip(x, [3]))]
             F.append(((z[0] + z[1]) / 2).numpy())
             print(f"  features {min(i + 32, len(files))}/{len(files)}", flush=True)
@@ -68,8 +72,12 @@ P = M[M.has_photo].reset_index(drop=True)           # photo-model training pool 
 XP = F[[fidx[f] for f in P.photo_file]]
 YP = np.log1p(P[[f"{m}_served" for m in MAC]].clip(lower=0).fillna(0).values)
 
+PKEY = P[["carbs_consumed", "protein_consumed", "fat_consumed"]].round(1).astype(str).agg("|".join, axis=1).values
+
 def fit_predict(train_sids, test_rows_mask):
-    tr = P.sid.isin(train_sids).values
+    tr = P.sid.isin(train_sids).values.copy()
+    if a.profile_excluded:  # standardised study meals recur across people: block memorising identical meals
+        tr &= ~np.isin(PKEY, PKEY[test_rows_mask])
     sc = StandardScaler().fit(XP[tr]); r = Ridge(alpha=a.alpha).fit(sc.transform(XP[tr]), YP[tr])
     return np.expm1(r.predict(sc.transform(XP[test_rows_mask]))).clip(min=0)
 
@@ -127,7 +135,8 @@ res = dict(n_meals=int(tgt.sum()), n_people=int(len(set(st))), spike_rate=float(
            notes="Exploratory: includes the 8 locked people; personal prior uses all target people; frozen backbone + ridge head.")
 res["rq1_noninferiority"] = noninferiority(res["delta_photo_minus_reference"]["lo"], res["delta_photo_minus_reference"]["hi"], cfg["targets"]["rq1_noninferiority_margin"])
 g = res["gain_photo"]; res["rq1_incremental"] = "positive" if g["lo"] > 0 else ("degradation" if g["hi"] < 0 else "inconclusive")
-json.dump(res, open("results/photo_experiment.json" if a.alpha == 300 else f"results/photo_experiment_alpha{int(a.alpha)}.json", "w"), indent=2)
+tag = "_noise_control" if a.noise_control else "_profile_excluded" if a.profile_excluded else ("" if a.alpha == 300 else f"_alpha{int(a.alpha)}")
+json.dump(res, open(f"results/photo_experiment{tag}.json", "w"), indent=2)
 
 print(f"\nMatched isolated target-cohort meals with photo: n={res['n_meals']}, people={res['n_people']}, spike rate {res['spike_rate']:.3f}")
 for k in ["target", "all"]:

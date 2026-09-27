@@ -1,0 +1,12 @@
+meal rows 1540 | with photo file 1486
+
+Matched isolated target-cohort meals with photo: n=611, people=31, spike rate 0.350
+Carb accuracy (target): n=611 MAE 29.0 g (constant baseline 27.2 g) | bias -10.0 g | median AE 25.6 g | Spearman 0.03 | mean reference 52.6 g
+Carb accuracy (all): n=867 MAE 29.1 g (constant baseline 26.8 g) | bias -10.5 g | median AE 25.7 g | Spearman 0.01 | mean reference 53.1 g
+AUROC none       0.675
+AUROC reference  0.752
+AUROC photo      0.665
+gain_reference               +0.077  95% CI [+0.044, +0.117]  width 0.073
+gain_photo                   -0.010  95% CI [-0.023, +0.003]  width 0.026
+delta_photo_minus_reference  -0.087  95% CI [-0.130, -0.053]  width 0.078
+RQ1 non-inferiority (margin 0.03): inferior | incremental value of photo: inconclusive
