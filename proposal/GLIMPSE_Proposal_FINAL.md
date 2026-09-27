@@ -1,6 +1,6 @@
 # GLIMPSE: Pre-Meal Glucose-Spike Risk from a Meal Photo, CGM Trend and Profile
 
-**Maitha Alhosani (solo)** · MAAI7103 Deep Learning · 27 September 2026 · Code and logs: [github.com/MaithaAR/glimpse](https://github.com/MaithaAR/glimpse) (pilot results: [commit `f7a0681`](https://github.com/MaithaAR/glimpse/tree/f7a0681/results))
+**Maitha Alhosani (solo)** · MAAI7103 Deep Learning · 27 September 2026 · Code and logs: [github.com/MaithaAR/glimpse](https://github.com/MaithaAR/glimpse) (pilot results: [commit `3609060`](https://github.com/MaithaAR/glimpse/tree/3609060/results))
 
 ## 1. Venture and user
 
