@@ -2,103 +2,101 @@
 
 **Team:** Maitha Alhosani (solo) · **Course:** MAAI7103 Deep Learning · **Proposal date:** 27 September 2026
 
-Before eating, a person with prediabetes photographs her plate. GLIMPSE (*Glycemic-response Inference from Meal Photos and Sensor Evidence*) combines the photo with the last two hours of her continuous glucose monitor (CGM) and heart-rate data, plus her profile. It returns a calibrated risk of a large glucose spike, or abstains.
+Before eating, a person with prediabetes photographs her plate. GLIMPSE (*Glycemic-response Inference from Meal Photos and Sensor Evidence*) combines the photo with the last two hours of her continuous glucose monitor (CGM) and heart-rate data, plus her profile. It returns a calibrated risk of a large glucose spike, or abstains when it cannot judge.
 
-**Research questions.**
-- **RQ1:** Does a photo recover the predictive value that logged meal information adds over sensor and profile data alone?
+The project asks two research questions:
+- **RQ1:** Does a photo recover the predictive value that logged meal information adds beyond sensor and profile data?
 - **RQ2:** Does a learned pre-meal sensor representation beat engineered trend features?
 
 ## 1. The venture and its user
 
-Some prediabetes and wellness programmes give members a CGM for a few weeks. It only shows a spike after eating, which is too late to change the decision.
+**Problem.** Some prediabetes and wellness programmes give members a CGM for a few weeks, but a CGM shows a spike only after eating, too late to change the choice. The user is an adult with prediabetes or a wellness member. The buyer is the programme provider, such as an employer or insurer wellness scheme.
 
-- **User:** an adult with prediabetes, or a wellness member.
-- **Buyer:** the programme provider, an employer or insurer wellness scheme.
-- **Differentiation (untested hypothesis):** January AI already predicts glucose responses from food photos without a sensor. GLIMPSE bets that live pre-meal glucose, calibration and explicit abstention make that guidance more trustworthy.
+**Differentiation.** January AI already predicts glucose responses from food photos without a sensor. GLIMPSE's untested bet is that live pre-meal glucose, calibration and explicit abstention make that guidance more trustworthy.
 
-**Scenario.** At lunch, Mariam photographs rice with chicken. Her glucose has been rising since a mid-morning coffee with dates. GLIMPSE shows *caution*: a high spike probability, a predicted-rise interval, and the relevant inputs it observed (a large carbohydrate estimate and a rising trend). These are shown as context, not causes. A slider shows how the *model's* prediction changes with less carbohydrate. That is model sensitivity, not dietary advice.
+**Scenario.** At lunch, Mariam photographs rice with chicken. Her glucose has been rising since a mid-morning coffee with dates. The **risk card** shows *caution*: a high spike probability, a predicted-rise interval, and the observed inputs behind it (a large carbohydrate estimate and a rising trend), shown as context rather than causes. A **carbohydrate-sensitivity slider** shows how the *model's* prediction changes with less carbohydrate. It displays model sensitivity, not dietary advice.
 
 **Journey.**
-- **Onboarding:** a profile, with labs optional. Missing labs are handled by missingness indicators and lab-dropout training, and evaluated separately. Meals whose windows finish within the first 72 hours set a personal prior: spike rate and mean rise. With fewer than 5 such meals, GLIMPSE uses a population prior from the training target cohort. The 72-hour wait is acknowledged friction.
-- **At each meal:** one of three actions:
+- **Onboarding.** The user enters a profile; labs are optional, with missing labs modelled and evaluated separately. Meals whose windows end within the first 72 hours set a personal prior (spike rate and mean rise). If there are fewer than 5 such meals, a population prior is used instead. The 72-hour wait is acknowledged friction.
+- **Each meal.** GLIMPSE takes one action:
   - *low risk*;
-  - *caution*, with the relevant inputs;
-  - *abstain*: "cannot judge this meal", plus generic guidance. This is triggered by an unreadable or unfamiliar photo, a CGM gap or low confidence.
-- **Afterwards:** abstained meals and a 5% audit go to a dietitian queue for learning. The target is ≤0.5 reviews per user per day, about 1 minute. Users can correct carbohydrate estimates. Completed CGM windows label predictions.
+  - *caution*;
+  - **abstain** ("cannot judge this meal", plus generic guidance). This covers an unreadable or unfamiliar photo, a CGM gap, or low confidence.
+- **Learning.** Abstained meals and a 5% audit go to a dietitian **review queue**. The target is ≤0.5 reviews per user per day, assuming about 2 minutes per review.
+- **Feedback and monitoring.** Users can correct carbohydrate estimates, and completed CGM windows label each prediction. **Monitoring** tracks confidence, abstention, calibration drift, out-of-distribution (OOD) rate and latency.
 
-**Boundaries.** GLIMPSE makes no dosing, hypoglycaemia or causal claims. CGMacros has no medication data, so the intended exclusion of insulin and sulfonylurea users cannot be verified. The licence (CC BY-NC-SA) limits use to coursework.
+**Boundaries.** There are no dosing, hypoglycaemia, causal or health-benefit claims. CGMacros has no medication data, so excluding insulin and sulfonylurea users cannot be verified. The licence (CC BY-NC-SA) limits use to coursework.
 
 ## 2. The system concept
 
-**Capabilities:**
-1. A **risk card**.
-2. A **carbohydrate-sensitivity slider**.
-3. **Abstention** with a review queue.
-4. **Feedback and monitoring** of confidence, abstention, calibration drift, out-of-distribution (OOD) rate and latency.
-
-**Modalities, each with its own encoder:**
-- the **before-meal photo**;
-- a **CGM and heart-rate series** (24 five-minute steps);
-- **tabular context** (profile, labs, time of day).
+Three modalities each have their own encoder: the **before-meal photo**, a **CGM and heart-rate series** (24 five-minute steps), and **tabular context** (profile, labs, time of day).
 
 | Component | Model | Params | Notes |
 |---|---|---|---|
-| Photo → served carbs, protein, fat (**fine-tuned**) | EfficientNet-B0 | ~5M | Nutrition5k overhead subset (<5,006), then CGMacros development before-photos (<1,640). Fibre is added at the CGMacros stage. |
-| Sensor encoder (**from scratch**) | 1-D CNN | 0.1–1M | The smallest is a serious candidate for 24 steps. |
-| Fusion (**from scratch**) | MLP | <1M | Spike logit, rise quantiles, meal-only and sensor-only auxiliary heads. |
-| OOD embedding (**frozen**) | DINOv2-S | 22M | Photo distance to the training data. |
+| Photo → served carbs, protein, fat (**fine-tuned**) | EfficientNet-B0 | ~5M | Nutrition5k overhead subset (<5,006), then CGMacros development before-photos (<1,640); fibre is added at the CGMacros stage |
+| Sensor encoder (**from scratch**) | 1-D CNN | 0.1–1M | The smallest size is a serious candidate |
+| Fusion (**from scratch**) | MLP | <1M | Spike logit, rise quantiles, and meal-only and sensor-only auxiliary heads |
+| OOD embedding (**frozen**) | DINOv2-S | 22M | Photo distance to training data |
 
 **Training.**
 - **Image model:** Huber loss on log-macros. The backbone is frozen first, then its last blocks are unfrozen.
-- **Fusion:** cross-entropy for spikes, pinball loss for the 10/50/90% rise quantiles, and auxiliary losses weighted 0.3, with weight decay and early stopping. Inner folds select sizes, loss weights and freezing depth.
-- **Carbohydrate path:** carbohydrate enters the spike logit only through a non-negative-weighted term, so predicted risk cannot rise when the carbohydrate estimate alone falls.
-- **Abstention signals:** head disagreement and DINOv2 distance are kept only if they beat a simpler rule based on the fused probability on the risk–coverage curve.
+- **Fusion:** cross-entropy for the spike, pinball loss for the 10/50/90% rise quantiles, and 0.3-weighted auxiliary losses, with weight decay and early stopping.
+- **Model selection:** a small, fixed set of inner-fold configurations chooses sizes, loss weights and freezing depth.
+- **Carbohydrate path:** carbohydrate enters the spike logit only through a non-negative weight, so predicted risk cannot rise when the carbohydrate estimate alone falls.
+- **Abstention signals:** head disagreement and DINOv2 distance are kept only if they beat a rule based on the fused probability alone.
 
-**Budget.** About 27M pretrained or fine-tuned parameters (limit 1B), plus under 2M trained from scratch. The latency target is p95 ≤ 300 ms, offline, in PyTorch and arm64 Docker, on the author's MacBook Pro CPU (4 threads, chip logged).
+**Budget.** About 27M pretrained or fine-tuned parameters (the limit is 1B) and under 2M trained from scratch. The latency target is p95 ≤300 ms, offline, in PyTorch inside arm64 Docker on the author's MacBook Pro CPU.
 
 ## 3. The data and learning plan
 
-**CGMacros** (PhysioNet) follows 45 adults (15 healthy, 16 with prediabetes, 14 with type 2 diabetes) for about 10 days. It records Dexcom and Libre CGM, Fitbit heart rate, before- and after-meal photos, labs, and macros estimated for the *consumed* meal with a percentage consumed.
+**Datasets.**
+- **CGMacros** (PhysioNet) follows 45 adults (15 healthy, 16 prediabetes, 14 type 2 diabetes) for about 10 days. It records Dexcom and Libre CGM, Fitbit heart rate, before- and after-meal photos, labs, and macros for the *consumed* meal along with the percentage consumed.
+- **Nutrition5k** provides 5,006 cafeteria plates, with overhead images for a subset. It has carbohydrate, protein and fat labels but no fibre (per its repository; to be confirmed). How well it transfers to phone photos is evaluated.
 
-**Nutrition5k** has 5,006 cafeteria plates, with overhead images for a subset. Per its official repository (to be confirmed on download), it has carbohydrate, protein and fat labels, but no fibre. Transfer from these cafeteria photos to phone photos is evaluated.
+**Reference macros are noisy supervision.** The reference is consumed macros ÷ share eaten.
+- This assumes proportional consumption, which may fail when particular components are left uneaten.
+- Labels are unusable if the share is below 10%, the photo is missing, or a photo-pair audit finds a mismatch.
+- Only 8.8% of meals are partly eaten, so an analysis restricted to fully consumed meals tests the assumption.
+- Consumed macros serve only as a retrospective comparator.
 
-**Reference macros are noisy supervision.** The before-photo shows the served plate, so the reference is consumed macros ÷ share eaten, after normalising the inconsistently coded share field.
-- This assumes proportional consumption, which *may fail* when particular components are left uneaten.
-- Labels are unusable if the share is below 10%, the before-photo is missing, or a photo-pair audit finds a clear mismatch.
-- Only 8.8% of meals are partly eaten, so a fully-consumed-only analysis tests the assumption.
-- Consumed macros serve as a *retrospective comparator*.
+**Inputs and label.** Inputs are only the before-photo, CGM and heart rate up to the meal, and profile, labs and time. The label is a Dexcom peak rise of at least 50 mg/dL above the 30-minute pre-meal mean, within 2 hours. This is an operational definition, so thresholds of 30 and 70 mg/dL are also reported.
 
-**Inputs and label.**
-- **Inputs** are only the before-photo, CGM and heart rate up to the meal, and profile, labs and time.
-- **Label:** a Dexcom peak rise of ≥50 mg/dL over the 30-minute pre-meal mean within 2 hours. This is an operational definition; 30 and 70 mg/dL are also reported.
-- **Usable windows** need ≥3 baseline readings, ≥70% of post-meal readings, and no gap over 20 minutes, because a missed peak can hide a spike. A stricter rule (≥90% of readings, no gap over 10 minutes) is also reported.
+A window is usable when it has:
+- at least 3 baseline readings;
+- at least 70% of post-meal readings;
+- no gap over 20 minutes.
 
-**Pilot accounting.** 1,526 meals pass all rules. Removing 453 onboarding meals, 19 that cross the 72-hour boundary, and 158 followed by another meal within 2 hours leaves **896**. Of these, 634 come from the 31-person **target cohort** (healthy plus prediabetes), with a 35.2% spike rate.
+A stricter rule is also reported.
+
+**Evaluation populations.**
+- **Isolated-meal cohort (RQ1, RQ2 and pilot):** meals with no other meal within 2 hours and a usable photo.
+- **Operational cohort:** *all* eligible meal events, including those followed by further eating, because the app cannot foresee them. Their outcome is the observed two-hour response, not a response attributed to the first meal. Missing or unusable photos count as abstentions.
+
+**Pilot counts.** 1,526 meals pass the window rules. Removing 453 onboarding meals and 19 that cross the 72-hour boundary leaves 1,054 operational meals. Of these, 896 are isolated meals, and 634 of those come from the 31-person **target cohort** (healthy plus prediabetes), which has a 35.2% spike rate.
 
 | Set | People | Use |
 |---|---|---|
-| Development | 23 target + 14 type 2 diabetes (training only) | **Primary analyses** by nested person-grouped cross-validation (CV). Each outer fold uses only its own training people. Inner 4-fold cross-fitting gives out-of-fold predictions, which fit the temperature, the conformal quantile and the cost thresholds. These are applied to the fold's model refitted on all its training people, then judged on the untouched outer fold. |
-| Locked final set | 8 target (4 healthy, 4 prediabetes) | A secondary check. IDs were frozen on 27 September (seeded draw, SHA-256 hash). These people were in the pilot, so results here are internal evidence only. |
-| Emirati stress set | 30 dishes (to be collected) + 30 in-distribution photos | An exploratory visual-OOD check. The threshold accepts 95% of development photos. |
-
-**Evaluation populations.** RQ1 uses the common set of meals with a usable before-photo. Operational metrics (actions, abstention, workload, cost) use *all* eligible meals. Meals with a missing or unusable photo count as abstentions.
+| Development | 23 target + 14 type 2 diabetes (training only) | **Primary analyses** using nested person-grouped cross-validation (CV). Each outer fold uses only its own training people. Inner 4-fold cross-fitting fits the temperature, conformal quantile and cost thresholds, which are then applied to the refitted fold model. Whether this calibration transfers is tested empirically on the outer fold. |
+| Locked final set | 8 target (4 healthy, 4 prediabetes) | Secondary check only. IDs were frozen on 27 September (seeded, with a SHA-256 hash). They appeared in the pilot, so results are internal evidence only. |
+| Emirati stress set | 30 dishes (to be collected) + 30 in-distribution photos | Exploratory visual-OOD check. The threshold accepts 95% of development photos. |
 
 **Leakage controls.**
-- Every learned stage shares the same person exclusions.
-- The fusion model trains on **out-of-fold photo predictions**.
-- Near-duplicate photos will be removed.
-- A *macro-profile group* test holds meals with identical logged macros out together. It tests macro profiles, not recipes, because CGMacros has no food identifiers. About 30 recurring groups will be checked by eye.
-- A 9-photo spot check found 3–4 packaging or drink photos. These will form a hard-example set.
+- Every learned stage uses the same person exclusions.
+- Fusion trains on **out-of-fold photo predictions**.
+- Near-duplicate photos are removed.
+- A *macro-profile group* test holds out meals with identical logged macros together. This tests macro profiles, not recipes, because the data has no food identifiers.
 
-**Feasibility milestone (week 4).** Carbohydrate mean absolute error (MAE) and bias on ≥100 audited CGMacros photos, from person-excluded predictions only, plus a first RQ1 estimate on the development folds.
+**First feasibility gate (week 4).** Carbohydrate mean absolute error (MAE) and bias on at least 100 audited CGMacros photos, using person-excluded predictions only, plus a first RQ1 estimate. So far, a 9-photo spot check has only flagged packaging and drink photos as a hard category.
 
 ## 4. Scope, evidence, and success
 
-**Deliverables.** An offline containerised Gradio app (risk card, slider, abstention, review queue, monitoring), plus W&B logs, git history and a reproducibility package. The pilot scripts, logs and locked-set file are already committed.
+**Deliverables.**
+- An offline containerised Gradio app with the risk card, slider, abstention, review queue and monitoring.
+- W&B logs, git history and a reproducibility package. The pilot scripts, logs and locked-set file are already committed.
 
-**Out of scope:** dosing, hypoglycaemia, causal claims, substitution advice and live CGM integration.
+**Out of scope:** dosing, hypoglycaemia, causal claims, substitution advice, live CGM integration.
 
-**Exploratory pilot.** Gradient-boosted trees (GBM) were trained within each fold on that fold's training people, from all groups. Scores are AUROC on held-out target-cohort meals (5-fold person CV × 3 seeds). The locked set is included, so these results are optimistic.
+**Exploratory pilot.** Gradient-boosted trees (GBM) were trained within each fold on that fold's training people. They were scored by AUROC on held-out isolated target-cohort meals (5-fold person CV × 3 seeds). The locked set is included, so these figures are optimistic.
 
 | Inputs besides sensor, profile and prior | AUROC |
 |---|---|
@@ -107,42 +105,53 @@ Some prediabetes and wellness programmes give members a CGM for a few weeks. It 
 | Consumed macros (retrospective) | 0.740 |
 | Served macros, fully consumed meals only | 0.741 (no-meal: 0.665) |
 
-- **Meal information** adds **+0.081**, with a paired person-bootstrap 95% CI of +0.050 to +0.122.
-- **Neural network vs GBM:** the difference between a small from-scratch network and the GBM was inconclusive (−0.013, CI −0.051 to +0.028).
-- **Learned vs engineered sequence features:** learned features trailed engineered trends (−0.021, CI −0.042 to +0.005), so RQ2 is genuinely open.
+Meal information adds **+0.081** (paired person-bootstrap 95% CI +0.050 to +0.122). Two comparisons were inconclusive:
+- a from-scratch network vs the GBM: −0.013 (CI −0.051 to +0.028);
+- learned vs engineered sequence features: −0.021 (CI −0.042 to +0.005).
 
-**RQ1 (primary: development CV; secondary: locked set).** Three otherwise identical models are compared. They share the same sensor, profile and prior inputs and use no image embedding. They differ only in meal information: *none*, *photo-predicted* served macros, or *reconstructed* served macros.
+RQ2 is therefore genuinely open.
 
-Let Δ = AUROC(photo) − AUROC(reconstructed), with a paired person-bootstrap 95% CI.
-- **Non-inferior** if the lower bound exceeds −0.03.
-- **Inferior** if the upper bound is below −0.03.
-- **Inconclusive** otherwise.
+**RQ1 (primary: development CV; secondary: locked set).** Three models share identical sensor, profile and prior inputs, with no image embedding. The only difference is the meal information they receive: *none*, *photo-predicted*, or *reconstructed* served macros. All intervals are paired person-bootstrap 95% CIs.
 
-**Incremental value.** The photo model shows incremental value only if the 95% CI of G_photo = AUROC(photo) − AUROC(none) excludes zero. A positive point estimate alone is exploratory.
-- **Reporting:** G_photo and G_reference are reported separately. A retained-gain percentage is descriptive only, because it is unstable when G_reference is small.
-- **Margin:** 0.03 is about one-third of the *pilot* meal-information gain.
-- **Simulation:** an illustrative run with multiplicative log-normal macro noise (CV 25%) gave CI widths of about 0.04 for the target cohort and 0.06 for 8 people. Real photo errors may be systematic, so this is not a power guarantee.
-- **Also reported:** carbohydrate MAE and bias. The image embedding is tested separately.
+- **Photo vs reconstructed.** For Δ = AUROC(photo) − AUROC(reconstructed):
+  - *non-inferior* if the lower bound exceeds −0.03;
+  - *inferior* if the upper bound is below −0.03;
+  - *inconclusive* otherwise.
 
-**RQ2.** A paired ΔAUROC compares the learned sensor encoder with engineered trends, with all other inputs identical.
+  The 0.03 margin is about one-third of the *pilot* meal-information gain.
+- **Photo vs none.** For G_photo = AUROC(photo) − AUROC(none):
+  - *positive incremental value* only if the **lower bound exceeds zero**;
+  - *degradation* if the interval lies wholly below zero;
+  - *inconclusive* otherwise.
 
-**Exploratory targets** (target cohort, reported with counts and denominators):
-- **Discrimination:** fusion AUROC ≥ a *fair GBM* given the same photo-predicted macros, engineered sensor features, profile and prior.
-- **Rise:** MAE below that of a GBM rise regressor.
-- **Calibration:** expected calibration error (ECE) ≤ 0.05 (15 equal-mass bins), with reliability diagrams.
-- **Intervals:** cross-fitted conformal quantile regression. The conformal quantile comes from the inner out-of-fold residuals, weighting each person by 1/(their meal count). No coverage guarantee is claimed. Target pooled coverage is 75–85% at 80% nominal, with person-averaged coverage and width reported.
-- **Usefulness:** requires all three of the following, with action proportions reported and zero cleared meals counting as failure:
-  - expected cost ≥ 10% below the better of *always caution* and *always low risk*;
-  - ≥ 20% of meals cleared as low risk, with ≤ 10% of those spiking;
-  - abstention ≤ 20%.
+G_photo and G_reference are reported separately, alongside carbohydrate MAE and bias. The image embedding is tested separately.
 
-**Costs** (spike / no spike) are assumptions: low risk 5/0, caution 0/1, abstain 2/0.5. Sweeps vary the missed-spike cost from 3 to 10 and scale the abstain costs by 0.5–4×.
+**RQ2.** Paired ΔAUROC of the learned sensor encoder vs engineered trends, with other inputs identical.
 
-**Formative checks.** A 5-person think-aloud test checks that users can tell *abstain* from *low risk*. Latency is measured on the stated hardware.
+**Exploratory targets** (target cohort, with counts and denominators):
+- **Discrimination:** fusion AUROC ≥ a *fair GBM* given the same photo-predicted macros, sensor features, profile and prior.
+- **Rise prediction:** MAE below a GBM rise regressor.
+- **Calibration:** expected calibration error (ECE) ≤0.05, with reliability diagrams.
+- **Rise intervals:** cross-fitted conformal quantile regression, weighting each person by 1/(their meal count). No guarantee is claimed; pooled coverage should be 75–85% at 80% nominal.
+- **Usefulness** (operational cohort; zero cleared meals counts as failure):
+  - cost at least 10% below the better of *always caution* and *always low risk*;
+  - at least 20% of meals cleared, with at most 10% of those spiking;
+  - abstention at most 20%.
 
-**Explainability and robustness.**
-- **Probes:** photo swaps with the sensor state held fixed; flat vs rising traces at equal glucose; branch masking. These complement the retrained no-meal baseline.
-- **Failure analysis:** failures are grouped by photo type, health group and trend.
-- **Stress tests:** blur and camera angle, CGM gaps, Dexcom-to-Libre transfer, missing heart rate or labs, and a sensor-free mode.
+**Costs** (spike / no spike) are assumptions, not demonstrated health benefit:
 
-No overlap with MAAI7102 (1–5-year data-centre power forecasting).
+| Action | Spike | No spike |
+|---|---|---|
+| Low risk | 5 | 0 |
+| Caution | 0 | 1 |
+| Abstain | 2 | 0.5 |
+
+Sensitivity sweeps vary the missed-spike cost from 3 to 10 and scale the abstain costs by 0.5–4×.
+
+**Other evidence.**
+- **Usability:** a 5-person formative think-aloud test checks that users can tell *abstain* from *low risk*.
+- **Probes:** photo swaps with the sensor state fixed, flat vs rising traces at equal glucose, and branch masking.
+- **Failure analysis:** failures are broken down by photo type, health group and trend.
+- **Stress tests:** blur, CGM gaps, a Dexcom-to-Libre switch, missing heart rate or labs, and a sensor-free mode.
+
+There is no overlap with MAAI7102 (1–5-year data-centre power forecasting).
