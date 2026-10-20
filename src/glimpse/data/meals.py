@@ -4,9 +4,16 @@ Only information available BEFORE eating is used as model input. Consumed macros
 solely to reconstruct the served-macro reference (consumed / share, proportional-consumption assumption).
 """
 from __future__ import annotations
-import glob, os, re
+
+import glob
+import os
+import re
+
 import numpy as np
 import pandas as pd
+from loguru import logger
+
+from glimpse.config import GlimpseConfig
 
 MACROS = ["carbs", "protein", "fat", "fiber", "kcal"]
 
@@ -35,9 +42,12 @@ def load_bio(root: str) -> pd.DataFrame:
     return b[["sid", "a1c", "fglu", "fins", "BMI", "Age", "Triglycerides", "group"]]
 
 
-def build_meals(root: str, cfg: dict) -> pd.DataFrame:
+def build_meals(cfg: GlimpseConfig) -> pd.DataFrame:
     """Return one row per labelled meal with pre-meal features, served/consumed macros, label and quality flags."""
-    L, W, Mc = cfg["label"], cfg["window_rules"], cfg["meals"]
+    root = str(cfg.data.cgmacros_root)
+    L, W, Mc = cfg.label, cfg.window_rules, cfg.meals
+    log = logger.bind(stage="data")
+    log.info("building meal table from {}", root)
     rows = []
     for f in sorted(glob.glob(os.path.join(root, "CGMacros-*", "CGMacros-*.csv"))):
         sid = int(re.findall(r"(\d+)", os.path.basename(f))[-1])
@@ -51,12 +61,12 @@ def build_meals(root: str, cfg: dict) -> pd.DataFrame:
         meals = d[pd.to_numeric(d["Calories"], errors="coerce").fillna(0) > 0]
         times = list(meals.index)
         for i, t in enumerate(times):
-            pre = g[t - pd.Timedelta(minutes=L["baseline_window_min"]):t].dropna()
-            post = g[t + pd.Timedelta("1min"):t + pd.Timedelta(minutes=L["horizon_min"])]
+            pre = g[t - pd.Timedelta(minutes=L.baseline_window_min):t].dropna()
+            post = g[t + pd.Timedelta("1min"):t + pd.Timedelta(minutes=L.horizon_min)]
             obs = post.dropna()
-            if len(pre) < W["min_baseline_readings"] or len(obs) == 0:
+            if len(pre) < W.min_baseline_readings or len(obs) == 0:
                 continue
-            edges = [t] + list(obs.index) + [t + pd.Timedelta(minutes=L["horizon_min"])]
+            edges = [t] + list(obs.index) + [t + pd.Timedelta(minutes=L.horizon_min)]
             max_gap = max((b - a).total_seconds() / 60 for a, b in zip(edges[:-1], edges[1:]))
             coverage = post.notna().mean()
             r = meals.loc[t]
@@ -65,9 +75,9 @@ def build_meals(root: str, cfg: dict) -> pd.DataFrame:
             prev = [u for u in times[:i] if u < t]
             row = dict(
                 sid=sid, t=t, base=pre.mean(), rise=obs.max() - pre.mean(), coverage=coverage, max_gap=max_gap,
-                usable=(coverage >= W["min_post_coverage"]) and (max_gap <= W["max_gap_min"]),
-                usable_strict=(coverage >= W["strict"]["min_post_coverage"]) and (max_gap <= W["strict"]["max_gap_min"]),
-                next_meal_within=any(t < u <= t + pd.Timedelta(minutes=Mc["exclude_next_meal_within_min"]) for u in times[i + 1:i + 3]),
+                usable=(coverage >= W.min_post_coverage) and (max_gap <= W.max_gap_min),
+                usable_strict=(coverage >= W.strict.min_post_coverage) and (max_gap <= W.strict.max_gap_min),
+                next_meal_within=any(t < u <= t + pd.Timedelta(minutes=Mc.exclude_next_meal_within_min) for u in times[i + 1:i + 3]),
                 share=share, photo=r.get("Image path"),
                 slope60=_slope(g[t - pd.Timedelta("60min"):t]), slope20=_slope(g[t - pd.Timedelta("20min"):t]),
                 sd120=g[t - pd.Timedelta("120min"):t].std(), min120=g[t - pd.Timedelta("120min"):t].min(),
@@ -81,26 +91,29 @@ def build_meals(root: str, cfg: dict) -> pd.DataFrame:
                 row[f"{m}_served"] = row[f"{m}_consumed"] * 100.0 / share
             rows.append(row)
     M = pd.DataFrame(rows).merge(load_bio(root), on="sid", how="left")
-    for thr in [L["spike_threshold_mgdl"]] + list(L["sensitivity_thresholds"]):
-        M[f"spike{thr}"] = (M.rise >= thr).astype(int)
-    M = M[M.share >= Mc["min_share_eaten_pct"]]
+    for thr in [L.spike_threshold_mgdl, *L.sensitivity_thresholds]:
+        M[f"spike{thr:g}"] = (M.rise >= thr).astype(int)
+    M = M[M.share >= Mc.min_share_eaten_pct]
     # 72-h onboarding, measured from each person's first labelled meal
     start = M.groupby("sid").t.transform("min")
-    h = pd.Timedelta(hours=cfg["onboarding"]["hours"])
-    M["onboarding"] = (M.t + pd.Timedelta(minutes=L["horizon_min"])) <= start + h
+    h = pd.Timedelta(hours=cfg.onboarding.hours)
+    M["onboarding"] = (M.t + pd.Timedelta(minutes=L.horizon_min)) <= start + h
     M["post_onboarding"] = M.t >= start + h
-    return M.sort_values(["sid", "t"]).reset_index(drop=True)
+    M = M.sort_values(["sid", "t"]).reset_index(drop=True)
+    log.info("meal table: {} rows, {} people, {} usable", len(M), M.sid.nunique(), int(M.usable.sum()))
+    log.debug("missing values per column: {}", M.isna().sum()[M.isna().sum() > 0].to_dict())
+    return M
 
 
-def add_personal_prior(M: pd.DataFrame, cfg: dict, train_target_sids=None) -> pd.DataFrame:
+def add_personal_prior(M: pd.DataFrame, cfg: GlimpseConfig, train_target_sids=None) -> pd.DataFrame:
     """Personal prior from onboarding meals; population prior (training target cohort only) if < min meals."""
-    thr = cfg["label"]["spike_threshold_mgdl"]
+    thr = cfg.label.spike_threshold_mgdl
     on = M[M.onboarding & M.usable]
-    stats = on.groupby("sid").agg(n=(f"spike{thr}", "size"), prior_rate=(f"spike{thr}", "mean"), prior_rise=("rise", "mean"))
+    stats = on.groupby("sid").agg(n=(f"spike{thr:g}", "size"), prior_rate=(f"spike{thr:g}", "mean"), prior_rise=("rise", "mean"))
     pool = on if train_target_sids is None else on[on.sid.isin(train_target_sids)]
-    pop_rate, pop_rise = pool[f"spike{thr}"].mean(), pool.rise.mean()
+    pop_rate, pop_rise = pool[f"spike{thr:g}"].mean(), pool.rise.mean()
     M = M.join(stats, on="sid")
-    few = M.n.fillna(0) < cfg["onboarding"]["min_meals_for_personal_prior"]
+    few = M.n.fillna(0) < cfg.onboarding.min_meals_for_personal_prior
     M.loc[few, "prior_rate"], M.loc[few, "prior_rise"] = pop_rate, pop_rise
     return M.drop(columns="n")
 

@@ -1,4 +1,12 @@
-# GLIMPSE default configuration (mirrors the proposal's prespecified rules)
+# GLIMPSE default configuration. Validated at startup by glimpse.config.GlimpseConfig (unknown keys are errors).
+seed: 20260927                               # Python, NumPy and torch seeds (glimpse.utils.seed)
+device: cpu                                  # cpu is the reference device; mps/cuda optional (results not bit-identical)
+paths:
+  outputs: outputs
+  logs: logs
+  checkpoints: checkpoints
+  weights_cache: data/weights
+  meals_table: data/meals.parquet
 data:
   cgmacros_root: data/cgmacros/CGMacros      # folder containing CGMacros-0XX/ and bio.csv
   nutrition5k_root: data/nutrition5k
@@ -26,10 +34,10 @@ cv:
   inner_folds: 4
   seeds: [0, 1, 2]
 costs:                                        # (spike, no_spike); assumptions, swept in sensitivity analysis
-  low_risk: [5, 0]
+  low_risk: [3, 0]                           # missed spike : unnecessary caution = 3:1 (design decision, Oct 2026)
   caution: [0, 1]
   abstain: [2, 0.5]
-  sweep_missed_spike: [3, 5, 7, 10]
+  sweep_missed_spike: [2, 3, 5]
   sweep_abstain_multiplier: [0.5, 1, 2, 4]
 targets:
   rq1_noninferiority_margin: 0.03
@@ -38,3 +46,13 @@ targets:
   conformal_nominal: 0.80
   usefulness: {min_cost_reduction: 0.10, min_cleared: 0.20, max_missed_among_cleared: 0.10, max_abstain: 0.20}
   latency_p95_ms: 300
+pipeline:                                    # deterministic input checks, run before any model
+  cgm_lookback_min: 120                      # sensor window fed to the model (24 x 5-min readings)
+  min_cgm_readings_last_30min: 3             # same rule as the training label baseline
+  min_cgm_coverage: 0.70                     # share of expected 5-min readings present in the lookback
+  max_cgm_gap_min: 20
+  glucose_range_mgdl: [40, 400]              # Dexcom reportable range
+  min_photo_side_px: 64
+decision:                                    # provisional until chosen on out-of-fold development predictions
+  low_risk_below: 0.20                       # spike probability below this -> low risk
+  caution_at_or_above: 0.30                  # at or above this -> caution; in between -> abstain (low confidence)

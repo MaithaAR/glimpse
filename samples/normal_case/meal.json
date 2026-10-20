@@ -1,0 +1,11 @@
+{
+  "meal_time": "2026-10-20T13:00:00",
+  "photo": "photo.jpg",
+  "profile": {
+    "age": 42,
+    "bmi": 27.5,
+    "a1c_pct": 5.9,
+    "fasting_glucose_mgdl": 104
+  },
+  "_note": "SYNTHETIC example: full 2-hour CGM trace rising ~0.9 mg/dL/min before the meal; synthetic plate image."
+}

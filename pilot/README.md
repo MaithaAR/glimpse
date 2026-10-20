@@ -9,3 +9,8 @@ Exploratory feasibility analysis on CGMacros v1.0.0 (PhysioNet). All 45 particip
 | test4.py | Improved CNN (separate encoders, multitask, 5-seed ensemble), self-supervised pretraining, monotone-carbohydrate head, ensembles, swap test on held-out meals | test4.log |
 
 Data path in the scripts: R = "<folder>/cgmacros/CGMacros" (edit to where CGMacros was unzipped). Meal accounting: 1,640 meals with complete 2-h window -> 509 onboarding (first ~30% per person) -> 1,131 -> 170 overlapping (next meal < 2 h) -> 961 evaluation meals (928 with photo).
+
+## Archived proposal-stage scripts (`pilot/proposal_scripts/`)
+The scripts that produced the proposal's pilot numbers (`results/`) were moved here unchanged when the project
+switched to the Python 3.14 / uv / Pydantic / Loguru structure. They ran under Python 3.11 (`requirements_py311.txt`)
+and depend on `efficientnet_pytorch`, which has no Python 3.14 build; their logic is being re-implemented in `src/glimpse/`.

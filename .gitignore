@@ -1,7 +1,19 @@
-data/
+# downloaded data and weights (CGMacros is CC BY-NC-SA: never commit participant data or photos)
+/data/
 *.parquet
 meals.csv
+# generated
+outputs/
+logs/
 wandb/
+.venv/
 __pycache__/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 .DS_Store
 results/photo_features*.npz
+# checkpoints: only small final ones are committed explicitly (git add -f)
+checkpoints/*
+!checkpoints/.gitkeep
