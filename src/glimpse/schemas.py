@@ -79,6 +79,17 @@ class MealSample(_Contract):
     rise_mgdl: float
     spike: Literal[0, 1]
     carbs_served_g: float | None = Field(default=None, ge=0)
+    onboarding: bool  # outcome window ends inside the person's first 72 h (feeds the personal prior)
+    isolated: bool  # post-onboarding and no further meal within 2 h (primary evaluation population)
+    premeal_ok: bool  # passes the same pre-meal sensor checks the product applies at inference
+
+    @field_validator("rise_mgdl")
+    @classmethod
+    def _plausible_rise(cls, v: float) -> float:
+        """A 2-hour rise outside +/-400 mg/dL is a sensor artefact, not physiology."""
+        if not -400 < v < 400:
+            raise ValueError(f"implausible glucose rise {v}")
+        return v
 
 
 # ---------------------------------------------------------------- outputs

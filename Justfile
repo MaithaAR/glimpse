@@ -12,6 +12,11 @@ install:
     uv sync
     uv run glimpse download-weights --config {{config}}
     uv run glimpse download-data --config {{config}}
+    uv run glimpse prepare --config {{config}}
+
+# rebuild the dataset, splits, normaliser and data-quality reports from the downloaded data
+prepare:
+    uv run glimpse prepare --config {{config}}
 
 # train both models (scratch sensor CNN and fine-tuned photo model)
 train: train-scratch train-finetune

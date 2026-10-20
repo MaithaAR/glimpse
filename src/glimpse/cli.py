@@ -55,6 +55,26 @@ def _cmd_build_meals(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_prepare(args: argparse.Namespace) -> int:
+    """Build the validated dataset, the person-grouped splits, the training-only normaliser and data reports."""
+    from glimpse.data.dataset import build_dataset
+    from glimpse.data.normalise import Normaliser
+    from glimpse.data.quality import write_reports
+    from glimpse.data.splits import make_splits
+
+    cfg = args.cfg
+    ds = build_dataset(cfg)
+    ds.save(Path(cfg.paths.dataset))
+    sp = make_splits(ds, cfg)
+    sp.save(Path(cfg.paths.splits))
+    train = [i for i, s in enumerate(ds.samples) if s.person_id in set(sp.train)]
+    norm = Normaliser.fit(ds.glucose[train], ds.heart_rate[train], ds.tabular[train], ds.tabular_names)
+    norm.save(Path(cfg.paths.normaliser))
+    write_reports(ds, sp, Path(cfg.data.cgmacros_root), Path(cfg.paths.outputs) / "data")
+    logger.bind(stage="prepare").info("dataset, splits, normaliser and data reports written")
+    return 0
+
+
 def _cmd_not_ready(args: argparse.Namespace) -> int:
     """Placeholder for milestones not built yet."""
     logger.bind(stage=args.command).error("'{}' is not implemented yet in this milestone", args.command)
@@ -74,6 +94,7 @@ def main(argv: list[str] | None = None) -> int:
     dd.set_defaults(func=_cmd_download_data)
     sub.add_parser("download-weights", help="download pretrained weights").set_defaults(func=_cmd_download_weights)
     sub.add_parser("build-meals", help="build the labelled meal table").set_defaults(func=_cmd_build_meals)
+    sub.add_parser("prepare", help="dataset, splits, normaliser, data reports").set_defaults(func=_cmd_prepare)
     t = sub.add_parser("train", help="train a model")
     t.add_argument("--model", choices=["scratch", "finetune"], required=True)
     t.set_defaults(func=_cmd_not_ready)

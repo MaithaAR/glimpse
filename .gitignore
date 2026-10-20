@@ -17,3 +17,4 @@ results/photo_features*.npz
 # checkpoints: only small final ones are committed explicitly (git add -f)
 checkpoints/*
 !checkpoints/.gitkeep
+!checkpoints/normaliser.json

@@ -23,6 +23,9 @@ class Paths(_Strict):
     checkpoints: Path
     weights_cache: Path
     meals_table: Path
+    dataset: Path
+    splits: Path
+    normaliser: Path
 
 
 class DataCfg(_Strict):
