@@ -22,6 +22,7 @@ class Paths(_Strict):
     logs: Path
     checkpoints: Path
     weights_cache: Path
+    feature_cache: Path
     meals_table: Path
     dataset: Path
     splits: Path
@@ -160,12 +161,31 @@ class ScratchTrainCfg(_Strict):
     augment: bool
 
 
+class FinetuneCfg(_Strict):
+    """Hyperparameters of the fine-tuned photo model."""
+
+    arch: str
+    views_per_photo: int = Field(ge=1, le=16)
+    batch_size: int = Field(ge=1, le=1024)
+    lr_heads: float = Field(gt=0, lt=1)
+    lr_stage3: float = Field(gt=0, lt=1)
+    weight_decay: float = Field(ge=0, lt=1)
+    dropout: float = Field(ge=0, lt=1)
+    phase1_max_epochs: int = Field(ge=1)
+    patience: int = Field(ge=1)
+    phase2_epochs: int = Field(ge=0)
+    cv_folds: int = Field(ge=2, le=10)
+    bin_loss_weight: float = Field(ge=0)
+    huber_delta: float = Field(gt=0)
+
+
 class TrainingCfg(_Strict):
     """Training settings shared by both models."""
 
     num_threads: int = Field(ge=1, le=64)
     tensorboard_dir: Path
     scratch: ScratchTrainCfg
+    finetune: FinetuneCfg
 
 
 class GlimpseConfig(_Strict):

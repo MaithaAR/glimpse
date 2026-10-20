@@ -6,6 +6,7 @@ paths:
   logs: logs
   checkpoints: checkpoints
   weights_cache: data/weights
+  feature_cache: data/cache
   meals_table: data/meals.parquet
   dataset: data/dataset.npz                  # validated samples + sensor windows (built by `glimpse prepare`)
   splits: splits/dev_splits.json             # person-grouped train/validation/test + CV folds (committed)
@@ -74,3 +75,17 @@ training:
     patience: 12                             # early stopping on cross-validated loss
     cv_folds: 4                              # person-grouped folds inside the training people choose the epoch count
     augment: true
+  finetune:                                  # pretrained ConvNeXt-Tiny photo model (photo -> served carbs)
+    arch: convnext_tiny.fb_in22k_ft_in1k
+    views_per_photo: 4                       # augmented copies per training photo, cached once (stem + stages 0-2)
+    batch_size: 32
+    lr_heads: 0.001
+    lr_stage3: 0.0001
+    weight_decay: 0.05
+    dropout: 0.2
+    phase1_max_epochs: 60                    # heads only (frozen backbone)
+    patience: 10
+    phase2_epochs: 3                         # max stage-3 epochs; count and keep/drop chosen by person-grouped CV
+    cv_folds: 3
+    bin_loss_weight: 0.5                     # loss = Huber(log1p carbs) + 0.5 * cross-entropy(carb bin)
+    huber_delta: 1.0

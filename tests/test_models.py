@@ -31,3 +31,32 @@ def test_parameter_budget_within_limits():
     rows = budget_table()
     assert all(r.within_limit for r in rows)
     assert {r.architecture for r in rows} >= {"convnext_tiny", "vit_small_patch14_dinov2"}
+
+
+def test_photo_model_split_matches_full_and_heads_shapes():
+    """lower+upper equals the full backbone; heads give (B,) log-carbs and (B, 4) bin logits; carb bins are right."""
+    from glimpse.models.photo_model import PhotoCarbModel, carb_bin
+
+    torch.manual_seed(0)
+    m = PhotoCarbModel(pretrained=False).eval()
+    x = torch.randn(2, 3, 224, 224)
+    with torch.no_grad():
+        feats = m.lower(x)
+        assert feats.shape == (2, 384, 14, 14)
+        assert torch.allclose(m.upper(feats), m.backbone(x), atol=1e-4)
+        reg, bins = m(x)
+    assert reg.shape == (2,) and bins.shape == (2, 4)
+    assert carb_bin(torch.tensor([0.0, 29.9, 30.0, 59.9, 60.0, 90.0, 200.0])).tolist() == [0, 0, 1, 1, 2, 3, 3]
+
+
+def test_photo_model_trainable_parts():
+    """Phase 1 trains only the heads; phase 2 adds stage 3 + final norm; the saved state is just those parts."""
+    from glimpse.models.photo_model import PhotoCarbModel
+
+    m = PhotoCarbModel(pretrained=False)
+    m.set_trainable(stage3=False)
+    assert sum(p.numel() for p in m.parameters() if p.requires_grad) == 768 * 5 + 5
+    m.set_trainable(stage3=True)
+    n_train = sum(p.numel() for p in m.parameters() if p.requires_grad)
+    assert n_train == sum(v.numel() for v in m.trainable_state().values())
+    assert not any(p.requires_grad for p in m.backbone.stem.parameters())

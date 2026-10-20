@@ -20,3 +20,5 @@ checkpoints/*
 !checkpoints/normaliser.json
 !checkpoints/sensor_cnn_*.pt
 !checkpoints/sensor_cnn_latest.txt
+!checkpoints/photo_convnext_*.pt
+!checkpoints/photo_convnext_latest.txt

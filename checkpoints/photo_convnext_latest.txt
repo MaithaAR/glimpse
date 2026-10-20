@@ -1,0 +1,1 @@
+photo_convnext_e07_valmae26.5.pt

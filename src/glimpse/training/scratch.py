@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -112,7 +113,7 @@ def train_scratch(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
     """Choose the epoch count by person-grouped CV inside the training people, retrain on all of them, save."""
     hp, out = cfg.training.scratch, Path(cfg.paths.outputs) / "training"
     log = logger.bind(stage="train", model=MODEL)
-    torch.set_num_threads(cfg.training.num_threads)
+    torch.set_num_threads(min(cfg.training.num_threads, os.cpu_count() or 1))  # never oversubscribe the CPU
     elog = EpochLogger(out / f"{MODEL}_history.csv", Path(cfg.training.tensorboard_dir) / MODEL)
     train_people = sorted(sp.train)
     target = {s.person_id for s in ds.samples if s.group in cfg.cohort.target_groups}

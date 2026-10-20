@@ -88,7 +88,10 @@ def _cmd_train(args: argparse.Namespace) -> int:
 
         train_scratch(ds, sp, cfg)
         return 0
-    return _cmd_not_ready(args)
+    from glimpse.training.finetune import finetune_photo
+
+    finetune_photo(ds, sp, cfg)
+    return 0
 
 
 def _cmd_params(args: argparse.Namespace) -> int:
