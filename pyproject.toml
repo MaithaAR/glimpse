@@ -20,6 +20,7 @@ dependencies = [
   "pillow>=11,<14",
   "matplotlib>=3.9,<4",
   "remotezip>=0.12,<1",
+  "tensorboard>=2.18,<3",
 ]
 
 [dependency-groups]

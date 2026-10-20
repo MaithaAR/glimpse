@@ -75,6 +75,30 @@ def _cmd_prepare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_train(args: argparse.Namespace) -> int:
+    """Train the requested model on the prepared dataset and splits."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits
+
+    cfg = args.cfg
+    ds = MealDataset.load(Path(cfg.paths.dataset))
+    sp = Splits.load(Path(cfg.paths.splits))
+    if args.model == "scratch":
+        from glimpse.training.scratch import train_scratch
+
+        train_scratch(ds, sp, cfg)
+        return 0
+    return _cmd_not_ready(args)
+
+
+def _cmd_params(args: argparse.Namespace) -> int:
+    """Write the programmatic parameter-budget table to outputs/."""
+    from glimpse.models.budget import write_budget
+
+    write_budget(Path(args.cfg.paths.outputs) / "param_budget.csv")
+    return 0
+
+
 def _cmd_not_ready(args: argparse.Namespace) -> int:
     """Placeholder for milestones not built yet."""
     logger.bind(stage=args.command).error("'{}' is not implemented yet in this milestone", args.command)
@@ -95,9 +119,10 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("download-weights", help="download pretrained weights").set_defaults(func=_cmd_download_weights)
     sub.add_parser("build-meals", help="build the labelled meal table").set_defaults(func=_cmd_build_meals)
     sub.add_parser("prepare", help="dataset, splits, normaliser, data reports").set_defaults(func=_cmd_prepare)
+    sub.add_parser("params", help="parameter budget table").set_defaults(func=_cmd_params)
     t = sub.add_parser("train", help="train a model")
     t.add_argument("--model", choices=["scratch", "finetune"], required=True)
-    t.set_defaults(func=_cmd_not_ready)
+    t.set_defaults(func=_cmd_train)
     sub.add_parser("evaluate", help="evaluate models and baselines").set_defaults(func=_cmd_not_ready)
     for sp in sub.choices.values():  # allow --config after the sub-command too (as the Justfile does)
         sp.add_argument("--config", default=argparse.SUPPRESS)

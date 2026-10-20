@@ -59,3 +59,18 @@ pipeline:                                    # deterministic input checks, run b
 decision:                                    # provisional until chosen on out-of-fold development predictions
   low_risk_below: 0.20                       # spike probability below this -> low risk
   caution_at_or_above: 0.30                  # at or above this -> caution; in between -> abstain (low confidence)
+training:
+  num_threads: 4                             # fixed CPU thread count for reproducible reported runs
+  tensorboard_dir: logs/tensorboard
+  scratch:                                   # 1-D CNN sensor model, trained from scratch
+    channels: 16
+    hidden: 32
+    dropout: 0.2
+    lr: 0.001                                # lowest CV loss of 5 settings compared on training-people CV (all within 0.01 AUROC)
+    weight_decay: 0.01
+    batch_size: 64
+    max_epochs: 60
+    warmup_epochs: 3
+    patience: 12                             # early stopping on cross-validated loss
+    cv_folds: 4                              # person-grouped folds inside the training people choose the epoch count
+    augment: true

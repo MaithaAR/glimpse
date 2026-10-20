@@ -144,6 +144,30 @@ class DecisionCfg(_Strict):
         return self
 
 
+class ScratchTrainCfg(_Strict):
+    """Hyperparameters of the from-scratch sensor CNN."""
+
+    channels: int = Field(ge=1, le=256)
+    hidden: int = Field(ge=1, le=1024)
+    dropout: float = Field(ge=0, lt=1)
+    lr: float = Field(gt=0, lt=1)
+    weight_decay: float = Field(ge=0, lt=1)
+    batch_size: int = Field(ge=1, le=4096)
+    max_epochs: int = Field(ge=1, le=1000)
+    warmup_epochs: int = Field(ge=0)
+    patience: int = Field(ge=1)
+    cv_folds: int = Field(ge=2, le=10)
+    augment: bool
+
+
+class TrainingCfg(_Strict):
+    """Training settings shared by both models."""
+
+    num_threads: int = Field(ge=1, le=64)
+    tensorboard_dir: Path
+    scratch: ScratchTrainCfg
+
+
 class GlimpseConfig(_Strict):
     """Complete project configuration."""
 
@@ -161,6 +185,7 @@ class GlimpseConfig(_Strict):
     targets: TargetsCfg
     pipeline: PipelineCfg
     decision: DecisionCfg
+    training: TrainingCfg
 
 
 def load_config(path: str | Path = "configs/default.yaml") -> GlimpseConfig:

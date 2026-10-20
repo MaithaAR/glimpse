@@ -1,0 +1,1 @@
+sensor_cnn_e17_valauc0.646.pt

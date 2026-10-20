@@ -18,3 +18,5 @@ results/photo_features*.npz
 checkpoints/*
 !checkpoints/.gitkeep
 !checkpoints/normaliser.json
+!checkpoints/sensor_cnn_*.pt
+!checkpoints/sensor_cnn_latest.txt
