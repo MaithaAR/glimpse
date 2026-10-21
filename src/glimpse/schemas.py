@@ -133,16 +133,74 @@ class RiskCard(_Contract):
 # ---------------------------------------------------------------- evaluation
 
 
-class EvalResult(_Contract):
-    """One model's metrics on one split."""
+class SpikeEval(_Contract):
+    """One spike-risk model (or baseline) on one split; CIs resample people."""
 
-    model_name: str
-    split: Literal["validation", "test", "cv"]
-    n_meals: int = Field(ge=0)
-    n_people: int = Field(ge=0)
+    model: str
+    kind: Literal["trivial", "heuristic", "classical", "scratch"]
+    split: Literal["validation", "test"]
+    n_meals: int = Field(ge=1)
+    n_people: int = Field(ge=1)
+    n_spikes: int = Field(ge=0)
     auroc: float = Field(ge=0, le=1)
     auroc_ci: tuple[float, float]
+    auprc: float = Field(ge=0, le=1)
     brier: float = Field(ge=0, le=1)
-    ece: float = Field(ge=0, le=1)
-    abstention_rate: float = Field(ge=0, le=1)
-    latency_ms_p95: float | None = Field(default=None, ge=0)
+    ece_equal_width: float = Field(ge=0, le=1)
+    ece_equal_mass: float = Field(ge=0, le=1)
+    delta_auroc_vs_cnn: float | None = None  # this model minus the sensor CNN, paired over the same meals
+    delta_ci: tuple[float, float] | None = None
+
+
+class PhotoEval(_Contract):
+    """One carbohydrate estimator on the test photos."""
+
+    model: str
+    n_photos: int = Field(ge=1)
+    n_people: int = Field(ge=1)
+    mae_g: float = Field(ge=0)
+    mae_ci: tuple[float, float]
+    spearman: float | None = Field(default=None, ge=-1, le=1)  # undefined for a constant predictor
+    bin_macro_f1: float = Field(ge=0, le=1)
+    mae_profile_excluded_g: float | None = Field(default=None, ge=0)
+    n_profile_excluded: int = Field(ge=0)
+
+
+class DecisionEval(_Contract):
+    """Decision-level (business) metrics of the thresholded sensor CNN on one split."""
+
+    split: Literal["validation", "test"]
+    thresholds: tuple[float, float]
+    threshold_source: str
+    share_low_risk: float = Field(ge=0, le=1)
+    share_caution: float = Field(ge=0, le=1)
+    share_abstain: float = Field(ge=0, le=1)
+    spike_rate_among_cleared: float | None = None
+    cost: float = Field(ge=0)
+    best_trivial_cost: float = Field(ge=0)
+    cost_reduction: float
+    cost_reduction_ci: tuple[float, float]
+    cost_reduction_by_missed_spike_cost: dict[str, float]
+
+
+class LatencyEval(_Contract):
+    """Warm single-meal CPU inference time (ms) per component and in total."""
+
+    n_meals: int = Field(ge=1)
+    threads: int = Field(ge=1)
+    sensor_p50: float = Field(ge=0)
+    sensor_p95: float = Field(ge=0)
+    photo_p50: float = Field(ge=0)
+    photo_p95: float = Field(ge=0)
+    total_p50: float = Field(ge=0)
+    total_p95: float = Field(ge=0)
+
+
+class TargetStatus(_Contract):
+    """A proposal success criterion next to the current result."""
+
+    criterion: str
+    target: str
+    result: str
+    status: Literal["met", "on track", "at risk", "deferred"]
+    note: str = ""

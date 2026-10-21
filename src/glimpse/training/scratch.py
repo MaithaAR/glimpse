@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import torch
 from loguru import logger
 from sklearn.metrics import roc_auc_score
@@ -119,7 +120,7 @@ def train_scratch(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
     target = {s.person_id for s in ds.samples if s.group in cfg.cohort.target_groups}
     folds = stratified_person_folds(train_people, target, hp.cv_folds, cfg.seed)
     best_epochs: list[int] = []
-    oof_p, oof_y, oof_target = [], [], []
+    oof_p, oof_y, oof_target, oof_rows = [], [], [], []
     log.info("cross-validation: {} folds over {} training people", hp.cv_folds, len(train_people))
     for k, held in enumerate(folds):
         fit_people = set(train_people) - set(held)
@@ -132,6 +133,7 @@ def train_scratch(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
         oof_p.append(predict_proba(m, val[0]))
         oof_y.append(val[1])
         oof_target.append(np.array([ds.samples[i].person_id in target for i in vr]))
+        oof_rows.append(vr)
         log.info("fold {} best epoch {}", k, be)
     epochs = int(np.median(best_epochs))
     p, y, t = np.concatenate(oof_p), np.concatenate(oof_y), np.concatenate(oof_target)
@@ -140,6 +142,9 @@ def train_scratch(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
           "n_heldout_target_meals": int(t.sum())}  # fmt: skip
     out.mkdir(parents=True, exist_ok=True)
     (out / f"{MODEL}_cv_summary.json").write_text(json.dumps(cv, indent=2))
+    rows = np.concatenate(oof_rows)  # held-out predictions: used later to choose the abstention band (never test)
+    pd.DataFrame({"row": rows, "person_id": [ds.samples[i].person_id for i in rows], "target_cohort": t,
+                  "spike": y, "p_spike": p}).to_csv(out / f"{MODEL}_oof.csv", index=False)  # fmt: skip
     log.info("CV: best epochs {} -> {} epochs; held-out AUROC all {:.3f}, target cohort only {:.3f}",
              best_epochs, epochs, cv["auroc_all_heldout"], cv["auroc_target_cohort_heldout"])  # fmt: skip
 

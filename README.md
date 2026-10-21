@@ -17,7 +17,7 @@ The CPU is the reference device; on Linux `uv` installs CPU-only torch.
 configs/default.yaml       every rule and hyperparameter (validated at startup by glimpse.config)
 src/glimpse/
   config.py                Pydantic config model (unknown keys / invalid values fail fast)
-  schemas.py               Pydantic contracts: PreMealInput, MealSample, RiskCard, EvalResult
+  schemas.py               Pydantic contracts: PreMealInput, MealSample, RiskCard, SpikeEval, PhotoEval, DecisionEval, TargetStatus
   cli.py                   `glimpse` command used by every Justfile recipe
   data/                    download (CGMacros, weights), meal table builder, shared preprocessing
   pipeline/                deterministic checks -> model -> thresholded decision / abstention

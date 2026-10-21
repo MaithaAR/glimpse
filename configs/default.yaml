@@ -46,7 +46,7 @@ costs:                                        # (spike, no_spike); assumptions, 
 targets:
   rq1_noninferiority_margin: 0.03
   ece_max: 0.05
-  ece_bins: 15
+  ece_bins: 10                               # equal-width bins (also equal-mass ECE); ~10 test meals per bin
   conformal_nominal: 0.80
   usefulness: {min_cost_reduction: 0.10, min_cleared: 0.20, max_missed_among_cleared: 0.10, max_abstain: 0.20}
   latency_p95_ms: 300
@@ -57,9 +57,9 @@ pipeline:                                    # deterministic input checks, run b
   max_cgm_gap_min: 20
   glucose_range_mgdl: [40, 400]              # Dexcom reportable range
   min_photo_side_px: 64
-decision:                                    # provisional until chosen on out-of-fold development predictions
-  low_risk_below: 0.20                       # spike probability below this -> low risk
-  caution_at_or_above: 0.30                  # at or above this -> caution; in between -> abstain (low confidence)
+decision:                                    # chosen on the validation people with the final model (never test):
+  low_risk_below: 0.25                       # min expected cost with <=10% spikes among cleared and <=20% abstain
+  caution_at_or_above: 0.25                  # >= -> caution; between the two -> abstain (empty at these costs)
 training:
   num_threads: 4                             # fixed CPU thread count for reproducible reported runs
   tensorboard_dir: logs/tensorboard

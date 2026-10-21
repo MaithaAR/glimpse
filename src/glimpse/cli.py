@@ -102,6 +102,14 @@ def _cmd_params(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_evaluate(args: argparse.Namespace) -> int:
+    """Test-split evaluation of both models and the baselines; writes outputs/eval/."""
+    from glimpse.evaluation.evaluate import run_evaluation
+
+    run_evaluation(args.cfg)
+    return 0
+
+
 def _cmd_not_ready(args: argparse.Namespace) -> int:
     """Placeholder for milestones not built yet."""
     logger.bind(stage=args.command).error("'{}' is not implemented yet in this milestone", args.command)
@@ -126,7 +134,7 @@ def main(argv: list[str] | None = None) -> int:
     t = sub.add_parser("train", help="train a model")
     t.add_argument("--model", choices=["scratch", "finetune"], required=True)
     t.set_defaults(func=_cmd_train)
-    sub.add_parser("evaluate", help="evaluate models and baselines").set_defaults(func=_cmd_not_ready)
+    sub.add_parser("evaluate", help="evaluate models and baselines on the test people").set_defaults(func=_cmd_evaluate)
     for sp in sub.choices.values():  # allow --config after the sub-command too (as the Justfile does)
         sp.add_argument("--config", default=argparse.SUPPRESS)
     args = p.parse_args(argv)

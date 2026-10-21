@@ -119,3 +119,63 @@ def coverage_report(lo, hi, y, sids):
     return dict(
         pooled=float(inside.mean()), person_averaged=float(np.mean(per_person)), mean_width=float(np.mean(hi - lo))
     )
+
+
+# ---------- added for the intermediate evaluation ----------
+def ece_equal_width(p: np.ndarray, y: np.ndarray, bins: int = 10) -> tuple[float, list[dict]]:
+    """ECE with equal-width probability bins; also returns per-bin count, mean confidence and observed rate."""
+    edges = np.linspace(0, 1, bins + 1)
+    idx = np.clip(np.digitize(p, edges[1:-1], right=False), 0, bins - 1)
+    table, ece = [], 0.0
+    for b in range(bins):
+        m = idx == b
+        n = int(m.sum())
+        conf = float(p[m].mean()) if n else float("nan")
+        rate = float(y[m].mean()) if n else float("nan")
+        if n:
+            ece += abs(conf - rate) * n / len(p)
+        table.append({"bin": b, "lo": float(edges[b]), "hi": float(edges[b + 1]), "n": n,
+                      "mean_predicted": conf, "observed_rate": rate})  # fmt: skip
+    return float(ece), table
+
+
+def person_bootstrap(stat, arrays: tuple[np.ndarray, ...], sids: np.ndarray, B: int = 2000, seed: int = 0):
+    """95% percentile CI of `stat(*arrays)` resampling PEOPLE with replacement (meals within a person are dependent).
+    Resamples where the statistic is undefined (e.g. one class only) are skipped."""
+    rng = np.random.default_rng(seed)
+    ppl = np.unique(sids)
+    idx = {p: np.where(sids == p)[0] for p in ppl}
+    vals = []
+    for _ in range(B):
+        pick = np.concatenate([idx[p] for p in rng.choice(ppl, len(ppl))])
+        try:
+            v = stat(*(a[pick] for a in arrays))
+        except ValueError:
+            continue
+        if np.isfinite(v):
+            vals.append(v)
+    lo, hi = np.percentile(vals, [2.5, 97.5])
+    return float(lo), float(hi)
+
+
+def select_band(p: np.ndarray, y: np.ndarray, costs, max_abstain: float, max_missed_among_cleared: float = 1.0,
+                step: float = 0.01) -> tuple[float, float]:  # fmt: skip
+    """Low-risk / caution thresholds minimising expected cost, subject to (i) at most `max_missed_among_cleared`
+    spikes among meals cleared as low risk and (ii) at most `max_abstain` abstentions. With calibrated risks and
+    these costs abstaining is never cheapest on its own, so the band comes from the safety constraint: meals not
+    safe enough to clear but below the caution threshold are abstained on. Ties go to fewer abstentions."""
+    grid = np.round(np.arange(0, 1 + step / 2, step), 4)
+    best = (np.inf, 1.0, 1.0, 0.0, 0.0)
+    for lo in grid:
+        cleared = p < lo
+        if cleared.any() and y[cleared].mean() > max_missed_among_cleared:
+            continue
+        for hi in grid[grid >= lo]:
+            a = decide(p, lo, hi)
+            share = float((a == 2).mean())
+            if share > max_abstain:
+                continue
+            key = (expected_cost(a, y, costs), share, hi - lo)
+            if key < best[:3]:
+                best = (*key, lo, hi)
+    return float(best[3]), float(best[4])
