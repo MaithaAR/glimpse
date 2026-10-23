@@ -43,6 +43,7 @@ def paired_person_bootstrap(y, pa, pb, sids, B=2000, seed=0):
 
 
 def noninferiority(lo: float, hi: float, margin: float = 0.03) -> str:
+    """Classify a 95% interval of an AUROC difference against the prespecified margin."""
     if lo > -margin:
         return "non-inferior"
     if hi < -margin:
@@ -52,6 +53,7 @@ def noninferiority(lo: float, hi: float, margin: float = 0.03) -> str:
 
 # ---------- calibration ----------
 def ece_equal_mass(p, y, bins=15):
+    """Expected calibration error with bins holding equal numbers of predictions."""
     order = np.argsort(p)
     chunks = np.array_split(order, bins)
     return float(sum(abs(p[c].mean() - y[c].mean()) * len(c) / len(p) for c in chunks if len(c)))
@@ -70,6 +72,7 @@ def decide(p, lo_thr, hi_thr, abstain_mask=None):
 
 
 def expected_cost(actions, y, costs):
+    """Mean cost of the chosen actions (0 low risk, 1 caution, 2 abstain) given the true spike labels."""
     c = np.array(
         [costs["low_risk"], costs["caution"], costs["abstain"]], float
     )  # rows: action; cols: (spike, no spike)
@@ -77,6 +80,7 @@ def expected_cost(actions, y, costs):
 
 
 def usefulness_report(actions, y, costs, targets):
+    """Share of each action, cost vs the best trivial policy, spikes among cleared meals, and the verdict."""
     trivial = min(expected_cost(np.zeros_like(y), y, costs), expected_cost(np.ones_like(y), y, costs))
     cost = expected_cost(actions, y, costs)
     cleared = actions == 0
@@ -114,6 +118,7 @@ def participant_weighted_cqr_quantile(lo_pred, hi_pred, y, sids, alpha=0.2):
 
 
 def coverage_report(lo, hi, y, sids):
+    """Pooled and person-averaged coverage of predicted rise intervals, and their mean width."""
     inside = (y >= lo) & (y <= hi)
     per_person = [inside[sids == p].mean() for p in np.unique(sids)]
     return dict(

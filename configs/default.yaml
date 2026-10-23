@@ -1,4 +1,9 @@
 # GLIMPSE default configuration (mirrors the proposal's prespecified rules)
+# Read and checked at startup by glimpse.config.GlimpseConfig: a missing, misspelled or out-of-range setting stops the program.
+seed: 20260927                               # one number fixes Python, NumPy and PyTorch randomness (glimpse.utils.seed)
+paths:
+  outputs: outputs                           # metrics, figures, tables
+  logs: logs                                 # glimpse.log (rotating)
 data:
   cgmacros_root: data/cgmacros/CGMacros      # folder containing CGMacros-0XX/ and bio.csv
   nutrition5k_root: data/nutrition5k

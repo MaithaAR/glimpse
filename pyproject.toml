@@ -13,7 +13,13 @@ dependencies = [
   "scipy>=1.14,<2",
   "pyyaml>=6.0,<7",
   "torch>=2.9,<3",
+  "pydantic>=2.10,<3",
+  "loguru>=0.7,<1",
 ]
+
+# `uv run glimpse ...` runs glimpse.cli:main
+[project.scripts]
+glimpse = "glimpse.cli:main"
 
 # Tools used only while developing (tests and code checks), kept apart from the product's libraries.
 [dependency-groups]

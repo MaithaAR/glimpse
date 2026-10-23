@@ -12,6 +12,10 @@ install:
 test:
     uv run pytest
 
+# load and validate configs/default.yaml, start logging, set the seed
+check-config:
+    uv run glimpse check-config
+
 # check code style and errors (no print(), sorted imports, line length)
 lint:
     uv run ruff check src tests

@@ -33,6 +33,7 @@ def _share_pct(v) -> float:
 
 
 def load_bio(root: str) -> pd.DataFrame:
+    """Read bio.csv: one row per participant with age, BMI, A1c, fasting glucose and cohort group."""
     b = pd.read_csv(os.path.join(root, "bio.csv"))
     b.columns = [c.strip() for c in b.columns]
     b = b.rename(
@@ -128,6 +129,7 @@ def add_personal_prior(M: pd.DataFrame, cfg: dict, train_target_sids=None) -> pd
 
 
 def evaluation_set(M: pd.DataFrame, strict: bool = False, include_overlap: bool = False) -> pd.DataFrame:
+    """Meals that are scored: after onboarding, usable windows, and (by default) no further meal within 2 h."""
     ok = M.post_onboarding & (M.usable_strict if strict else M.usable) & M.rise.notna()
     if not include_overlap:
         ok &= ~M.next_meal_within
