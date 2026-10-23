@@ -44,11 +44,20 @@ def _prepare(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Meal table -> model-ready dataset (windows, profile inputs, labels) saved to data/dataset.*."""
     from glimpse.data.dataset import build_dataset
     from glimpse.data.meals import build_meal_table
+    from glimpse.data.normalise import Normaliser
+    from glimpse.data.splits import make_splits, meal_rows, save_split_outputs
 
     build_meal_table(cfg)
     ds = build_dataset(cfg)
     ds.save(Path("data/dataset"))
     logger.bind(stage="data").info("dataset saved to data/dataset.npz and data/dataset.json")
+    sp = make_splits(ds, cfg)
+    save_split_outputs(ds, sp, cfg)
+    tr = meal_rows(ds, set(sp.train), scored_only=False)  # scaling statistics from TRAINING people only
+    Normaliser.fit(ds.glucose[tr], ds.heart_rate[tr], ds.profile[tr], ds.profile_names).save(
+        Path("checkpoints/normaliser.json")
+    )
+    logger.bind(stage="data").info("splits in splits/dev_splits.json; normaliser in checkpoints/normaliser.json")
     return 0
 
 
@@ -62,7 +71,7 @@ def main(argv: list[str] | None = None) -> int:
     dl = sub.add_parser("download-data", help="download CGMacros CSVs and before-meal photos (resumable)")
     dl.add_argument("--no-photos", action="store_true", help="CSVs only")
     sub.add_parser("build-meals", help="build and validate the labelled meal table")
-    sub.add_parser("prepare", help="meal table + model-ready dataset (windows, profile inputs, labels)")
+    sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
     try:
         cfg = load_config(args.config)

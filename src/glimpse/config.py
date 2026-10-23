@@ -80,6 +80,14 @@ class CohortCfg(_Strict):
     target_groups: list[Group] = Field(min_length=1)
 
 
+class SplitsCfg(_Strict):
+    """Person-level split sizes and the sealed locked set."""
+
+    locked_file: str
+    test_people: int = Field(ge=1)
+    validation_people: int = Field(ge=1)
+
+
 class CvCfg(_Strict):
     """Person-grouped cross-validation settings."""
 
@@ -153,6 +161,7 @@ class GlimpseConfig(_Strict):
     meals: MealsCfg
     onboarding: OnboardingCfg
     cohort: CohortCfg
+    splits: SplitsCfg
     cv: CvCfg
     costs: CostsCfg
     pipeline: PipelineCfg

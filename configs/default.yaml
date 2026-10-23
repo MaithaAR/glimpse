@@ -26,9 +26,13 @@ onboarding:
   min_meals_for_personal_prior: 5             # else population prior from training target cohort
 cohort:
   target_groups: [healthy, prediabetes]       # A1c < 5.7 healthy, 5.7-6.4 prediabetes, >= 6.5 T2D
+splits:                                      # by PERSON: all meals of one person stay in one group
+  locked_file: splits/locked_final_set.json  # 8 target people sealed in the proposal (SHA-256), used once at the end
+  test_people: 5                             # fixed test group = outer CV fold 1 (rubric's held-out split, demo)
+  validation_people: 4                       # fixed validation group (threshold selection)
 cv:
-  outer_folds: 5
-  inner_folds: 4
+  outer_folds: 5                             # main estimate: every development target person is tested once
+  inner_folds: 4                             # inside the training people: tuning (e.g. number of epochs)
   seeds: [0, 1, 2]
 costs:                                        # (spike, no_spike); assumptions, swept in sensitivity analysis
   low_risk: [5, 0]
