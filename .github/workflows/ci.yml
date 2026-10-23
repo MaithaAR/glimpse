@@ -18,3 +18,19 @@ jobs:
           uv run ruff format --check src tests
       - name: Tests
         run: uv run pytest
+  data-pipeline:
+    # Downloads the CGMacros CSVs (no photos, to stay quick), rebuilds the dataset and splits, trains the SensorCNN,
+    # and checks that Linux produces exactly the committed person split.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - name: Download CGMacros CSVs (PhysioNet, open access)
+        run: uv run glimpse download-data --no-photos
+      - name: Meal table, dataset, splits, normaliser, quality report
+        run: uv run glimpse prepare
+      - name: Same person split as the committed one
+        run: git diff --exit-code splits/dev_splits.json
+      - name: Train the from-scratch SensorCNN
+        run: uv run glimpse train --model scratch

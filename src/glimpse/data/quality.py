@@ -66,7 +66,7 @@ def duplicate_photos(ds: MealDataset, sp: Splits, photo_root: Path) -> tuple[pd.
                         "dhash_distance": dist,
                     }
                 )
-    pair_counts = np.array(list(within.values()))
+    pair_counts = np.array(list(within.values())) if within else np.zeros((1, 2))  # no photos downloaded -> 0
     info = {
         "photos_checked": len(items),
         "cross_split_duplicates": len(pairs),

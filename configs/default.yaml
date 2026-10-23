@@ -53,6 +53,7 @@ augment:                                     # training batches only; the stored
 finetune_cap_items: 10000                    # project limit: photos used to fine-tune, summed over the whole project
 baselines:                                   # fixed before seeing results; every model gets the same folds and normaliser
   logreg_c_grid: [0.01, 0.1, 1.0, 10.0]      # logistic regression: one setting tuned on the inner folds (CNN: epochs)
+  gbm_depth_grid: [2, 3, 4]                  # gradient boosting (the proposal's baseline): tree depth tuned the same way
 targets:                                     # fixed before seeing results (see docs/evaluation_protocol.md)
   primary_metric: auroc                      # target cohort, cross-validated out-of-fold predictions
   rq1_noninferiority_margin: 0.03

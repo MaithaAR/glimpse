@@ -151,6 +151,7 @@ class BaselinesCfg(_Strict):
     """Simple comparison models, tuned with the same budget and folds as the CNN."""
 
     logreg_c_grid: list[float] = Field(min_length=1)
+    gbm_depth_grid: list[int] = Field(min_length=1)
 
 
 class TargetsCfg(_Strict):

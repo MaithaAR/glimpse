@@ -41,6 +41,10 @@ train: train-scratch
 train-scratch:
     uv run glimpse train --model scratch
 
+# cross-validated out-of-fold predictions of the CNN and every comparison model (main estimate) -> outputs/cv/
+cv:
+    uv run glimpse cv
+
 # evaluate models and baselines, writing results to outputs/ (built in Step 5)
 evaluate:
     @echo "Not built yet: evaluation is added in Step 5." && exit 1
