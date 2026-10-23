@@ -1,0 +1,20 @@
+# Proof that the project installs and passes its checks on a clean Linux machine (like the grader's container).
+# Runs on every push. Tests that need the downloaded CGMacros data are skipped here (no data in the repository).
+name: ci
+on: [push, pull_request]
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install Python 3.14 + locked libraries (CPU-only PyTorch on Linux)
+        run: uv sync --locked
+      - name: Settings check
+        run: uv run glimpse check-config
+      - name: Code checks
+        run: |
+          uv run ruff check src tests
+          uv run ruff format --check src tests
+      - name: Tests
+        run: uv run pytest

@@ -43,3 +43,18 @@ def test_normaliser_ignores_other_splits():
     assert x.sequence.shape == (50, 3, 24) and x.profile.shape == (50, 8)
     assert not np.isnan(x.sequence).any() and not np.isnan(x.profile).any()
     assert x.sequence[0, 2, 3] == 1.0  # the missing glucose slot is flagged
+
+
+@pytest.mark.skipif(not HAVE_DATA, reason="run `just prepare` first")
+def test_test_and_validation_people_never_used_for_fitting():
+    """Inner (tuning) folds and the normaliser's rows contain training people only."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits, meal_rows
+
+    ds = MealDataset.load(Path("data/dataset"))
+    sp = Splits.load(Path("splits/dev_splits.json"))
+    held_out = set(sp.test) | set(sp.validation) | set(sp.locked)
+    assert not set(sum(sp.inner_folds, [])) & held_out
+    assert sorted(sum(sp.inner_folds, [])) == sorted(sp.train)
+    rows = meal_rows(ds, set(sp.train), scored_only=False)
+    assert not {ds.samples[i].person_id for i in rows} & held_out

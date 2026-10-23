@@ -147,10 +147,18 @@ class AugmentCfg(_Strict):
     hr_noise_bpm: float = Field(ge=0, le=10)
 
 
+class BaselinesCfg(_Strict):
+    """Simple comparison models, tuned with the same budget and folds as the CNN."""
+
+    logreg_c_grid: list[float] = Field(min_length=1)
+
+
 class TargetsCfg(_Strict):
     """Success targets fixed before seeing results."""
 
+    primary_metric: Literal["auroc"]
     rq1_noninferiority_margin: float = Field(gt=0, lt=1)
+    rq2_min_lower_bound: float = Field(ge=-1, le=1)
     ece_max: Prob
     ece_bins: int = Field(ge=2, le=50)
     conformal_nominal: Prob
@@ -175,6 +183,7 @@ class GlimpseConfig(_Strict):
     pipeline: PipelineCfg
     augment: AugmentCfg
     finetune_cap_items: int = Field(gt=0, le=10000)
+    baselines: BaselinesCfg
     targets: TargetsCfg
 
 

@@ -51,8 +51,12 @@ augment:                                     # training batches only; the stored
   glucose_noise_mgdl: 3.0                    # small random wobble on real readings (below typical CGM error)
   hr_noise_bpm: 1.0
 finetune_cap_items: 10000                    # project limit: photos used to fine-tune, summed over the whole project
-targets:
+baselines:                                   # fixed before seeing results; every model gets the same folds and normaliser
+  logreg_c_grid: [0.01, 0.1, 1.0, 10.0]      # logistic regression: one setting tuned on the inner folds (CNN: epochs)
+targets:                                     # fixed before seeing results (see docs/evaluation_protocol.md)
+  primary_metric: auroc                      # target cohort, cross-validated out-of-fold predictions
   rq1_noninferiority_margin: 0.03
+  rq2_min_lower_bound: 0.0                   # CNN "beats" engineered features only if the 95% range of the gain is above this
   ece_max: 0.05
   ece_bins: 15
   conformal_nominal: 0.80
