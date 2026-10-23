@@ -22,19 +22,31 @@ pilot/                      exploratory pilot scripts and logs (27 Sep 2026)
 tests/                      unit tests (pytest)
 ```
 
-## Quick start (reproduces every number in the proposal)
+## Setup (uv + just)
+Needs [uv](https://docs.astral.sh/uv/) and [just](https://just.systems/). uv installs Python 3.14 and the exact library versions in `uv.lock`; no pip.
 ```bash
-python3 -m pip install -r requirements.txt
+just install   # uv sync: Python 3.14 + locked libraries
+just check     # code checks (ruff) + tests (pytest)
+just           # list all recipes; train / evaluate / demo are added in later steps
+```
+
+## Proposal evidence (frozen)
+`scripts/`, `pilot/` and `results/` are the code and logs behind the proposal's numbers (commit `3609060`).
+They are kept unchanged on purpose and excluded from the code checks. Script 03 also needs the photo libraries, which are added in Step 4.
+
+## Quick start for the proposal pilot (reproduces every number in the proposal)
+```bash
+just install
 mkdir -p data && ln -s /path/to/unzipped/cgmacros data/cgmacros   # folder containing CGMacros/ (PhysioNet, open access)
-python3 -m pytest -q tests
-python3 scripts/01_build_meals.py      # expect: usable 1526 | onboarding 453 | post-onboarding 1054 | evaluated 896 (634 target, 31 people)
-python3 scripts/00_fetch_photos.py     # downloads the 1,486 before-meal photos listed in splits/photo_list.txt (~290 MB)
+just test
+uv run python scripts/01_build_meals.py      # expect: usable 1526 | onboarding 453 | post-onboarding 1054 | evaluated 896 (634 target, 31 people)
+uv run python scripts/00_fetch_photos.py     # downloads the 1,486 before-meal photos listed in splits/photo_list.txt (~290 MB)
 curl -L -o data/efficientnet-b0-355c32eb.pth https://github.com/lukemelas/EfficientNet-PyTorch/releases/download/1.0/efficientnet-b0-355c32eb.pth
-python3 scripts/03_photo_experiment.py                      # pilot table, row "Photo, person-excluded"  -> results/photo_experiment.{log,json}
-python3 scripts/03_photo_experiment.py --profile-excluded   # row "Photo, also profile-excluded"
-python3 scripts/03_photo_experiment.py --noise-control      # row "Noise images (control)"
-python3 scripts/03_photo_experiment.py --alpha 100          # ridge-strength sensitivity (also --alpha 1000)
-python3 scripts/04_usefulness_pilot.py                      # usefulness/ECE pilot baseline -> results/usefulness_pilot.log
+uv run python scripts/03_photo_experiment.py                      # pilot table, row "Photo, person-excluded"  -> results/photo_experiment.{log,json}
+uv run python scripts/03_photo_experiment.py --profile-excluded   # row "Photo, also profile-excluded"
+uv run python scripts/03_photo_experiment.py --noise-control      # row "Noise images (control)"
+uv run python scripts/03_photo_experiment.py --alpha 100          # ridge-strength sensitivity (also --alpha 1000)
+uv run python scripts/04_usefulness_pilot.py                      # usefulness/ECE pilot baseline -> results/usefulness_pilot.log
 ```
 Runtime: about 4 minutes for the first 03 run on a 2-core CPU (image features are then cached in results/), about a minute per later run.
 No dataset files are stored in this repository (CGMacros is CC BY-NC-SA 4.0; download it from PhysioNet).

@@ -5,3 +5,8 @@ wandb/
 __pycache__/
 .DS_Store
 results/photo_features*.npz
+.venv/
+logs/
+outputs/
+.pytest_cache/
+.ruff_cache/

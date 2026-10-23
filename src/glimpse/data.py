@@ -3,8 +3,13 @@
 Only information available BEFORE eating is used as model input. Consumed macros and share eaten are used
 solely to reconstruct the served-macro reference (consumed / share, proportional-consumption assumption).
 """
+
 from __future__ import annotations
-import glob, os, re
+
+import glob
+import os
+import re
+
 import numpy as np
 import pandas as pd
 
@@ -30,7 +35,9 @@ def _share_pct(v) -> float:
 def load_bio(root: str) -> pd.DataFrame:
     b = pd.read_csv(os.path.join(root, "bio.csv"))
     b.columns = [c.strip() for c in b.columns]
-    b = b.rename(columns={"subject": "sid", "A1c PDL (Lab)": "a1c", "Fasting GLU - PDL (Lab)": "fglu", "Insulin": "fins"})
+    b = b.rename(
+        columns={"subject": "sid", "A1c PDL (Lab)": "a1c", "Fasting GLU - PDL (Lab)": "fglu", "Insulin": "fins"}
+    )
     b["group"] = pd.cut(b.a1c, [0, 5.69, 6.49, 99], labels=["healthy", "prediabetes", "T2D"]).astype(str)
     return b[["sid", "a1c", "fglu", "fins", "BMI", "Age", "Triglycerides", "group"]]
 
@@ -51,29 +58,42 @@ def build_meals(root: str, cfg: dict) -> pd.DataFrame:
         meals = d[pd.to_numeric(d["Calories"], errors="coerce").fillna(0) > 0]
         times = list(meals.index)
         for i, t in enumerate(times):
-            pre = g[t - pd.Timedelta(minutes=L["baseline_window_min"]):t].dropna()
-            post = g[t + pd.Timedelta("1min"):t + pd.Timedelta(minutes=L["horizon_min"])]
+            pre = g[t - pd.Timedelta(minutes=L["baseline_window_min"]) : t].dropna()
+            post = g[t + pd.Timedelta("1min") : t + pd.Timedelta(minutes=L["horizon_min"])]
             obs = post.dropna()
             if len(pre) < W["min_baseline_readings"] or len(obs) == 0:
                 continue
             edges = [t] + list(obs.index) + [t + pd.Timedelta(minutes=L["horizon_min"])]
-            max_gap = max((b - a).total_seconds() / 60 for a, b in zip(edges[:-1], edges[1:]))
+            max_gap = max((b - a).total_seconds() / 60 for a, b in zip(edges[:-1], edges[1:], strict=False))
             coverage = post.notna().mean()
             r = meals.loc[t]
             r = r.iloc[0] if isinstance(r, pd.DataFrame) else r
             share = _share_pct(r.get("Amount Consumed"))
             prev = [u for u in times[:i] if u < t]
             row = dict(
-                sid=sid, t=t, base=pre.mean(), rise=obs.max() - pre.mean(), coverage=coverage, max_gap=max_gap,
+                sid=sid,
+                t=t,
+                base=pre.mean(),
+                rise=obs.max() - pre.mean(),
+                coverage=coverage,
+                max_gap=max_gap,
                 usable=(coverage >= W["min_post_coverage"]) and (max_gap <= W["max_gap_min"]),
-                usable_strict=(coverage >= W["strict"]["min_post_coverage"]) and (max_gap <= W["strict"]["max_gap_min"]),
-                next_meal_within=any(t < u <= t + pd.Timedelta(minutes=Mc["exclude_next_meal_within_min"]) for u in times[i + 1:i + 3]),
-                share=share, photo=r.get("Image path"),
-                slope60=_slope(g[t - pd.Timedelta("60min"):t]), slope20=_slope(g[t - pd.Timedelta("20min"):t]),
-                sd120=g[t - pd.Timedelta("120min"):t].std(), min120=g[t - pd.Timedelta("120min"):t].min(),
+                usable_strict=(coverage >= W["strict"]["min_post_coverage"])
+                and (max_gap <= W["strict"]["max_gap_min"]),
+                next_meal_within=any(
+                    t < u <= t + pd.Timedelta(minutes=Mc["exclude_next_meal_within_min"]) for u in times[i + 1 : i + 3]
+                ),
+                share=share,
+                photo=r.get("Image path"),
+                slope60=_slope(g[t - pd.Timedelta("60min") : t]),
+                slope20=_slope(g[t - pd.Timedelta("20min") : t]),
+                sd120=g[t - pd.Timedelta("120min") : t].std(),
+                min120=g[t - pd.Timedelta("120min") : t].min(),
                 since_meal=(t - prev[-1]).total_seconds() / 3600 if prev else 12.0,
-                hr30=hr[t - pd.Timedelta("30min"):t].mean(), hr_slope=_slope(hr[t - pd.Timedelta("60min"):t]),
-                mets60=mets[t - pd.Timedelta("60min"):t].mean(), hour=t.hour + t.minute / 60,
+                hr30=hr[t - pd.Timedelta("30min") : t].mean(),
+                hr_slope=_slope(hr[t - pd.Timedelta("60min") : t]),
+                mets60=mets[t - pd.Timedelta("60min") : t].mean(),
+                hour=t.hour + t.minute / 60,
             )
             for m in MACROS:
                 col = {"carbs": "Carbs", "protein": "Protein", "fat": "Fat", "fiber": "Fiber", "kcal": "Calories"}[m]
@@ -96,7 +116,9 @@ def add_personal_prior(M: pd.DataFrame, cfg: dict, train_target_sids=None) -> pd
     """Personal prior from onboarding meals; population prior (training target cohort only) if < min meals."""
     thr = cfg["label"]["spike_threshold_mgdl"]
     on = M[M.onboarding & M.usable]
-    stats = on.groupby("sid").agg(n=(f"spike{thr}", "size"), prior_rate=(f"spike{thr}", "mean"), prior_rise=("rise", "mean"))
+    stats = on.groupby("sid").agg(
+        n=(f"spike{thr}", "size"), prior_rate=(f"spike{thr}", "mean"), prior_rise=("rise", "mean")
+    )
     pool = on if train_target_sids is None else on[on.sid.isin(train_target_sids)]
     pop_rate, pop_rise = pool[f"spike{thr}"].mean(), pool.rise.mean()
     M = M.join(stats, on="sid")
