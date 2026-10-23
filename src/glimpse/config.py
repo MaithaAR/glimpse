@@ -139,6 +139,14 @@ class PipelineCfg(_Strict):
         return self
 
 
+class AugmentCfg(_Strict):
+    """Random noise added to training windows only."""
+
+    enabled: bool
+    glucose_noise_mgdl: float = Field(ge=0, le=20)
+    hr_noise_bpm: float = Field(ge=0, le=10)
+
+
 class TargetsCfg(_Strict):
     """Success targets fixed before seeing results."""
 
@@ -165,6 +173,8 @@ class GlimpseConfig(_Strict):
     cv: CvCfg
     costs: CostsCfg
     pipeline: PipelineCfg
+    augment: AugmentCfg
+    finetune_cap_items: int = Field(gt=0, le=10000)
     targets: TargetsCfg
 
 

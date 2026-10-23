@@ -58,6 +58,9 @@ def _prepare(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
         Path("checkpoints/normaliser.json")
     )
     logger.bind(stage="data").info("splits in splits/dev_splits.json; normaliser in checkpoints/normaliser.json")
+    from glimpse.data.quality import write_quality_outputs
+
+    write_quality_outputs(ds, sp, cfg)
     return 0
 
 

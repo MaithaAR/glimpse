@@ -46,6 +46,11 @@ pipeline:                                    # checks the product applies BEFORE
   min_cgm_coverage: 0.70                     # share of 5-min slots with a reading
   max_cgm_gap_min: 20
   glucose_range_mgdl: [40, 400]              # Dexcom reportable range
+augment:                                     # training batches only; the stored data never change
+  enabled: true                              # switch off to measure its effect (ablation)
+  glucose_noise_mgdl: 3.0                    # small random wobble on real readings (below typical CGM error)
+  hr_noise_bpm: 1.0
+finetune_cap_items: 10000                    # project limit: photos used to fine-tune, summed over the whole project
 targets:
   rq1_noninferiority_margin: 0.03
   ece_max: 0.05
