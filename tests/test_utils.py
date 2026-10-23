@@ -33,3 +33,8 @@ def test_check_config_command(tmp_path):
     bad = tmp_path / "bad.yaml"
     bad.write_text("seed: -1\n")
     assert main(["--config", str(bad), "check-config"]) == 2
+
+
+def test_params_command_runs():
+    """`glimpse params` is wired up and writes the budget table (catches a missing command entry)."""
+    assert main(["params"]) == 0

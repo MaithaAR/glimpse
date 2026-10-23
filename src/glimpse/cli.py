@@ -64,6 +64,14 @@ def _prepare(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _params(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Parameter budget table -> outputs/param_budget.csv."""
+    from glimpse.models.budget import write_budget
+
+    write_budget(Path(cfg.paths.outputs) / "param_budget.csv")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """Parse the command line, load + validate the config, set up logging and seeds, then run the sub-command."""
     p = argparse.ArgumentParser(prog="glimpse", description="GLIMPSE: pre-meal glucose-spike risk")
@@ -74,6 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     dl = sub.add_parser("download-data", help="download CGMacros CSVs and before-meal photos (resumable)")
     dl.add_argument("--no-photos", action="store_true", help="CSVs only")
     sub.add_parser("build-meals", help="build and validate the labelled meal table")
+    sub.add_parser("params", help="count every model's parameters against the project limits")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
     try:
@@ -90,6 +99,7 @@ def main(argv: list[str] | None = None) -> int:
         "download-data": _download_data,
         "build-meals": _build_meals,
         "prepare": _prepare,
+        "params": _params,
     }
     return commands[args.command](cfg, args)
 

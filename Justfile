@@ -30,6 +30,10 @@ lint:
 # lint, then test
 check: lint test
 
+# count every model's parameters against the limits (writes outputs/param_budget.csv)
+params:
+    uv run glimpse params
+
 # train the models (built in Step 3 and Step 4)
 train:
     @echo "Not built yet: training is added in Step 3 (sensor model) and Step 4 (photo model)." && exit 1
