@@ -37,10 +37,11 @@ class Normaliser(BaseModel):
     def fit(cls, glucose: np.ndarray, heart_rate: np.ndarray, profile: np.ndarray, names: list[str]) -> Normaliser:
         """Compute the statistics from the rows given (the caller passes training rows only)."""
         pstd = np.nanstd(profile, axis=0)
-        n = cls(glucose_mean=float(np.nanmean(glucose)), glucose_std=float(np.nanstd(glucose)),
-                hr_mean=float(np.nanmean(heart_rate)), hr_std=float(np.nanstd(heart_rate)), profile_names=list(names),
+        spread = lambda v: float(v) if v > 0 else 1.0  # noqa: E731 - a constant input must not cause division by 0
+        n = cls(glucose_mean=float(np.nanmean(glucose)), glucose_std=spread(np.nanstd(glucose)),
+                hr_mean=float(np.nanmean(heart_rate)), hr_std=spread(np.nanstd(heart_rate)), profile_names=list(names),
                 profile_mean=[float(v) for v in np.nanmean(profile, axis=0)],
-                profile_std=[float(v) if v > 0 else 1.0 for v in pstd], n_train_meals=len(glucose))  # fmt: skip
+                profile_std=[spread(v) for v in pstd], n_train_meals=len(glucose))  # fmt: skip
         logger.bind(stage="normalise").info("fitted on {} training meals", len(glucose))
         return n
 

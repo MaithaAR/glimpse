@@ -72,6 +72,17 @@ def _params(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _train(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Train a model on the prepared dataset and the committed splits."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits
+    from glimpse.training.scratch import train_scratch
+
+    ds, sp = MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json"))
+    train_scratch(ds, sp, cfg)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """Parse the command line, load + validate the config, set up logging and seeds, then run the sub-command."""
     p = argparse.ArgumentParser(prog="glimpse", description="GLIMPSE: pre-meal glucose-spike risk")
@@ -83,6 +94,8 @@ def main(argv: list[str] | None = None) -> int:
     dl.add_argument("--no-photos", action="store_true", help="CSVs only")
     sub.add_parser("build-meals", help="build and validate the labelled meal table")
     sub.add_parser("params", help="count every model's parameters against the project limits")
+    tr = sub.add_parser("train", help="train a model")
+    tr.add_argument("--model", choices=["scratch"], required=True, help="scratch = SensorCNN (photo model: Step 4)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
     try:
@@ -100,6 +113,7 @@ def main(argv: list[str] | None = None) -> int:
         "build-meals": _build_meals,
         "prepare": _prepare,
         "params": _params,
+        "train": _train,
     }
     return commands[args.command](cfg, args)
 

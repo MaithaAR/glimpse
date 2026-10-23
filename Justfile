@@ -34,9 +34,12 @@ check: lint test
 params:
     uv run glimpse params
 
-# train the models (built in Step 3 and Step 4)
-train:
-    @echo "Not built yet: training is added in Step 3 (sensor model) and Step 4 (photo model)." && exit 1
+# train the models (the photo model joins in Step 4)
+train: train-scratch
+
+# train the from-scratch SensorCNN: epochs chosen on inner folds, then the 28-person model + checkpoint
+train-scratch:
+    uv run glimpse train --model scratch
 
 # evaluate models and baselines, writing results to outputs/ (built in Step 5)
 evaluate:

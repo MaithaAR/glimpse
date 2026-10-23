@@ -58,3 +58,10 @@ def test_test_and_validation_people_never_used_for_fitting():
     assert sorted(sum(sp.inner_folds, [])) == sorted(sp.train)
     rows = meal_rows(ds, set(sp.train), scored_only=False)
     assert not {ds.samples[i].person_id for i in rows} & held_out
+
+
+def test_constant_input_does_not_break_scaling():
+    """If an input never changes in training (spread 0), scaling must not divide by zero."""
+    g, h, p = np.full((10, 24), 100.0), np.full((10, 24), 70.0), np.zeros((10, 8))
+    x = Normaliser.fit(g, h, p, [f"x{i}" for i in range(8)]).transform(g, h, p)
+    assert np.isfinite(x.sequence).all() and np.isfinite(x.profile).all()

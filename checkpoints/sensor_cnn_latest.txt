@@ -1,0 +1,1 @@
+sensor_cnn_e13_valauc0.662.pt

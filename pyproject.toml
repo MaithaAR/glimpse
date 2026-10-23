@@ -17,6 +17,7 @@ dependencies = [
   "loguru>=0.7,<1",
   "remotezip>=0.12,<1",
   "pillow>=11,<14",
+  "matplotlib>=3.9,<4",
 ]
 
 # `uv run glimpse ...` runs glimpse.cli:main

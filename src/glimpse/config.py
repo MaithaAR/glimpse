@@ -166,6 +166,27 @@ class TargetsCfg(_Strict):
     latency_p95_ms: float = Field(gt=0)
 
 
+class ScratchTrainCfg(_Strict):
+    """Settings for training the from-scratch SensorCNN."""
+
+    channels: int = Field(ge=1, le=256)
+    hidden: int = Field(ge=1, le=1024)
+    dropout: float = Field(ge=0, lt=1)
+    lr: float = Field(gt=0, lt=1)
+    weight_decay: float = Field(ge=0, lt=1)
+    batch_size: int = Field(ge=1, le=4096)
+    max_epochs: int = Field(ge=1, le=1000)
+    warmup_epochs: int = Field(ge=0)
+    patience: int = Field(ge=1)
+
+
+class TrainingCfg(_Strict):
+    """Training settings shared by all models, plus one block per model."""
+
+    num_threads: int = Field(ge=1, le=64)
+    scratch: ScratchTrainCfg
+
+
 class GlimpseConfig(_Strict):
     """All settings of the project, mirroring configs/default.yaml."""
 
@@ -185,6 +206,7 @@ class GlimpseConfig(_Strict):
     finetune_cap_items: int = Field(gt=0, le=10000)
     baselines: BaselinesCfg
     targets: TargetsCfg
+    training: TrainingCfg
 
 
 def load_config(path: str | Path = "configs/default.yaml") -> GlimpseConfig:

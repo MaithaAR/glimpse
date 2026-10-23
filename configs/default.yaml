@@ -62,3 +62,15 @@ targets:                                     # fixed before seeing results (see 
   conformal_nominal: 0.80
   usefulness: {min_cost_reduction: 0.10, min_cleared: 0.20, max_missed_among_cleared: 0.10, max_abstain: 0.20}
   latency_p95_ms: 300
+training:
+  num_threads: 4                             # CPU threads (capped at the machine's count); fixed for repeatable runs
+  scratch:                                   # SensorCNN, trained from scratch
+    channels: 16
+    hidden: 32
+    dropout: 0.2
+    lr: 0.001                                # AdamW learning rate (peak, after warm-up)
+    weight_decay: 0.01
+    batch_size: 64
+    max_epochs: 60                           # upper limit while the inner folds look for the best epoch
+    warmup_epochs: 3
+    patience: 12                             # inner folds: stop after this many epochs without improvement
