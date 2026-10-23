@@ -38,8 +38,8 @@ class DataCfg(_Strict):
 class LabelCfg(_Strict):
     """Definition of a spike: peak rise above the pre-meal baseline within the horizon."""
 
-    spike_threshold_mgdl: float = Field(gt=0)
-    sensitivity_thresholds: list[float] = Field(min_length=1)
+    spike_threshold_mgdl: int = Field(gt=0)  # whole mg/dL; also names the label column, e.g. spike50
+    sensitivity_thresholds: list[int] = Field(min_length=1)
     horizon_min: int = Field(gt=0)
     baseline_window_min: int = Field(gt=0)
 

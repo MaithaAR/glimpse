@@ -4,9 +4,15 @@
 default:
     @just --list
 
-# install Python 3.14 and the exact locked library versions (later steps add data and model downloads)
+# install Python 3.14 + locked libraries, download the data (resumable), build the meal table
 install:
     uv sync
+    uv run glimpse download-data
+    uv run glimpse build-meals
+
+# rebuild the validated meal table from the downloaded data
+build-meals:
+    uv run glimpse build-meals
 
 # run the test suite
 test:

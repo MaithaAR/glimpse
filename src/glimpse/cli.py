@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
 from loguru import logger
 from pydantic import ValidationError
@@ -13,13 +14,29 @@ from glimpse.utils.logging import setup_logging
 from glimpse.utils.seed import set_seed
 
 
-def _check_config(cfg: GlimpseConfig) -> int:
+def _check_config(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Report the key settings so a user can see what the run will use."""
     log = logger.bind(stage="config")
     log.info("spike = rise >= {} mg/dL within {} min", cfg.label.spike_threshold_mgdl, cfg.label.horizon_min)
     log.info("target groups: {}; costs low_risk={} caution={} abstain={}", cfg.cohort.target_groups,
              cfg.costs.low_risk, cfg.costs.caution, cfg.costs.abstain)  # fmt: skip
     log.info("settings are valid")
+    return 0
+
+
+def _download_data(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Download CGMacros CSVs (and photos unless --no-photos) into the folder above cgmacros_root."""
+    from glimpse.data.download import download_cgmacros
+
+    download_cgmacros(Path(cfg.data.cgmacros_root).parent, with_photos=not args.no_photos)
+    return 0
+
+
+def _build_meals(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Build and validate the meal table; report the proposal's counts."""
+    from glimpse.data.meals import build_meal_table
+
+    build_meal_table(cfg)
     return 0
 
 
@@ -30,6 +47,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--config", default="configs/default.yaml", help="settings file (checked at startup)")
     sub = p.add_subparsers(dest="command", required=True)
     sub.add_parser("check-config", help="load and validate the settings, then report them")
+    dl = sub.add_parser("download-data", help="download CGMacros CSVs and before-meal photos (resumable)")
+    dl.add_argument("--no-photos", action="store_true", help="CSVs only")
+    sub.add_parser("build-meals", help="build and validate the labelled meal table")
     args = p.parse_args(argv)
     try:
         cfg = load_config(args.config)
@@ -40,7 +60,8 @@ def main(argv: list[str] | None = None) -> int:
     setup_logging(cfg.paths.logs)
     set_seed(cfg.seed)
     logger.bind(stage="cli").info("command={} config={}", args.command, args.config)
-    return {"check-config": _check_config}[args.command](cfg)
+    commands = {"check-config": _check_config, "download-data": _download_data, "build-meals": _build_meals}
+    return commands[args.command](cfg, args)
 
 
 if __name__ == "__main__":
