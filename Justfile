@@ -4,10 +4,11 @@
 default:
     @just --list
 
-# install Python 3.14 + locked libraries, download the data (resumable), build the meal table
+# install Python 3.14 + locked libraries, download the data and the pinned photo weights, prepare the dataset
 install:
     uv sync
     uv run glimpse download-data
+    uv run glimpse download-weights
     uv run glimpse prepare
 
 # rebuild the meal table and the model-ready dataset from the downloaded data

@@ -14,11 +14,8 @@ PER_MODEL_LIMIT = 200_000_000
 PRETRAINED_TOTAL_LIMIT = 1_000_000_000
 SCRATCH_LIMIT = 50_000_000
 
-# models planned for later steps: (name, role, estimated parameters from the proposal)
-PLANNED = [
-    ("photo model", "pretrained, fine-tuned (photo -> carbs); counted exactly when built", 28_000_000),
-    ("photo out-of-distribution check (DINOv2-S)", "pretrained, frozen; planned", 22_000_000),
-]
+# models planned for later stages: (name, role, estimated parameters)
+PLANNED = [("photo out-of-distribution check (DINOv2-S)", "pretrained, frozen; planned", 22_000_000)]
 
 
 class BudgetRow(BaseModel):
@@ -38,6 +35,12 @@ def budget_table() -> list[BudgetRow]:
     n = count_parameters(SensorCNN())
     rows = [BudgetRow(model="SensorCNN (1-D CNN)", role="trained from scratch", status="built", parameters=n,
                       limit=SCRATCH_LIMIT, within_limit=n <= SCRATCH_LIMIT)]  # fmt: skip
+    from glimpse.models.photo_model import PhotoCarbModel
+
+    n = sum(p.numel() for p in PhotoCarbModel().parameters())  # all weights (frozen or not); no download needed
+    name = "PhotoCarbModel (ConvNeXt-Tiny + 2 heads)"
+    rows.append(BudgetRow(model=name, role="pretrained, fine-tuned", status="built", parameters=n,
+                          limit=PER_MODEL_LIMIT, within_limit=n <= PER_MODEL_LIMIT))  # fmt: skip
     for name, role, est in PLANNED:
         rows.append(BudgetRow(model=name, role=role, status="planned (estimate)", parameters=est,
                               limit=PER_MODEL_LIMIT, within_limit=est <= PER_MODEL_LIMIT))  # fmt: skip

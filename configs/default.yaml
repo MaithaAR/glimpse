@@ -50,6 +50,16 @@ augment:                                     # training batches only; the stored
   enabled: true                              # switch off to measure its effect (ablation)
   glucose_noise_mgdl: 3.0                    # small random wobble on real readings (below typical CGM error)
   hr_noise_bpm: 1.0
+photo:                                       # pretrained photo model (carbohydrate estimate)
+  arch: convnext_tiny.fb_in22k_ft_in1k       # timm name; ImageNet-22k pretraining, ImageNet-1k fine-tuning
+  hf_repo: timm/convnext_tiny.fb_in22k_ft_in1k
+  revision: bc48a87f119bae1b06418f5340bfa97ef75d4609   # exact Hugging Face commit (pinned)
+  weights_sha256: 77b619e187de71bce58721689da0c009e84cc20677293d7d43105307e34d868a  # fingerprint of model.safetensors
+  weights_dir: data/weights
+  crop_pct: 1.0                              # keep as much of the plate as possible (no extra zoom-in crop)
+  min_side_px: 64                            # smaller photos are rejected as unusable
+  dropout: 0.2
+  carb_bin_edges_g: [30, 60, 90]             # bins <30, 30-<60, 60-<90, >=90 g (an edge value goes to the upper bin)
 finetune_cap_items: 10000                    # project limit: photos used to fine-tune, summed over the whole project
 baselines:                                   # fixed before seeing results; every model gets the same folds and normaliser
   logreg_c_grid: [0.01, 0.1, 1.0, 10.0]      # logistic regression: one setting tuned on the inner folds (CNN: epochs)

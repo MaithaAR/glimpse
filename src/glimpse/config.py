@@ -154,6 +154,27 @@ class BaselinesCfg(_Strict):
     gbm_depth_grid: list[int] = Field(min_length=1)
 
 
+class PhotoCfg(_Strict):
+    """Pretrained photo model: pinned weights and preprocessing."""
+
+    arch: str
+    hf_repo: str
+    revision: str = Field(min_length=40, max_length=40)
+    weights_sha256: str = Field(min_length=64, max_length=64)
+    weights_dir: str
+    crop_pct: float = Field(gt=0, le=1)
+    min_side_px: int = Field(ge=16)
+    dropout: float = Field(ge=0, lt=1)
+    carb_bin_edges_g: list[float] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _edges_increase(self) -> PhotoCfg:
+        """Bin edges must go up."""
+        if any(b <= a for a, b in zip(self.carb_bin_edges_g, self.carb_bin_edges_g[1:], strict=False)):
+            raise ValueError("photo.carb_bin_edges_g must be increasing")
+        return self
+
+
 class TargetsCfg(_Strict):
     """Success targets fixed before seeing results."""
 
@@ -204,6 +225,7 @@ class GlimpseConfig(_Strict):
     costs: CostsCfg
     pipeline: PipelineCfg
     augment: AugmentCfg
+    photo: PhotoCfg
     finetune_cap_items: int = Field(gt=0, le=10000)
     baselines: BaselinesCfg
     targets: TargetsCfg

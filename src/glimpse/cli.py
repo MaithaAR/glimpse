@@ -93,6 +93,14 @@ def _cv(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _download_weights(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Fetch and verify the pinned photo-model weights (needed once; everything else then runs offline)."""
+    from glimpse.models.weights import download_weights
+
+    download_weights(cfg.photo)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """Parse the command line, load + validate the config, set up logging and seeds, then run the sub-command."""
     p = argparse.ArgumentParser(prog="glimpse", description="GLIMPSE: pre-meal glucose-spike risk")
@@ -102,6 +110,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("check-config", help="load and validate the settings, then report them")
     dl = sub.add_parser("download-data", help="download CGMacros CSVs and before-meal photos (resumable)")
     dl.add_argument("--no-photos", action="store_true", help="CSVs only")
+    sub.add_parser("download-weights", help="download and verify the pinned photo-model weights")
     sub.add_parser("build-meals", help="build and validate the labelled meal table")
     sub.add_parser("params", help="count every model's parameters against the project limits")
     tr = sub.add_parser("train", help="train a model")
@@ -121,6 +130,7 @@ def main(argv: list[str] | None = None) -> int:
     commands = {
         "check-config": _check_config,
         "download-data": _download_data,
+        "download-weights": _download_weights,
         "build-meals": _build_meals,
         "prepare": _prepare,
         "params": _params,

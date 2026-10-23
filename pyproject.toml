@@ -18,6 +18,10 @@ dependencies = [
   "remotezip>=0.12,<1",
   "pillow>=11,<14",
   "matplotlib>=3.9,<4",
+  "torchvision>=0.24,<1",
+  "timm>=1.0,<2",
+  "huggingface-hub>=0.26,<2",
+  "safetensors>=0.4,<1",
 ]
 
 # `uv run glimpse ...` runs glimpse.cli:main
@@ -43,6 +47,7 @@ packages = ["src/glimpse"]
 # macOS uses the normal PyPI build (it includes Apple-GPU support).
 [tool.uv.sources]
 torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+torchvision = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
