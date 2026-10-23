@@ -114,6 +114,23 @@ class UsefulnessCfg(_Strict):
     max_abstain: Prob
 
 
+class PipelineCfg(_Strict):
+    """Pre-meal input checks applied before any model runs (the same rules used to label meals)."""
+
+    cgm_lookback_min: int = Field(gt=0, le=360, multiple_of=5)
+    min_cgm_readings_last_30min: int = Field(ge=1)
+    min_cgm_coverage: Prob
+    max_cgm_gap_min: int = Field(gt=0)
+    glucose_range_mgdl: Annotated[list[float], Field(min_length=2, max_length=2)]
+
+    @model_validator(mode="after")
+    def _range_ordered(self) -> PipelineCfg:
+        """The lower glucose limit must be below the upper one."""
+        if not 0 < self.glucose_range_mgdl[0] < self.glucose_range_mgdl[1]:
+            raise ValueError("pipeline.glucose_range_mgdl must be [low, high] with 0 < low < high")
+        return self
+
+
 class TargetsCfg(_Strict):
     """Success targets fixed before seeing results."""
 
@@ -138,6 +155,7 @@ class GlimpseConfig(_Strict):
     cohort: CohortCfg
     cv: CvCfg
     costs: CostsCfg
+    pipeline: PipelineCfg
     targets: TargetsCfg
 
 

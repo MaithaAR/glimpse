@@ -36,6 +36,12 @@ costs:                                        # (spike, no_spike); assumptions, 
   abstain: [2, 0.5]
   sweep_missed_spike: [3, 5, 7, 10]
   sweep_abstain_multiplier: [0.5, 1, 2, 4]
+pipeline:                                    # checks the product applies BEFORE any model (same rules as labelling)
+  cgm_lookback_min: 120                      # model input = 2 h before the meal (24 x 5-min slots)
+  min_cgm_readings_last_30min: 3
+  min_cgm_coverage: 0.70                     # share of 5-min slots with a reading
+  max_cgm_gap_min: 20
+  glucose_range_mgdl: [40, 400]              # Dexcom reportable range
 targets:
   rq1_noninferiority_margin: 0.03
   ece_max: 0.05

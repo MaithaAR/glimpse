@@ -8,11 +8,11 @@ default:
 install:
     uv sync
     uv run glimpse download-data
-    uv run glimpse build-meals
+    uv run glimpse prepare
 
-# rebuild the validated meal table from the downloaded data
-build-meals:
-    uv run glimpse build-meals
+# rebuild the meal table and the model-ready dataset from the downloaded data
+prepare:
+    uv run glimpse prepare
 
 # run the test suite
 test:

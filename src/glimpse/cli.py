@@ -40,6 +40,18 @@ def _build_meals(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _prepare(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Meal table -> model-ready dataset (windows, profile inputs, labels) saved to data/dataset.*."""
+    from glimpse.data.dataset import build_dataset
+    from glimpse.data.meals import build_meal_table
+
+    build_meal_table(cfg)
+    ds = build_dataset(cfg)
+    ds.save(Path("data/dataset"))
+    logger.bind(stage="data").info("dataset saved to data/dataset.npz and data/dataset.json")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """Parse the command line, load + validate the config, set up logging and seeds, then run the sub-command."""
     p = argparse.ArgumentParser(prog="glimpse", description="GLIMPSE: pre-meal glucose-spike risk")
@@ -50,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
     dl = sub.add_parser("download-data", help="download CGMacros CSVs and before-meal photos (resumable)")
     dl.add_argument("--no-photos", action="store_true", help="CSVs only")
     sub.add_parser("build-meals", help="build and validate the labelled meal table")
+    sub.add_parser("prepare", help="meal table + model-ready dataset (windows, profile inputs, labels)")
     args = p.parse_args(argv)
     try:
         cfg = load_config(args.config)
@@ -60,7 +73,12 @@ def main(argv: list[str] | None = None) -> int:
     setup_logging(cfg.paths.logs)
     set_seed(cfg.seed)
     logger.bind(stage="cli").info("command={} config={}", args.command, args.config)
-    commands = {"check-config": _check_config, "download-data": _download_data, "build-meals": _build_meals}
+    commands = {
+        "check-config": _check_config,
+        "download-data": _download_data,
+        "build-meals": _build_meals,
+        "prepare": _prepare,
+    }
     return commands[args.command](cfg, args)
 
 

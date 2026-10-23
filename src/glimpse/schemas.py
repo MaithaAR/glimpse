@@ -34,3 +34,21 @@ class MealRecord(BaseModel):
         if self.spike50 != int(self.rise >= 50):
             raise ValueError("spike50 does not match rise")
         return self
+
+
+class MealSample(BaseModel):
+    """One model-ready meal: identity, label, carb label and quality flags. Inputs live in aligned arrays."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+
+    person_id: int = Field(ge=1)
+    meal_time: datetime
+    group: Literal["healthy", "prediabetes", "T2D"]
+    photo_relpath: str | None
+    baseline_mgdl: float = Field(gt=20, lt=600)
+    rise_mgdl: float = Field(gt=-300, lt=600)
+    spike: Literal[0, 1]
+    carbs_served_g: float | None = Field(default=None, ge=0)
+    onboarding: bool  # outcome window ends in the person's first 72 h (used for the personal prior, not scored)
+    isolated: bool  # after onboarding and no other meal within 2 h: the meals that are scored
+    premeal_ok: bool  # passes the product's pre-meal sensor checks
