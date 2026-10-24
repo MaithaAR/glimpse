@@ -56,7 +56,7 @@ Out-of-range glucose (outside 40–400 mg/dL): 0 readings.
 ## Modalities
 - **Sequential:** CGM glucose and heart rate (this step).
 - **Tabular:** profile and personal prior (this step).
-- **Images:** before-meal photos are downloaded and checked here. They join the pipeline with the photo model (served-carbohydrate estimate), using its own image preprocessing and augmentation.
+- **Images:** before-meal photos, joined through the photo model (served-carbohydrate range and estimate) with its own preprocessing (the backbone's resize and normalisation, whole plate kept) and augmentation (flip, ±10% brightness/contrast, crops keeping ≥ 80%; training only).
 
 ## Glossary
 - **Onboarding meals:** a person's first 72 h. They build the personal prior and are never scored.
