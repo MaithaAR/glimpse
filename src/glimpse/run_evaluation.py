@@ -300,7 +300,7 @@ def _figures(table: pd.DataFrame, rel: list, ece: float) -> None:
     ax.axvline(base, ls="--", c="#95a5a6", lw=1)
     ax.axvline(0.5, ls=":", c="#bdc3c7", lw=1)
     ax.set_yticks(range(len(t)), t.model, fontsize=8)
-    ax.set_xlabel("AUROC (5-fold person cross-validation, 23 people; bars = 95% range by person)")
+    ax.set_xlabel("AUROC, 5-fold person cross-validation (23 people)\nbars = 95% range by person", fontsize=9)
     ax.set_title("Spike warning: what each input adds", fontsize=10)
     fig.tight_layout()
     fig.savefig(OUT / "fig1_auroc_ladder.png", dpi=200)
