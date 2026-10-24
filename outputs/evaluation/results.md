@@ -11,6 +11,7 @@
 | + logged carbs (reference) | 0.717 (0.648-0.796) | 0.729 | 0.587 | 0.192 |
 | + shuffled photo (control) | 0.679 (0.590-0.766) | 0.674 | 0.502 | 0.204 |
 | + ridge photo (post-hoc) | 0.703 (0.630-0.783) | 0.716 | 0.565 | 0.196 |
+| + photo grams only, no bins (post-hoc) | 0.704 (0.635-0.782) | 0.712 | 0.584 | 0.195 |
 
 Base spike rate 33% (481 meals, 23 people).
 

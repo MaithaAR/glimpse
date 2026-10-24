@@ -108,8 +108,11 @@ def run_carbs_check(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
 
 # ---------------------------------------------------------------- Step 4c-3: fusion with the photo estimate
 PHOTO_COLS = ["log_photo_g", "p_bin1", "p_bin2", "p_bin3"]  # p_bin0 left out: the four probabilities sum to 1
-FUSION_ARMS = ["no_meal", "photo", "logged_carbs", "photo_shuffled", "ridge_photo"]
-POST_HOC = ["ridge_photo"]  # added after seeing 4c-2; reported as secondary, never as the main result
+FUSION_ARMS = ["no_meal", "photo", "logged_carbs", "photo_shuffled", "ridge_photo", "photo_grams_only"]
+# added after seeing results; reported as secondary, never as the main result. ridge_photo: after 4c-2.
+# photo_grams_only (after Step 5): the fine-tuned photo estimate WITHOUT the bin probabilities, to show what the
+# carb-bin head adds (the instructor asked for that head).
+POST_HOC = ["ridge_photo", "photo_grams_only"]
 
 
 def photo_table(df: pd.DataFrame) -> dict[int, list[float]]:
@@ -162,8 +165,10 @@ def run_fusion(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
         pt = photo_table(p_nested[p_nested.fold == kk]) | photo_table(p_oof[p_oof.fold == kk])
         rt = ridge_table(r_nested[r_nested.fold == kk]) | ridge_table(r_oof[r_oof.fold == kk])
         inner = _inner_folds(people, groups, cfg.cv.inner_folds, cfg.seed + 100 + k)
+        gt = {r: v[:1] for r, v in pt.items()}  # log grams only, no bin probabilities
         X = {"no_meal": trend_features, "photo": with_table(pt, len(PHOTO_COLS)),
-             "logged_carbs": arm_features("logged_carbs"), "ridge_photo": with_table(rt, 1)}  # fmt: skip
+             "logged_carbs": arm_features("logged_carbs"), "ridge_photo": with_table(rt, 1),
+             "photo_grams_only": with_table(gt, 1)}  # fmt: skip
         preds, chosen = {}, {"fold": kk}
         for arm, fx in X.items():
             c, _ = _tune_sklearn(lambda c: logistic(c, cfg.seed), grid, fx, ds, people, inner, y)

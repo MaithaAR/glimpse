@@ -59,6 +59,7 @@ LADDER = [  # (label, column): the order of the results table and the AUROC figu
     ("+ logged carbs (reference)", "logged_carbs"),
     ("+ shuffled photo (control)", "photo_shuffled"),
     ("+ ridge photo (post-hoc)", "ridge_photo"),
+    ("+ photo grams only, no bins (post-hoc)", "photo_grams_only"),
 ]
 
 
@@ -186,7 +187,9 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
         m, lo, hi = paired_person_bootstrap(y, df[a].to_numpy(), df[b].to_numpy(), sids, B=B, seed=seed)
         return {"point": _auc(y, df[a].to_numpy()) - _auc(y, df[b].to_numpy()), "ci95": [lo, hi]}
 
-    gains = {c: gain(c, "no_meal") for c in ["photo", "logged_carbs", "photo_shuffled", "ridge_photo"]}
+    arms = ["photo", "logged_carbs", "photo_shuffled", "ridge_photo", "photo_grams_only"]
+    gains = {c: gain(c, "no_meal") for c in arms}
+    gains["bins_added"] = gain("photo", "photo_grams_only")  # what the carb-bin head adds (post-hoc)
     rq1 = gain("photo", "logged_carbs")
     rq1["verdict"] = noninferiority(*rq1["ci95"], cfg.targets.rq1_noninferiority_margin)
     rq2 = gain("sensor_cnn", "no_meal")
@@ -292,8 +295,8 @@ def _figures(table: pd.DataFrame, rel: list, ece: float) -> None:
 
     t = table.iloc[::-1]
     fig, ax = plt.subplots(figsize=(7.5, 4.2))
-    colors = ["#c0392b" if c == "photo" else "#7f8c8d" if c in ("photo_shuffled", "ridge_photo") else "#2c3e50"
-              for c in t.column]  # fmt: skip
+    grey = ("photo_shuffled", "ridge_photo", "photo_grams_only")
+    colors = ["#c0392b" if c == "photo" else "#7f8c8d" if c in grey else "#2c3e50" for c in t.column]
     for k, (r, col) in enumerate(zip(t.itertuples(), colors, strict=True)):
         ax.errorbar(r.auroc, k, xerr=[[r.auroc - r.auroc_lo], [r.auroc_hi - r.auroc]], fmt="o", color=col, capsize=3)
     base = float(table.loc[table.column == "no_meal", "auroc"].iloc[0])

@@ -88,3 +88,7 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
   cross-validation with the main cut-offs (they use no data, so this is fair).
 - The amendment file (`checkpoints/thresholds_amended.json`, with its hash) is committed before `glimpse evaluate`
   scores the test; the command refuses to run otherwise.
+
+## Added after Step 5 (post-hoc, secondary)
+- **Carb-bin head check:** a fusion arm with the fine-tuned photo estimate in grams only (no bin probabilities), same
+  folds and estimates. The gain of the main arm over it shows what the carb-bin head adds. Never the main result.
