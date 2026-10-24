@@ -167,6 +167,34 @@ def _demo(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _predict(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """One meal from your own files -> the answer as JSON on screen."""
+    import json
+    import sys
+    from datetime import datetime
+
+    from glimpse.demo import Glimpse, MealInput, read_cgm_csv
+
+    gt, gv, ht, hv = read_cgm_csv(args.cgm)
+    nan = float("nan")
+    profile = {"age": args.age, "bmi": args.bmi, "a1c_pct": args.a1c, "fasting_glucose_mgdl": args.fasting,
+               "prior_spike_rate": nan if args.prior_rate is None else args.prior_rate,
+               "prior_rise": nan if args.prior_rise is None else args.prior_rise}  # fmt: skip
+    when = datetime.fromisoformat(args.meal_time) if args.meal_time else max(gt)
+    a = Glimpse(cfg).predict(MealInput(meal_time=when, glucose_times=gt, glucose_mgdl=gv, hr_times=ht, hr_bpm=hv,
+                                       profile=profile, photo=Path(args.photo) if args.photo else None))  # fmt: skip
+    sys.stdout.write(json.dumps(a.to_dict(), indent=2) + "\n")
+    return 0
+
+
+def _selftest(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Check that every frozen part loads offline and the full path runs (used inside the container)."""
+    from glimpse.demo_run import selftest
+
+    selftest(cfg)
+    return 0
+
+
 def _download_weights(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Fetch and verify the pinned photo-model weights (needed once; everything else then runs offline)."""
     from glimpse.models.weights import download_weights
@@ -202,6 +230,15 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
     sub.add_parser("evaluate", help="full evaluation into outputs/evaluation/ (scores the fixed test once)")
     sub.add_parser("demo", help="worked cases, can't-judge cases and response time (Step 6a)")
+    pr = sub.add_parser("predict", help="answer one meal from your own photo, CGM CSV and profile")
+    pr.add_argument("--cgm", required=True, help="CSV with timestamp, glucose_mgdl (and optionally hr_bpm)")
+    pr.add_argument("--photo", help="before-meal photo (omit if none: the answer is then 'can't judge')")
+    pr.add_argument("--meal-time", help="YYYY-MM-DDTHH:MM (default: last reading in the CSV)")
+    for name in ("age", "bmi", "a1c", "fasting"):
+        pr.add_argument(f"--{name}", type=float, required=True)
+    pr.add_argument("--prior-rate", type=float, help="spike rate in your onboarding week (0-1), optional")
+    pr.add_argument("--prior-rise", type=float, help="mean rise in your onboarding week (mg/dL), optional")
+    sub.add_parser("selftest", help="check the frozen pipeline loads offline and runs (no dataset needed)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
     try:
@@ -229,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
         "amend-thresholds": _amend,
         "evaluate": _evaluate,
         "demo": _demo,
+        "predict": _predict,
+        "selftest": _selftest,
     }
     return commands[args.command](cfg, args)
 

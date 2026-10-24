@@ -34,3 +34,15 @@ jobs:
         run: git diff --exit-code splits/dev_splits.json
       - name: Train the from-scratch SensorCNN
         run: uv run glimpse train --model scratch
+  container:
+    # Builds the Linux container from the Dockerfile and runs it with the network switched off:
+    # settings check + self-test (all frozen parts load from local files; the full prediction path runs).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image (locked libraries + pinned, hash-checked photo weights)
+        run: docker build -t glimpse .
+      - name: Settings check, offline
+        run: docker run --rm --network none glimpse check-config
+      - name: Self-test, offline
+        run: docker run --rm --network none glimpse selftest

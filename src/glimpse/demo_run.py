@@ -174,3 +174,34 @@ def write_example(cfg: GlimpseConfig, ds: MealDataset, row: int, folder: Path) -
     csv = folder / f"meal_{row}.csv"
     d.to_csv(csv, index=False)
     return {"row": row, "csv": csv, "photo": m.photo, "meal_time": m.meal_time, "profile": m.profile}
+
+
+def selftest(cfg: GlimpseConfig) -> dict:
+    """Container check without any dataset: loads every frozen part (offline weights with their hash, fusion,
+    frozen cut-offs, unfamiliar-photo reference) and runs the full path on a synthetic meal."""
+    import tempfile
+    from datetime import datetime, timedelta
+
+    app = Glimpse(cfg)
+    folder = Path(tempfile.mkdtemp())
+    photo = folder / "grey.jpg"
+    synthetic_images()["grey"].save(photo)
+    meal = datetime(2024, 1, 1, 12, 0)
+    times = [meal - timedelta(minutes=m) for m in range(115, -1, -5)]
+    m = MealInput(meal_time=meal, glucose_times=times, glucose_mgdl=[95 + 0.2 * k for k in range(len(times))],
+                  profile={"age": 50, "bmi": 29, "a1c_pct": 5.9, "fasting_glucose_mgdl": 104,
+                           "prior_spike_rate": float("nan"), "prior_rise": float("nan")}, photo=photo)  # fmt: skip
+    unfamiliar = app.predict(m)
+    no_photo = app.predict(MealInput(**{**m.__dict__, "photo": None}))
+    app.ood_cut = float("inf")  # let the grey picture through, only to exercise the scoring path end to end
+    scored = app.predict(m)
+    checks = {"unfamiliar photo -> can't judge": unfamiliar.decision == "can't judge" and "unlike" in unfamiliar.reason,
+              "no photo -> can't judge": no_photo.decision == "can't judge",
+              "full path gives a risk in [0, 1]": scored.risk is not None and 0 <= scored.risk <= 1}  # fmt: skip
+    log = logger.bind(stage="selftest")
+    for k, ok in checks.items():
+        log.info("{:<36} {}", k, "OK" if ok else "FAILED")
+    log.info("full path: {} (risk {:.2f}) in {:.0f} ms", scored.decision, scored.risk, scored.latency_ms)
+    if not all(checks.values()):
+        raise RuntimeError("self-test failed")
+    return checks

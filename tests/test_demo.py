@@ -2,6 +2,7 @@
 
 import math
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -64,3 +65,18 @@ def test_cgm_csv_input(tmp_path):
     f.write_text("time,value\n2020-05-01 12:00,100\n")
     with pytest.raises(ValueError, match="glucose_mgdl"):
         read_cgm_csv(f)
+
+
+def test_selftest_runs_when_weights_are_present():
+    """The container's self-test, run locally when the weights and frozen checkpoints exist."""
+    import pytest
+
+    from glimpse.demo import OOD_REF
+
+    cfg = load_config()
+    weights = Path(cfg.photo.weights_dir)
+    if not (OOD_REF.is_file() and weights.is_dir() and any(weights.iterdir())):
+        pytest.skip("photo weights not downloaded (run `just install`)")
+    from glimpse.demo_run import selftest
+
+    assert all(selftest(cfg).values())

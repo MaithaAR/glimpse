@@ -78,6 +78,24 @@ evaluate:
 demo:
     uv run glimpse demo
 
+# answer one meal from your own files, e.g. just predict --cgm my_cgm.csv --photo lunch.jpg --age 45 --bmi 28 --a1c 5.9 --fasting 100
+predict *ARGS:
+    uv run glimpse predict {{ARGS}}
+
+# offline check that every frozen part loads and the full path runs (no dataset needed)
+selftest:
+    uv run glimpse selftest
+
+# Linux container (needs Docker): build, offline self-test, and the demo with your own CGMacros copy mounted read-only
+docker-build:
+    docker build -t glimpse .
+
+docker-selftest:
+    docker run --rm --network none glimpse selftest
+
+docker-demo:
+    docker run --rm --network none -v "$PWD/data/cgmacros:/app/data/cgmacros:ro" -v "$PWD/data/dataset.json:/app/data/dataset.json:ro" -v "$PWD/data/dataset.npz:/app/data/dataset.npz:ro" glimpse demo
+
 # the GLIMPSE screen in the browser (http://127.0.0.1:7860); needs the optional `app` extra (Gradio)
 app:
     uv run --extra app python -m glimpse.app
