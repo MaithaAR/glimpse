@@ -58,6 +58,10 @@ carbs-check:
 photo-cv:
     uv run glimpse photo-cv
 
+# fusion: profile + trend with no meal / photo / logged carbs / shuffled photo (+ post-hoc ridge arm); ~2 min
+fusion:
+    uv run glimpse fusion
+
 # evaluate models and baselines, writing results to outputs/ (built in Step 5)
 evaluate:
     @echo "Not built yet: evaluation is added in Step 5." && exit 1

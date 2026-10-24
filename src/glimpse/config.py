@@ -180,6 +180,7 @@ class FusionCfg(_Strict):
 
     bootstrap_draws: int = Field(ge=100, le=100000)
     carbs_check_min_gain: float = Field(ge=0, lt=1)
+    ridge_alpha_grid_posthoc: list[float] = Field(min_length=1)
 
 
 class TargetsCfg(_Strict):

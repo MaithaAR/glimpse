@@ -244,3 +244,38 @@ def summarise_photo_cv(oof: pd.DataFrame, nested: pd.DataFrame, choices: list[di
         "note": "one seed; nested estimates come from models trained on fewer people, so they are a little worse "
                 "than the OOF ones",
     }  # fmt: skip
+
+
+def ridge_estimates(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+    """POST-HOC (added after 4c-2): frozen ConvNeXt + ridge, with the alpha grid widened because 1000 (the old top)
+    won in every fold. Same folds; OOF estimates for held-out people and nested ones for training people, exactly
+    like the fine-tuned model, so ridge can be a secondary fusion arm. Takes about a minute (cached photos)."""
+    log, out = logger.bind(stage="photo_cv"), Path(cfg.paths.outputs) / "photo_cv"
+    out.mkdir(parents=True, exist_ok=True)
+    groups = {s.person_id: s.group for s in ds.samples}
+    dev, grid = set(groups) - set(sp.locked), cfg.fusion.ridge_alpha_grid_posthoc
+    rows = photo_rows(ds, dev, Path(cfg.data.cgmacros_root))
+    person, g = np.array([ds.samples[i].person_id for i in rows]), grams(ds, rows)
+    model = PhotoCarbModel(cfg.photo.arch, weights=weights_path(cfg.photo), dropout=cfg.photo.dropout)
+    maps = build_cache(model, ds, rows, cfg, "maps_eval", Path("data/cache") / "photo_cv_maps_eval.pt")
+    emb = embed_maps(model, maps).numpy()
+    oof, nested, alphas = [], [], {}
+    for f in fold_plan(sp, groups, cfg):
+        k = f["fold"]
+        pos_t, pos_h = np.where(np.isin(person, f["train"]))[0], np.where(np.isin(person, f["held"]))[0]
+        splits = [(pos_t[~np.isin(person[pos_t], h)], pos_t[np.isin(person[pos_t], h)]) for h in f["inner"]]
+        err = {a: np.mean([np.mean(np.abs(_ridge_predict(_ridge(emb[a_], g[a_], a), emb[b_]) - g[b_]))
+                           for a_, b_ in splits]) for a in grid}  # fmt: skip
+        alphas[k] = min(grid, key=lambda a: float(err[a]))
+        for j, (fit, hold) in enumerate(splits):
+            pr = _ridge_predict(_ridge(emb[fit], g[fit], alphas[k]), emb[hold])
+            part = {"fold": k, "inner": j + 1, "row": rows[hold], "carbs_g": g[hold], "ridge_g": pr}
+            nested.append(pd.DataFrame(part))
+        pr = _ridge_predict(_ridge(emb[pos_t], g[pos_t], alphas[k]), emb[pos_h])
+        oof.append(pd.DataFrame({"fold": k, "row": rows[pos_h], "carbs_g": g[pos_h], "ridge_g": pr}))
+    oof_df, nested_df = pd.concat(oof, ignore_index=True), pd.concat(nested, ignore_index=True)
+    oof_df.to_csv(out / "ridge_posthoc_oof.csv", index=False)
+    nested_df.to_csv(out / "ridge_posthoc_nested.csv", index=False)
+    info = {"alpha_grid": grid, "alpha_by_fold": alphas}
+    log.info("post-hoc ridge: alpha per fold {}", alphas)
+    return oof_df, nested_df, info

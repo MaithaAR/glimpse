@@ -62,3 +62,13 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 - **RQ1** (photo vs logged carbs, margin 0.03) is kept as written in the proposal. With 23 people the 95% range is
   expected to be about 0.06 wide, so "inconclusive" is a likely, honest outcome.
 - Scored meals without a photo get the training median estimate and are reported with and without.
+
+## Added after 4c-2 results, before 4c-3 ran (post-hoc, reported as secondary)
+- 4c-2 showed frozen ConvNeXt + ridge with a lower carb error than the fine-tuned model (20.4 vs 22.5 g; paired person
+  bootstrap of the difference 0.7 to 3.4 g), and ridge alpha at the top of its grid in every fold.
+- **Ridge photo arm** (log of the ridge estimate) is added to the fusion with nested/OOF estimates made like the
+  fine-tuned ones, alpha grid widened to `fusion.ridge_alpha_grid_posthoc`. It is labelled post-hoc and is never
+  the main result, whatever it scores. The primary arm stays the fine-tuned photo model, as written above.
+- **Shuffled control:** the fitted photo model scores the test meals with their photo inputs swapped among the
+  test meals of the same fold.
+- **Diagnostic:** calibration slope of the photo estimates (log scale), out-of-fold vs nested.

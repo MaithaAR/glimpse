@@ -62,3 +62,28 @@ def test_every_scored_meal_has_logged_carbs():
     ds, sp = MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json"))
     rows = meal_rows(ds, {p for f in sp.outer_folds for p in f}, scored_only=True)
     assert len(rows) == 481 and all(ds.samples[i].carbs_served_g is not None for i in rows)
+
+
+def test_photo_inputs_and_missing_photos():
+    """Photo inputs = log grams + 3 bin probabilities; a meal without a photo gets NaN (filled from training)."""
+    import pandas as pd
+
+    from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
+
+    df = pd.DataFrame({"row": [0], "photo_g": [50.0], "p_bin0": [0.1], "p_bin1": [0.2], "p_bin2": [0.3],
+                       "p_bin3": [0.4]})  # fmt: skip
+    t = photo_table(df)
+    assert np.isclose(t[0][0], np.log(51)) and t[0][1:] == [0.2, 0.3, 0.4]
+    x = with_table(t, len(PHOTO_COLS))(_toy([10.0, 20.0]), np.arange(2))
+    assert x.shape[1] == len(TREND_FEATURES) + len(PROFILE) + len(PHOTO_COLS)
+    assert not np.isnan(x[0, -4:]).any() and np.isnan(x[1, -4:]).all()
+
+
+def test_shuffled_control_only_moves_photo_columns():
+    """The control swaps the photo inputs between meals and leaves every other input where it was."""
+    from glimpse.training.fusion import shuffle_within
+
+    x = np.arange(40, dtype=float).reshape(10, 4)
+    s = shuffle_within(x, 2, seed=1)
+    assert np.array_equal(s[:, :2], x[:, :2])
+    assert sorted(map(tuple, s[:, 2:])) == sorted(map(tuple, x[:, 2:])) and not np.array_equal(s, x)

@@ -68,6 +68,7 @@ baselines:                                   # fixed before seeing results; ever
 fusion:                                      # meal information added to profile + trend (fixed before running 4c)
   bootstrap_draws: 2000                      # paired person bootstrap of the AUROC gain
   carbs_check_min_gain: 0.02                 # logged-carbs check: skip the photo CV only if the WHOLE 95% range is below this
+  ridge_alpha_grid_posthoc: [1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0]  # POST-HOC (after 4c-2): ridge hit 1000 in all folds
 targets:                                     # fixed before seeing results (see docs/evaluation_protocol.md)
   primary_metric: auroc                      # target cohort, cross-validated out-of-fold predictions
   rq1_noninferiority_margin: 0.03
