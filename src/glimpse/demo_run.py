@@ -86,8 +86,8 @@ def card(title: str, m: MealInput, a, truth: str | None) -> str:
     photo = m.photo.name if m.photo else "none"
     lines = [f"### {title}", f"- meal time: {m.meal_time:%Y-%m-%d %H:%M}; photo: {photo}",
              f"- **{a.decision.upper()}**: {a.sentence}", f"- reason: {a.reason}"]  # fmt: skip
-    if a.carbs_g is not None:
-        lines.append(f"- estimated carbs: {a.carbs_g:.0f} g (bin {a.carb_bin}); unfamiliar-photo score "
+    if a.carb_bin is not None:
+        lines.append(f"- carbs: most likely {a.carb_bin} ({a.carb_bin_prob:.0%} sure); unfamiliar-photo score "
                      f"{a.unfamiliar_photo_score:.3f}")  # fmt: skip
     if truth:
         lines.append(f"- what happened: {truth}")
@@ -160,3 +160,17 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
              "windows match the dataset: {}", len(df), summary["decisions"], p50, p95, cfg.targets.latency_p95_ms,
              summary["raw_window_matches_dataset"])  # fmt: skip
     return summary
+
+
+def write_example(cfg: GlimpseConfig, ds: MealDataset, row: int, folder: Path) -> dict:
+    """One meal as the files a user would supply: the 2 h of readings before it as a CSV, plus photo and profile."""
+    m = meal_input(cfg, ds, row)
+    start = m.meal_time - pd.Timedelta(minutes=cfg.pipeline.cgm_lookback_min)
+    g = pd.DataFrame({"timestamp": m.glucose_times, "glucose_mgdl": m.glucose_mgdl})
+    h = pd.DataFrame({"timestamp": m.hr_times, "hr_bpm": m.hr_bpm})
+    d = g.merge(h, on="timestamp", how="outer").sort_values("timestamp")
+    d = d[(d.timestamp > start) & (d.timestamp <= m.meal_time)]
+    folder.mkdir(parents=True, exist_ok=True)
+    csv = folder / f"meal_{row}.csv"
+    d.to_csv(csv, index=False)
+    return {"row": row, "csv": csv, "photo": m.photo, "meal_time": m.meal_time, "profile": m.profile}

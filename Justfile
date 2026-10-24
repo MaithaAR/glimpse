@@ -78,6 +78,10 @@ evaluate:
 demo:
     uv run glimpse demo
 
+# the GLIMPSE screen in the browser (http://127.0.0.1:7860); needs the optional `app` extra (Gradio)
+app:
+    uv run --extra app python -m glimpse.app
+
 # remove generated files (keeps downloaded data and the locked environment)
 clean:
     rm -rf outputs logs .pytest_cache .ruff_cache

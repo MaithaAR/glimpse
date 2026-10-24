@@ -49,3 +49,18 @@ def test_unfamiliar_photo_distance():
     assert torch.isclose(knn_distance(ref, ref[:1], 1), torch.zeros(1), atol=1e-6).all()
     assert knn_distance(ref, -ref[:1], 1)[0] > 1e-3
     assert (leave_one_out_distances(ref, 1) > 1e-6).all()
+
+
+def test_cgm_csv_input(tmp_path):
+    """The app's CSV: timestamp + glucose_mgdl (+ optional hr_bpm); a wrong header is refused clearly."""
+    import pytest
+
+    from glimpse.demo import read_cgm_csv
+
+    f = tmp_path / "cgm.csv"
+    f.write_text("timestamp,glucose_mgdl,hr_bpm\n2020-05-01 11:55,101,70\n2020-05-01 12:00,,72\n")
+    gt, gv, ht, hv = read_cgm_csv(f)
+    assert gv == [101.0] and len(ht) == 2 and hv == [70.0, 72.0]
+    f.write_text("time,value\n2020-05-01 12:00,100\n")
+    with pytest.raises(ValueError, match="glucose_mgdl"):
+        read_cgm_csv(f)

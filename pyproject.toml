@@ -28,6 +28,11 @@ dependencies = [
 [project.scripts]
 glimpse = "glimpse.cli:main"
 
+[project.optional-dependencies]
+app = [
+    "gradio>=5",
+]
+
 # Tools used only while developing (tests and code checks), kept apart from the product's libraries.
 [dependency-groups]
 dev = [

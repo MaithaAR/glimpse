@@ -59,8 +59,10 @@ class Answer:
     sentence: str
     reason: str
     risk: float | None = None
-    carbs_g: float | None = None
-    carb_bin: str | None = None
+    carbs_g: float | None = None  # point estimate from the other head; kept in results, not shown (the two heads
+    # were trained separately and disagree on about half of the meals, so the user sees the range only)
+    carb_bin: str | None = None  # what the user sees: the most likely carb range ...
+    carb_bin_prob: float | None = None  # ... and how sure the model is
     unfamiliar_photo_score: float | None = None
     latency_ms: float | None = None
 
@@ -171,10 +173,11 @@ class Glimpse:
         reg, logits = self.model.heads(emb)
         grams = float(torch.expm1(reg).clamp(min=0)[0])
         probs = torch.softmax(logits, 1)[0].numpy()
-        base = {"carbs_g": grams, "carb_bin": CARB_BINS[int(probs.argmax())], "unfamiliar_photo_score": score}
+        base = {"carbs_g": grams, "carb_bin": CARB_BINS[int(probs.argmax())], "carb_bin_prob": float(probs.max()),
+                "unfamiliar_photo_score": score}  # fmt: skip
         if score > self.ood_cut:
-            r = "the photo looks unlike the meal photos the model learned from"
-            return done(Answer("can't judge", sentence("can't judge", None, r), r, **base))
+            r = "the photo looks unlike the meal photos the model learned from"  # no carb guess for a non-meal photo
+            return done(Answer("can't judge", sentence("can't judge", None, r), r, unfamiliar_photo_score=score))
         ns = SimpleNamespace(glucose=g.values[None], heart_rate=h.values[None],
                              profile=profile_vector(m.profile, m.meal_time)[None])  # fmt: skip
         x = np.hstack([trend_features(ns, np.array([0])), [[np.log1p(grams), *probs[1:]]]])
@@ -185,3 +188,18 @@ class Glimpse:
                   "can't judge": f"the risk ({risk:.0%}) is borderline, between {self.lo:.0%} and "
                                  f"{self.hi:.0%}"}[dec]  # fmt: skip
         return done(Answer(dec, sentence(dec, risk, reason), reason, risk=risk, **base))
+
+
+def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[datetime], list[float]]:
+    """A sensor export as the app accepts it: columns `timestamp`, `glucose_mgdl` and optionally `hr_bpm`."""
+    import pandas as pd
+
+    d = pd.read_csv(path)
+    missing = {"timestamp", "glucose_mgdl"} - set(d.columns)
+    if missing:
+        raise ValueError(f"the CSV needs the columns timestamp and glucose_mgdl (missing: {sorted(missing)})")
+    d["timestamp"] = pd.to_datetime(d["timestamp"])
+    g = d.dropna(subset=["glucose_mgdl"])
+    h = d.dropna(subset=["hr_bpm"]) if "hr_bpm" in d else d.iloc[0:0]
+    return (list(g.timestamp.dt.to_pydatetime()), g.glucose_mgdl.astype(float).tolist(),
+            list(h.timestamp.dt.to_pydatetime()), h.hr_bpm.astype(float).tolist() if len(h) else [])  # fmt: skip
