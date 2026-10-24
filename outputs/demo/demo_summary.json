@@ -1,0 +1,37 @@
+{
+  "test_meals": 96,
+  "decisions": {
+    "caution": 78,
+    "can't judge": 15,
+    "low risk": 3
+  },
+  "latency_ms_p50": 277.01108300243504,
+  "latency_ms_p95": 296.89863574458286,
+  "latency_target_ms": 300.0,
+  "latency_met": true,
+  "machine": "Darwin arm64",
+  "torch_threads": 4,
+  "raw_window_matches_dataset": true,
+  "unfamiliar_photo_check": {
+    "training_photos": 865,
+    "k": 5,
+    "quantile": 0.99,
+    "cut": 0.6087613701820374,
+    "held_out_meal_photos_flagged": 0.03089887648820877,
+    "held_out_photos": 356,
+    "synthetic_scores": {
+      "grey": 0.7491320967674255,
+      "black": 0.7249965667724609,
+      "white": 0.5943560004234314,
+      "noise": 0.7669946551322937,
+      "gradient": 0.6654955148696899,
+      "checkerboard": 0.7656465768814087
+    },
+    "synthetic_flagged": 5
+  },
+  "cases": {
+    "Correct warning (caution, and it spiked)": 545,
+    "Correct all-clear (low risk, no spike)": 543,
+    "Wrong answer (shown on purpose)": 546
+  }
+}

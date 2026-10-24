@@ -157,6 +157,16 @@ def _evaluate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _demo(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Worked cases, can't-judge cases and response time with the frozen pipeline (Step 6a)."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits
+    from glimpse.demo_run import run_demo
+
+    run_demo(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
+    return 0
+
+
 def _download_weights(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Fetch and verify the pinned photo-model weights (needed once; everything else then runs offline)."""
     from glimpse.models.weights import download_weights
@@ -191,6 +201,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
     sub.add_parser("evaluate", help="full evaluation into outputs/evaluation/ (scores the fixed test once)")
+    sub.add_parser("demo", help="worked cases, can't-judge cases and response time (Step 6a)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
     try:
@@ -217,6 +228,7 @@ def main(argv: list[str] | None = None) -> int:
         "final": _final,
         "amend-thresholds": _amend,
         "evaluate": _evaluate,
+        "demo": _demo,
     }
     return commands[args.command](cfg, args)
 

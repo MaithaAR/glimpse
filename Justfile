@@ -74,9 +74,9 @@ amend-thresholds:
 evaluate:
     uv run glimpse evaluate
 
-# end-to-end demo on the sample inputs (built in Step 6)
+# demo with the frozen pipeline: worked cases from the test people, two can't-judge cases, response time
 demo:
-    @echo "Not built yet: the demo is added in Step 6." && exit 1
+    uv run glimpse demo
 
 # remove generated files (keeps downloaded data and the locked environment)
 clean:

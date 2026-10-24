@@ -31,8 +31,9 @@ def resample_window(times: Sequence[datetime], values: Sequence[float], meal_tim
     n = lookback_min // STEP_MIN
     start = meal_time - timedelta(minutes=lookback_min)
     sums, counts = np.zeros(n), np.zeros(n)
-    inside = [(t, v) for t, v in zip(times, values, strict=True)
-              if start < t <= meal_time and v is not None and not math.isnan(v)]  # fmt: skip
+    # sorted by time, so the gaps below are measured between neighbouring readings even if input is unordered
+    inside = sorted((t, v) for t, v in zip(times, values, strict=True)
+                    if start < t <= meal_time and v is not None and not math.isnan(v))  # fmt: skip
     for t, v in inside:
         k = min(max(math.ceil((t - start).total_seconds() / (60 * STEP_MIN)) - 1, 0), n - 1)
         sums[k] += v
