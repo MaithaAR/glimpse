@@ -175,6 +175,13 @@ class PhotoCfg(_Strict):
         return self
 
 
+class FusionCfg(_Strict):
+    """Adding meal information (logged or photo-estimated carbs) to the profile + trend logistic regression."""
+
+    bootstrap_draws: int = Field(ge=100, le=100000)
+    carbs_check_min_gain: float = Field(ge=0, lt=1)
+
+
 class TargetsCfg(_Strict):
     """Success targets fixed before seeing results."""
 
@@ -247,6 +254,7 @@ class GlimpseConfig(_Strict):
     photo: PhotoCfg
     finetune_cap_items: int = Field(gt=0, le=10000)
     baselines: BaselinesCfg
+    fusion: FusionCfg
     targets: TargetsCfg
     training: TrainingCfg
 

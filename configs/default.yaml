@@ -62,8 +62,12 @@ photo:                                       # pretrained photo model (carbohydr
   carb_bin_edges_g: [30, 60, 90]             # bins <30, 30-<60, 60-<90, >=90 g (an edge value goes to the upper bin)
 finetune_cap_items: 10000                    # project limit: photos used to fine-tune, summed over the whole project
 baselines:                                   # fixed before seeing results; every model gets the same folds and normaliser
-  logreg_c_grid: [0.01, 0.1, 1.0, 10.0]      # logistic regression: one setting tuned on the inner folds (CNN: epochs)
+  logreg_c_grid: [0.001, 0.003, 0.01, 0.03, 0.1, 1.0, 10.0]  # logistic regression strength C, tuned on the inner folds;
+                                           # widened downwards in 4c because 0.01 (the old minimum) won 9 of 10 times
   gbm_depth_grid: [2, 3, 4]                  # gradient boosting (the proposal's baseline): tree depth tuned the same way
+fusion:                                      # meal information added to profile + trend (fixed before running 4c)
+  bootstrap_draws: 2000                      # paired person bootstrap of the AUROC gain
+  carbs_check_min_gain: 0.02                 # logged-carbs check: skip the photo CV only if the WHOLE 95% range is below this
 targets:                                     # fixed before seeing results (see docs/evaluation_protocol.md)
   primary_metric: auroc                      # target cohort, cross-validated out-of-fold predictions
   rq1_noninferiority_margin: 0.03

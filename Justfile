@@ -50,6 +50,10 @@ train-photo:
 cv:
     uv run glimpse cv
 
+# logged-carbs check: profile + trend with vs without the logged carbs, same folds; decides whether the photo CV runs
+carbs-check:
+    uv run glimpse carbs-check
+
 # evaluate models and baselines, writing results to outputs/ (built in Step 5)
 evaluate:
     @echo "Not built yet: evaluation is added in Step 5." && exit 1

@@ -9,6 +9,7 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 | Scaling statistics, missing-value fills | training people of that run (refitted inside every fold) | validation, test, locked |
 | Number of training epochs (CNN) | 4 inner person folds inside the training people (median best epoch) | validation, test, locked |
 | Logistic-regression strength (C) | the same 4 inner folds | validation, test, locked |
+| Whether the photo cross-validation runs | logged-carbs check on the out-of-fold predictions (rule below) | validation, test, locked |
 | Decision thresholds (low risk / caution / can't judge) | the 4 validation people, with the 28-person model | test, locked |
 | Threshold stability check (reported, not used to choose) | pooled cross-validated predictions of the 23 development target people | locked |
 | **Main result** | out-of-fold predictions over the 23 development target people (5 outer folds, 3 seeds) | locked |
@@ -33,3 +34,15 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 - **RQ2:** the CNN beats engineered trends only if the lower end of the 95% range of the AUROC gain is above `targets.rq2_min_lower_bound` (0). Otherwise it is reported as a tie or a loss.
 - **Calibration:** ECE ≤ `targets.ece_max` (0.05).
 - **Status labels:** *met* only if the whole 95% range meets the target; *on track* if only the estimate does; otherwise *at risk*.
+
+## Meal information (added in Step 4c, before running it)
+- **C grid widened** to `baselines.logreg_c_grid` = 0.001 ... 10: the old minimum (0.01) was chosen in 9 of 10 tunings,
+  so the best setting may have been below the grid. Heavy shrinkage could hide a useful carbs input.
+- **Logged-carbs check (4c-1).** The same logistic regression (trend + profile inputs) with and without log(1 + logged
+  carbs), same folds and inner folds. Logged carbs are the upper bound for photo-estimated carbs.
+- **Rule:** skip the photo cross-validation only if the whole 95% person-bootstrap range of the AUROC gain is below
+  `fusion.carbs_check_min_gain` (0.02). Any other result, including an unclear one, means proceed.
+- **One main comparison** for the photo: AUROC gain of photo carbs over no meal information (paired person bootstrap).
+  Logged carbs are a reference arm, not a competitor. No extra arms (interactions, other learners) are added after
+  seeing results.
+- **Known limit:** the bootstrap resamples people but not the inner-fold tuning, so the range is slightly too narrow.
