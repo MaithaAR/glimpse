@@ -5,6 +5,7 @@ that are already present, so an interrupted download simply resumes."""
 from __future__ import annotations
 
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from loguru import logger
 
 CGMACROS_ZIP = "https://physionet-open.s3.amazonaws.com/cgmacros/1.0.0/CGMacros_dateshifted365.zip"
 PHOTO_LIST = Path("splits/photo_list.txt")
+ATTEMPTS = 4  # tries per file before giving up (network hiccups)
 
 _local = threading.local()
 
@@ -21,7 +23,7 @@ def _zip():
     from remotezip import RemoteZip
 
     if not hasattr(_local, "z"):
-        _local.z = RemoteZip(CGMACROS_ZIP)
+        _local.z = RemoteZip(CGMACROS_ZIP, timeout=60)  # never wait forever on a stalled connection
     return _local.z
 
 
@@ -32,7 +34,16 @@ def _fetch(member: str, dest_root: Path) -> str:
         return "skip"
     dst.parent.mkdir(parents=True, exist_ok=True)
     tmp = dst.with_suffix(dst.suffix + ".part")  # write to a temporary name first, so a crash never leaves half a file
-    tmp.write_bytes(_zip().read(member))
+    for attempt in range(1, ATTEMPTS + 1):
+        try:
+            tmp.write_bytes(_zip().read(member))
+            break
+        except Exception as e:  # network hiccup: start a fresh connection for this thread and try again
+            if attempt == ATTEMPTS:
+                raise
+            logger.bind(stage="download").warning("retry {}/{} for {}: {}", attempt, ATTEMPTS - 1, member, e)
+            _local.__dict__.pop("z", None)
+            time.sleep(2 * attempt)
     tmp.replace(dst)
     return "ok"
 
