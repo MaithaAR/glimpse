@@ -1,0 +1,150 @@
+{
+  "scored_meals": 481,
+  "with_photo": 460,
+  "people": 23,
+  "spikes": 158,
+  "auroc_pooled": {
+    "no_meal": 0.6863855468903084,
+    "photo": 0.7236352235764394,
+    "logged_carbs": 0.7169534036132774,
+    "photo_shuffled": 0.6785868244699612,
+    "ridge_photo": 0.7034526002272994,
+    "photo_grams_only": 0.7039032801661638
+  },
+  "auroc_within_fold_mean": {
+    "no_meal": 0.6990954718848457,
+    "photo": 0.734142410518122,
+    "logged_carbs": 0.7292829907156284,
+    "photo_shuffled": 0.674159666854164,
+    "ridge_photo": 0.7163395110738564,
+    "photo_grams_only": 0.7117830793779559
+  },
+  "gains_vs_no_meal": {
+    "photo": {
+      "point": 0.037249676686130995,
+      "bootstrap_mean": 0.037574222042278595,
+      "ci95": [
+        0.0032237600922721517,
+        0.07308492340025431
+      ]
+    },
+    "logged_carbs": {
+      "point": 0.030567856722969022,
+      "bootstrap_mean": 0.03158537951870373,
+      "ci95": [
+        0.0030937874259147516,
+        0.06307657150882118
+      ]
+    },
+    "photo_shuffled": {
+      "point": -0.007798722420347182,
+      "bootstrap_mean": -0.009132855719641538,
+      "ci95": [
+        -0.04570190326540337,
+        0.025176475709331157
+      ]
+    },
+    "ridge_photo": {
+      "point": 0.01706705333699099,
+      "bootstrap_mean": 0.017051473184053725,
+      "ci95": [
+        -0.011411360548013222,
+        0.044120903323333606
+      ]
+    },
+    "photo_grams_only": {
+      "point": 0.017517733275855374,
+      "bootstrap_mean": 0.017558254543263437,
+      "ci95": [
+        -0.007412796734076643,
+        0.0417681130119732
+      ]
+    }
+  },
+  "primary_photo_meals_only": {
+    "point": 0.03744186544932382,
+    "bootstrap_mean": 0.037878619879770314,
+    "ci95": [
+      -3.0535470001978244e-06,
+      0.07626518347112408
+    ]
+  },
+  "rq1_photo_vs_logged": {
+    "point": 0.006681819963161972,
+    "bootstrap_mean": 0.0059888425235748565,
+    "ci95": [
+      -0.020148534192877952,
+      0.03180035419930513
+    ],
+    "margin": 0.03,
+    "verdict": "non-inferior"
+  },
+  "post_hoc_arms": [
+    "ridge_photo",
+    "photo_grams_only"
+  ],
+  "tuning": [
+    {
+      "fold": 1,
+      "no_meal_C": 0.03,
+      "photo_C": 0.03,
+      "logged_carbs_C": 0.03,
+      "ridge_photo_C": 0.03,
+      "photo_grams_only_C": 0.03
+    },
+    {
+      "fold": 2,
+      "no_meal_C": 0.03,
+      "photo_C": 0.03,
+      "logged_carbs_C": 0.03,
+      "ridge_photo_C": 0.03,
+      "photo_grams_only_C": 0.03
+    },
+    {
+      "fold": 3,
+      "no_meal_C": 0.01,
+      "photo_C": 0.01,
+      "logged_carbs_C": 0.01,
+      "ridge_photo_C": 0.01,
+      "photo_grams_only_C": 0.01
+    },
+    {
+      "fold": 4,
+      "no_meal_C": 0.03,
+      "photo_C": 0.03,
+      "logged_carbs_C": 0.03,
+      "ridge_photo_C": 0.03,
+      "photo_grams_only_C": 0.03
+    },
+    {
+      "fold": 5,
+      "no_meal_C": 0.03,
+      "photo_C": 0.03,
+      "logged_carbs_C": 0.03,
+      "ridge_photo_C": 0.03,
+      "photo_grams_only_C": 0.03
+    }
+  ],
+  "ridge_posthoc": {
+    "alpha_grid": [
+      1.0,
+      10.0,
+      100.0,
+      1000.0,
+      10000.0,
+      100000.0
+    ],
+    "alpha_by_fold": {
+      "1": 1000.0,
+      "2": 1000.0,
+      "3": 1000.0,
+      "4": 1000.0,
+      "5": 1000.0
+    }
+  },
+  "photo_estimate_calibration_slope": {
+    "out_of_fold": 0.7226302175499218,
+    "nested": 0.5242988881426608
+  },
+  "ridge_posthoc_mae_g": 20.40772819519043
+}

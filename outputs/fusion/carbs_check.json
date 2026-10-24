@@ -1,0 +1,53 @@
+{
+  "scored_meals": 481,
+  "people": 23,
+  "spikes": 158,
+  "tuning": [
+    {
+      "fold": 1,
+      "no_meal_C": 0.03,
+      "logged_carbs_C": 0.03
+    },
+    {
+      "fold": 2,
+      "no_meal_C": 0.03,
+      "logged_carbs_C": 0.03
+    },
+    {
+      "fold": 3,
+      "no_meal_C": 0.01,
+      "logged_carbs_C": 0.01
+    },
+    {
+      "fold": 4,
+      "no_meal_C": 0.03,
+      "logged_carbs_C": 0.03
+    },
+    {
+      "fold": 5,
+      "no_meal_C": 0.03,
+      "logged_carbs_C": 0.03
+    }
+  ],
+  "auroc_pooled": {
+    "no_meal": 0.6863855468903084,
+    "logged_carbs": 0.7169534036132774
+  },
+  "auroc_within_fold_mean": {
+    "no_meal": 0.6990954718848457,
+    "logged_carbs": 0.7292829907156284
+  },
+  "auroc_carbs_alone_pooled": 0.6617549084923778,
+  "gain_logged_carbs": {
+    "point": 0.030567856722969022,
+    "bootstrap_mean": 0.03158537951870373,
+    "ci95": [
+      0.0030937874259147516,
+      0.06307657150882118
+    ],
+    "draws": 2000
+  },
+  "min_gain": 0.02,
+  "decision": "proceed to the photo cross-validation",
+  "note": "logged carbs = upper bound for photo-estimated carbs; the 95% range resamples people but not the inner-fold tuning, so it is slightly too narrow"
+}

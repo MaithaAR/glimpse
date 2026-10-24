@@ -31,6 +31,15 @@ Base spike rate 33% (481 meals, 23 people).
 
 ## Fixed test (sanity check): 5 people, 96 meals, spike rate 29%
 
+| Model (fitted on the 28 training people) | AUROC (95% range) | AUPRC | Brier | ECE |
+|---|---|---|---|---|
+| Base rate (always the same guess) | 0.500 (0.500-0.500) | 0.292 | 0.236 | 0.171 |
+| Profile only (logistic regression) | 0.765 (0.571-0.818) | 0.606 | 0.183 | 0.126 |
+| Profile + trend (logistic regression) | 0.695 (0.602-0.816) | 0.500 | 0.192 | 0.085 |
+| Profile + trend (gradient boosting) | 0.632 (0.512-0.744) | 0.419 | 0.203 | 0.088 |
+| Profile + SensorCNN (from scratch) | 0.674 (0.563-0.815) | 0.466 | 0.208 | 0.173 |
+| + photo carbs (MAIN) | 0.742 (0.670-0.900) | 0.618 | 0.182 | 0.129 |
+
 | Cut-offs | low risk below | caution from | cleared | spikes among cleared | can't judge | cost change |
 |---|---|---|---|---|---|---|
 | main (cost-only) | 0.143 | 0.200 | 3% | 0% | 9% | -7% |

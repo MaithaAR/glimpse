@@ -1,0 +1,116 @@
+{
+  "tuning": [
+    {
+      "fold": 1,
+      "training_people": 32,
+      "scored_meals": 96,
+      "profile_lr_C": 0.03,
+      "trend_lr_C": 0.03,
+      "gbm_depth": 2,
+      "cnn_epochs": 11
+    },
+    {
+      "fold": 2,
+      "training_people": 32,
+      "scored_meals": 109,
+      "profile_lr_C": 0.03,
+      "trend_lr_C": 0.03,
+      "gbm_depth": 2,
+      "cnn_epochs": 22
+    },
+    {
+      "fold": 3,
+      "training_people": 32,
+      "scored_meals": 110,
+      "profile_lr_C": 0.01,
+      "trend_lr_C": 0.01,
+      "gbm_depth": 2,
+      "cnn_epochs": 11
+    },
+    {
+      "fold": 4,
+      "training_people": 33,
+      "scored_meals": 71,
+      "profile_lr_C": 0.03,
+      "trend_lr_C": 0.03,
+      "gbm_depth": 2,
+      "cnn_epochs": 20
+    },
+    {
+      "fold": 5,
+      "training_people": 33,
+      "scored_meals": 95,
+      "profile_lr_C": 0.03,
+      "trend_lr_C": 0.03,
+      "gbm_depth": 2,
+      "cnn_epochs": 22
+    }
+  ],
+  "scored_meals_per_seed": 481,
+  "people": 23,
+  "auroc_pooled_by_seed": {
+    "prevalence": [
+      0.402555159305561,
+      0.402555159305561,
+      0.402555159305561
+    ],
+    "profile_lr": [
+      0.6720617627464044,
+      0.6720617627464044,
+      0.6720617627464044
+    ],
+    "trend_lr": [
+      0.6863855468903084,
+      0.6863855468903084,
+      0.6863855468903084
+    ],
+    "trend_gbm": [
+      0.6892169925931733,
+      0.6892169925931733,
+      0.6892169925931733
+    ],
+    "sensor_cnn": [
+      0.6781165497511463,
+      0.6891092213034448,
+      0.6956734725869028
+    ]
+  },
+  "auroc_pooled_mean": {
+    "prevalence": 0.402555159305561,
+    "profile_lr": 0.6720617627464044,
+    "trend_lr": 0.6863855468903083,
+    "trend_gbm": 0.6892169925931734,
+    "sensor_cnn": 0.6876330812138313
+  },
+  "auroc_per_fold_mean": {
+    "prevalence": 0.5,
+    "profile_lr": 0.6755830960385042,
+    "trend_lr": 0.6990954718848457,
+    "trend_gbm": 0.7138494975971256,
+    "sensor_cnn": 0.7021289717115143
+  },
+  "auroc_seed_sd": {
+    "prevalence": 0.0,
+    "profile_lr": 0.0,
+    "trend_lr": 1.1102230246251565e-16,
+    "trend_gbm": 1.1102230246251565e-16,
+    "sensor_cnn": 0.007243186547291645
+  },
+  "loss_check": {
+    "train, target people": {
+      "loss_eval_mode": 0.5918,
+      "auroc": 0.7294,
+      "spike_rate": 0.388
+    },
+    "train, type 2 diabetes": {
+      "loss_eval_mode": 0.5319,
+      "auroc": 0.8054,
+      "spike_rate": 0.586
+    },
+    "validation": {
+      "loss_eval_mode": 0.5313,
+      "auroc": 0.6618,
+      "spike_rate": 0.192
+    }
+  }
+}

@@ -150,7 +150,12 @@ def _status(point: float, lo: float, hi: float, ok) -> str:
 
 def _cv_table(cfg: GlimpseConfig) -> pd.DataFrame:
     """One row per scored meal: cross-validated predictions of every model (CNN averaged over its 3 seeds)."""
-    cv = pd.read_csv(Path(cfg.paths.outputs) / "cv" / "oof_predictions.csv")
+    out = Path(cfg.paths.outputs)
+    need = [out / "cv" / "oof_predictions.csv", out / "fusion" / "fusion_oof.csv"]
+    missing = [str(f) for f in need if not f.is_file()]
+    if missing:  # committed in the repository; rebuild with: just cv, just photo-cv, just fusion (see README)
+        raise FileNotFoundError(f"cross-validated predictions missing: {missing}; run `just cv photo-cv fusion`")
+    cv = pd.read_csv(need[0])
     models = ["prevalence", "profile_lr", "trend_lr", "trend_gbm", "sensor_cnn"]
     how = {"fold": "first", "person_id": "first", "spike": "first", **dict.fromkeys(models, "mean")}
     cv = cv.groupby("row").agg(how)
@@ -238,6 +243,9 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
            "usefulness_cv_main_cutoffs": use_cv, "cutoffs": amended, "test": test, "targets_status": st}  # fmt: skip
     (OUT / "results.json").write_text(json.dumps(res, indent=2, default=float))
     _figures(table, rel, ece)
+    tc = test["test"]["calibration"]
+    _reliability_figure(tc["bins"], tc["ece"], "Main model, fixed test (5 people, 96 meals)",
+                        OUT / "fig3_reliability_test.png")  # fmt: skip
     _markdown(res)
     _log(log, res)
     return res
@@ -286,8 +294,72 @@ def _score_test(ds, sp, cfg, amended, costs, targets, B, seed) -> dict:
                           "low_risk_below": lo, "caution_from": hi,
                           "cost_reduction": 1 - expected_cost(act, y, sc["costs"]) / trivial})  # fmt: skip
         out[name]["cost_sweep_main_rule"] = sweep
+        out[name]["table"] = _test_table(ds, sp, cfg, r, y, s, p, B, seed)
+        rel_t, ece_t = reliability(p["photo"], y, cfg.targets.ece_bins)
+        ece_t_ci = person_bootstrap_ci(s, lambda i, q=p["photo"], t=y: reliability(q[i], t[i], cfg.targets.ece_bins)[1],
+                                       B, seed)  # fmt: skip
+        out[name]["calibration"] = {"ece": ece_t, "ece_ci95": list(ece_t_ci[1:]), "bins": rel_t}
     marker.write_text(json.dumps(stamp, indent=2))
     return out
+
+
+def _test_table(ds, sp, cfg, r, y, s, p, B, seed) -> list[dict]:
+    """Every baseline and the main model on the SAME fixed test meals with the same metrics. Baselines are refitted
+    on the same 28 training people (one setting tuned on the same 4 inner folds); the SensorCNN is its saved
+    28-person checkpoint. Nothing here is tuned on the test people."""
+    from glimpse.training.baselines import gbm, logistic, profile_features
+    from glimpse.training.cv import _tune_sklearn
+    from glimpse.training.scratch import _inputs, load_bundle, predict_proba
+
+    y_all, tr, b = ds.labels(), meal_rows(ds, set(sp.train), scored_only=False), cfg.baselines
+    c_prof, _ = _tune_sklearn(lambda c: logistic(c, cfg.seed), b.logreg_c_grid, profile_features, ds, sp.train,
+                              sp.inner_folds, y_all)  # fmt: skip
+    depth, _ = _tune_sklearn(lambda d: gbm(d, cfg.seed), b.gbm_depth_grid, trend_features, ds, sp.train,
+                             sp.inner_folds, y_all)  # fmt: skip
+    cnn, norm, _ = load_bundle(Path("checkpoints") / Path("checkpoints/sensor_cnn_latest.txt").read_text().strip())
+    preds = {
+        "prevalence": np.full(len(r), y_all[tr].mean()),
+        "profile_lr": logistic(c_prof, cfg.seed).fit(profile_features(ds, tr), y_all[tr]).predict_proba(
+            profile_features(ds, r))[:, 1],
+        "no_meal": p["no_meal"],
+        "trend_gbm": gbm(depth, cfg.seed).fit(trend_features(ds, tr), y_all[tr]).predict_proba(
+            trend_features(ds, r))[:, 1],
+        "sensor_cnn": predict_proba(cnn, _inputs(ds, r, norm)),
+        "photo": p["photo"],
+    }  # fmt: skip
+    labels = dict(LADDER)
+    rows = []
+    for col, q in preds.items():
+        auc, lo, hi = person_bootstrap_ci(s, lambda i, q=q: _auc(y[i], q[i]), B, seed)
+        rows.append({"model": next(k for k, v in labels.items() if v == col), "column": col, "auroc": auc,
+                     "auroc_lo": lo, "auroc_hi": hi, "auprc": float(average_precision_score(y, q)),
+                     "brier": float(brier_score_loss(y, q)),
+                     "ece": reliability(q, y, cfg.targets.ece_bins)[1]})  # fmt: skip
+    pd.DataFrame(rows).to_csv(OUT / "test_table.csv", index=False)
+    return rows
+
+
+def _reliability_figure(rel: list, ece: float, title: str, path: Path) -> None:
+    """Reliability diagram: predicted risk vs observed spike rate per equal-width bin, meals per bin printed."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(4.4, 4.4))
+    m, o, n = zip(*rel, strict=True)
+    ax.plot([0, 1], [0, 1], ls="--", c="#95a5a6", lw=1)
+    ax.scatter(m, o, s=[10 + 2 * k for k in n], c="#c0392b", alpha=0.8)
+    for x_, y_, k in zip(m, o, n, strict=True):
+        ax.annotate(str(k), (x_, y_), textcoords="offset points", xytext=(6, -10), fontsize=7, color="#555")
+    ax.set_xlabel("predicted spike risk (mean in bin)")
+    ax.set_ylabel("observed spike rate in bin")
+    ax.set_title(f"{title}\nECE {ece:.3f}; 15 equal-width bins; numbers = meals", fontsize=9)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    fig.tight_layout()
+    fig.savefig(path, dpi=200)
+    plt.close(fig)
 
 
 def _figures(table: pd.DataFrame, rel: list, ece: float) -> None:
@@ -313,18 +385,7 @@ def _figures(table: pd.DataFrame, rel: list, ece: float) -> None:
     fig.savefig(OUT / "fig1_auroc_ladder.png", dpi=200)
     plt.close(fig)
 
-    fig, ax = plt.subplots(figsize=(4.2, 4.2))
-    m, o, n = zip(*rel, strict=True)
-    ax.plot([0, 1], [0, 1], ls="--", c="#95a5a6", lw=1)
-    ax.scatter(m, o, s=[10 + 2 * k for k in n], c="#c0392b", alpha=0.8)
-    ax.set_xlabel("predicted spike risk")
-    ax.set_ylabel("observed spike rate")
-    ax.set_title(f"Main model calibration (ECE {ece:.3f}); dot size = meals", fontsize=9)
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    fig.tight_layout()
-    fig.savefig(OUT / "fig2_reliability.png", dpi=200)
-    plt.close(fig)
+    _reliability_figure(rel, ece, "Main model, cross-validation (23 people, 481 meals)", OUT / "fig2_reliability.png")
 
 
 def _markdown(res: dict) -> None:
@@ -342,7 +403,17 @@ def _markdown(res: dict) -> None:
         L.append(f"| {s['target']} | {est} | {ci} | {s['status']} |")
     t = res["test"]["test"]
     head = f"## Fixed test (sanity check): {t['people']} people, {t['meals']} meals, spike rate {t['spike_rate']:.0%}"
-    L += ["", head, "",
+    L += [
+        "",
+        head,
+        "",
+        "| Model (fitted on the 28 training people) | AUROC (95% range) | AUPRC | Brier | ECE |",
+        "|---|---|---|---|---|",
+    ]
+    for r in t["table"]:
+        L.append(f"| {r['model']} | {r['auroc']:.3f} ({r['auroc_lo']:.3f}-{r['auroc_hi']:.3f}) | {r['auprc']:.3f} | "
+                 f"{r['brier']:.3f} | {r['ece']:.3f} |")  # fmt: skip
+    L += ["",
           "| Cut-offs | low risk below | caution from | cleared | spikes among cleared | can't judge | cost change |",
           "|---|---|---|---|---|---|---|"]  # fmt: skip
     for k, d in t["decisions"].items():
@@ -370,10 +441,15 @@ def _log(log, res: dict) -> None:
     t = res["test"]["test"]
     log.info("TEST ({} people, {} meals, spike rate {:.0%}): AUROC photo {:.3f} ({:.3f}-{:.3f}), no meal {:.3f}",
              t["people"], t["meals"], t["spike_rate"], *t["auroc_photo"], t["auroc_no_meal"][0])  # fmt: skip
+    for r in t["table"]:
+        log.info("test, {:<38} AUROC {:.3f} ({:.3f}-{:.3f}) | ECE {:.3f}", r["model"], r["auroc"], r["auroc_lo"],
+                 r["auroc_hi"], r["ece"])  # fmt: skip
+    log.info("test calibration of the main model: ECE {:.3f} ({:.3f} to {:.3f})", t["calibration"]["ece"],
+             *t["calibration"]["ece_ci95"])  # fmt: skip
     for k, d in t["decisions"].items():
         log.info("test, {:<28} cleared {:.0%}, spikes among cleared {:.0%}, can't judge {:.0%}, cost {:+.0%} "
                  "vs best simple policy", k, d["share_low_risk"], d["missed_among_cleared"], d["share_abstain"],
                  -d["cost_reduction"])  # fmt: skip
     for s in res["targets_status"]:
         log.info("target: {:<55} {}", s["target"], s["status"])
-    log.info("written to {}/ (results, tables and two figures)", OUT)
+    log.info("written to {}/ (results, tables and figures)", OUT)
