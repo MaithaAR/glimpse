@@ -106,6 +106,19 @@ def usefulness_report(actions, y, costs, targets):
     return rep
 
 
+def choose_thresholds(p, y, costs, grid=None):
+    """(lo, hi) with lo <= hi that give the lowest mean cost: low risk below lo, caution from hi, abstain between.
+    Ties go to the first pair found (smallest lo, then smallest hi), so the choice is deterministic."""
+    grid = np.round(np.arange(0.0, 1.0001, 0.01), 2) if grid is None else grid
+    best = (float("inf"), 0.0, 0.0)
+    for lo in grid:
+        for hi in grid[grid >= lo]:
+            c = expected_cost(decide(p, lo, hi), y, costs)
+            if c < best[0] - 1e-12:
+                best = (c, float(lo), float(hi))
+    return best[1], best[2], best[0]
+
+
 # ---------- conformal rise intervals ----------
 def participant_weighted_cqr_quantile(lo_pred, hi_pred, y, sids, alpha=0.2):
     """Conformalised quantile regression score with each calibration person weighted 1/(their meal count).

@@ -1,0 +1,25 @@
+{
+  "model": "fusion: profile + trend + photo (fine-tuned ConvNeXt-Tiny)",
+  "low_risk_below": 0.31,
+  "caution_from": 0.31,
+  "chosen_on": "4 validation people (99 meals)",
+  "costs": {
+    "low_risk": [
+      5.0,
+      0.0
+    ],
+    "caution": [
+      0.0,
+      1.0
+    ],
+    "abstain": [
+      2.0,
+      0.5
+    ]
+  },
+  "stability_check_pooled_cv": {
+    "low_risk_below": 0.18,
+    "caution_from": 0.21
+  },
+  "sha256": "462799bcd5bbc245350e96cb657d8fa29865625c2e238f82124bfcdd2eeb3a46"
+}

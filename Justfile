@@ -36,7 +36,7 @@ params:
     uv run glimpse params
 
 # train both models
-train: train-scratch train-photo
+train: train-scratch train-photo train-final
 
 # train the from-scratch SensorCNN: epochs chosen on inner folds, then the 28-person model + checkpoint
 train-scratch:
@@ -61,6 +61,10 @@ photo-cv:
 # fusion: profile + trend with no meal / photo / logged carbs / shuffled photo (+ post-hoc ridge arm); ~2 min
 fusion:
     uv run glimpse fusion
+
+# final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
+train-final:
+    uv run glimpse final
 
 # evaluate models and baselines, writing results to outputs/ (built in Step 5)
 evaluate:
