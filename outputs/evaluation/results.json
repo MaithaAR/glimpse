@@ -1,0 +1,611 @@
+{
+  "cv_people": 23,
+  "cv_meals": 481,
+  "cv_spike_rate": 0.3284823284823285,
+  "table": [
+    {
+      "model": "Base rate (always the same guess)",
+      "column": "prevalence",
+      "auroc": 0.402555159305561,
+      "auroc_lo": 0.309322157188018,
+      "auroc_hi": 0.5181786551480732,
+      "auroc_within_fold": 0.5,
+      "auprc": 0.28493053974729066,
+      "brier": 0.23112847812606985
+    },
+    {
+      "model": "Profile only (logistic regression)",
+      "column": "profile_lr",
+      "auroc": 0.6720617627464044,
+      "auroc_lo": 0.5673539262302107,
+      "auroc_hi": 0.7635445740130501,
+      "auroc_within_fold": 0.6755830960385041,
+      "auprc": 0.4874766703258221,
+      "brier": 0.20376158611515197
+    },
+    {
+      "model": "Profile + trend (logistic regression)",
+      "column": "no_meal",
+      "auroc": 0.6863855468903084,
+      "auroc_lo": 0.6039985154990714,
+      "auroc_hi": 0.7718477652498377,
+      "auroc_within_fold": 0.6990954718848457,
+      "auprc": 0.5472267629701146,
+      "brier": 0.19938664604173167
+    },
+    {
+      "model": "Profile + trend (gradient boosting)",
+      "column": "trend_gbm",
+      "auroc": 0.6892169925931733,
+      "auroc_lo": 0.6102698166069283,
+      "auroc_hi": 0.7776217564512077,
+      "auroc_within_fold": 0.7138494975971257,
+      "auprc": 0.5313317477898852,
+      "brier": 0.20422992918448127
+    },
+    {
+      "model": "Profile + SensorCNN (from scratch)",
+      "column": "sensor_cnn",
+      "auroc": 0.6885409726848766,
+      "auroc_lo": 0.602857306898923,
+      "auroc_hi": 0.7729862420191598,
+      "auroc_within_fold": 0.7018898246507355,
+      "auprc": 0.5512635133744257,
+      "brier": 0.20061316495682602
+    },
+    {
+      "model": "+ photo carbs (MAIN)",
+      "column": "photo",
+      "auroc": 0.7236352235764394,
+      "auroc_lo": 0.6585157652656167,
+      "auroc_hi": 0.7957906367515951,
+      "auroc_within_fold": 0.734142410518122,
+      "auprc": 0.5850780988697089,
+      "brier": 0.19066481996806645
+    },
+    {
+      "model": "+ logged carbs (reference)",
+      "column": "logged_carbs",
+      "auroc": 0.7169534036132774,
+      "auroc_lo": 0.6476703240157096,
+      "auroc_hi": 0.7960147164704504,
+      "auroc_within_fold": 0.7292829907156284,
+      "auprc": 0.5870571775185351,
+      "brier": 0.1916442671725719
+    },
+    {
+      "model": "+ shuffled photo (control)",
+      "column": "photo_shuffled",
+      "auroc": 0.6785868244699612,
+      "auroc_lo": 0.5902171810091187,
+      "auroc_hi": 0.7656999884731177,
+      "auroc_within_fold": 0.674159666854164,
+      "auprc": 0.502360420070001,
+      "brier": 0.20397231833662902
+    },
+    {
+      "model": "+ ridge photo (post-hoc)",
+      "column": "ridge_photo",
+      "auroc": 0.7034526002272994,
+      "auroc_lo": 0.6295501934392248,
+      "auroc_hi": 0.7829256925569009,
+      "auroc_within_fold": 0.7163395110738564,
+      "auprc": 0.5645059086473662,
+      "brier": 0.19574411696301253
+    }
+  ],
+  "gains_vs_profile_trend": {
+    "photo": {
+      "point": 0.037249676686130995,
+      "ci95": [
+        0.0032237600922721517,
+        0.07308492340025431
+      ]
+    },
+    "logged_carbs": {
+      "point": 0.030567856722969022,
+      "ci95": [
+        0.0030937874259147516,
+        0.06307657150882118
+      ]
+    },
+    "photo_shuffled": {
+      "point": -0.007798722420347182,
+      "ci95": [
+        -0.04570190326540337,
+        0.025176475709331157
+      ]
+    },
+    "ridge_photo": {
+      "point": 0.01706705333699099,
+      "ci95": [
+        -0.011411360548013222,
+        0.044120903323333606
+      ]
+    }
+  },
+  "rq1": {
+    "point": 0.006681819963161972,
+    "ci95": [
+      -0.020148534192877952,
+      0.03180035419930513
+    ],
+    "verdict": "non-inferior"
+  },
+  "rq2": {
+    "point": 0.0021554257945681776,
+    "ci95": [
+      -0.015974737824978474,
+      0.02157237388080867
+    ],
+    "verdict": "tie or worse"
+  },
+  "calibration": {
+    "ece": 0.05244381961569137,
+    "ece_ci95": [
+      0.05155985726514768,
+      0.12502132288812315
+    ],
+    "bins": [
+      [
+        0.04244950992119339,
+        0.16666666666666666,
+        12
+      ],
+      [
+        0.10249935541371973,
+        0.1,
+        50
+      ],
+      [
+        0.1695691754887143,
+        0.13793103448275862,
+        58
+      ],
+      [
+        0.23312077476156898,
+        0.21311475409836064,
+        61
+      ],
+      [
+        0.3014937124964295,
+        0.30303030303030304,
+        66
+      ],
+      [
+        0.36580897448669264,
+        0.27586206896551724,
+        58
+      ],
+      [
+        0.43182829702008224,
+        0.4807692307692308,
+        52
+      ],
+      [
+        0.49871567180493404,
+        0.38235294117647056,
+        34
+      ],
+      [
+        0.5599822946230554,
+        0.52,
+        25
+      ],
+      [
+        0.6356759446829944,
+        0.5238095238095238,
+        21
+      ],
+      [
+        0.7011001198013922,
+        0.6071428571428571,
+        28
+      ],
+      [
+        0.7549872245685718,
+        0.9285714285714286,
+        14
+      ],
+      [
+        0.8374035807354054,
+        1.0,
+        2
+      ]
+    ]
+  },
+  "usefulness_cv_main_cutoffs": {
+    "share_low_risk": 0.14345114345114346,
+    "share_caution": 0.7505197505197505,
+    "share_abstain": 0.10602910602910603,
+    "cost": 0.6112266112266113,
+    "best_trivial_cost": 0.6715176715176715,
+    "cost_reduction": 0.08978328173374606,
+    "missed_among_cleared": 0.11594202898550725,
+    "n_cleared": 69,
+    "useful": false,
+    "cost_reduction_ci95": [
+      -0.0447032642465866,
+      0.22547265809344028
+    ],
+    "share_low_risk_ci95": [
+      0.07578716712098973,
+      0.22475003830411272
+    ],
+    "missed_among_cleared_ci95": [
+      0.030291723202170964,
+      0.20780573593073587
+    ],
+    "share_abstain_ci95": [
+      0.06828064679747894,
+      0.14628831899607075
+    ]
+  },
+  "cutoffs": {
+    "status": "amendment made after Step 5a and BEFORE the test was opened",
+    "reason": "cut-offs chosen on the 4 validation people (spike rate 19% vs 33% in the cross-validation) failed the pre-registered stability check (no cost saving on the pooled cross-validation)",
+    "main": {
+      "rule": "cost-only (from the pre-registered costs; uses no data)",
+      "low_risk_below": 0.14285714285714285,
+      "caution_from": 0.2
+    },
+    "secondary_preregistered": {
+      "low_risk_below": 0.31,
+      "caution_from": 0.31,
+      "sha256": "462799bcd5bbc245350e96cb657d8fa29865625c2e238f82124bfcdd2eeb3a46"
+    },
+    "secondary_cv_without_test": {
+      "low_risk_below": 0.18,
+      "caution_from": 0.18,
+      "chosen_on": "385 cross-validated meals, test people excluded"
+    },
+    "sensitivity": "cost-only cut-offs recomputed for every pre-registered cost setting (costs.sweep_*)",
+    "success_targets": {
+      "min_cost_reduction": 0.1,
+      "min_cleared": 0.2,
+      "max_missed_among_cleared": 0.1,
+      "max_abstain": 0.2
+    },
+    "test_role": "sanity check; the test people are also inside the cross-validation (main estimate)",
+    "sha256": "06f7b87a77133b8f13a8f60a2086849b5e137228f172088cce428b5da171280d"
+  },
+  "test": {
+    "validation": {
+      "people": 4,
+      "meals": 99,
+      "spike_rate": 0.1919191919191919,
+      "mean_predicted_risk": 0.31091612040163835
+    },
+    "test": {
+      "people": 5,
+      "meals": 96,
+      "spike_rate": 0.2916666666666667,
+      "mean_predicted_risk": 0.3794154973939367,
+      "auroc_no_meal": [
+        0.6953781512605042,
+        0.6015873015873016,
+        0.816442239546421
+      ],
+      "auroc_photo": [
+        0.7421218487394958,
+        0.6703246456332876,
+        0.8997150997150998
+      ],
+      "per_person": [
+        {
+          "person": 15,
+          "meals": 24,
+          "spike_rate": 0.16666666666666666,
+          "auroc_photo": 0.6625
+        },
+        {
+          "person": 19,
+          "meals": 17,
+          "spike_rate": 0.11764705882352941,
+          "auroc_photo": 0.6000000000000001
+        },
+        {
+          "person": 21,
+          "meals": 16,
+          "spike_rate": 0.4375,
+          "auroc_photo": 0.9365079365079365
+        },
+        {
+          "person": 31,
+          "meals": 20,
+          "spike_rate": 0.1,
+          "auroc_photo": 0.888888888888889
+        },
+        {
+          "person": 33,
+          "meals": 19,
+          "spike_rate": 0.6842105263157895,
+          "auroc_photo": 0.7307692307692308
+        }
+      ],
+      "decisions": {
+        "main (cost-only)": {
+          "low_risk_below": 0.14285714285714285,
+          "caution_from": 0.2,
+          "share_low_risk": 0.03125,
+          "share_caution": 0.875,
+          "share_abstain": 0.09375,
+          "cost": 0.65625,
+          "best_trivial_cost": 0.7083333333333334,
+          "cost_reduction": 0.07352941176470595,
+          "missed_among_cleared": 0.0,
+          "n_cleared": 3,
+          "useful": false,
+          "cost_reduction_ci95": [
+            -0.27500000000000013,
+            0.11971830985915499
+          ],
+          "share_low_risk_ci95": [
+            0.010416666666666666,
+            0.05319148936170213
+          ],
+          "missed_among_cleared_ci95": [
+            0.0,
+            0.0
+          ],
+          "share_abstain_ci95": [
+            0.04040404040404041,
+            0.15053763440860216
+          ]
+        },
+        "pre-registered (validation)": {
+          "low_risk_below": 0.31,
+          "caution_from": 0.31,
+          "share_low_risk": 0.4166666666666667,
+          "share_caution": 0.5833333333333334,
+          "share_abstain": 0.0,
+          "cost": 0.6666666666666666,
+          "best_trivial_cost": 0.7083333333333334,
+          "cost_reduction": 0.05882352941176483,
+          "missed_among_cleared": 0.15,
+          "n_cleared": 40,
+          "useful": false,
+          "cost_reduction_ci95": [
+            -0.8444444444444443,
+            0.3999999999999999
+          ],
+          "share_low_risk_ci95": [
+            0.21951219512195122,
+            0.5294117647058824
+          ],
+          "missed_among_cleared_ci95": [
+            0.02564102564102564,
+            0.36
+          ],
+          "share_abstain_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "CV without test people": {
+          "low_risk_below": 0.18,
+          "caution_from": 0.18,
+          "share_low_risk": 0.09375,
+          "share_caution": 0.90625,
+          "share_abstain": 0.0,
+          "cost": 0.6770833333333334,
+          "best_trivial_cost": 0.7083333333333334,
+          "cost_reduction": 0.044117647058823484,
+          "missed_among_cleared": 0.1111111111111111,
+          "n_cleared": 9,
+          "useful": false,
+          "cost_reduction_ci95": [
+            -0.30000000000000004,
+            0.13333333333333341
+          ],
+          "share_low_risk_ci95": [
+            0.045454545454545456,
+            0.14285714285714285
+          ],
+          "missed_among_cleared_ci95": [
+            0.0,
+            0.375
+          ],
+          "share_abstain_ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "cost_sweep_main_rule": [
+        {
+          "missed_spike": 3.0,
+          "abstain_multiplier": 0.5,
+          "low_risk_below": 0.1111111111111111,
+          "caution_from": 0.42857142857142855,
+          "cost_reduction": 0.4191176470588236
+        },
+        {
+          "missed_spike": 3.0,
+          "abstain_multiplier": 1.0,
+          "low_risk_below": 0.25,
+          "caution_from": 0.25,
+          "cost_reduction": 0.11764705882352944
+        },
+        {
+          "missed_spike": 3.0,
+          "abstain_multiplier": 2.0,
+          "low_risk_below": 0.25,
+          "caution_from": 0.25,
+          "cost_reduction": 0.11764705882352944
+        },
+        {
+          "missed_spike": 3.0,
+          "abstain_multiplier": 4.0,
+          "low_risk_below": 0.25,
+          "caution_from": 0.25,
+          "cost_reduction": 0.11764705882352944
+        },
+        {
+          "missed_spike": 5.0,
+          "abstain_multiplier": 0.5,
+          "low_risk_below": 0.058823529411764705,
+          "caution_from": 0.42857142857142855,
+          "cost_reduction": 0.4117647058823529
+        },
+        {
+          "missed_spike": 5.0,
+          "abstain_multiplier": 1.0,
+          "low_risk_below": 0.14285714285714285,
+          "caution_from": 0.2,
+          "cost_reduction": 0.07352941176470595
+        },
+        {
+          "missed_spike": 5.0,
+          "abstain_multiplier": 2.0,
+          "low_risk_below": 0.16666666666666666,
+          "caution_from": 0.16666666666666666,
+          "cost_reduction": 0.014705882352941235
+        },
+        {
+          "missed_spike": 5.0,
+          "abstain_multiplier": 4.0,
+          "low_risk_below": 0.16666666666666666,
+          "caution_from": 0.16666666666666666,
+          "cost_reduction": 0.014705882352941235
+        },
+        {
+          "missed_spike": 7.0,
+          "abstain_multiplier": 0.5,
+          "low_risk_below": 0.04,
+          "caution_from": 0.42857142857142855,
+          "cost_reduction": 0.4117647058823529
+        },
+        {
+          "missed_spike": 7.0,
+          "abstain_multiplier": 1.0,
+          "low_risk_below": 0.09090909090909091,
+          "caution_from": 0.2,
+          "cost_reduction": 0.05147058823529416
+        },
+        {
+          "missed_spike": 7.0,
+          "abstain_multiplier": 2.0,
+          "low_risk_below": 0.125,
+          "caution_from": 0.125,
+          "cost_reduction": 0.02941176470588236
+        },
+        {
+          "missed_spike": 7.0,
+          "abstain_multiplier": 4.0,
+          "low_risk_below": 0.125,
+          "caution_from": 0.125,
+          "cost_reduction": 0.02941176470588236
+        },
+        {
+          "missed_spike": 10.0,
+          "abstain_multiplier": 0.5,
+          "low_risk_below": 0.02702702702702703,
+          "caution_from": 0.42857142857142855,
+          "cost_reduction": 0.4117647058823529
+        },
+        {
+          "missed_spike": 10.0,
+          "abstain_multiplier": 1.0,
+          "low_risk_below": 0.058823529411764705,
+          "caution_from": 0.2,
+          "cost_reduction": 0.05147058823529416
+        },
+        {
+          "missed_spike": 10.0,
+          "abstain_multiplier": 2.0,
+          "low_risk_below": 0.09090909090909091,
+          "caution_from": 0.09090909090909091,
+          "cost_reduction": 0.0
+        },
+        {
+          "missed_spike": 10.0,
+          "abstain_multiplier": 4.0,
+          "low_risk_below": 0.09090909090909091,
+          "caution_from": 0.09090909090909091,
+          "cost_reduction": 0.0
+        }
+      ]
+    }
+  },
+  "targets_status": [
+    {
+      "target": "Photo adds to spike prediction (main result)",
+      "estimate": 0.037249676686130995,
+      "ci95": [
+        0.0032237600922721517,
+        0.07308492340025431
+      ],
+      "status": "met"
+    },
+    {
+      "target": "RQ1: photo not worse than logged carbs by > margin",
+      "estimate": 0.006681819963161972,
+      "ci95": [
+        -0.020148534192877952,
+        0.03180035419930513
+      ],
+      "status": "met"
+    },
+    {
+      "target": "RQ2: SensorCNN beats hand-made trends",
+      "estimate": 0.0021554257945681776,
+      "ci95": [
+        -0.015974737824978474,
+        0.02157237388080867
+      ],
+      "status": "on track"
+    },
+    {
+      "target": "Calibration: ECE <= 0.05",
+      "estimate": 0.05244381961569137,
+      "ci95": [
+        0.05155985726514768,
+        0.12502132288812315
+      ],
+      "status": "at risk"
+    },
+    {
+      "target": "Cost reduction >= 10% (CV, main cut-offs)",
+      "estimate": 0.08978328173374606,
+      "ci95": [
+        -0.0447032642465866,
+        0.22547265809344028
+      ],
+      "status": "at risk"
+    },
+    {
+      "target": "Meals cleared >= 20% (CV, main cut-offs)",
+      "estimate": 0.14345114345114346,
+      "ci95": [
+        0.07578716712098973,
+        0.22475003830411272
+      ],
+      "status": "at risk"
+    },
+    {
+      "target": "Spikes among cleared <= 10% (CV, main cut-offs)",
+      "estimate": 0.11594202898550725,
+      "ci95": [
+        0.030291723202170964,
+        0.20780573593073587
+      ],
+      "status": "at risk"
+    },
+    {
+      "target": "Can't judge <= 20% (CV, main cut-offs)",
+      "estimate": 0.10602910602910603,
+      "ci95": [
+        0.06828064679747894,
+        0.14628831899607075
+      ],
+      "status": "met"
+    },
+    {
+      "target": "Latency p95 <= 300 ms",
+      "estimate": null,
+      "ci95": null,
+      "status": "measured with the demo (Step 6)"
+    }
+  ]
+}
