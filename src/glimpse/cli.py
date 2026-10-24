@@ -79,7 +79,12 @@ def _train(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     from glimpse.training.scratch import train_scratch
 
     ds, sp = MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json"))
-    train_scratch(ds, sp, cfg)
+    if args.model == "scratch":
+        train_scratch(ds, sp, cfg)
+    else:
+        from glimpse.training.photo import train_photo
+
+        train_photo(ds, sp, cfg)
     return 0
 
 
@@ -114,7 +119,12 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("build-meals", help="build and validate the labelled meal table")
     sub.add_parser("params", help="count every model's parameters against the project limits")
     tr = sub.add_parser("train", help="train a model")
-    tr.add_argument("--model", choices=["scratch"], required=True, help="scratch = SensorCNN (photo model: Step 4)")
+    tr.add_argument(
+        "--model",
+        choices=["scratch", "photo"],
+        required=True,
+        help="scratch = SensorCNN (from scratch); photo = PhotoCarbModel (pretrained, fine-tuned)",
+    )
     sub.add_parser("cv", help="5-fold person cross-validation of the CNN and the comparison models")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)

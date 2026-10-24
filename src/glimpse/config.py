@@ -202,11 +202,30 @@ class ScratchTrainCfg(_Strict):
     patience: int = Field(ge=1)
 
 
+class PhotoTrainCfg(_Strict):
+    """Settings for training the photo model's heads (and optionally its last stage)."""
+
+    lr_heads: float = Field(gt=0, lt=1)
+    lr_last_stage: float = Field(gt=0, lt=1)
+    weight_decay: float = Field(ge=0, lt=1)
+    batch_size: int = Field(ge=1, le=4096)
+    max_epochs: int = Field(ge=1, le=1000)
+    warmup_epochs: int = Field(ge=0)
+    patience: int = Field(ge=1)
+    bin_loss_weight: float = Field(ge=0)
+    huber_delta: float = Field(gt=0)
+    try_last_stage: bool
+    last_stage_max_epochs: int = Field(ge=1, le=20)
+    last_stage_min_gain_g: float = Field(ge=0)
+    augmented_views: int = Field(ge=1, le=8)
+
+
 class TrainingCfg(_Strict):
     """Training settings shared by all models, plus one block per model."""
 
     num_threads: int = Field(ge=1, le=64)
     scratch: ScratchTrainCfg
+    photo: PhotoTrainCfg
 
 
 class GlimpseConfig(_Strict):

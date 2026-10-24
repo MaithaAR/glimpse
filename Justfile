@@ -35,12 +35,16 @@ check: lint test
 params:
     uv run glimpse params
 
-# train the models (the photo model joins in Step 4)
-train: train-scratch
+# train both models
+train: train-scratch train-photo
 
 # train the from-scratch SensorCNN: epochs chosen on inner folds, then the 28-person model + checkpoint
 train-scratch:
     uv run glimpse train --model scratch
+
+# train the photo model: frozen ConvNeXt-Tiny + heads; last stage kept only if the inner folds show a gain
+train-photo:
+    uv run glimpse train --model photo
 
 # cross-validated out-of-fold predictions of the CNN and every comparison model (main estimate) -> outputs/cv/
 cv:

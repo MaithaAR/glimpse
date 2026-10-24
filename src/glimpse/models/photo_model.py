@@ -44,9 +44,21 @@ class PhotoCarbModel(nn.Module):
         self.bin_head = nn.Sequential(nn.Dropout(dropout), nn.Linear(width, n_bins))
         self.set_trainable(last_stage=False)
 
+    def lower(self, images: torch.Tensor) -> torch.Tensor:
+        """Frozen part: stem + first 3 stages -> feature maps (batch, 384, 14, 14). Cached once per photo."""
+        x = self.backbone.stem(images)
+        for stage in self.backbone.stages[:-1]:
+            x = stage(x)
+        return x
+
+    def upper(self, maps: torch.Tensor) -> torch.Tensor:
+        """Last stage + pooling: feature maps -> summary (batch, 768). This part can be fine-tuned."""
+        b = self.backbone
+        return b.forward_head(b.norm_pre(b.stages[-1](maps)), pre_logits=True)
+
     def embed(self, images: torch.Tensor) -> torch.Tensor:
         """Photos (batch, 3, 224, 224) -> backbone summary (batch, 768)."""
-        return self.backbone(images)
+        return self.upper(self.lower(images))
 
     def heads(self, emb: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Summary -> (log(1+grams) of shape (batch,), bin scores of shape (batch, 4))."""

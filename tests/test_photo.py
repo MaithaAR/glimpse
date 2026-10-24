@@ -71,3 +71,38 @@ def test_pinned_weights_load_offline():
     path = weights_path(cfg.photo, download=False)
     m = PhotoCarbModel(ARCH, weights=path)
     assert not torch.equal(m.backbone.stem[0].weight, PhotoCarbModel(ARCH).backbone.stem[0].weight)
+
+
+def test_split_backbone_equals_full_backbone(model):
+    """Frozen part + last stage gives exactly the backbone's own output (so caching the frozen part is safe)."""
+    x = torch.randn(2, 3, 224, 224)
+    with torch.no_grad():
+        assert torch.allclose(model.upper(model.lower(x)), model.backbone(x), atol=1e-4)
+
+
+def test_heads_learn_on_toy_summaries(tmp_path):
+    """Heads trained on made-up summaries where the carbs depend on them: the loss falls clearly."""
+    from glimpse.training.common import EpochLogger
+    from glimpse.training.photo import train_heads
+
+    cfg = load_config()
+    torch.manual_seed(0)
+    emb = torch.randn(300, 768)
+    g = (40 + 30 * emb[:, 0]).clamp(min=1).numpy().astype(np.float32)
+    m = PhotoCarbModel(ARCH)
+    log = EpochLogger(tmp_path / "h.csv")
+    train_heads(m, emb, g, cfg.training.photo, epochs=30, seed=0, run="toy", elog=log)
+    losses = [r.train_loss for r in log.records]
+    assert losses[-1] < 0.6 * losses[0]
+
+
+def test_cache_key_changes_with_inputs():
+    """Saved photo numbers are reused only for the same photos, weights and preparation."""
+    from glimpse.training.photo import cache_key
+
+    cfg = load_config()
+    a = cache_key(np.array([1, 2, 3]), cfg, "maps_eval")
+    assert a == cache_key(np.array([1, 2, 3]), cfg, "maps_eval")
+    assert a != cache_key(np.array([1, 2, 4]), cfg, "maps_eval")
+    other = cfg.model_copy(update={"photo": cfg.photo.model_copy(update={"crop_pct": 0.875})})
+    assert a != cache_key(np.array([1, 2, 3]), other, "maps_eval")

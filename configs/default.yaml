@@ -85,3 +85,17 @@ training:
     max_epochs: 60                           # upper limit while the inner folds look for the best epoch
     warmup_epochs: 3
     patience: 12                             # inner folds: stop after this many epochs without improvement
+  photo:                                     # PhotoCarbModel (pretrained ConvNeXt-Tiny + 2 heads)
+    lr_heads: 0.001
+    lr_last_stage: 0.0001                    # 10x smaller: small changes to pretrained weights
+    weight_decay: 0.05
+    batch_size: 64
+    max_epochs: 100                          # upper limit for the heads while the inner folds look for the best epoch
+    warmup_epochs: 2
+    patience: 10
+    bin_loss_weight: 0.5                     # loss = Huber(log grams) + 0.5 x cross-entropy(carb bin)
+    huber_delta: 1.0
+    try_last_stage: true                     # phase-2 trial: also train the backbone's last stage
+    last_stage_max_epochs: 3
+    last_stage_min_gain_g: 0.5               # keep phase 2 only if the inner folds' carb error drops by >= 0.5 g
+    augmented_views: 2                       # saved augmented copies per training photo (phase 2 only)

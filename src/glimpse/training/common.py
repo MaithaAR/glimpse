@@ -21,7 +21,8 @@ class EpochRecord(BaseModel):
     lr: float
     train_loss: float
     val_loss: float | None = None
-    val_auroc: float | None = None
+    val_metric: float | None = None  # AUROC for the sensor model, carb error in grams for the photo model
+    val_metric_name: str = "auroc"
 
 
 def warmup_cosine(optimizer: torch.optim.Optimizer, warmup: int, total: int) -> torch.optim.lr_scheduler.LambdaLR:
@@ -55,16 +56,17 @@ class EpochLogger:
         self._f.flush()
         fmt = lambda v: "-" if v is None else f"{v:.4f}"  # noqa: E731
         logger.bind(model=rec.model, run=rec.run, epoch=rec.epoch).info(
-            "train_loss={:.4f} val_loss={} val_auroc={} lr={:.2e}",
-            rec.train_loss, fmt(rec.val_loss), fmt(rec.val_auroc), rec.lr)  # fmt: skip
+            "train_loss={:.4f} val_loss={} val_{}={} lr={:.2e}",
+            rec.train_loss, fmt(rec.val_loss), rec.val_metric_name, fmt(rec.val_metric), rec.lr)  # fmt: skip
 
     def close(self) -> None:
         """Close the CSV file."""
         self._f.close()
 
 
-def plot_curves(records: list[EpochRecord], run: str, path: Path, title: str) -> None:
-    """Training and validation loss (left) and validation AUROC (right) for one run, saved as a PNG."""
+def plot_curves(records: list[EpochRecord], run: str, path: Path, title: str, marker_epoch: int | None = None) -> None:
+    """Training and validation loss (left) and the validation measure (right) for one run, saved as a PNG.
+    `marker_epoch` draws a dashed line, e.g. where the photo model's last stage was unfrozen."""
     import matplotlib
 
     matplotlib.use("Agg")  # draw to a file, no window
@@ -76,13 +78,16 @@ def plot_curves(records: list[EpochRecord], run: str, path: Path, title: str) ->
     a.plot(ep, [r.train_loss for r in rs], label="training")
     if any(r.val_loss is not None for r in rs):
         a.plot(ep, [r.val_loss for r in rs], label="validation")
-    a.set(xlabel="epoch", ylabel="loss (binary cross-entropy)")
+    a.set(xlabel="epoch", ylabel="loss")
     a.legend()
-    if any(r.val_auroc is not None for r in rs):
-        b.plot(ep, [r.val_auroc for r in rs], color="tab:green")
-    b.set(xlabel="epoch", ylabel="validation AUROC")
+    if any(r.val_metric is not None for r in rs):
+        b.plot(ep, [r.val_metric for r in rs], color="tab:green")
+    names = {"auroc": "validation AUROC", "mae_g": "validation carb error (g)"}
+    b.set(xlabel="epoch", ylabel=names.get(rs[0].val_metric_name, rs[0].val_metric_name) if rs else "")
     for ax in (a, b):
         ax.grid(alpha=0.3)
+        if marker_epoch is not None:
+            ax.axvline(marker_epoch + 0.5, color="grey", linestyle="--", linewidth=1)
     fig.suptitle(title)
     fig.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)

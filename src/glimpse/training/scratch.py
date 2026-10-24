@@ -81,7 +81,7 @@ def fit(ds: MealDataset, rows: np.ndarray, norm: Normaliser, hp: ScratchTrainCfg
         vl, va = evaluate(model, *val) if val else (None, None)
         if elog:
             elog.log(EpochRecord(model=MODEL, run=run, epoch=epoch, lr=lr, train_loss=total / len(y), val_loss=vl,
-                                 val_auroc=va))  # fmt: skip
+                                 val_metric=va, val_metric_name="auroc"))  # fmt: skip
         if patience is not None and vl is not None:
             if vl < best - 1e-4:
                 best, best_epoch, waited = vl, epoch, 0

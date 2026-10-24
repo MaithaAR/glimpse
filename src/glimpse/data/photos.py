@@ -41,3 +41,15 @@ def eval_transform(arch: str, crop_pct: float = 1.0):
 def photo_tensor(path: str | Path, arch: str, crop_pct: float = 1.0, min_side_px: int = 64) -> torch.Tensor:
     """Photo file -> model-ready tensor (3, 224, 224). The same function serves training and the demo."""
     return eval_transform(arch, crop_pct)(open_photo(path, min_side_px))
+
+
+@lru_cache(maxsize=4)
+def train_transform(arch: str):
+    """Training-only augmentation (used only when the backbone's last stage learns): horizontal flip, brightness and
+    contrast +/-10% (no hue change: colour tells foods apart), and crops keeping at least 80% of the photo."""
+    import timm
+    from timm.data import create_transform, resolve_model_data_config
+
+    cfg = resolve_model_data_config(timm.create_model(arch, pretrained=False, num_classes=0))
+    return create_transform(**cfg, is_training=True, scale=(0.8, 1.0), hflip=0.5, color_jitter=(0.1, 0.1, 0.0),
+                            auto_augment=None, re_prob=0.0)  # fmt: skip
