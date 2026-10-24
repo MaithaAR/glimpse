@@ -138,6 +138,25 @@ def _final(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _amend(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Freeze the amended decision cut-offs before the test is opened (Step 5b)."""
+    from glimpse.data.splits import Splits
+    from glimpse.run_evaluation import amend_thresholds
+
+    amend_thresholds(Splits.load(Path("splits/dev_splits.json")), cfg)
+    return 0
+
+
+def _evaluate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Main estimate, research questions, calibration, usefulness, fixed test (once), targets, figures."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits
+    from glimpse.run_evaluation import run_evaluation
+
+    run_evaluation(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
+    return 0
+
+
 def _download_weights(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Fetch and verify the pinned photo-model weights (needed once; everything else then runs offline)."""
     from glimpse.models.weights import download_weights
@@ -170,6 +189,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("photo-cv", help="out-of-fold and nested photo carb estimates + baselines (Step 4c-2)")
     sub.add_parser("fusion", help="add photo / logged carbs to profile + trend, with controls (Step 4c-3)")
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
+    sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
+    sub.add_parser("evaluate", help="full evaluation into outputs/evaluation/ (scores the fixed test once)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
     try:
@@ -194,6 +215,8 @@ def main(argv: list[str] | None = None) -> int:
         "photo-cv": _photo_cv,
         "fusion": _fusion,
         "final": _final,
+        "amend-thresholds": _amend,
+        "evaluate": _evaluate,
     }
     return commands[args.command](cfg, args)
 

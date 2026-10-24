@@ -72,3 +72,19 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 - **Shuffled control:** the fitted photo model scores the test meals with their photo inputs swapped among the
   test meals of the same fold.
 - **Diagnostic:** calibration slope of the photo estimates (log scale), out-of-fold vs nested.
+
+## Amendment to the decision cut-offs (after Step 5a, before the test was opened)
+- Step 5a: cut-offs chosen on the 4 validation people (spike rate 19%) were 0.31 / 0.31. The pre-registered stability
+  check failed: on the pooled cross-validation (spike rate 33%) they gave no cost saving (+2%).
+- **Main cut-offs** now follow from the pre-registered costs alone, assuming honest probabilities: low risk below
+  0.143, caution from 0.20, can't judge in between. They use no data, so no test label can influence them.
+  Calibration of the cross-validated main model on folds 2-5 (test people excluded) supported this assumption.
+- **Secondary rows (reported, not chosen between afterwards):** the pre-registered 0.31; cut-offs chosen on the
+  cross-validation without the test people.
+- **Sensitivity:** the main rule recomputed for every pre-registered cost setting (`costs.sweep_*`).
+- **Success criteria** are unchanged (`targets.usefulness`), each with a 95% range by person.
+- **Role of the test:** the 5 test people are also inside the cross-validation, so the test is a sanity check of the
+  28-person pipeline; the cross-validation is the main estimate. Usefulness is also reported on the
+  cross-validation with the main cut-offs (they use no data, so this is fair).
+- The amendment file (`checkpoints/thresholds_amended.json`, with its hash) is committed before `glimpse evaluate`
+  scores the test; the command refuses to run otherwise.

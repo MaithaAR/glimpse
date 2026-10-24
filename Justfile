@@ -66,9 +66,13 @@ fusion:
 train-final:
     uv run glimpse final
 
-# evaluate models and baselines, writing results to outputs/ (built in Step 5)
+# freeze the amended decision cut-offs (main = from the costs alone) before the test is opened; then commit them
+amend-thresholds:
+    uv run glimpse amend-thresholds
+
+# full evaluation -> outputs/evaluation/ (run `just cv` first if the C grid changed; scores the fixed test once)
 evaluate:
-    @echo "Not built yet: evaluation is added in Step 5." && exit 1
+    uv run glimpse evaluate
 
 # end-to-end demo on the sample inputs (built in Step 6)
 demo:

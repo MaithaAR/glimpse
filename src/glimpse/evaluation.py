@@ -119,6 +119,47 @@ def choose_thresholds(p, y, costs, grid=None):
     return best[1], best[2], best[0]
 
 
+def cost_only_thresholds(costs):
+    """Cut-offs that follow from the costs alone, if the probability p is honest (calibrated): each answer's
+    expected cost is a straight line in p; pick the cheapest. Low risk a*p, caution b*(1-p), abstain c*p + d*(1-p)
+    with (a, 0), (0, b), (c, d) = low_risk, caution, abstain. Uses no data."""
+    a, b = costs["low_risk"][0], costs["caution"][1]
+    c, d = costs["abstain"]
+    den_lo, den_hi = a - c + d, b - d + c
+    if den_lo > 0 and den_hi > 0:
+        lo, hi = d / den_lo, (b - d) / den_hi
+        if 0 <= lo < hi <= 1:
+            return float(lo), float(hi)
+    # abstaining is never the cheapest answer: one cut-off where low risk and caution cost the same
+    return float(b / (a + b)), float(b / (a + b))
+
+
+def person_bootstrap_ci(sids, fn, B=2000, seed=0):
+    """Point value and 95% range of fn(meal indices), resampling PEOPLE with replacement. fn may return NaN for a
+    draw where it is undefined (e.g. only one class); those draws are skipped."""
+    rng = np.random.default_rng(seed)
+    ppl = np.unique(sids)
+    idx = {p: np.where(sids == p)[0] for p in ppl}
+    vals = []
+    for _ in range(B):
+        v = fn(np.concatenate([idx[p] for p in rng.choice(ppl, len(ppl))]))
+        if not np.isnan(v):
+            vals.append(v)
+    lo, hi = np.percentile(vals, [2.5, 97.5]) if vals else (np.nan, np.nan)
+    return float(fn(np.arange(len(sids)))), float(lo), float(hi)
+
+
+def reliability(p, y, bins=15):
+    """Equal-width bins: mean predicted, observed rate and count per non-empty bin, and the ECE
+    (count-weighted mean gap)."""
+    edges = np.linspace(0, 1, bins + 1)
+    b = np.clip(np.digitize(p, edges[1:-1]), 0, bins - 1)
+    rows = [(float(p[b == k].mean()), float(y[b == k].mean()), int((b == k).sum()))
+            for k in range(bins) if (b == k).any()]  # fmt: skip
+    ece = sum(n * abs(m - o) for m, o, n in rows) / len(p)
+    return rows, float(ece)
+
+
 # ---------- conformal rise intervals ----------
 def participant_weighted_cqr_quantile(lo_pred, hi_pred, y, sids, alpha=0.2):
     """Conformalised quantile regression score with each calibration person weighted 1/(their meal count).

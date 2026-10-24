@@ -1,0 +1,28 @@
+{
+  "status": "amendment made after Step 5a and BEFORE the test was opened",
+  "reason": "cut-offs chosen on the 4 validation people (spike rate 19% vs 33% in the cross-validation) failed the pre-registered stability check (no cost saving on the pooled cross-validation)",
+  "main": {
+    "rule": "cost-only (from the pre-registered costs; uses no data)",
+    "low_risk_below": 0.14285714285714285,
+    "caution_from": 0.2
+  },
+  "secondary_preregistered": {
+    "low_risk_below": 0.31,
+    "caution_from": 0.31,
+    "sha256": "462799bcd5bbc245350e96cb657d8fa29865625c2e238f82124bfcdd2eeb3a46"
+  },
+  "secondary_cv_without_test": {
+    "low_risk_below": 0.18,
+    "caution_from": 0.18,
+    "chosen_on": "385 cross-validated meals, test people excluded"
+  },
+  "sensitivity": "cost-only cut-offs recomputed for every pre-registered cost setting (costs.sweep_*)",
+  "success_targets": {
+    "min_cost_reduction": 0.1,
+    "min_cleared": 0.2,
+    "max_missed_among_cleared": 0.1,
+    "max_abstain": 0.2
+  },
+  "test_role": "sanity check; the test people are also inside the cross-validation (main estimate)",
+  "sha256": "06f7b87a77133b8f13a8f60a2086849b5e137228f172088cce428b5da171280d"
+}
