@@ -244,6 +244,18 @@ def train_last_stage(
 
 
 # ---------------------------------------------------------------- the full recipe on the fixed split
+def choose_recipe(best_epochs: list[int], mae1: list[float], mae2: list[list[float]], hp: PhotoTrainCfg):
+    """Head epochs = median inner best epoch. Last stage kept only if the mean inner carb error at its best epoch is
+    at least `last_stage_min_gain_g` below heads-only; its epochs = that best epoch. Returns (e1, keep, e2)."""
+    e1 = int(np.median(best_epochs))
+    if not mae2:
+        return e1, False, 0
+    per_epoch = np.mean(mae2, axis=0)
+    e2 = int(np.argmin(per_epoch)) + 1
+    keep = float(np.mean(mae1) - per_epoch[e2 - 1]) >= hp.last_stage_min_gain_g
+    return e1, keep, e2 if keep else 0
+
+
 def _subset_views(maps_aug: torch.Tensor, pos: np.ndarray, views: int) -> torch.Tensor:
     """Augmented copies belonging to the photos at positions `pos` (copies of one photo are stored together)."""
     idx = (pos[:, None] * views + np.arange(views)[None, :]).ravel()
@@ -327,12 +339,7 @@ def train_photo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
             mae1[-1],
             f"; with last stage per epoch {[round(m, 1) for m in mae2[-1]]}" if mae2 else "",
         )
-    e1 = int(np.median(best_epochs))
-    keep, e2 = False, 0
-    if mae2:
-        per_epoch = np.mean(mae2, axis=0)
-        e2 = int(np.argmin(per_epoch)) + 1
-        keep = float(np.mean(mae1) - per_epoch[e2 - 1]) >= hp.last_stage_min_gain_g
+    e1, keep, e2 = choose_recipe(best_epochs, mae1, mae2, hp)
     choice = {
         "heads_best_epochs": best_epochs,
         "heads_epochs": e1,
@@ -347,7 +354,7 @@ def train_photo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
         e1,
         f"KEPT for {e2} epochs" if keep else "rejected",
         float(np.mean(mae1)),
-        f", {float(np.mean(mae2, axis=0)[e2 - 1]):.1f} g with last stage" if mae2 else "",
+        f", {float(np.min(np.mean(mae2, axis=0))):.1f} g with last stage" if mae2 else "",
     )
 
     model.load_state_dict(fresh_heads, strict=False)

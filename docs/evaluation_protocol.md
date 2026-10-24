@@ -46,3 +46,19 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
   Logged carbs are a reference arm, not a competitor. No extra arms (interactions, other learners) are added after
   seeing results.
 - **Known limit:** the bootstrap resamples people but not the inner-fold tuning, so the range is slightly too narrow.
+
+## Photo cross-validation and fusion (fixed after 4c-1, before 4c-2 ran)
+- **Photo estimates for the fusion test side:** out-of-fold, the 4b recipe re-chosen inside each outer fold's training
+  people (same inner folds), one seed.
+- **Photo estimates for the fusion training side:** nested. The chosen recipe is refitted per inner fold with fixed
+  epochs (no early stopping) and used on that inner fold's held-out people, so training and test estimates are made
+  the same way. They come from slightly fewer people, so they are a little noisier.
+- **Carb baselines:** training median; frozen ConvNeXt + ridge (alpha from the inner folds). Reported on the scored
+  meals that have a photo.
+- **Fusion arms (4c-3):** no meal; + photo (log of estimated grams + bin probabilities); + logged carbs (reference);
+  + shuffled photo estimates (control: photo estimates permuted among the held-out meals of each fold).
+- **Primary result:** pooled AUROC gain of the photo arm over no meal, paired person bootstrap (23 people).
+  Within-fold AUROC is reported as a check.
+- **RQ1** (photo vs logged carbs, margin 0.03) is kept as written in the proposal. With 23 people the 95% range is
+  expected to be about 0.06 wide, so "inconclusive" is a likely, honest outcome.
+- Scored meals without a photo get the training median estimate and are reported with and without.

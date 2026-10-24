@@ -54,6 +54,10 @@ cv:
 carbs-check:
     uv run glimpse carbs-check
 
+# photo cross-validation: recipe re-chosen inside each outer fold; OOF + nested carb estimates (~1.5 h, resumable)
+photo-cv:
+    uv run glimpse photo-cv
+
 # evaluate models and baselines, writing results to outputs/ (built in Step 5)
 evaluate:
     @echo "Not built yet: evaluation is added in Step 5." && exit 1

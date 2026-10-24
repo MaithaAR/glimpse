@@ -108,6 +108,16 @@ def _carbs_check(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _photo_cv(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Photo carb estimates for every development meal from models that never saw that person (Step 4c-2)."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits
+    from glimpse.training.photo_cv import run_photo_cv
+
+    run_photo_cv(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
+    return 0
+
+
 def _download_weights(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Fetch and verify the pinned photo-model weights (needed once; everything else then runs offline)."""
     from glimpse.models.weights import download_weights
@@ -137,6 +147,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     sub.add_parser("cv", help="5-fold person cross-validation of the CNN and the comparison models")
     sub.add_parser("carbs-check", help="does adding the logged carbs to profile + trend raise AUROC? (Step 4c-1)")
+    sub.add_parser("photo-cv", help="out-of-fold and nested photo carb estimates + baselines (Step 4c-2)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
     try:
@@ -158,6 +169,7 @@ def main(argv: list[str] | None = None) -> int:
         "train": _train,
         "cv": _cv,
         "carbs-check": _carbs_check,
+        "photo-cv": _photo_cv,
     }
     return commands[args.command](cfg, args)
 
