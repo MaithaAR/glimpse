@@ -152,6 +152,7 @@ class BaselinesCfg(_Strict):
 
     logreg_c_grid: list[float] = Field(min_length=1)
     gbm_depth_grid: list[int] = Field(min_length=1)
+    ridge_alpha_grid: list[float] = Field(min_length=1)
 
 
 class PhotoCfg(_Strict):
@@ -181,6 +182,25 @@ class FusionCfg(_Strict):
     bootstrap_draws: int = Field(ge=100, le=100000)
     carbs_check_min_gain: float = Field(ge=0, lt=1)
     ridge_alpha_grid_posthoc: list[float] = Field(min_length=1)
+
+
+class PrototypeCfg(_Strict):
+    """The app's decision cut-offs (frozen before the test) and its unfamiliar-photo rule."""
+
+    low_risk_below: Prob
+    caution_from: Prob
+    thresholds_file: str
+    ood_reference_file: str
+    ood_neighbours: int = Field(ge=1, le=50)
+    ood_quantile: float = Field(gt=0.5, lt=1)
+    feedback_file: str
+
+    @model_validator(mode="after")
+    def _cutoffs_ordered(self) -> PrototypeCfg:
+        """'Low risk' must start below 'caution' (the gap between them is 'can't judge')."""
+        if self.low_risk_below > self.caution_from:
+            raise ValueError("prototype: low_risk_below must not exceed caution_from")
+        return self
 
 
 class TargetsCfg(_Strict):
@@ -256,6 +276,7 @@ class GlimpseConfig(_Strict):
     finetune_cap_items: int = Field(gt=0, le=10000)
     baselines: BaselinesCfg
     fusion: FusionCfg
+    prototype: PrototypeCfg
     targets: TargetsCfg
     training: TrainingCfg
 

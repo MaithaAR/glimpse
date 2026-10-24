@@ -80,6 +80,7 @@ def finetune_ledger(ds: MealDataset, sp: Splits, photo_root: Path, cap: int) -> 
     Cross-validation trains on different people per fold, so the worst case counts every development photo."""
 
     def n_photos(people: set[int]) -> int:
+        """Photos of these people that fine-tuning could use."""
         return sum(
             1
             for s in ds.samples

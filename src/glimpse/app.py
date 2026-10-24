@@ -6,7 +6,6 @@ optionally hr_bpm) and a short profile. Example meals from the test people can b
 
 from __future__ import annotations
 
-from datetime import datetime
 from pathlib import Path
 
 import gradio as gr
@@ -15,8 +14,9 @@ from loguru import logger
 from glimpse.config import load_config
 from glimpse.data.dataset import MealDataset
 from glimpse.data.splits import Splits
-from glimpse.demo import Glimpse, MealInput, read_cgm_csv
+from glimpse.demo import Glimpse, answer_from_files
 from glimpse.demo_run import write_example
+from glimpse.feedback import record_feedback
 from glimpse.utils.logging import setup_logging
 
 COLOURS = {"low risk": "#1e8449", "caution": "#b9770e", "can't judge": "#5d6d7e"}
@@ -37,32 +37,26 @@ def _examples(cfg) -> dict[str, dict]:
 
 
 def build(cfg=None) -> gr.Blocks:
+    """The page: inputs on the left, the answer, examples and the feedback form on the right."""
     cfg = cfg or load_config()
     app = Glimpse(cfg)
     examples = _examples(cfg)
 
     def answer(photo, csv, meal_time, age, bmi, a1c, fasting, prior_rate, prior_rise):
-        if csv is None:
-            return "### Please add the CGM export (CSV)", ""
-        try:
-            gt, gv, ht, hv = read_cgm_csv(csv)
-        except ValueError as e:
-            return f"### {e}", ""
-        when = datetime.fromisoformat(meal_time) if meal_time else max(gt)
-        nan = float("nan")
-        given = {"age": age, "bmi": bmi, "a1c_pct": a1c, "fasting_glucose_mgdl": fasting,
-                 "prior_spike_rate": prior_rate, "prior_rise": prior_rise}  # fmt: skip
-        profile = {k: nan if v is None else float(v) for k, v in given.items()}  # empty = filled from training
-        a = app.predict(MealInput(meal_time=when, glucose_times=gt, glucose_mgdl=gv, hr_times=ht, hr_bpm=hv,
-                                  profile=profile, photo=Path(photo) if photo else None))  # fmt: skip
+        """Screen inputs -> the same validated Answer as `glimpse predict` (bad input -> can't judge)."""
+        profile = {"age": age, "bmi": bmi, "a1c_pct": a1c, "fasting_glucose_mgdl": fasting,
+                   "prior_spike_rate": prior_rate, "prior_rise": prior_rise}  # fmt: skip
+        a = answer_from_files(app, csv, photo, meal_time or None, profile)
+        state = {"meal_time": meal_time, **a.model_dump()}
         head = f"<h2 style='color:{COLOURS[a.decision]}'>{a.decision.upper()}</h2>\n\n{a.sentence}"
         rows = [f"- **Why:** {a.reason}"]
         if a.carb_bin:
             rows.append(f"- **Carbs on the plate:** most likely {a.carb_bin} ({a.carb_bin_prob:.0%} sure)")
-        rows.append(f"- **Answered in** {a.latency_ms:.0f} ms")
-        return head, "\n".join(rows)
+        rows.append(f"- **Answered in** {a.latency_ms or 0:.0f} ms")
+        return head, "\n".join(rows), state
 
     def load_example(title):
+        """Fill the inputs with one of the demo's worked meals."""
         e = examples[title]
         p = e["profile"]
         r = [None if v != v else round(float(v), 2) for v in (p["age"], p["bmi"], p["a1c_pct"],
@@ -90,12 +84,27 @@ def build(cfg=None) -> gr.Blocks:
                     pick = gr.Dropdown(list(examples), value=None, label="Or load an example meal (test people)")
                     pick.change(load_example, pick, [photo, csv, meal_time, age, bmi, a1c, fasting, prior_rate,
                                                      prior_rise])  # fmt: skip
+                with gr.Accordion("After the meal: what happened? (helps improve GLIMPSE)", open=False):
+                    ate = gr.Radio(["ate it all", "ate part of it", "did not eat it"], label="Did you eat it?")
+                    rise = gr.Number(label="Rise seen on your CGM in the 2 h after (mg/dL, optional)")
+                    send, sent = gr.Button("Send feedback"), gr.Markdown()
                 gr.Markdown(f"*{DISCLAIMER}*")
-        go.click(answer, [photo, csv, meal_time, age, bmi, a1c, fasting, prior_rate, prior_rise], [head, details])
+        last = gr.State({})
+        go.click(answer, [photo, csv, meal_time, age, bmi, a1c, fasting, prior_rate, prior_rise], [head, details, last])
+
+        def give_feedback(state, ate_value, rise_value):
+            """Save the user's correction next to what the app said (mocked feedback loop)."""
+            if not state:
+                return "Check a meal first."
+            r = record_feedback(cfg, state, ate_value, rise_value, source="user")
+            return f"Thanks, saved ({r.feedback_label})."
+
+        send.click(give_feedback, [last, ate, rise], sent)
     return ui
 
 
 def main() -> None:
+    """Start the local server (offline, local weights)."""
     cfg = load_config()
     setup_logging(cfg.paths.logs)
     logger.bind(stage="app").info("starting the GLIMPSE screen on http://127.0.0.1:7860")

@@ -168,22 +168,15 @@ def _demo(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
 
 
 def _predict(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
-    """One meal from your own files -> the answer as JSON on screen."""
-    import json
+    """One meal from your own files -> the validated answer as JSON on screen (bad input -> 'can't judge')."""
     import sys
-    from datetime import datetime
 
-    from glimpse.demo import Glimpse, MealInput, read_cgm_csv
+    from glimpse.demo import Glimpse, answer_from_files
 
-    gt, gv, ht, hv = read_cgm_csv(args.cgm)
-    nan = float("nan")
     profile = {"age": args.age, "bmi": args.bmi, "a1c_pct": args.a1c, "fasting_glucose_mgdl": args.fasting,
-               "prior_spike_rate": nan if args.prior_rate is None else args.prior_rate,
-               "prior_rise": nan if args.prior_rise is None else args.prior_rise}  # fmt: skip
-    when = datetime.fromisoformat(args.meal_time) if args.meal_time else max(gt)
-    a = Glimpse(cfg).predict(MealInput(meal_time=when, glucose_times=gt, glucose_mgdl=gv, hr_times=ht, hr_bpm=hv,
-                                       profile=profile, photo=Path(args.photo) if args.photo else None))  # fmt: skip
-    sys.stdout.write(json.dumps(a.to_dict(), indent=2) + "\n")
+               "prior_spike_rate": args.prior_rate, "prior_rise": args.prior_rise}  # fmt: skip
+    a = answer_from_files(Glimpse(cfg), args.cgm, args.photo, args.meal_time, profile)
+    sys.stdout.write(a.model_dump_json(indent=2) + "\n")
     return 0
 
 

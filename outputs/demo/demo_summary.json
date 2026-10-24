@@ -5,8 +5,8 @@
     "can't judge": 15,
     "low risk": 3
   },
-  "latency_ms_p50": 274.36970850249054,
-  "latency_ms_p95": 286.2931669988029,
+  "latency_ms_p50": 271.80145849706605,
+  "latency_ms_p95": 285.48839599170606,
   "latency_target_ms": 300.0,
   "latency_met": true,
   "machine": "Darwin arm64",
@@ -33,5 +33,22 @@
     "Correct warning (caution, and it spiked)": 545,
     "Correct all-clear (low risk, no spike)": 543,
     "Wrong answer (shown on purpose)": 546
+  },
+  "cgm_auto_feedback": {
+    "Correct warning (caution, and it spiked)": {
+      "auto_rise_mgdl": 60.46451612903226,
+      "dataset_rise_mgdl": 57.95333333333333,
+      "label": "spike"
+    },
+    "Correct all-clear (low risk, no spike)": {
+      "auto_rise_mgdl": -23.46451612903229,
+      "dataset_rise_mgdl": -32.9933333333333,
+      "label": "no spike"
+    },
+    "Wrong answer (shown on purpose)": {
+      "auto_rise_mgdl": 36.38709677419355,
+      "dataset_rise_mgdl": 35.42666666666666,
+      "label": "no spike"
+    }
   }
 }

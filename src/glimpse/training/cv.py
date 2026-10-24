@@ -126,6 +126,7 @@ def summarise(oof: pd.DataFrame) -> dict:
     so both are reported; 95% ranges by person come in the evaluation step."""
 
     def auc(g: pd.DataFrame, m: str) -> float:
+        """AUROC of model m on these meals (0.5 if only one class or a constant guess)."""
         return float(roc_auc_score(g.spike, g[m])) if g[m].nunique() > 1 and g.spike.nunique() > 1 else 0.5
 
     pooled = {m: [auc(g, m) for _, g in oof.groupby("seed")] for m in MODELS}

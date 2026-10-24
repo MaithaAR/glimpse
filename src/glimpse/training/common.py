@@ -29,6 +29,7 @@ def warmup_cosine(optimizer: torch.optim.Optimizer, warmup: int, total: int) -> 
     """Learning rate: small steps rising to full size over `warmup` epochs, then a smooth (cosine) fade to zero."""
 
     def factor(epoch: int) -> float:
+        """Learning-rate multiplier: linear warm-up, then cosine decay."""
         if epoch < warmup:
             return (epoch + 1) / (warmup + 1)
         progress = (epoch - warmup) / max(1, total - warmup)

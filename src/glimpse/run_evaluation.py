@@ -127,7 +127,10 @@ def _usefulness_ci(p, y, sids, lo, hi, costs, targets, B, seed) -> dict:
     rep = usefulness_report(decide(p, lo, hi), y, costs, targets)
 
     def stat(key):
+        """A function of meal indices returning one usefulness number (for the person bootstrap)."""
+
         def f(i):
+            """The number on these meals (NaN if undefined)."""
             r = usefulness_report(decide(p[i], lo, hi), y[i], costs, targets)
             return float(r[key]) if r[key] == r[key] else float("nan")
 
@@ -184,6 +187,7 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     table.to_csv(OUT / "results_table.csv", index=False)
 
     def gain(a, b):
+        """AUROC of a minus b with a paired 95% range by person."""
         m, lo, hi = paired_person_bootstrap(y, df[a].to_numpy(), df[b].to_numpy(), sids, B=B, seed=seed)
         return {"point": _auc(y, df[a].to_numpy()) - _auc(y, df[b].to_numpy()), "ci95": [lo, hi]}
 

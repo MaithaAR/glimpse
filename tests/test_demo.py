@@ -71,12 +71,54 @@ def test_selftest_runs_when_weights_are_present():
     """The container's self-test, run locally when the weights and frozen checkpoints exist."""
     import pytest
 
-    from glimpse.demo import OOD_REF
-
     cfg = load_config()
     weights = Path(cfg.photo.weights_dir)
-    if not (OOD_REF.is_file() and weights.is_dir() and any(weights.iterdir())):
+    if not (Path(cfg.prototype.ood_reference_file).is_file() and weights.is_dir() and any(weights.iterdir())):
         pytest.skip("photo weights not downloaded (run `just install`)")
     from glimpse.demo_run import selftest
 
     assert all(selftest(cfg).values())
+
+
+def test_meal_input_and_answer_are_validated():
+    """Readings must pair up and profile keys must be known; an answer needs a valid decision and a risk in [0, 1]."""
+    import pytest
+    from pydantic import ValidationError
+
+    from glimpse.demo import Answer, MealInput, cant_judge
+
+    with pytest.raises(ValidationError):
+        MealInput(meal_time=MEAL, glucose_times=[MEAL], glucose_mgdl=[], profile={})
+    with pytest.raises(ValidationError):
+        MealInput(meal_time=MEAL, glucose_times=[], glucose_mgdl=[], profile={"shoe_size": 40.0})
+    with pytest.raises(ValidationError):
+        Answer(decision="maybe", sentence="x", reason="y")
+    with pytest.raises(ValidationError):
+        Answer(decision="caution", sentence="x", reason="y", risk=1.5)
+    with pytest.raises(ValidationError):
+        Answer(decision="caution", sentence="x", reason="y")  # answered without a risk
+    a = cant_judge("no meal photo was taken")
+    assert a.decision == "can't judge" and '"decision":"can\'t judge"' in a.model_dump_json()
+
+
+def test_bad_input_files_give_a_structured_cant_judge(tmp_path):
+    """Missing, empty or wrong files never crash: they come back as 'can't judge' with the reason."""
+    from glimpse.demo import answer_from_files
+
+    empty = tmp_path / "empty.csv"
+    empty.write_text("")
+    header_only = tmp_path / "header.csv"
+    header_only.write_text("timestamp,glucose_mgdl\n")
+    wrong = tmp_path / "wrong.csv"
+    wrong.write_text("time,value\n2020-05-01 12:00,100\n")
+    for cgm in (None, tmp_path / "missing.csv", empty, header_only, wrong):
+        a = answer_from_files(None, cgm, None, None, {"age": 50.0})
+        assert a.decision == "can't judge" and a.reason.startswith("unsupported input")
+
+
+def test_sample_cgm_file_is_valid():
+    """The synthetic sample in samples/ reads cleanly: 24 readings in the 2 h before the meal."""
+    from glimpse.demo import read_cgm_csv
+
+    gt, gv, ht, hv = read_cgm_csv(Path("samples/cgm_example.csv"))
+    assert len(gt) == len(gv) == 24 and len(hv) == 24

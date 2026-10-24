@@ -214,6 +214,7 @@ def summarise_fusion(oof: pd.DataFrame, cfg: GlimpseConfig) -> dict:
     yy, sids, B, seed = oof.spike.to_numpy(), oof.person_id.to_numpy(), cfg.fusion.bootstrap_draws, cfg.seed
 
     def gain(a: str, b: str, df: pd.DataFrame = oof) -> dict:
+        """AUROC of arm a minus arm b on these meals, with a paired 95% range by person."""
         y_, s_ = df.spike.to_numpy(), df.person_id.to_numpy()
         mean, lo, hi = paired_person_bootstrap(y_, df[a].to_numpy(), df[b].to_numpy(), s_, B=B, seed=seed)
         return {"point": _auc(y_, df[a].to_numpy()) - _auc(y_, df[b].to_numpy()), "bootstrap_mean": mean,

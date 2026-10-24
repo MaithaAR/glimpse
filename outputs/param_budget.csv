@@ -1,0 +1,6 @@
+model,role,status,parameters,limit,within_limit
+SensorCNN (1-D CNN),trained from scratch,built,5217,50000000,True
+PhotoCarbModel (ConvNeXt-Tiny + 2 heads),"pretrained, fine-tuned",built,27823973,200000000,True
+Fusion (logistic regression: 15 profile/trend + 4 photo inputs),"trained (classical, on top of the networks)",built,20,50000000,True
+Unfamiliar-photo check (5 nearest training photos),no weights (reference set),built,0,200000000,True
+"photo out-of-distribution check (DINOv2-S), final stage","pretrained, frozen; planned",planned (estimate),22000000,200000000,True

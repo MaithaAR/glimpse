@@ -65,10 +65,19 @@ baselines:                                   # fixed before seeing results; ever
   logreg_c_grid: [0.001, 0.003, 0.01, 0.03, 0.1, 1.0, 10.0]  # logistic regression strength C, tuned on the inner folds;
                                            # widened downwards in 4c because 0.01 (the old minimum) won 9 of 10 times
   gbm_depth_grid: [2, 3, 4]                  # gradient boosting (the proposal's baseline): tree depth tuned the same way
+  ridge_alpha_grid: [1.0, 10.0, 100.0, 1000.0]  # frozen ConvNeXt + ridge carb baseline: strength tuned on the inner folds
 fusion:                                      # meal information added to profile + trend (fixed before running 4c)
   bootstrap_draws: 2000                      # paired person bootstrap of the AUROC gain
   carbs_check_min_gain: 0.02                 # logged-carbs check: skip the photo CV only if the WHOLE 95% range is below this
   ridge_alpha_grid_posthoc: [1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0]  # POST-HOC (after 4c-2): ridge hit 1000 in all folds
+prototype:                                   # the app (glimpse demo / predict / app); rules run before the model
+  low_risk_below: 0.14285714285714285        # decision cut-offs = the frozen amendment (costs alone, no data); must match
+  caution_from: 0.2                          #   checkpoints/thresholds_amended.json, which the app checks at start-up
+  thresholds_file: checkpoints/thresholds_amended.json
+  ood_reference_file: checkpoints/photo_ood_reference.pt
+  ood_neighbours: 5                          # unfamiliar photo: mean distance to the 5 nearest training photos ...
+  ood_quantile: 0.99                         # ... above the 99th percentile of the training photos' own distances
+  feedback_file: outputs/feedback/feedback.jsonl  # mocked user feedback (what happened after the meal)
 targets:                                     # fixed before seeing results (see docs/evaluation_protocol.md)
   primary_metric: auroc                      # target cohort, cross-validated out-of-fold predictions
   rq1_noninferiority_margin: 0.03

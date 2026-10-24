@@ -48,7 +48,6 @@ from glimpse.training.photo import (
     train_last_stage,
 )
 
-RIDGE_ALPHAS = [1.0, 10.0, 100.0, 1000.0]
 BINS = ["p_bin0", "p_bin1", "p_bin2", "p_bin3"]
 
 
@@ -86,6 +85,7 @@ class _Recipe:
         self.pristine = _last_stage_state(model)
 
     def reset(self) -> None:
+        """Back to the untouched pretrained last stage and fresh heads."""
         self.model.load_state_dict(self.fresh, strict=False)
         self.model.load_state_dict(self.pristine, strict=False)
 
@@ -165,7 +165,8 @@ def run_photo_cv(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
         assert not set(person[pos_t]) & set(f["held"]), "a held-out person is in training"
 
         # 1. choose the recipe inside this fold's training people
-        best, mae1, mae2, ridge_err = [], [], [], {a: [] for a in RIDGE_ALPHAS}
+        alphas = cfg.baselines.ridge_alpha_grid
+        best, mae1, mae2, ridge_err = [], [], [], {a: [] for a in alphas}
         for j, held in enumerate(f["inner"]):
             fit, hold = pos_t[~np.isin(person[pos_t], held)], pos_t[np.isin(person[pos_t], held)]
             e, m1, curve = recipe.select(fit, hold, cfg.seed + 10 * k + j, f"fold{k}-inner{j + 1}", elog)
@@ -173,11 +174,11 @@ def run_photo_cv(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
             mae1.append(m1)
             if curve:
                 mae2.append(curve)
-            for a in RIDGE_ALPHAS:
+            for a in alphas:
                 pr = _ridge_predict(_ridge(emb_np[fit], g[fit], a), emb_np[hold])
                 ridge_err[a].append(float(np.mean(np.abs(pr - g[hold]))))
         e1, keep, e2 = choose_recipe(best, mae1, mae2, cfg.training.photo)
-        alpha = min(RIDGE_ALPHAS, key=lambda a: float(np.mean(ridge_err[a])))
+        alpha = min(alphas, key=lambda a: float(np.mean(ridge_err[a])))
 
         # 2. nested estimates: chosen recipe refitted per inner fold, used on that fold's held-out people
         nested = []
