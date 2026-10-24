@@ -132,7 +132,7 @@ Pretrained and fine-tuned models: 27.8M built, 49.8M with the planned model, aga
 | Cost saving ≥ 10% | 9% CV / 7% test | at risk |
 | Meals cleared ≥ 20%, spikes among them ≤ 10% | 14%, 12% CV / **3%, 0% test** | at risk |
 | *Can't judge* ≤ 20% | 11% CV / 16% test | met |
-| Response time p95 ≤ 300 ms (Mac CPU) | 285 ms | met |
+| Response time p95 ≤ 300 ms (Mac CPU) | 285–303 ms across runs | borderline (met in the committed run) |
 
 **In practice:** on the test, the app said *caution* to 81% of meals. That is safe, but not yet useful.
 
