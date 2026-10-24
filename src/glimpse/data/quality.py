@@ -102,7 +102,11 @@ def finetune_ledger(ds: MealDataset, sp: Splits, photo_root: Path, cap: int) -> 
             "stage": "intermediate",
             "items": n_photos(dev),
         },
-        {"dataset": "Nutrition5k plates (optional pre-training)", "stage": "final, planned", "items": 0},
+        {
+            "dataset": "Nutrition5k overhead plates (optional pre-training; estimate)",
+            "stage": "final, planned",
+            "items": 800,
+        },
     ]
     t = pd.DataFrame(rows)
     total = int(t["items"].iloc[1:].sum())  # worst case + later stages (the fixed-split row is a subset)

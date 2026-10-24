@@ -49,8 +49,8 @@ Out-of-range glucose (outside 40–400 mg/dL): 0 readings.
 |---|---|---|
 | CGMacros before-meal photos, fixed training people | intermediate | 865 |
 | CGMacros before-meal photos, all development people (worst case over CV folds) | intermediate | 1,221 |
-| Nutrition5k plates (optional pre-training) | final, planned | 0 |
-| **Running total (worst case)** | | **1,221** |
+| Nutrition5k overhead plates (optional pre-training; estimate) | final, planned | 800 |
+| **Running total (worst case, incl. planned)** | | **2,021** |
 `glimpse prepare` stops with an error if the total exceeds the cap.
 
 ## Modalities

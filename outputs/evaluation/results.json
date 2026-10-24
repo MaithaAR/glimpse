@@ -747,10 +747,10 @@
       "status": "met"
     },
     {
-      "target": "Latency p95 <= 300 ms",
-      "estimate": null,
+      "target": "Response time p95 <= 300 ms (just demo)",
+      "estimate": 285.48839599170606,
       "ci95": null,
-      "status": "measured with the demo (Step 6)"
+      "status": "met"
     }
   ]
 }

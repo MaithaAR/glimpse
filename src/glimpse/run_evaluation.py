@@ -19,11 +19,13 @@ import hashlib
 import json
 import subprocess
 from pathlib import Path
+from typing import Any, Literal
 
 import joblib
 import numpy as np
 import pandas as pd
 from loguru import logger
+from pydantic import BaseModel, ConfigDict, Field
 from sklearn.metrics import average_precision_score, brier_score_loss, roc_auc_score
 
 from glimpse.config import GlimpseConfig
@@ -61,6 +63,55 @@ LADDER = [  # (label, column): the order of the results table and the AUROC figu
     ("+ ridge photo (post-hoc)", "ridge_photo"),
     ("+ photo grams only, no bins (post-hoc)", "photo_grams_only"),
 ]
+
+
+class ResultRow(BaseModel):
+    """One model in a results table."""
+
+    model_config = ConfigDict(extra="allow")
+    model: str
+    column: str
+    auroc: float = Field(ge=0, le=1)
+    auroc_lo: float = Field(ge=0, le=1)
+    auroc_hi: float = Field(ge=0, le=1)
+    auprc: float = Field(ge=0, le=1)
+    brier: float = Field(ge=0, le=1)
+
+
+class Comparison(BaseModel):
+    """A paired difference with its 95% range by person."""
+
+    model_config = ConfigDict(extra="allow")
+    point: float = Field(ge=-1, le=1)
+    ci95: list[float] = Field(min_length=2, max_length=2)
+
+
+class TargetStatus(BaseModel):
+    """One target from the proposal, its result and the honest status."""
+
+    model_config = ConfigDict(extra="forbid")
+    target: str
+    estimate: float | None
+    ci95: list[float] | None
+    status: Literal["met", "on track", "at risk", "not measured"]
+
+
+class EvaluationResult(BaseModel):
+    """Everything `just evaluate` writes to results.json, validated before it is written."""
+
+    model_config = ConfigDict(extra="forbid")
+    cv_people: int = Field(gt=0)
+    cv_meals: int = Field(gt=0)
+    cv_spike_rate: float = Field(ge=0, le=1)
+    table: list[ResultRow]
+    gains_vs_profile_trend: dict[str, Comparison]
+    rq1: Comparison
+    rq2: Comparison
+    calibration: dict[str, Any]
+    usefulness_cv_main_cutoffs: dict[str, Any]
+    cutoffs: dict[str, Any]
+    test: dict[str, Any]
+    targets_status: list[TargetStatus]
 
 
 def _auc(y: np.ndarray, p: np.ndarray) -> float:
@@ -169,12 +220,14 @@ def _cv_table(cfg: GlimpseConfig) -> pd.DataFrame:
 
 
 def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
-    """Write outputs/evaluation/ (results.json, results_table.csv, results.md, two figures)."""
+    """Write outputs/evaluation/ (results.json, results_table.csv, test_table.csv, results.md, three figures)."""
     log, B, seed = logger.bind(stage="evaluate"), cfg.fusion.bootstrap_draws, cfg.seed
     OUT.mkdir(parents=True, exist_ok=True)
-    amended = load_thresholds(AMENDED)
-    if not _amendment_committed():
+    amended = load_thresholds(AMENDED)  # refuses the file if it was edited after freezing (hash)
+    if Path(".git").exists() and not _amendment_committed():
         raise RuntimeError(f"commit {AMENDED} before scoring the test (git add + commit)")
+    if not Path(".git").exists():
+        log.warning("no git folder (e.g. a zip copy): relying on the amendment's hash only")
     costs, targets = cost_dict(cfg), cfg.targets.model_dump()
 
     # 1. main estimate: cross-validation over the 23 development target people
@@ -234,14 +287,19 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
                            lambda v: v <= u.max_abstain)]:  # fmt: skip
         st.append({"target": name + " (CV, main cut-offs)", "estimate": use_cv[key], "ci95": use_cv[f"{key}_ci95"],
                    "status": _status(use_cv[key], *use_cv[f"{key}_ci95"], ok)})  # fmt: skip
-    st.append({"target": f"Latency p95 <= {cfg.targets.latency_p95_ms:.0f} ms", "estimate": None, "ci95": None,
-               "status": "measured with the demo (Step 6)"})  # fmt: skip
+    demo = Path("outputs/demo/demo_summary.json")  # response time is measured by `just demo` (96 test meals)
+    p95 = json.loads(demo.read_text())["latency_ms_p95"] if demo.is_file() else None
+    ok_ms = p95 is not None and p95 <= cfg.targets.latency_p95_ms
+    st.append({"target": f"Response time p95 <= {cfg.targets.latency_p95_ms:.0f} ms (just demo)", "estimate": p95,
+               "ci95": None, "status": "not measured" if p95 is None else "met" if ok_ms else "at risk"})  # fmt: skip
 
     res = {"cv_people": int(len(set(sids))), "cv_meals": int(len(df)), "cv_spike_rate": float(y.mean()),
            "table": rows, "gains_vs_profile_trend": gains, "rq1": rq1, "rq2": rq2,
            "calibration": {"ece": ece, "ece_ci95": list(ece_ci[1:]), "bins": rel},
            "usefulness_cv_main_cutoffs": use_cv, "cutoffs": amended, "test": test, "targets_status": st}  # fmt: skip
-    (OUT / "results.json").write_text(json.dumps(res, indent=2, default=float))
+    res = json.loads(json.dumps(res, default=float))  # plain JSON types (NumPy numbers -> float)
+    EvaluationResult.model_validate(res)  # schema check before anything is written
+    (OUT / "results.json").write_text(json.dumps(res, indent=2))
     _figures(table, rel, ece)
     tc = test["test"]["calibration"]
     _reliability_figure(tc["bins"], tc["ece"], "Main model, fixed test (5 people, 96 meals)",
@@ -398,7 +456,8 @@ def _markdown(res: dict) -> None:
     L += ["", f"Base spike rate {res['cv_spike_rate']:.0%} ({res['cv_meals']} meals, {res['cv_people']} people).", "",
           "## Targets status", "", "| Target | Estimate | 95% range | Status |", "|---|---|---|---|"]  # fmt: skip
     for s in res["targets_status"]:
-        est = "-" if s["estimate"] is None else f"{s['estimate']:+.3f}"
+        e = s["estimate"]
+        est = "-" if e is None else f"{e:.0f} ms" if abs(e) > 1 else f"{e:+.3f}"
         ci = "-" if s["ci95"] is None else f"{s['ci95'][0]:+.3f} to {s['ci95'][1]:+.3f}"
         L.append(f"| {s['target']} | {est} | {ci} | {s['status']} |")
     t = res["test"]["test"]

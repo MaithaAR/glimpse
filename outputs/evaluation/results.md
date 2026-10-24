@@ -27,7 +27,7 @@ Base spike rate 33% (481 meals, 23 people).
 | Meals cleared >= 20% (CV, main cut-offs) | +0.143 | +0.076 to +0.225 | at risk |
 | Spikes among cleared <= 10% (CV, main cut-offs) | +0.116 | +0.030 to +0.208 | at risk |
 | Can't judge <= 20% (CV, main cut-offs) | +0.106 | +0.068 to +0.146 | met |
-| Latency p95 <= 300 ms | - | - | measured with the demo (Step 6) |
+| Response time p95 <= 300 ms (just demo) | 285 ms | - | met |
 
 ## Fixed test (sanity check): 5 people, 96 meals, spike rate 29%
 

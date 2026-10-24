@@ -100,7 +100,7 @@ docker-demo:
 app:
     uv run --extra app python -m glimpse.app
 
-# remove generated files (keeps downloaded data and the locked environment)
+# remove generated files (keeps downloaded data, the locked environment, checkpoints and committed results)
 clean:
-    rm -rf outputs logs .pytest_cache .ruff_cache
+    rm -rf logs .pytest_cache .ruff_cache outputs/feedback outputs/demo/examples outputs/demo/test_meals.csv outputs/demo/blank_photo.jpg outputs/data outputs/quality
     find . -name "__pycache__" -type d -prune -exec rm -rf {} +
