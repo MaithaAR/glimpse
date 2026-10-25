@@ -8,7 +8,7 @@ before-meal photo, the 2 h of CGM and heart rate before the meal, and a short pr
 CGM. **Not** a medical device. Not for type 1 diabetes, insulin dosing or treatment decisions.
 
 **Parts.** The photo model is ConvNeXt-Tiny (27.8M parameters, pretrained on ImageNet-22k and fine-tuned on 865
-CGMacros photos); it estimates a carb range and grams. The fusion is a logistic regression over profile, CGM trend
+CGMacros photos of the training people; 1,221 counting all CV refits); it estimates a carb range and grams. The fusion is a logistic regression over profile, CGM trend
 and photo inputs. Deterministic input checks run first. The from-scratch SensorCNN is evaluated but not deployed:
 it ties the trend features.
 
@@ -21,15 +21,15 @@ USA; CC BY-NC-SA 4.0. Carb labels are "served" carbs (logged ÷ share eaten), wh
 - **Calibration:** ECE 0.052.
 - **Fixed test (5 people):** AUROC 0.742, ECE 0.129 (over-predicts).
 - **Decisions on the cross-validation:** 14% of meals cleared, 12% of those spiked; 11% *can't judge*.
-- **Speed:** p95 283–286 ms on a Mac CPU in the committed runs (one run 303 ms; close to the 300 ms target).
+- **Speed:** p95 286 ms on a Mac CPU in the committed demo run (`outputs/demo/demo_summary.json`); runs vary by a few ms, and one earlier run reached 303 ms, so it is close to the 300 ms target.
 
 **Limitations:**
 
 - Small and narrow data: 45 people from one study, mostly US foods, no local dishes.
-- Risk is over-predicted for people who rarely spike.
+- Risk is over-predicted for people who rarely spike (test ECE 0.129), so few meals are cleared (3% on the test).
 - The photo's two outputs often disagree, so users are shown only the carb range.
-- One photo-model seed.
-- The unfamiliar-photo check misses some non-meal images (for example, a plain white picture).
+- One photo-model seed (the CV of the sensor models uses 3 seeds).
+- The unfamiliar-photo check alone misses some non-meal images (for example, a plain white picture); the blank-photo rule catches that case.
 
 **Fairness and safety.**
 
