@@ -80,6 +80,11 @@ def meal_input(cfg: GlimpseConfig, ds: MealDataset, row: int) -> MealInput:
                      photo=(root / s.photo_relpath) if s.photo_relpath else None)  # fmt: skip
 
 
+def _change(rise: float) -> str:
+    """Plain words for the change in glucose after the meal."""
+    return f"glucose rose {rise:.0f} mg/dL" if rise >= 0 else f"glucose fell {-rise:.0f} mg/dL"
+
+
 def card(title: str, m: MealInput, a, truth: str | None) -> str:
     """One case as Markdown."""
     photo = m.photo.name if m.photo else "none"
@@ -132,7 +137,7 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
             md.append(f"### {title}\n- none among the test meals")
             continue
         m, s = meal_input(cfg, ds, r), ds.samples[r]
-        truth = f"glucose rose {s.rise_mgdl:.0f} mg/dL ({'spike' if s.spike else 'no spike'})"
+        truth = f"{_change(s.rise_mgdl)} ({'spike' if s.spike else 'no spike'})"
         md.append(card(title, m, app.predict(m), truth))
     # mocked feedback loop: the CGM labels each worked case 2 h later (same rule as the training label)
     from glimpse.feedback import auto_rise, record_feedback
@@ -164,7 +169,7 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     if len(border):
         r = int(border.row.iloc[0])
         m_b, s_b = meal_input(cfg, ds, r), ds.samples[r]
-        truth = f"glucose rose {s_b.rise_mgdl:.0f} mg/dL ({'spike' if s_b.spike else 'no spike'})"
+        truth = f"{_change(s_b.rise_mgdl)} ({'spike' if s_b.spike else 'no spike'})"
         md.append(card("Can't judge: borderline risk (between the two cut-offs)", m_b, app.predict(m_b), truth))
     p50, p95 = float(np.percentile(lat, 50)), float(np.percentile(lat, 95))
     summary = {"test_meals": len(df), "decisions": df.decision.value_counts().to_dict(),

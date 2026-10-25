@@ -1,0 +1,59 @@
+{
+  "meals": 1526,
+  "missing_share": {
+    "glucose_slots": 0.006525775447793796,
+    "heart_rate_slots": 0.051605504587155966,
+    "age": 0.0,
+    "bmi": 0.0,
+    "a1c_pct": 0.0,
+    "fasting_glucose_mgdl": 0.0,
+    "hour_sin": 0.0,
+    "hour_cos": 0.0,
+    "prior_spike_rate": 0.01834862385321101,
+    "prior_rise": 0.01834862385321101
+  },
+  "windows_needing_gap_fill": 0.022280471821756225,
+  "glucose_out_of_range_readings": 0,
+  "flagged_by_premeal_checks": 20,
+  "by_split": {
+    "train": {
+      "scored_meals": 547,
+      "spikes": 264,
+      "spike_rate_target_cohort": 0.3881118881118881,
+      "spike_rate_T2D": 0.5862068965517241,
+      "mean_glucose_last_slot": 133.35319926873856,
+      "mean_a1c": 6.442047531992688
+    },
+    "validation": {
+      "scored_meals": 99,
+      "spikes": 19,
+      "spike_rate_target_cohort": 0.1919191919191919,
+      "spike_rate_T2D": null,
+      "mean_glucose_last_slot": 119.46666666666667,
+      "mean_a1c": 5.515151515151516
+    },
+    "test": {
+      "scored_meals": 96,
+      "spikes": 28,
+      "spike_rate_target_cohort": 0.2916666666666667,
+      "spike_rate_T2D": null,
+      "mean_glucose_last_slot": 118.08624999999999,
+      "mean_a1c": 5.395833333333333
+    }
+  },
+  "per_person_scored_meals": {
+    "min": 7,
+    "median": 20.0,
+    "max": 28
+  },
+  "per_person_spike_rate": {
+    "min": 0.0,
+    "median": 0.5,
+    "max": 0.8421052631578947
+  },
+  "duplicate_photos": {
+    "photos_checked": 1221,
+    "cross_split_duplicates": 0,
+    "within_person_lookalike_pair_rate": 0.00013863856924996534
+  }
+}

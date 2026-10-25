@@ -102,5 +102,5 @@ app:
 
 # remove generated files (keeps downloaded data, the locked environment, checkpoints and committed results)
 clean:
-    rm -rf logs .pytest_cache .ruff_cache outputs/feedback outputs/demo/examples outputs/demo/test_meals.csv outputs/demo/blank_photo.jpg outputs/data outputs/quality
+    rm -rf logs .pytest_cache .ruff_cache outputs/feedback outputs/demo/examples outputs/demo/test_meals.csv outputs/demo/blank_photo.jpg
     find . -name "__pycache__" -type d -prune -exec rm -rf {} +

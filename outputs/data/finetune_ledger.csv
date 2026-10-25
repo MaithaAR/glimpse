@@ -1,0 +1,5 @@
+dataset,stage,items
+"CGMacros before-meal photos, fixed training people",intermediate,865
+"CGMacros before-meal photos, all development people (worst case over CV folds)",intermediate,1221
+Nutrition5k overhead plates (optional pre-training; estimate),"final, planned",800
+"running total (worst case) vs cap 10,000",,2021

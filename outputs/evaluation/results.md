@@ -13,6 +13,17 @@
 | + ridge photo (post-hoc) | 0.703 (0.630-0.783) | 0.716 | 0.565 | 0.196 |
 | + photo grams only, no bins (post-hoc) | 0.704 (0.635-0.782) | 0.712 | 0.584 | 0.195 |
 
+**Paired differences (95% range by person):**
+
+- photo minus profile + trend: +0.037 (+0.003 to +0.073)
+- logged_carbs minus profile + trend: +0.031 (+0.003 to +0.063)
+- photo_shuffled minus profile + trend: -0.008 (-0.046 to +0.025)
+- ridge_photo minus profile + trend: +0.017 (-0.011 to +0.044)
+- photo_grams_only minus profile + trend: +0.018 (-0.007 to +0.042)
+- carb ranges added (main minus grams only): +0.020 (+0.005 to +0.035)
+- RQ1 photo minus logged carbs: +0.007 (-0.020 to +0.032) -> non-inferior
+- RQ2 SensorCNN minus profile + trend: +0.002 (-0.016 to +0.022) -> tie or worse
+
 Base spike rate 33% (481 meals, 23 people).
 
 ## Targets status

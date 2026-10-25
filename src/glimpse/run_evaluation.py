@@ -468,6 +468,13 @@ def _markdown(res: dict) -> None:
     for r in res["table"]:
         L.append(f"| {r['model']} | {r['auroc']:.3f} ({r['auroc_lo']:.3f}-{r['auroc_hi']:.3f}) | "
                  f"{r['auroc_within_fold']:.3f} | {r['auprc']:.3f} | {r['brier']:.3f} |")  # fmt: skip
+    L += ["", "**Paired differences (95% range by person):**", ""]
+    for k, g in res["gains_vs_profile_trend"].items():
+        name = "carb ranges added (main minus grams only)" if k == "bins_added" else f"{k} minus profile + trend"
+        L.append(f"- {name}: {g['point']:+.3f} ({g['ci95'][0]:+.3f} to {g['ci95'][1]:+.3f})")
+    for k, lab in (("rq1", "RQ1 photo minus logged carbs"), ("rq2", "RQ2 SensorCNN minus profile + trend")):
+        g = res[k]
+        L.append(f"- {lab}: {g['point']:+.3f} ({g['ci95'][0]:+.3f} to {g['ci95'][1]:+.3f}) -> {g['verdict']}")
     L += ["", f"Base spike rate {res['cv_spike_rate']:.0%} ({res['cv_meals']} meals, {res['cv_people']} people).", "",
           "## Targets status", "", "| Target | Estimate | 95% range | Status |", "|---|---|---|---|"]  # fmt: skip
     for s in res["targets_status"]:

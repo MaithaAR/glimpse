@@ -1,0 +1,10 @@
+group,people,training_meals,scored_meals,spike_rate_scored
+train,28,633,547,0.483
+validation,4,133,99,0.192
+test (= outer fold 1),5,125,96,0.292
+locked,8,181,153,0.425
+outer fold 1,5,125,96,0.292
+outer fold 2,5,131,109,0.321
+outer fold 3,5,156,110,0.236
+outer fold 4,4,77,71,0.507
+outer fold 5,4,112,95,0.347
