@@ -82,7 +82,7 @@ class Answer(BaseModel):
     reason: str = Field(min_length=1)
     risk: float | None = Field(default=None, ge=0, le=1)
     # point estimate from the regression head; kept in results, not shown (the two heads were trained separately
-    # and disagree on about half of the meals, so the user sees the bin head's range and confidence only)
+    # and their agreement is not yet measured, so the user sees the bin head's range and confidence only)
     carbs_g: float | None = Field(default=None, ge=0)
     carb_bin: str | None = None
     carb_bin_prob: float | None = Field(default=None, ge=0, le=1)
