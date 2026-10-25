@@ -5,7 +5,7 @@ Maitha Alhosani · MAAI7103 · October 2026 · `just install` → `just demo`
 **Bottom line.** A meal photo helps predict a glucose spike, about as much as asking the person to log their carbs, and this was checked against a shuffled-photo control. The product runs end to end but is not yet safe to clear meals, because it misjudges who spikes rarely and who spikes often. In numbers: the photo adds +0.037 AUROC over profile + trend logistic regression (+0.003 to +0.073), which holds on the whole CV range but not once the test people are removed (−0.007 to +0.077); the shuffled-photo control is consistent with it (photo minus shuffled +0.045, −0.006 to +0.098), logged carbs are matched (+0.007), and a 5-person sanity check (people also inside the CV) was scored once. The main comparison and its decision rules were fixed before training; later additions are dated in `docs/evaluation_protocol.md`. The product runs end to end on all four inputs (nothing is stubbed) but does not yet meet its clearance target: it is miscalibrated in opposite directions, over-predicting for rare spikers and under-predicting for frequent spikers (test ECE 0.129), and clears 3% of test meals. Section 4 lists each limit with its fix and pass target.
 
 ## 1. User and workflow
-An adult with prediabetes in a 10–14 day continuous glucose monitor (CGM) programme wants fewer spikes (a rise ≥ 50 mg/dL within 2 h) but stops logging food within days. Before eating they take one photo and get *caution* with a nudge (smaller carb portion, a walk), *low risk*, or *can't judge* with the reason. The programme pays, as it drops manual logging; a wellness nudge, not a medical device. **Feedback (mocked):** the CGM labels each meal 2 h later, the user can correct it in `just app`, and validated `FeedbackRecord`s are stored for retraining.
+An adult with prediabetes in a 10–14 day continuous glucose monitor (CGM) programme wants fewer spikes (a rise ≥ 50 mg/dL within 2 h) but stops logging food within days. Before eating they take one photo and get *caution* with a nudge (smaller carb portion, a walk), *low risk*, or *can't judge* with the reason. The programme pays a per-member fee, as it drops manual logging; abstentions and a sample of answers go to its dietitian for review; a wellness nudge, not a medical device. **Feedback (mocked):** the CGM labels each meal 2 h later, the user can correct it in `just app`, and validated `FeedbackRecord`s are stored for retraining.
 
 ## 2. Work completed
 **Tooling:** uv + Python 3.14 + lock; `just`; strict Pydantic for config, data and outputs; Loguru (stderr + rotating file); ruff + 85 tests; Linux CI with an offline Docker self-test. **Blockers:** none for dependencies. Photo cross-validation costs 90 min per seed on the Mac, so the CV photo arm has one seed; the final model's seed spread is measured below.
@@ -51,7 +51,7 @@ CNN validation loss sits below training loss because validation people spike les
 | Fine-tuned, grams only | 22.5 | – | 0.704 |
 | Fine-tuned, grams + carb ranges (used) | 22.5 | 0.61 | **0.724** |
 
-Fine-tuning worsens the gram error but its carb-range head raises the fused AUROC by +0.020 (+0.005 to +0.035); it is kept for that.
+Fine-tuning worsens the gram error but its carb-range head raises the fused AUROC by +0.020 (+0.005 to +0.035); it is kept for that. The proposal's fusion (spike logit plus three rise quantiles, non-negative carb weight) was simplified to the logistic regression after the proposal feedback; rise intervals, if kept, become a separate conformal layer in the final.
 
 **Pipeline:** `just demo`, `predict` and `app` share one path: `MealInput` → window code → rules → photo model → fusion → cut-offs → Pydantic `Answer` JSON, e.g. `{"decision": "low risk", "risk": 0.108, "reason": "risk 11% is below the low-risk cut-off 14%"}`. Bad input returns *can't judge* with its reason.
 
@@ -119,7 +119,28 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 | Wrong | meal at 12:47 (rose 35 mg/dL, no spike) | low risk | **caution** (48%): large carb portion, but this person responds mildly |
 
 ## 4. Limits, deviations and plan for the final
-**Proposal feedback:** ConvNeXt-Tiny + carb-range head; fusion cut to a 20-parameter logistic regression; scratch CNN tested (it ties); person CV and a locked hold-out for the small data. **Changes from the proposal:** nearest-neighbour + blank-photo checks replace DINOv2 for now (the nearest-neighbour check flags 5 of 6 synthetic non-meal images and the blank rule the white one; 3.1% of real meal photos are falsely flagged, above the 2% final target); conformal intervals, W&B, Nutrition5k (overhead plate photos with weighed carbs, joined as pre-training of the carb heads, 800 items in the ledger) and the user test move to the final.
+**Proposal feedback acted on:** ConvNeXt-Tiny + carb-range head; fusion cut to a 20-parameter logistic regression; scratch CNN tested (it ties); person CV and a locked hold-out for the small data; a shorter report.
+
+**Proposal items: status and final plan** (deviations in bold):
+
+| Proposal item | Status now | Final |
+|---|---|---|
+| Photo model: EfficientNet-B0, Nutrition5k pre-training (≤ 5,006) then CGMacros | changed: ConvNeXt-Tiny + carb-range head on CGMacros only | Nutrition5k pre-training of the heads, cut to 800 items to keep cap headroom |
+| **Week-4 gate:** carb error < 23.1 g and < 29.1 g under profile exclusion; photo gain lower bound > 0 on both | 22.5 g and lower bound +0.003 on the person-excluded split; **the profile-excluded split was not run** | run the profile-excluded split (meals sharing a macro profile with a test person removed) and report both halves of the gate |
+| Repeated-meal check (62% of meals share a macro profile across people) | **not run**; only exact and look-alike photo duplicates checked | same profile-excluded split; near-duplicate photos already share a fold |
+| Scratch 1-D CNN vs engineered trends (RQ2) | done: tie (+0.002, −0.016 to +0.022) | 4 h window, 3 seeds; else kept as baseline |
+| Fusion: logit + 3 rise quantiles, non-negative carb weight | changed: logistic regression, no quantiles, no constraint | conformal rise intervals as a separate layer, coverage 75–85% at 80% nominal, if the product needs them |
+| Photo OOD: DINOv2-S kNN | changed: nearest-neighbour + blank rule on ConvNeXt features | DINOv2-S vs current check; 30-photo Emirati set as an exploratory OOD test |
+| Cost-based thresholds after calibration | **deviation:** cost-only cut-offs; two validation rules failed | per-person intercept, then cut-offs on recalibrated CV-fold risk, sealed before the locked 8 |
+| Onboarding personal prior (72 h; population prior under 5 meals) | done, as inputs to the fusion | per-person intercept added (see limit 1) |
+| Spike label 50 mg/dL; 30 and 70 as checks | 50 only | sensitivity at 30 and 70 |
+| Class weighting as an ablation; fusion vs GBM on the same inputs; CNN + GBM ensemble | not run | all three, on CV |
+| Explainability: photo swaps, flat vs rising traces, branch masking; robustness: blur, missing labs/heart rate, CGM gaps | not run (final-stage per rubric) | all, with ΔAUROC, ΔECE and abstention rate |
+| Monitoring of drift, abstention, OOD rate, latency; W&B exports | latency only | drift and rate dashboards from the feedback log; tracker exports |
+| Dietitian acceptance of "can't judge" (2 dietitians, 5-person think-aloud) | not run | user test with 3–5 people plus 2 dietitians on the abstention queue |
+| Locked 8 people, run once | sealed, untouched | scored once under the hashed manifest |
+
+**Limits, fixes and pass tests:**
 
 | Limit | Evidence now | Fix in the final | Test (split · metric · pass) |
 |---|---|---|---|
