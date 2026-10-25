@@ -2,7 +2,7 @@
 Before eating: a meal photo + the last 2 h of CGM glucose and heart rate + a short profile → **low risk**, **caution** or **can't judge** (with a reason). Offline, local weights, Docker self-test.
 Maitha Alhosani · MAAI7103 · October 2026 · `just install` → `just demo`
 
-**Bottom line.** The one claim, that the photo adds spike signal (+0.037 AUROC over profile + trend logistic regression, range +0.003 to +0.073), holds on the whole range; a shuffled-photo control is consistent with it (photo minus shuffled +0.045, −0.002 to +0.097), logged carbs are matched (+0.007), and a 5-person sanity check (people also inside the CV) was scored once. The main comparison and its decision rules were fixed before training; later additions are dated in `docs/evaluation_protocol.md`. The product runs end to end on all four inputs (nothing is stubbed) but does not yet meet its clearance target: it is miscalibrated in opposite directions, over-predicting for rare spikers and under-predicting for frequent spikers (test ECE 0.129), and clears 3% of test meals. Section 4 lists each limit with its fix and pass target.
+**Bottom line.** The one claim, that the photo adds spike signal (+0.037 AUROC over profile + trend logistic regression, range +0.003 to +0.073), holds on the whole range; a shuffled-photo control is consistent with it (photo minus shuffled +0.045, −0.006 to +0.098), logged carbs are matched (+0.007), and a 5-person sanity check (people also inside the CV) was scored once. The main comparison and its decision rules were fixed before training; later additions are dated in `docs/evaluation_protocol.md`. The product runs end to end on all four inputs (nothing is stubbed) but does not yet meet its clearance target: it is miscalibrated in opposite directions, over-predicting for rare spikers and under-predicting for frequent spikers (test ECE 0.129), and clears 3% of test meals. Section 4 lists each limit with its fix and pass target.
 
 ## 1. User and workflow
 An adult with prediabetes in a 10–14 day continuous glucose monitor (CGM) programme wants fewer spikes (a rise ≥ 50 mg/dL within 2 h) but stops logging food within days. Before eating they take one photo and get *caution* with a nudge (smaller carb portion, a walk), *low risk*, or *can't judge* with the reason. The programme pays, as it drops manual logging; a wellness nudge, not a medical device. **Feedback (mocked):** the CGM labels each meal 2 h later, the user can correct it in `just app`, and validated `FeedbackRecord`s are stored for retraining.
@@ -73,7 +73,7 @@ AUROC is primary; 95% ranges come from resampling people; on the test every mode
 |---|---|---|---|
 | Photo vs profile + trend | +0.037 | +0.003 to +0.073 | the main claim |
 | Same, without the test people | +0.033 | −0.007 to +0.077 | not yet certain |
-| Photo vs shuffled photo (control) | +0.045 | −0.002 to +0.097 | consistent with the signal coming from the photo; the range just touches zero |
+| Photo vs shuffled photo (control) | +0.045 | −0.006 to +0.098 | consistent with the signal coming from the photo; the range just touches zero |
 | Photo vs logged carbs (RQ1) | +0.007 | −0.020 to +0.032 | photo matches logging |
 | Scratch CNN vs trend numbers (RQ2) | +0.002 | −0.016 to +0.022 | tie; CNN stays a baseline |
 | Test: main vs profile only | −0.023 | −0.114 to +0.159 | 5 people do not separate models |
