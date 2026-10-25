@@ -27,7 +27,7 @@ Base spike rate 33% (481 meals, 23 people).
 | Meals cleared >= 20% (CV, main cut-offs) | +0.143 | +0.076 to +0.225 | at risk |
 | Spikes among cleared <= 10% (CV, main cut-offs) | +0.116 | +0.030 to +0.208 | at risk |
 | Can't judge <= 20% (CV, main cut-offs) | +0.106 | +0.068 to +0.146 | met |
-| Response time p95 <= 300 ms (just demo) | 285 ms | - | met |
+| Response time p95 <= 300 ms (just demo) | 283 ms | - | met |
 
 ## Fixed test (sanity check): 5 people, 96 meals, spike rate 29%
 
@@ -45,6 +45,14 @@ Base spike rate 33% (481 meals, 23 people).
 | main (cost-only) | 0.143 | 0.200 | 3% | 0% | 9% | -7% |
 | pre-registered (validation) | 0.310 | 0.310 | 42% | 15% | 0% | -6% |
 | CV without test people | 0.180 | 0.180 | 9% | 11% | 0% | -4% |
+
+## CV without the 5 test people (18 people, 385 meals; added after the results)
+
+| profile_lr | no_meal | sensor_cnn | photo | logged_carbs |
+|---|---|---|---|---|
+| 0.659 | 0.686 | 0.691 | 0.719 | 0.715 |
+
+Photo gain over profile + trend: +0.033 (95% range -0.007 to +0.077).
 
 Main model minus profile-only on the test (paired, by person): -0.023 (95% range -0.114 to +0.159).
 

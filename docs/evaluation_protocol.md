@@ -92,3 +92,8 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 ## Added after Step 5 (post-hoc, secondary)
 - **Carb-bin head check:** a fusion arm with the fine-tuned photo estimate in grams only (no bin probabilities), same
   folds and estimates. The gain of the main arm over it shows what the carb-bin head adds. Never the main result.
+
+## Robustness view (added after the results)
+- The cross-validated predictions are also summarised **without the 5 test people** (outer fold 1, 18 people, 385
+  meals), because the main CV includes them. Photo gain there: +0.033 (95% range −0.007 to +0.077). No model is
+  refitted; this is a view of the same predictions.

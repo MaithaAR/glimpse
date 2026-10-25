@@ -112,6 +112,7 @@ class EvaluationResult(BaseModel):
     cutoffs: dict[str, Any]
     test: dict[str, Any]
     targets_status: list[TargetStatus]
+    cv_without_test_people: dict[str, Any]
 
 
 def _auc(y: np.ndarray, p: np.ndarray) -> float:
@@ -254,6 +255,16 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     gains["bins_added"] = gain("photo", "photo_grams_only")  # what the carb-bin head adds (post-hoc)
     rq1 = gain("photo", "logged_carbs")
     rq1["verdict"] = noninferiority(*rq1["ci95"], cfg.targets.rq1_noninferiority_margin)
+    # robustness view (added after the results): the same cross-validated predictions WITHOUT the 5 test people
+    # (outer fold 1), so the headline does not rest on people who are also the held-out test
+    nt = df[df.fold != 1]
+    y_nt, s_nt = nt.spike.to_numpy(), nt.person_id.to_numpy()
+    m_nt, lo_nt, hi_nt = paired_person_bootstrap(y_nt, nt.photo.to_numpy(), nt.no_meal.to_numpy(), s_nt, B=B, seed=seed)
+    without_test = {"people": int(nt.person_id.nunique()), "meals": len(nt),
+                    "auroc": {c: _auc(y_nt, nt[c].to_numpy()) for c in ["profile_lr", "no_meal", "sensor_cnn",
+                                                                       "photo", "logged_carbs"]},
+                    "photo_gain": {"point": _auc(y_nt, nt.photo.to_numpy()) - _auc(y_nt, nt.no_meal.to_numpy()),
+                                   "ci95": [lo_nt, hi_nt]}}  # fmt: skip
     rq2 = gain("sensor_cnn", "no_meal")
     rq2["verdict"] = "CNN better" if rq2["ci95"][0] > cfg.targets.rq2_min_lower_bound else "tie or worse"
 
@@ -296,7 +307,8 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     res = {"cv_people": int(len(set(sids))), "cv_meals": int(len(df)), "cv_spike_rate": float(y.mean()),
            "table": rows, "gains_vs_profile_trend": gains, "rq1": rq1, "rq2": rq2,
            "calibration": {"ece": ece, "ece_ci95": list(ece_ci[1:]), "bins": rel},
-           "usefulness_cv_main_cutoffs": use_cv, "cutoffs": amended, "test": test, "targets_status": st}  # fmt: skip
+           "usefulness_cv_main_cutoffs": use_cv, "cutoffs": amended, "test": test, "targets_status": st,
+           "cv_without_test_people": without_test}  # fmt: skip
     res = json.loads(json.dumps(res, default=float))  # plain JSON types (NumPy numbers -> float)
     EvaluationResult.model_validate(res)  # schema check before anything is written
     (OUT / "results.json").write_text(json.dumps(res, indent=2))
@@ -482,6 +494,12 @@ def _markdown(res: dict) -> None:
         L.append(f"| {k} | {d['low_risk_below']:.3f} | {d['caution_from']:.3f} | {d['share_low_risk']:.0%} | "
                  f"{d['missed_among_cleared']:.0%} | {d['share_abstain']:.0%} | "
                  f"{-d['cost_reduction']:+.0%} |")  # fmt: skip
+    w = res["cv_without_test_people"]
+    L += ["", f"## CV without the 5 test people ({w['people']} people, {w['meals']} meals; added after the results)",
+          "", "| " + " | ".join(w["auroc"]) + " |", "|" + "---|" * len(w["auroc"]),
+          "| " + " | ".join(f"{v:.3f}" for v in w["auroc"].values()) + " |", "",
+          f"Photo gain over profile + trend: {w['photo_gain']['point']:+.3f} "
+          f"(95% range {w['photo_gain']['ci95'][0]:+.3f} to {w['photo_gain']['ci95'][1]:+.3f})."]  # fmt: skip
     d = t["photo_minus_profile_only"]
     L += ["", f"Main model minus profile-only on the test (paired, by person): {d['point']:+.3f} "
           f"(95% range {d['ci95'][0]:+.3f} to {d['ci95'][1]:+.3f}).", ""]  # fmt: skip
@@ -503,6 +521,10 @@ def _log(log, res: dict) -> None:
                  r["auroc_hi"], r["auroc_within_fold"])  # fmt: skip
     for k, g in res["gains_vs_profile_trend"].items():
         log.info("gain {:<15} {:+.3f} ({:+.3f} to {:+.3f})", k, g["point"], *g["ci95"])
+    w = res["cv_without_test_people"]
+    log.info("CV without the test people ({} people): photo {:.3f} vs profile+trend {:.3f}; gain {:+.3f} ({:+.3f} to "
+             "{:+.3f})", w["people"], w["auroc"]["photo"], w["auroc"]["no_meal"], w["photo_gain"]["point"],
+             *w["photo_gain"]["ci95"])  # fmt: skip
     log.info("RQ1 photo - logged {:+.3f} ({:+.3f} to {:+.3f}) -> {}", res["rq1"]["point"], *res["rq1"]["ci95"],
              res["rq1"]["verdict"])  # fmt: skip
     log.info("RQ2 CNN - trend LR {:+.3f} ({:+.3f} to {:+.3f}) -> {}", res["rq2"]["point"], *res["rq2"]["ci95"],

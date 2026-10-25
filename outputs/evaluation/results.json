@@ -755,9 +755,27 @@
     },
     {
       "target": "Response time p95 <= 300 ms (just demo)",
-      "estimate": 285.48839599170606,
+      "estimate": 283.2716772463755,
       "ci95": null,
       "status": "met"
     }
-  ]
+  ],
+  "cv_without_test_people": {
+    "people": 18,
+    "meals": 385,
+    "auroc": {
+      "profile_lr": 0.6594871794871794,
+      "no_meal": 0.6860030165912518,
+      "sensor_cnn": 0.6908898944193061,
+      "photo": 0.7193061840120664,
+      "logged_carbs": 0.7147511312217195
+    },
+    "photo_gain": {
+      "point": 0.03330316742081452,
+      "ci95": [
+        -0.007243689913686784,
+        0.07719950618047208
+      ]
+    }
+  }
 }
