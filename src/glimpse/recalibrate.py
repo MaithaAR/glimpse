@@ -150,8 +150,10 @@ def run_recalibration(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
                       "by_person_after": calibration_by_person(s_c, y_c, q_c),
                       "validation_rule": _slim(use_val_rule).model_dump(),
                       "cost_only_rule": _slim(use_cost_rule).model_dump()},
-         "stability": "passed (meets the pre-registered cost-saving and missed-spike targets on the CV check)" if stable
-                      else "failed (misses the pre-registered cost-saving or missed-spike target on the CV check)"}  # fmt: skip
+         "stability": ("passed (meets the pre-registered cost-saving and missed-spike targets on the CV check)"
+                       if stable else
+                       "failed (misses the pre-registered cost-saving or missed-spike target on the CV check)"),
+         }  # fmt: skip
     d["sha256"] = hash_thresholds(d)
     res = Recalibration(**d)
     FROZEN.write_text(
