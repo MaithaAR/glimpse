@@ -1,0 +1,44 @@
+{
+  "recipe": {
+    "heads_epochs": 15,
+    "last_stage_epochs": 2
+  },
+  "runs": [
+    {
+      "seed": 20260927,
+      "source": "deployed checkpoint",
+      "mae_g": 26.1671199798584,
+      "spearman": 0.46025236470963743,
+      "bin_f1": 0.5515450925897543
+    },
+    {
+      "seed": 20260928,
+      "source": "retrained, not saved",
+      "mae_g": 27.630386352539062,
+      "spearman": 0.44876901457486085,
+      "bin_f1": 0.5580202911709125
+    },
+    {
+      "seed": 20260929,
+      "source": "retrained, not saved",
+      "mae_g": 22.76868438720703,
+      "spearman": 0.5144953736208007,
+      "bin_f1": 0.5244385682385091
+    }
+  ],
+  "summary": {
+    "mae_g": {
+      "mean": 25.522063573201496,
+      "sd": 2.494215272536669
+    },
+    "spearman": {
+      "mean": 0.4745055843017663,
+      "sd": 0.03510490378729208
+    },
+    "bin_f1": {
+      "mean": 0.5446679839997253,
+      "sd": 0.017815835531808894
+    }
+  },
+  "note": "validation people only; the deployed checkpoint is the first run and is not replaced"
+}

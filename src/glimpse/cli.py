@@ -147,6 +147,16 @@ def _amend(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _photo_seeds(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Seed spread of the final photo model on the validation people (the deployed checkpoint is untouched)."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits
+    from glimpse.training.photo import photo_seed_check
+
+    photo_seed_check(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
+    return 0
+
+
 def _recalibrate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Validation-chosen cut-offs on Platt-recalibrated risk, checked on CV without the test people (no test labels)."""
     from glimpse.data.dataset import MealDataset
@@ -232,6 +242,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
     sub.add_parser("evaluate", help="full evaluation into outputs/evaluation/ (scores the fixed test once)")
+    sub.add_parser("photo-seeds", help="retrain the final photo model with 2 more seeds; validation spread only")
     sub.add_parser(
         "recalibrate", help="validation-chosen cut-offs on recalibrated risk, checked on CV (no test labels)"
     )
@@ -272,6 +283,7 @@ def main(argv: list[str] | None = None) -> int:
         "amend-thresholds": _amend,
         "evaluate": _evaluate,
         "recalibrate": _recalibrate,
+        "photo-seeds": _photo_seeds,
         "demo": _demo,
         "predict": _predict,
         "selftest": _selftest,

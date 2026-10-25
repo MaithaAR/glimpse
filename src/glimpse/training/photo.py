@@ -403,3 +403,46 @@ def train_photo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
         val["bin_f1"],
     )
     return path
+
+
+def photo_seed_check(ds: MealDataset, sp: Splits, cfg: GlimpseConfig, extra_seeds: tuple[int, ...] = (1, 2)) -> dict:
+    """Seed spread of the final photo model (added after the results): retrain the chosen recipe (epochs from
+    `photo_convnext_choice.json`) on the 28 training people with other seeds and score the 4 validation people.
+    Nothing is saved to `checkpoints/`; the deployed checkpoint (seed 0) is untouched. No test labels are used."""
+    torch.set_num_threads(min(cfg.training.num_threads, os.cpu_count() or 1))
+    hp, pc, log = cfg.training.photo, cfg.photo, logger.bind(stage="train", model=MODEL)
+    out, cache = Path(cfg.paths.outputs) / "training", Path("data/cache")
+    root, views = Path(cfg.data.cgmacros_root), hp.augmented_views
+    choice = json.loads((out / f"{MODEL}_choice.json").read_text())
+    e1, e2 = int(choice["heads_epochs"]), int(choice["last_stage_epochs"])
+    model = PhotoCarbModel(pc.arch, weights=weights_path(pc), dropout=pc.dropout)
+    fresh_heads = {k: v.clone() for k, v in model.state_dict().items() if "head." in k and "backbone" not in k}
+    pristine_stage = _last_stage_state(model)
+    R, V = photo_rows(ds, set(sp.train), root), photo_rows(ds, set(sp.validation), root)
+    gR, gV = grams(ds, R), grams(ds, V)
+    maps_eval = build_cache(model, ds, np.concatenate([R, V]), cfg, "maps_eval", cache / "photo_maps_eval.pt")
+    mR, mV = maps_eval[: len(R)], maps_eval[len(R) :]
+    eR, eV = embed_maps(model, mR), embed_maps(model, mV)
+    maps_aug = build_cache(model, ds, R, cfg, "maps_aug", cache / "photo_maps_aug.pt") if e2 > 0 else None
+    runs = [{"seed": cfg.seed, "source": "deployed checkpoint", **choice["validation"]}]
+    for s in extra_seeds:
+        model.load_state_dict(fresh_heads, strict=False)
+        model.load_state_dict(pristine_stage, strict=False)
+        train_heads(model, eR, gR, hp, e1, cfg.seed + s, f"seed-{s}", None, (eV, gV))
+        if e2 > 0:
+            train_last_stage(model, maps_aug, views, gR, hp, e2, cfg.seed + s, f"seed-{s}", None, (mV, gV),
+                             start_epoch=e1)  # fmt: skip
+        pred, probs = predict(model, embed_maps(model, mV) if e2 > 0 else eV)
+        val = measures(pred, probs, gV)
+        runs.append({"seed": cfg.seed + s, "source": "retrained, not saved", **val})
+        log.info("seed {}: validation carb error {:.1f} g, Spearman {:.2f}, bin F1 {:.2f}",
+                 cfg.seed + s, val["mae_g"], val["spearman"], val["bin_f1"])  # fmt: skip
+    summary = {k: {"mean": float(np.mean([r[k] for r in runs])), "sd": float(np.std([r[k] for r in runs], ddof=1))}
+               for k in ("mae_g", "spearman", "bin_f1")}  # fmt: skip
+    res = {"recipe": {"heads_epochs": e1, "last_stage_epochs": e2}, "runs": runs, "summary": summary,
+           "note": "validation people only; the deployed checkpoint is the first run and is not replaced"}  # fmt: skip
+    (out / f"{MODEL}_seeds.json").write_text(json.dumps(res, indent=2))
+    log.info("photo seed spread over {} seeds: carb error {:.1f} +/- {:.1f} g, bin F1 {:.2f} +/- {:.2f} -> {}",
+             len(runs), summary["mae_g"]["mean"], summary["mae_g"]["sd"], summary["bin_f1"]["mean"],
+             summary["bin_f1"]["sd"], out / f"{MODEL}_seeds.json")  # fmt: skip
+    return res

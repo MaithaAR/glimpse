@@ -30,7 +30,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 ## Quick start (macOS or Linux; needs [uv](https://docs.astral.sh/uv/) and [just](https://just.systems/), no pip)
 ```bash
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
-just check       # ruff + 84 tests
+just check       # ruff + 85 tests
 just demo        # worked cases, two can't-judge cases, response time  -> outputs/demo/cases.md
 just evaluate    # all metrics, baselines, calibration, fixed test     -> outputs/evaluation/ (about 1 min)
 just app         # local screen at http://127.0.0.1:7860 (optional extra: Gradio)
@@ -53,6 +53,7 @@ just docker-demo                              # needs `just install` first, for 
 | `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · 28-person fusion + frozen cut-offs (`just train` runs all three) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
 | `just evaluate` | tables, figures, targets; scores the fixed test (refuses if the frozen cut-offs were changed) | 1 min |
+| `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10 min |
 | `just recalibrate` | validation-chosen cut-offs on recalibrated risk, checked on CV without the test people (no test labels) -> `outputs/evaluation/recalibration.md` | 1 min |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`.

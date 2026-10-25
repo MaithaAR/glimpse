@@ -74,6 +74,10 @@ amend-thresholds:
 evaluate:
     uv run glimpse evaluate
 
+# seed spread of the final photo model: 2 more seeds scored on the validation people (~10 min; nothing deployed changes)
+photo-seeds:
+    uv run glimpse photo-seeds
+
 # validation-chosen cut-offs on Platt-recalibrated risk, checked on CV without the test people (uses no test labels)
 recalibrate:
     uv run glimpse recalibrate

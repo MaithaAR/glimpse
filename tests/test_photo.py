@@ -106,3 +106,13 @@ def test_cache_key_changes_with_inputs():
     assert a != cache_key(np.array([1, 2, 4]), cfg, "maps_eval")
     other = cfg.model_copy(update={"photo": cfg.photo.model_copy(update={"crop_pct": 0.875})})
     assert a != cache_key(np.array([1, 2, 3]), other, "maps_eval")
+
+
+def test_photo_seed_check_is_registered():
+    """The seed-spread command exists and leaves the deployed checkpoint alone (it never writes to checkpoints/)."""
+    import inspect
+
+    from glimpse.training import photo
+
+    src = inspect.getsource(photo.photo_seed_check)
+    assert "torch.save" not in src and "_latest.txt" not in src
