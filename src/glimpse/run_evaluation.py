@@ -259,6 +259,7 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     arms = ["photo", "logged_carbs", "photo_shuffled", "ridge_photo", "photo_grams_only"]
     gains = {c: gain(c, "no_meal") for c in arms}
     gains["bins_added"] = gain("photo", "photo_grams_only")  # what the carb-bin head adds (post-hoc)
+    gains["photo_vs_shuffled"] = gain("photo", "photo_shuffled")  # the control, paired (added after the results)
     rq1 = gain("photo", "logged_carbs")
     rq1["verdict"] = noninferiority(*rq1["ci95"], cfg.targets.rq1_noninferiority_margin)
     # robustness view (added after the results): the same cross-validated predictions WITHOUT the 5 test people
@@ -471,14 +472,17 @@ def _figures(table: pd.DataFrame, rel: list, ece: float) -> None:
 
 def _markdown(res: dict) -> None:
     """results.md: the tables in a form that can be pasted into the report."""
-    L = ["## Cross-validation (main estimate)", "",
+    L = ["## Cross-validation (main estimate; sensor models 3 seeds, photo arms one seed)", "",
          "| Model | AUROC (95% range) | within folds | AUPRC | Brier |", "|---|---|---|---|---|"]  # fmt: skip
     for r in res["table"]:
         L.append(f"| {r['model']} | {r['auroc']:.3f} ({r['auroc_lo']:.3f}-{r['auroc_hi']:.3f}) | "
                  f"{r['auroc_within_fold']:.3f} | {r['auprc']:.3f} | {r['brier']:.3f} |")  # fmt: skip
     L += ["", "**Paired differences (95% range by person):**", ""]
     for k, g in res["gains_vs_profile_trend"].items():
-        name = "carb ranges added (main minus grams only)" if k == "bins_added" else f"{k} minus profile + trend"
+        name = {
+            "bins_added": "carb ranges added (main minus grams only)",
+            "photo_vs_shuffled": "photo minus shuffled photo (control, paired)",
+        }.get(k, f"{k} minus profile + trend")
         L.append(f"- {name}: {g['point']:+.3f} ({g['ci95'][0]:+.3f} to {g['ci95'][1]:+.3f})")
     for k, lab in (("rq1", "RQ1 photo minus logged carbs"), ("rq2", "RQ2 SensorCNN minus profile + trend")):
         g = res[k]

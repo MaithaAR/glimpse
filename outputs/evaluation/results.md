@@ -1,4 +1,4 @@
-## Cross-validation (main estimate)
+## Cross-validation (main estimate; sensor models 3 seeds, photo arms one seed)
 
 | Model | AUROC (95% range) | within folds | AUPRC | Brier |
 |---|---|---|---|---|
@@ -21,6 +21,7 @@
 - ridge_photo minus profile + trend: +0.017 (-0.011 to +0.044)
 - photo_grams_only minus profile + trend: +0.018 (-0.007 to +0.042)
 - carb ranges added (main minus grams only): +0.020 (+0.005 to +0.035)
+- photo minus shuffled photo (control, paired): +0.045 (-0.006 to +0.098)
 - RQ1 photo minus logged carbs: +0.007 (-0.020 to +0.032) -> non-inferior
 - RQ2 SensorCNN minus profile + trend: +0.002 (-0.016 to +0.022) -> tie or worse
 

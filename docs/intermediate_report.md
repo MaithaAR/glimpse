@@ -2,7 +2,7 @@
 Before eating: a meal photo + the last 2 h of CGM glucose and heart rate + a short profile → **low risk**, **caution** or **can't judge** (with a reason). Offline, local weights, Docker self-test.
 Maitha Alhosani · MAAI7103 · October 2026 · `just install` → `just demo`
 
-**Bottom line.** The one claim, that the photo adds spike signal (+0.037 AUROC over profile + trend logistic regression), is backed by a shuffled-photo control, a logged-carbs reference it matches, and a 5-person sanity check (people also inside the CV) scored once under a protocol frozen before training. The product runs end to end on all four inputs (nothing is stubbed) but does not yet meet its clearance target: the model cannot tell rare from frequent spikers, so it over-predicts for the people who matter most and clears 3% of test meals. Section 4 lists each limit with its fix and pass target.
+**Bottom line.** The one claim, that the photo adds spike signal (+0.037 AUROC over profile + trend logistic regression, range +0.003 to +0.073), holds on the whole range; a shuffled-photo control is consistent with it (photo minus shuffled +0.045, −0.002 to +0.097), logged carbs are matched (+0.007), and a 5-person sanity check (people also inside the CV) was scored once. The main comparison and its decision rules were fixed before training; later additions are dated in `docs/evaluation_protocol.md`. The product runs end to end on all four inputs (nothing is stubbed) but does not yet meet its clearance target: it is miscalibrated in opposite directions, over-predicting for rare spikers and under-predicting for frequent spikers (test ECE 0.129), and clears 3% of test meals. Section 4 lists each limit with its fix and pass target.
 
 ## 1. User and workflow
 An adult with prediabetes in a 10–14 day continuous glucose monitor (CGM) programme wants fewer spikes (a rise ≥ 50 mg/dL within 2 h) but stops logging food within days. Before eating they take one photo and get *caution* with a nudge (smaller carb portion, a walk), *low risk*, or *can't judge* with the reason. The programme pays, as it drops manual logging; a wellness nudge, not a medical device. **Feedback (mocked):** the CGM labels each meal 2 h later, the user can correct it in `just app`, and validated `FeedbackRecord`s are stored for retraining.
@@ -64,15 +64,16 @@ AUROC is primary; 95% ranges come from resampling people; on the test every mode
 | Profile + trend (logistic regression) | 0.686 (0.604–0.772) | 0.686 | 0.695 |
 | Profile + trend (gradient boosting) | 0.689 (0.610–0.778) | – | 0.632 |
 | Profile + SensorCNN (scratch) | 0.689 (0.603–0.773) | 0.691 | 0.674 |
-| **+ photo (main model; one photo seed)** | **0.724 (0.659–0.796)** | **0.719** | 0.742 |
+| **+ photo (main model; photo arms one seed)** | **0.724 (0.659–0.796)** | **0.719** | 0.742 |
 | + logged carbs (reference) · + shuffled photo (control) | 0.717 · 0.679 | 0.715 · – | – |
 
 <img src="../outputs/evaluation/fig1_auroc_ladder.png" width="46%">
 
 | Paired difference (by person) | Estimate | 95% range | Reading |
 |---|---|---|---|
-| Photo vs profile + trend | +0.037 | +0.003 to +0.073 | shuffling the photos removes it |
+| Photo vs profile + trend | +0.037 | +0.003 to +0.073 | the main claim |
 | Same, without the test people | +0.033 | −0.007 to +0.077 | not yet certain |
+| Photo vs shuffled photo (control) | +0.045 | −0.002 to +0.097 | consistent with the signal coming from the photo; the range just touches zero |
 | Photo vs logged carbs (RQ1) | +0.007 | −0.020 to +0.032 | photo matches logging |
 | Scratch CNN vs trend numbers (RQ2) | +0.002 | −0.016 to +0.022 | tie; CNN stays a baseline |
 | Test: main vs profile only | −0.023 | −0.114 to +0.159 | 5 people do not separate models |
@@ -86,7 +87,7 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 | Target (*met* = whole range meets it) | CV / test | Status |
 |---|---|---|
 | Photo adds signal | +0.037 (+0.003 to +0.073); −0.007 to +0.077 without test people | met (CV rule); at risk without the test people |
-| RQ1: photo not worse than logged carbs by > 0.03 | +0.007 (−0.020 to +0.032) | met under the pre-specified one-sided rule: lower bound −0.020 > −0.030 |
+| RQ1: photo not worse than logged carbs by > 0.03 | +0.007 (−0.020 to +0.032) | met under the pre-specified one-sided rule: lower bound −0.020 > −0.030 (the upper bound leaves a small disadvantage possible) |
 | RQ2: scratch CNN beats trend numbers | +0.002 (−0.016 to +0.022) | at risk (tie) |
 | ECE ≤ 0.05 | 0.052 / 0.129 | at risk |
 | Cost saving ≥ 10%; cleared ≥ 20%; spikes among cleared ≤ 10% (vs the best always-same answer) | 9%, 14%, 12% / 7%, 3%, 0% | at risk |
@@ -94,6 +95,18 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 | Response time p95 ≤ 300 ms | 282–299 ms across runs | met |
 
 **Abstention cut-offs and rubric 5b.** A validation-chosen rule is implemented and frozen (`just recalibrate`: Platt recalibration fitted on the 4 validation people, cut-offs chosen on that risk) but not deployed: on 14 CV people whose labels it never saw it cleared 39% of meals with 22% spikes (cost −22%), because fitting to 4 rare spikers pushed frequent spikers to 36% predicted vs 59% observed. The pre-registered validation cut-off 0.31 had failed the same kind of check before the test was opened. Four validation people are too few and too alike to choose a rule, so the deployed cut-offs are the pre-registered cost-based ones, frozen before the test (*low risk* below 0.143, *caution* from 0.20, *can't judge (borderline)* between). They are derived from the cost table alone: a derivation, not evidence of safety or usefulness; that evidence is the 3% and 14% cleared rows. This deviates from 5b and is fix 2 in §4; 0.31 would clear 42% of test meals with 15% spikes. Details: `outputs/evaluation/recalibration.md`.
+
+**Evidence index** (every headline number and the file that produces it):
+
+| Claim | File | Command |
+|---|---|---|
+| CV AUROC ladder, paired differences, RQ1/RQ2, targets | `outputs/evaluation/results.md`, `.json` | `just evaluate` |
+| Fixed test, calibration bins, calibration by person | `outputs/evaluation/results.md` §Fixed test, §Calibration | `just evaluate` |
+| Validation-chosen rule and its failed stability check | `outputs/evaluation/recalibration.md` | `just recalibrate` |
+| Photo ablation (median / ridge / grams / ranges) | `outputs/photo_cv/photo_cv_summary.json`, `outputs/fusion/fusion_summary.json` | `just photo-cv`, `just fusion` |
+| Learning curves, epochs, seed spread | `outputs/training/*_history.csv`, `*_choice.json`, `photo_convnext_seeds.json` | `just train`, `just photo-seeds` |
+| Decisions on the test, latency, test cases | `outputs/demo/demo_summary.json`, `cases.md` | `just demo` |
+| Parameter budget, fine-tuning ledger, data quality | `outputs/param_budget.csv`, `outputs/data/` | `just params`, `just prepare` |
 
 **Test cases** (`outputs/demo/cases.md`):
 
@@ -106,11 +119,11 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 | Wrong | meal at 12:47 (rose 35 mg/dL, no spike) | low risk | **caution** (48%): large carb portion, but this person responds mildly |
 
 ## 4. Limits, deviations and plan for the final
-**Proposal feedback:** ConvNeXt-Tiny + carb-range head; fusion cut to a 20-parameter logistic regression; scratch CNN tested (it ties); person CV and a locked hold-out for the small data. **Changes from the proposal:** nearest-neighbour + blank-photo checks replace DINOv2 for now (together they flag all 6 synthetic non-meal images and 3.1% of real meal photos); conformal intervals, W&B, Nutrition5k (overhead plate photos with weighed carbs, joined as pre-training of the carb heads, 800 items in the ledger) and the user test move to the final.
+**Proposal feedback:** ConvNeXt-Tiny + carb-range head; fusion cut to a 20-parameter logistic regression; scratch CNN tested (it ties); person CV and a locked hold-out for the small data. **Changes from the proposal:** nearest-neighbour + blank-photo checks replace DINOv2 for now (the nearest-neighbour check flags 5 of 6 synthetic non-meal images and the blank rule the white one; 3.1% of real meal photos are falsely flagged, above the 2% final target); conformal intervals, W&B, Nutrition5k (overhead plate photos with weighed carbs, joined as pre-training of the carb heads, 800 items in the ledger) and the user test move to the final.
 
 | Limit | Evidence now | Fix in the final | Test (split · metric · pass) |
 |---|---|---|---|
-| 1. Model cannot tell rare from frequent spikers | CV ex-test: 30% vs 16%, 42% vs 54%; r = −0.77 | per-person prior from the first 5 labelled meals (cold start: *caution* only); recalibration on CV folds, not 4 people | locked 8 · ECE overall and within each spike-rate half · ≤ 0.05 |
+| 1. Model cannot tell rare from frequent spikers | CV ex-test: 30% vs 16%, 42% vs 54%; r = −0.77. The fusion already has 72 h personal spike-rate and rise inputs, but strong regularisation (C = 0.01) and one shared intercept pool people | per-person intercept from the first 5 labelled meals, shrunk toward the population (cold start: *caution* only); the onboarding inputs stay; recalibration on CV folds, not 4 people | locked 8 · ECE overall and within each spike-rate half · ≤ 0.05 |
 | 2. Cut-offs not validation-chosen (5b); 3% cleared | two validation rules failed stability | after fix 1: cut-offs chosen on recalibrated CV-fold risk, committed with a hash before the locked set is scored; tiered escalation (borderline → nudge, unfamiliar photo → human) | locked 8 · cleared ≥ 20%, spikes among cleared ≤ 10%, cost saving ≥ 10% |
 | 3. Photo gain uncertain; CV photo arm has one seed | lower bound −0.007 ex-test; final-model spread 25.5 ± 2.5 g | 3 seeds in the photo CV (4.5 h); Nutrition5k pre-training of the heads; a meal-type/time-only arm to show the gain is carbs | CV + locked 8 (31 people) · AUROC gain lower bound · > 0 |
 | 4. Backbone freezing untested | frozen vs last stage only | ablation frozen / last stage / full fine-tuning | CV · carb-range F1 · best kept |
@@ -118,4 +131,4 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 | 6. Two photo outputs disagree | agreement not yet measured; users see the range only | single head with ordinal bins, or a consistency loss | CV · agreement rate · ≥ 90% |
 | 7. Unfamiliar photos | nearest-neighbour check; 3.1% false flags | DINOv2-S vs nearest-neighbour | synthetic + held-out photos · recall 100%, false flags ≤ 2% |
 
-Fixes run in this order (1 gates 2). Before the locked 8 are scored once, the checkpoints, preprocessing, recalibration procedure, cut-offs and pass targets will be listed in one hashed manifest, and every missed target will be reported as a failure. Also in the final: robustness (blur, lighting, CGM gaps), latency breakdown, explainability of the fusion weights, experiment-tracker exports, and a user test with 3–5 people.
+Fixes run in this order (1 gates 2). Before the locked 8 are scored once, the checkpoints, preprocessing, recalibration procedure, cut-offs and pass targets will be listed in one SHA-256 manifest, and every missed target will be reported as a failure. Passing on 8 people checks the fixes; it is not evidence of general safety. Also in the final: robustness (blur, lighting, CGM gaps), latency breakdown, explainability of the fusion weights, experiment-tracker exports, and a user test with 3–5 people.

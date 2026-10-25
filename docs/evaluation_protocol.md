@@ -1,6 +1,6 @@
-# Evaluation protocol (fixed before any model was trained)
+# Evaluation protocol (main comparison and decision rules fixed before training; later additions dated and labelled)
 
-Written on the date of the commit that adds it, before training, so that no choice below can depend on results.
+Written on the date of the commit that adds it, before training, so that the main comparison and its rules cannot depend on results. Amendments and post-hoc views made after the results are marked as such below.
 Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `baselines`, `targets`).
 
 ## Which data makes which decision
@@ -35,6 +35,7 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 - **Calibration:** ECE ≤ `targets.ece_max` (0.05).
 - **Calibration by person (added after the results, no test labels):** on the CV without the test people, mean predicted vs observed spike rate for people below and above the median spike rate, plus the validation people under the 28-person model.
 - **Validation-chosen rule on recalibrated risk (`just recalibrate`, added after the test was scored, no test labels):** Platt scaling fitted on the 4 validation people, cut-offs chosen on the recalibrated validation risk, stability check on the CV predictions without the test and validation people (14 people). Result: failed (cost −22%); the deployed cut-offs stay cost-only. Frozen in `checkpoints/thresholds_validation_recal.json`.
+- **Photo minus shuffled photo (paired, added after the results, same CV predictions):** reported next to the other paired differences in `results.md`; the control's paired range is shown rather than claimed.
 - **Status labels:** *met* only if the whole 95% range meets the target; *on track* if only the estimate does; otherwise *at risk*. RQ1 and RQ2 are lower-bound rules, so they are *met* or *at risk* on the lower end alone (label rule corrected after the results; no number changed).
 
 ## Meal information (added in Step 4c, before running it)
