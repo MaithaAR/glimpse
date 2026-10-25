@@ -2,7 +2,7 @@
 Before eating: a meal photo + the last 2 h of CGM glucose and heart rate + a short profile → **low risk**, **caution** or **can't judge** (with a reason). Offline, local weights, Docker self-test.
 Maitha Alhosani · MAAI7103 · October 2026 · `just install` → `just demo`
 
-**Bottom line.** All four inputs run end to end. The one claim, that the photo adds spike signal (+0.037 AUROC over profile + glucose trend), is backed by a shuffled-photo control, a logged-carbs reference it matches (+0.007), and a hold-out scored once under a protocol frozen before training. The product runs end to end on all four inputs (nothing is stubbed) but does not yet meet its clearance target: the model cannot tell rare from frequent spikers, so it over-predicts for the people who matter most (test ECE 0.129) and clears 3% of test meals. Section 4 states each limit with its fix and pass target.
+**Bottom line.** The one claim, that the photo adds spike signal (+0.037 AUROC over profile + trend logistic regression), is backed by a shuffled-photo control, a logged-carbs reference it matches (+0.007), and a hold-out scored once under a protocol frozen before training. The product runs end to end on all four inputs (nothing is stubbed) but does not yet meet its clearance target: the model cannot tell rare from frequent spikers, so it over-predicts for the people who matter most (test ECE 0.129) and clears 3% of test meals. Section 4 states each limit with its fix and pass target.
 
 ## 1. User and workflow
 An adult with prediabetes in a 10–14 day continuous glucose monitor (CGM) programme wants fewer spikes (a rise ≥ 50 mg/dL within 2 h) but stops logging food within days. Before eating they take one photo and get *caution* with a nudge (smaller carb portion, a walk), *low risk*, or *can't judge* with the reason. The programme pays, as it drops manual logging; a wellness nudge, not a medical device. **Feedback (mocked):** the CGM labels each meal 2 h later, the user can correct it in `just app`, and validated `FeedbackRecord`s are stored for retraining.
@@ -21,7 +21,7 @@ An adult with prediabetes in a 10–14 day continuous glucose monitor (CGM) prog
 | Fusion: logistic regression on 15 profile/trend + 4 photo inputs | classical | 20 |
 | DINOv2-S photo check (final; compared with the current nearest-neighbour check) | *planned* | 22M / 200M |
 | **Pretrained total** | | 27.8M (+22M) / 1B |
-| **Fine-tuning photos** (counted as photo-uses over all fits; 865 unique in the final model) | | 1,221 (2,021 with Nutrition5k) / 10,000 |
+| **Fine-tuning photos** (every photo any fit touched, so the cap is never under-counted; 865 unique in the final model) | | 1,221 (2,021 with Nutrition5k) / 10,000 |
 
 The CNN tests whether the raw trace beats 7 hand-made trend numbers; two layers with 25-min kernels cover the 2 h window with few weights, suiting 547 meals. ConvNeXt-Tiny + carb-range head follows the proposal feedback; with 865 photos the backbone is kept frozen except its last stage. Learned parts (CNN, photo model, fusion) and deterministic parts (input rules, cut-offs) are separated in code: rules run first (CGM complete and in range; photo readable, not blank, familiar), then the models, then fixed cut-offs.
 
@@ -66,7 +66,7 @@ The photo adds +0.037 (+0.003 to +0.073) and shuffling removes it; without the t
 
 | Target (*met* = whole range meets it) | CV / test | Status |
 |---|---|---|
-| Photo adds signal | +0.037 (+0.003 to +0.073); without test people −0.007 to +0.077 | met on the whole range; at risk without the test people |
+| Photo adds signal | +0.037 (+0.003 to +0.073); without test people −0.007 to +0.077 | met (CV rule); at risk once the test people are left out |
 | RQ1: photo not worse than logged carbs by > 0.03 | +0.007 (−0.020 to +0.032) | met |
 | RQ2: scratch CNN beats trend numbers | +0.002 (−0.016 to +0.022) | at risk (tie) |
 | ECE ≤ 0.05 | 0.052 / 0.129 | at risk |
