@@ -125,7 +125,7 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 
 | Proposal item | Status now | Final |
 |---|---|---|
-| Photo model: EfficientNet-B0, Nutrition5k pre-training (≤ 5,006) then CGMacros | changed: ConvNeXt-Tiny + carb-range head on CGMacros only | Nutrition5k pre-training of the heads, cut to 800 items to keep cap headroom; kept only if CV carb error or carb-range F1 improves |
+| Photo model: EfficientNet-B0, Nutrition5k pre-training (≤ 5,006) then CGMacros | changed: ConvNeXt-Tiny + carb-range head on CGMacros only | Nutrition5k pre-training of the heads, cut to 800 items to keep cap headroom; kept only if the CV carb error falls by ≥ 1 g or carb-range F1 rises by ≥ 0.02 |
 | **Week-4 gate:** carb error < 23.1 g and < 29.1 g under profile exclusion; photo gain lower bound > 0 on both | 22.5 g and lower bound +0.003 on the person-excluded split; **the profile-excluded split was not run** | run the profile-excluded split (meals sharing a macro profile with a test person removed) and report both halves of the gate |
 | Repeated-meal check (62% of meals share a macro profile across people) | **not run**; only exact and look-alike photo duplicates checked | same profile-excluded split; near-duplicate photos already share a fold |
 | Scratch 1-D CNN vs engineered trends (RQ2) | done: tie (+0.002, −0.016 to +0.022) | 4 h window, 3 seeds; else kept as baseline |
@@ -133,14 +133,14 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 | Photo OOD: DINOv2-S kNN | changed: nearest-neighbour + blank rule on ConvNeXt features | DINOv2-S vs current check; 30-photo Emirati set as an exploratory OOD test |
 | Cost-based thresholds after calibration | **deviation:** cost-only cut-offs; two validation rules failed | per-person intercept, then cut-offs on recalibrated CV-fold risk, sealed before the locked 8 |
 | Onboarding personal prior (72 h; population prior under 5 meals) | done, as inputs to the fusion | per-person intercept added (see limit 1) |
-| Spike label 50 mg/dL; 30 and 70 as checks | 50 only | sensitivity at 30 and 70 |
-| Class weighting as an ablation; fusion vs GBM on the same inputs; CNN + GBM ensemble | not run | all three, on CV |
-| Explainability: photo swaps, flat vs rising traces, branch masking; robustness: blur, missing labs/heart rate, CGM gaps | not run (final-stage per rubric) | all, with ΔAUROC, ΔECE and abstention rate |
+| Spike label 50 mg/dL; 30 and 70 as checks | 50 only | sensitivity at 30 and 70: the photo gain's lower bound must stay > 0 at both |
+| Class weighting as an ablation; fusion vs GBM on the same inputs; CNN + GBM ensemble | not run | all three on CV, paired AUROC by person: fusion non-inferior to GBM if the lower bound > −0.03; class weighting or the ensemble adopted only if the lower bound > 0 |
+| Explainability: photo swaps, flat vs rising traces, branch masking; robustness: blur, missing labs/heart rate, CGM gaps | not run (final-stage per rubric) | all, with ΔAUROC, ΔECE and abstention rate: pass if ΔAUROC ≥ −0.03 under blur and missing heart rate, and CGM gaps over 20 min always give *can't judge* |
 | Monitoring of drift, abstention, OOD rate, latency; W&B exports | latency only | drift and rate dashboards from the feedback log; tracker exports |
-| Dietitian acceptance of "can't judge" (2 dietitians, 5-person think-aloud) | not run | user test with 3–5 people plus 2 dietitians on the abstention queue |
+| Dietitian acceptance of "can't judge" (2 dietitians, 5-person think-aloud) | not run | user test with 3–5 people plus 2 dietitians on the abstention queue; pass if both dietitians rate the queue usable and at least 4 of 5 users act correctly on all three answers |
 | Locked 8 people, run once | sealed, untouched | scored once under the hashed manifest |
 | Meal counts: 1,526 usable, 1,054 operational, 769 target operational, 634 isolated target | same counts in `outputs/data/meal_counts.json`; the 577 scored development meals (481 CV + 96 test) are the target operational meals outside the locked 8 and the onboarding window | one reconciliation table from usable meals to each split |
-| Usefulness on all 769 operational meals, costs swept | computed on the 481 scored CV meals and the test; the cost sweep is run on the test only (`results.json`) | operational-meal basis and the full cost sweep on CV |
+| Usefulness on all 769 operational meals, costs swept | computed on the 481 scored CV meals and the test; the cost sweep is run on the test only (`results.json`) | operational-meal basis and the full cost sweep on CV, judged by the proposal targets (cost saving ≥ 10%, cleared ≥ 20% with ≤ 10% spiking, *can't judge* ≤ 20%) |
 | Conformal rise intervals: 75–85% coverage, width, median-rise MAE vs a GBM regressor | not run | run only if the dietitian test rates rise size useful; else dropped and said so |
 | RQ2 non-inferiority of the CNN (−0.03), reported separately | lower bound −0.016 > −0.03: non-inferior, so the CNN loses nothing but adds nothing | reported next to the beats-test |
 | Carb-sensitivity slider (model's weight, not advice) | not built | fusion-weight view in `just app`, or dropped with the reason |
