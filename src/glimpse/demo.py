@@ -116,6 +116,16 @@ def window_problem(w, cfg: GlimpseConfig) -> str | None:
     return None
 
 
+def photo_problem(img, min_contrast: float) -> str | None:
+    """A deterministic check before the photo model: a near-uniform picture (blank, covered lens, plain wall) has
+    almost no grey-level spread, so there is no meal to read. Returns the reason, or None if the photo is usable."""
+    grey = np.asarray(img.convert("L").resize((64, 64)), dtype=np.float32)
+    if float(grey.std()) < min_contrast:
+        spread = float(grey.std())
+        return f"the photo is almost blank (grey-level spread {spread:.1f}, need {min_contrast:.0f}); no meal visible"
+    return None
+
+
 def decision(risk: float, lo: float, hi: float) -> str:
     """Frozen cut-offs: low risk below lo, caution from hi, can't judge in between."""
     return "low risk" if risk < lo else "caution" if risk >= hi else "can't judge"
@@ -198,6 +208,9 @@ class Glimpse:
             img = open_photo(m.photo, self.cfg.photo.min_side_px)
         except PhotoError as e:
             return cant_judge(f"the photo cannot be used ({e})")
+        blank = photo_problem(img, self.cfg.prototype.min_photo_contrast)
+        if blank:
+            return cant_judge(blank)
         emb = self.embed_image(img)
         score = self.unfamiliar_score(emb)
         if score > self.ood_cut:  # no carb guess for a photo that does not look like a meal

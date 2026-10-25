@@ -75,6 +75,7 @@ prototype:                                   # the app (glimpse demo / predict /
   caution_from: 0.2                          #   checkpoints/thresholds_amended.json, which the app checks at start-up
   thresholds_file: checkpoints/thresholds_amended.json
   ood_reference_file: checkpoints/photo_ood_reference.pt
+  min_photo_contrast: 8.0                    # near-blank photo (grey-level spread below this, 0-255 scale) -> can't judge
   ood_neighbours: 5                          # unfamiliar photo: mean distance to the 5 nearest training photos ...
   ood_quantile: 0.99                         # ... above the 99th percentile of the training photos' own distances
   feedback_file: outputs/feedback/feedback.jsonl  # mocked user feedback (what happened after the meal)

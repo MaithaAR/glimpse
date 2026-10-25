@@ -5,8 +5,8 @@
     "can't judge": 15,
     "low risk": 3
   },
-  "latency_ms_p50": 271.80145849706605,
-  "latency_ms_p95": 285.48839599170606,
+  "latency_ms_p50": 273.50314550858457,
+  "latency_ms_p95": 283.2716772463755,
   "latency_target_ms": 300.0,
   "latency_met": true,
   "machine": "Darwin arm64",

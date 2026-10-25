@@ -17,7 +17,7 @@ The report is [`docs/intermediate_report.md`](docs/intermediate_report.md).
 ## Architecture
 ```
 raw CGM/HR readings ─┐                                  (rules run before any model)
-before-meal photo ───┼─> checks: CGM complete & in range? photo readable? photo familiar? ──no──> CAN'T JUDGE + reason
+before-meal photo ───┼─> checks: CGM complete & in range? photo readable, not blank, familiar? ──no──> CAN'T JUDGE + reason
 profile ─────────────┘          │ yes
                                 ├─ 2-h window (24 × 5 min, same code as training) + profile ─┐
                                 └─ ConvNeXt-Tiny photo model → carb range (4 bins) + grams ──┴─> logistic-regression
@@ -82,7 +82,7 @@ checkpoints/           trained models, frozen cut-offs (hashed), unfamiliar-phot
 outputs/               evaluation tables and figures, learning curves, cross-validated predictions, demo cases
 docs/                  intermediate report, data card, model card, evaluation protocol (decisions fixed in advance)
 samples/               synthetic CGM CSV for `just predict`
-pilot/ scripts/ results/  frozen code and logs behind the proposal's pilot numbers (not part of the pipeline)
+pilot/ scripts/ results/  proposal-pilot code and logs, frozen (GitHub only; left out of the submitted zip)
 ```
 
 ## Promised in the proposal vs delivered (intermediate)

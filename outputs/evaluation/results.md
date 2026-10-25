@@ -45,3 +45,44 @@ Base spike rate 33% (481 meals, 23 people).
 | main (cost-only) | 0.143 | 0.200 | 3% | 0% | 9% | -7% |
 | pre-registered (validation) | 0.310 | 0.310 | 42% | 15% | 0% | -6% |
 | CV without test people | 0.180 | 0.180 | 9% | 11% | 0% | -4% |
+
+Main model minus profile-only on the test (paired, by person): -0.023 (95% range -0.114 to +0.159).
+
+## Calibration of the main model
+
+Equal-width bins (15 over 0-1); empty bins omitted. ECE = meal-weighted mean gap between the two columns.
+The bootstrap range of ECE is biased upward (resampled data always look less calibrated).
+
+**Cross-validation (481 meals): ECE 0.052**
+
+| predicted (mean in bin) | observed spike rate | meals |
+|---|---|---|
+| 0.04 | 0.17 | 12 |
+| 0.10 | 0.10 | 50 |
+| 0.17 | 0.14 | 58 |
+| 0.23 | 0.21 | 61 |
+| 0.30 | 0.30 | 66 |
+| 0.37 | 0.28 | 58 |
+| 0.43 | 0.48 | 52 |
+| 0.50 | 0.38 | 34 |
+| 0.56 | 0.52 | 25 |
+| 0.64 | 0.52 | 21 |
+| 0.70 | 0.61 | 28 |
+| 0.75 | 0.93 | 14 |
+| 0.84 | 1.00 | 2 |
+
+**Fixed test (96 meals): ECE 0.129**
+
+| predicted (mean in bin) | observed spike rate | meals |
+|---|---|---|
+| 0.11 | 0.00 | 3 |
+| 0.17 | 0.11 | 9 |
+| 0.23 | 0.24 | 21 |
+| 0.29 | 0.00 | 7 |
+| 0.36 | 0.08 | 12 |
+| 0.44 | 0.33 | 15 |
+| 0.49 | 0.55 | 11 |
+| 0.56 | 0.25 | 8 |
+| 0.64 | 0.75 | 4 |
+| 0.69 | 0.83 | 6 |
+

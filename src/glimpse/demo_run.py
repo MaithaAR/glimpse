@@ -157,9 +157,15 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     title = "Can't judge: sensor gap (same meal, last 40 min of glucose removed)"
     md.append(card(title, gap_m, app.predict(gap_m), None))
     blank = OUT / "blank_photo.jpg"
-    synthetic_images()["grey"].save(blank)
+    synthetic_images()["white"].save(blank)
     blank_m = m.model_copy(update={"photo": blank})
-    md.append(card("Can't judge: not a meal photo (plain grey picture)", blank_m, app.predict(blank_m), None))
+    md.append(card("Can't judge: not a meal photo (plain white picture)", blank_m, app.predict(blank_m), None))
+    border = df[df.reason.str.startswith("the risk")]  # first borderline meal in row order (fixed rule)
+    if len(border):
+        r = int(border.row.iloc[0])
+        m_b, s_b = meal_input(cfg, ds, r), ds.samples[r]
+        truth = f"glucose rose {s_b.rise_mgdl:.0f} mg/dL ({'spike' if s_b.spike else 'no spike'})"
+        md.append(card("Can't judge: borderline risk (between the two cut-offs)", m_b, app.predict(m_b), truth))
     p50, p95 = float(np.percentile(lat, 50)), float(np.percentile(lat, 95))
     summary = {"test_meals": len(df), "decisions": df.decision.value_counts().to_dict(),
                "latency_ms_p50": p50, "latency_ms_p95": p95, "latency_target_ms": cfg.targets.latency_p95_ms,
@@ -200,18 +206,21 @@ def selftest(cfg: GlimpseConfig) -> dict:
 
     app = Glimpse(cfg)
     folder = Path(tempfile.mkdtemp())
-    photo = folder / "grey.jpg"
-    synthetic_images()["grey"].save(photo)
+    photo, grey = folder / "noise.jpg", folder / "grey.jpg"
+    synthetic_images()["noise"].save(photo)  # textured but not a meal: caught by the unfamiliar-photo check
+    synthetic_images()["grey"].save(grey)  # flat picture: caught by the blank-photo rule before any model
     meal = datetime(2024, 1, 1, 12, 0)
     times = [meal - timedelta(minutes=m) for m in range(115, -1, -5)]
     m = MealInput(meal_time=meal, glucose_times=times, glucose_mgdl=[95 + 0.2 * k for k in range(len(times))],
                   profile={"age": 50, "bmi": 29, "a1c_pct": 5.9, "fasting_glucose_mgdl": 104,
                            "prior_spike_rate": float("nan"), "prior_rise": float("nan")}, photo=photo)  # fmt: skip
     unfamiliar = app.predict(m)
+    blank = app.predict(m.model_copy(update={"photo": grey}))
     no_photo = app.predict(m.model_copy(update={"photo": None}))
-    app.ood_cut = float("inf")  # let the grey picture through, only to exercise the scoring path end to end
+    app.ood_cut = float("inf")  # let the noise picture through, only to exercise the scoring path end to end
     scored = app.predict(m)
     checks = {"unfamiliar photo -> can't judge": unfamiliar.decision == "can't judge" and "unlike" in unfamiliar.reason,
+              "blank photo -> can't judge": blank.decision == "can't judge" and "blank" in blank.reason,
               "no photo -> can't judge": no_photo.decision == "can't judge",
               "full path gives a risk in [0, 1]": scored.risk is not None and 0 <= scored.risk <= 1}  # fmt: skip
     log = logger.bind(stage="selftest")

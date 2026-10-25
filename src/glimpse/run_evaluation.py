@@ -352,7 +352,10 @@ def _score_test(ds, sp, cfg, amended, costs, targets, B, seed) -> dict:
                           "low_risk_below": lo, "caution_from": hi,
                           "cost_reduction": 1 - expected_cost(act, y, sc["costs"]) / trivial})  # fmt: skip
         out[name]["cost_sweep_main_rule"] = sweep
-        out[name]["table"] = _test_table(ds, sp, cfg, r, y, s, p, B, seed)
+        out[name]["table"], tp = _test_table(ds, sp, cfg, r, y, s, p, B, seed)
+        m_, lo_, hi_ = paired_person_bootstrap(y, tp["photo"], tp["profile_lr"], s, B=B, seed=seed)
+        out[name]["photo_minus_profile_only"] = {"point": _auc(y, tp["photo"]) - _auc(y, tp["profile_lr"]),
+                                                 "ci95": [lo_, hi_]}  # fmt: skip
         rel_t, ece_t = reliability(p["photo"], y, cfg.targets.ece_bins)
         ece_t_ci = person_bootstrap_ci(s, lambda i, q=p["photo"], t=y: reliability(q[i], t[i], cfg.targets.ece_bins)[1],
                                        B, seed)  # fmt: skip
@@ -361,7 +364,7 @@ def _score_test(ds, sp, cfg, amended, costs, targets, B, seed) -> dict:
     return out
 
 
-def _test_table(ds, sp, cfg, r, y, s, p, B, seed) -> list[dict]:
+def _test_table(ds, sp, cfg, r, y, s, p, B, seed) -> tuple[list[dict], dict]:
     """Every baseline and the main model on the SAME fixed test meals with the same metrics. Baselines are refitted
     on the same 28 training people (one setting tuned on the same 4 inner folds); the SensorCNN is its saved
     28-person checkpoint. Nothing here is tuned on the test people."""
@@ -394,7 +397,7 @@ def _test_table(ds, sp, cfg, r, y, s, p, B, seed) -> list[dict]:
                      "brier": float(brier_score_loss(y, q)),
                      "ece": reliability(q, y, cfg.targets.ece_bins)[1]})  # fmt: skip
     pd.DataFrame(rows).to_csv(OUT / "test_table.csv", index=False)
-    return rows
+    return rows, preds
 
 
 def _reliability_figure(rel: list, ece: float, title: str, path: Path) -> None:
@@ -479,6 +482,18 @@ def _markdown(res: dict) -> None:
         L.append(f"| {k} | {d['low_risk_below']:.3f} | {d['caution_from']:.3f} | {d['share_low_risk']:.0%} | "
                  f"{d['missed_among_cleared']:.0%} | {d['share_abstain']:.0%} | "
                  f"{-d['cost_reduction']:+.0%} |")  # fmt: skip
+    d = t["photo_minus_profile_only"]
+    L += ["", f"Main model minus profile-only on the test (paired, by person): {d['point']:+.3f} "
+          f"(95% range {d['ci95'][0]:+.3f} to {d['ci95'][1]:+.3f}).", ""]  # fmt: skip
+    L += ["## Calibration of the main model", "",
+          "Equal-width bins (15 over 0-1); empty bins omitted. ECE = meal-weighted mean gap between the two columns.",
+          "The bootstrap range of ECE is biased upward (resampled data always look less calibrated).", ""]  # fmt: skip
+    for title, bins, e in (("Cross-validation (481 meals)", res["calibration"]["bins"], res["calibration"]["ece"]),
+                           ("Fixed test (96 meals)", t["calibration"]["bins"], t["calibration"]["ece"])):  # fmt: skip
+        L += [f"**{title}: ECE {e:.3f}**", "", "| predicted (mean in bin) | observed spike rate | meals |",
+              "|---|---|---|"]  # fmt: skip
+        L += [f"| {mp:.2f} | {ob:.2f} | {n} |" for mp, ob, n in bins]
+        L.append("")
     (OUT / "results.md").write_text("\n".join(L) + "\n")
 
 
@@ -503,6 +518,8 @@ def _log(log, res: dict) -> None:
     for r in t["table"]:
         log.info("test, {:<38} AUROC {:.3f} ({:.3f}-{:.3f}) | ECE {:.3f}", r["model"], r["auroc"], r["auroc_lo"],
                  r["auroc_hi"], r["ece"])  # fmt: skip
+    d = t["photo_minus_profile_only"]
+    log.info("test, main model minus profile-only {:+.3f} ({:+.3f} to {:+.3f})", d["point"], *d["ci95"])
     log.info("test calibration of the main model: ECE {:.3f} ({:.3f} to {:.3f})", t["calibration"]["ece"],
              *t["calibration"]["ece_ci95"])  # fmt: skip
     for k, d in t["decisions"].items():

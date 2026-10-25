@@ -191,6 +191,7 @@ class PrototypeCfg(_Strict):
     caution_from: Prob
     thresholds_file: str
     ood_reference_file: str
+    min_photo_contrast: float = Field(ge=0, le=128)
     ood_neighbours: int = Field(ge=1, le=50)
     ood_quantile: float = Field(gt=0.5, lt=1)
     feedback_file: str

@@ -122,3 +122,15 @@ def test_sample_cgm_file_is_valid():
 
     gt, gv, ht, hv = read_cgm_csv(Path("samples/cgm_example.csv"))
     assert len(gt) == len(gv) == 24 and len(hv) == 24
+
+
+def test_blank_photo_rule():
+    """Plain white, black or grey pictures are caught before the photo model; a textured picture is not."""
+    from PIL import Image
+
+    from glimpse.demo import photo_problem
+
+    for v in (0, 128, 255):
+        assert "blank" in photo_problem(Image.new("RGB", (200, 200), (v, v, v)), 8.0)
+    noise = Image.fromarray(np.random.default_rng(0).integers(0, 256, (200, 200, 3), dtype=np.uint8))
+    assert photo_problem(noise, 8.0) is None
