@@ -12,7 +12,7 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 | Whether the photo cross-validation runs | logged-carbs check on the out-of-fold predictions (rule below) | validation, test, locked |
 | Decision thresholds (low risk / caution / can't judge) | the 4 validation people, with the 28-person model | test, locked |
 | Threshold stability check (reported, not used to choose) | pooled cross-validated predictions of the 23 development target people | locked |
-| **Main result** | out-of-fold predictions over the 23 development target people (5 outer folds, 3 seeds) | locked |
+| **Main result** | out-of-fold predictions over the 23 development target people (5 outer folds; 3 seeds for the sensor models, one seed for the photo fusion at the intermediate stage because of compute, three in the final; deviation noted in the report, §4 row 3) | locked |
 | Held-out confirmation | the fixed test people (outer fold 1), scored once with the 28-person model | — |
 | Final check (final submission only) | the 8 locked people, once | — |
 

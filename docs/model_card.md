@@ -17,7 +17,7 @@ USA; CC BY-NC-SA 4.0. Carb labels are "served" carbs (logged ÷ share eaten), wh
 
 **Evaluation** (5-fold person cross-validation, 23 people; 95% ranges by person):
 
-- **Discrimination:** AUROC 0.724 (0.659–0.796), against 0.686 without the photo.
+- **Discrimination:** AUROC 0.724 (0.659–0.796; one photo seed), against 0.686 without the photo.
 - **Calibration:** ECE 0.052.
 - **Fixed test (5 people):** AUROC 0.742, ECE 0.129 (over-predicts).
 - **Decisions on the cross-validation:** 14% of meals cleared, 12% of those spiked; 11% *can't judge*.
