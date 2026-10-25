@@ -119,13 +119,13 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 | Wrong | meal at 12:47 (rose 35 mg/dL, no spike) | low risk | **caution** (48%): large carb portion, but this person responds mildly |
 
 ## 4. Limits, deviations and plan for the final
-**Proposal feedback acted on:** ConvNeXt-Tiny + carb-range head; fusion cut to a 20-parameter logistic regression; scratch CNN tested (it ties); person CV and a locked hold-out for the small data; a shorter report.
+**Proposal feedback acted on:** a shorter report; startup framing narrowed to a per-member nudge for CGM programmes with a dietitian queue (§1; validated by the final user test); ConvNeXt-Tiny + carb-range head; scratch CNN tested (it ties); person CV and a locked hold-out for the small data; fusion cut to a 20-parameter logistic regression.
 
 **Proposal items: status and final plan** (deviations in bold):
 
 | Proposal item | Status now | Final |
 |---|---|---|
-| Photo model: EfficientNet-B0, Nutrition5k pre-training (≤ 5,006) then CGMacros | changed: ConvNeXt-Tiny + carb-range head on CGMacros only | Nutrition5k pre-training of the heads, cut to 800 items to keep cap headroom |
+| Photo model: EfficientNet-B0, Nutrition5k pre-training (≤ 5,006) then CGMacros | changed: ConvNeXt-Tiny + carb-range head on CGMacros only | Nutrition5k pre-training of the heads, cut to 800 items to keep cap headroom; kept only if CV carb error or carb-range F1 improves |
 | **Week-4 gate:** carb error < 23.1 g and < 29.1 g under profile exclusion; photo gain lower bound > 0 on both | 22.5 g and lower bound +0.003 on the person-excluded split; **the profile-excluded split was not run** | run the profile-excluded split (meals sharing a macro profile with a test person removed) and report both halves of the gate |
 | Repeated-meal check (62% of meals share a macro profile across people) | **not run**; only exact and look-alike photo duplicates checked | same profile-excluded split; near-duplicate photos already share a fold |
 | Scratch 1-D CNN vs engineered trends (RQ2) | done: tie (+0.002, −0.016 to +0.022) | 4 h window, 3 seeds; else kept as baseline |
@@ -139,17 +139,24 @@ CV AUROC is pooled across folds, so the constant baseline scores 0.40 rather tha
 | Monitoring of drift, abstention, OOD rate, latency; W&B exports | latency only | drift and rate dashboards from the feedback log; tracker exports |
 | Dietitian acceptance of "can't judge" (2 dietitians, 5-person think-aloud) | not run | user test with 3–5 people plus 2 dietitians on the abstention queue |
 | Locked 8 people, run once | sealed, untouched | scored once under the hashed manifest |
+| Meal counts: 1,526 usable, 1,054 operational, 769 target operational, 634 isolated target | same counts in `outputs/data/meal_counts.json`; the 577 scored development meals (481 CV + 96 test) are the target operational meals outside the locked 8 and the onboarding window | one reconciliation table from usable meals to each split |
+| Usefulness on all 769 operational meals, costs swept | computed on the 481 scored CV meals and the test; the cost sweep is run on the test only (`results.json`) | operational-meal basis and the full cost sweep on CV |
+| Conformal rise intervals: 75–85% coverage, width, median-rise MAE vs a GBM regressor | not run | run only if the dietitian test rates rise size useful; else dropped and said so |
+| RQ2 non-inferiority of the CNN (−0.03), reported separately | lower bound −0.016 > −0.03: non-inferior, so the CNN loses nothing but adds nothing | reported next to the beats-test |
+| Carb-sensitivity slider (model's weight, not advice) | not built | fusion-weight view in `just app`, or dropped with the reason |
+| Fallback: confirm-carbs mode if the week-4 gate fails, assessed with simulated ±25% / ±40% corrections | not triggered (the half of the gate that ran passed) | decided after the profile-excluded run; if triggered, the simulation as proposed |
+| Limitations kept: no dosing, hypoglycaemia or causal claims; proportional eating assumed; packaging and drink photos hard; non-commercial licence; 45 people from one study | unchanged (`docs/model_card.md`) | restated in the final with any new evidence |
 
 **Limits, fixes and pass tests:**
 
 | Limit | Evidence now | Fix in the final | Test (split · metric · pass) |
 |---|---|---|---|
-| 1. Model cannot tell rare from frequent spikers | CV ex-test: 30% vs 16%, 42% vs 54%; r = −0.77. The fusion already has 72 h personal spike-rate and rise inputs, but strong regularisation (C = 0.01) and one shared intercept pool people | per-person intercept from the first 5 labelled meals, shrunk toward the population (cold start: *caution* only); the onboarding inputs stay; recalibration on CV folds, not 4 people | locked 8 · ECE overall and within each spike-rate half · ≤ 0.05 |
+| 1. Model cannot tell rare from frequent spikers | CV ex-test: 30% vs 16%, 42% vs 54%; r = −0.77. The fusion already has 72 h personal spike-rate and rise inputs, but strong regularisation (C = 0.01) and one shared intercept pool people | per-person intercept from the first 5 labelled meals, shrunk toward the population (cold start: *caution* only, reported as a share of meals, must stay < 20%); the onboarding inputs stay; recalibration on CV folds, not 4 people | locked 8 · ECE overall and within each spike-rate half · ≤ 0.05 |
 | 2. Cut-offs not validation-chosen (5b); 3% cleared | two validation rules failed stability | after fix 1: cut-offs chosen on recalibrated CV-fold risk, committed with a hash before the locked set is scored; tiered escalation (borderline → nudge, unfamiliar photo → human) | locked 8 · cleared ≥ 20%, spikes among cleared ≤ 10%, cost saving ≥ 10% |
 | 3. Photo gain uncertain; CV photo arm has one seed | lower bound −0.007 ex-test; final-model spread 25.5 ± 2.5 g | 3 seeds in the photo CV (4.5 h); Nutrition5k pre-training of the heads; a meal-type/time-only arm to show the gain is carbs | CV + locked 8 (31 people) · AUROC gain lower bound · > 0 |
-| 4. Backbone freezing untested | frozen vs last stage only | ablation frozen / last stage / full fine-tuning | CV · carb-range F1 · best kept |
+| 4. Backbone freezing untested | frozen vs last stage only | ablation frozen / last stage / full fine-tuning | CV · carb-range F1 and fused AUROC · the variant with the highest fused-AUROC lower bound is kept; both reported |
 | 5. Scratch CNN ties trend numbers | +0.002 (−0.016 to +0.022) | 4 h window, 3 seeds; else kept as baseline only | CV · RQ2 lower bound · > 0 |
-| 6. Two photo outputs disagree | agreement not yet measured; users see the range only | single head with ordinal bins, or a consistency loss | CV · agreement rate · ≥ 90% |
+| 6. Two photo outputs disagree | agreement not yet measured; users see the range only | measure agreement first; add a consistency loss; switch to one ordinal head only if agreement stays < 90% or F1 drops > 0.02 | CV · agreement rate · ≥ 90% |
 | 7. Unfamiliar photos | nearest-neighbour check; 3.1% false flags | DINOv2-S vs nearest-neighbour | synthetic + held-out photos · recall 100%, false flags ≤ 2% |
 
 Fixes run in this order (1 gates 2). Before the locked 8 are scored once, the checkpoints, preprocessing, recalibration procedure, cut-offs and pass targets will be listed in one SHA-256 manifest, and every missed target will be reported as a failure. Passing on 8 people checks the fixes; it is not evidence of general safety. Also in the final: robustness (blur, lighting, CGM gaps), latency breakdown, explainability of the fusion weights, experiment-tracker exports, and a user test with 3–5 people.
