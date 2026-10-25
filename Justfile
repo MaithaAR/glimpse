@@ -74,6 +74,10 @@ amend-thresholds:
 evaluate:
     uv run glimpse evaluate
 
+# validation-chosen cut-offs on Platt-recalibrated risk, checked on CV without the test people (uses no test labels)
+recalibrate:
+    uv run glimpse recalibrate
+
 # demo with the frozen pipeline: worked cases from the test people, two can't-judge cases, response time
 demo:
     uv run glimpse demo

@@ -26,7 +26,7 @@ USA; CC BY-NC-SA 4.0. Carb labels are "served" carbs (logged ÷ share eaten), wh
 **Limitations:**
 
 - Small and narrow data: 45 people from one study, mostly US foods, no local dishes.
-- Risk is over-predicted for people who rarely spike (test ECE 0.129), so few meals are cleared (3% on the test).
+- The model cannot tell rare from frequent spikers (CV without test people: 30% predicted vs 16% observed for rare spikers, 42% vs 54% for frequent ones), so risk is over-predicted for rare spikers (test ECE 0.129) and few meals are cleared (3% on the test). A validation-fitted recalibration made this worse on other people (`outputs/evaluation/recalibration.md`); the final uses a per-person prior.
 - The photo's two outputs often disagree, so users are shown only the carb range.
 - One photo-model seed (the CV of the sensor models uses 3 seeds).
 - The unfamiliar-photo check alone misses some non-meal images (for example, a plain white picture); the blank-photo rule catches that case.

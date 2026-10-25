@@ -38,3 +38,17 @@ def test_calibration_by_person_finds_rare_spikers_over_predicted():
     assert out["rare_spikers"]["predicted"] > out["rare_spikers"]["observed"]
     assert out["frequent_spikers"]["predicted"] < out["frequent_spikers"]["observed"]
     assert out["corr_spike_rate_vs_gap"] < -0.9
+
+
+def test_platt_recalibration_fixes_over_prediction():
+    """Over-predicted probabilities get an intercept below 0 and a lower ECE after recalibration."""
+    from glimpse.evaluation import apply_platt, fit_platt, reliability
+
+    rng = np.random.default_rng(0)
+    true_p = rng.uniform(0.05, 0.6, 600)
+    y = (rng.uniform(size=600) < true_p).astype(int)
+    over = np.clip(true_p + 0.2, 0, 0.99)  # the model says 20 points too much
+    slope, intercept = fit_platt(over, y)
+    assert intercept < 0
+    assert reliability(apply_platt(over, slope, intercept), y)[1] < reliability(over, y)[1]
+    np.testing.assert_allclose(apply_platt(np.array([0.3, 0.7]), 1.0, 0.0), [0.3, 0.7], atol=1e-6)

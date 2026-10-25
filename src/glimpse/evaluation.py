@@ -198,3 +198,24 @@ def calibration_by_person(person: np.ndarray, y: np.ndarray, p: np.ndarray) -> d
 
     return {"corr_spike_rate_vs_gap": float(np.corrcoef(obs, pred - obs)[0, 1]),
             "rare_spikers": half(low), "frequent_spikers": half(~low)}  # fmt: skip
+
+
+# ---------- recalibration (fitted on validation only) ----------
+def fit_platt(p: np.ndarray, y: np.ndarray) -> tuple[float, float]:
+    """Platt scaling: logistic regression of the outcome on logit(p), nearly unregularised.
+    Returns (slope, intercept); slope 1 and intercept 0 leave p unchanged."""
+    from sklearn.linear_model import LogisticRegression
+
+    z = _logit(p).reshape(-1, 1)
+    m = LogisticRegression(C=1e6, max_iter=1000).fit(z, y)
+    return float(m.coef_[0, 0]), float(m.intercept_[0])
+
+
+def apply_platt(p: np.ndarray, slope: float, intercept: float) -> np.ndarray:
+    """Recalibrated probability sigmoid(slope * logit(p) + intercept)."""
+    return 1 / (1 + np.exp(-(slope * _logit(p) + intercept)))
+
+
+def _logit(p: np.ndarray) -> np.ndarray:
+    q = np.clip(np.asarray(p, dtype=float), 1e-6, 1 - 1e-6)
+    return np.log(q / (1 - q))

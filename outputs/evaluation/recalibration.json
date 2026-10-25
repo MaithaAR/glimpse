@@ -1,0 +1,83 @@
+{
+  "fitted_on": "4 validation people (99 meals), frozen 28-person model",
+  "platt": {
+    "slope": 1.3963127722439816,
+    "intercept": -0.46661539498210153
+  },
+  "cutoffs": {
+    "low_risk_below": 0.17,
+    "caution_from": 0.17
+  },
+  "validation": {
+    "meals": 99,
+    "spike_rate": 0.1919191919191919,
+    "ece_before": 0.1262889185583112,
+    "ece_after": 0.07379846856690202,
+    "validation_rule": {
+      "share_low_risk": 0.5252525252525253,
+      "share_caution": 0.47474747474747475,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.057692307692307696,
+      "cost_reduction": 0.42500000000000004,
+      "n_cleared": 52
+    },
+    "cost_only_rule": {
+      "share_low_risk": 0.13131313131313133,
+      "share_caution": 0.7777777777777778,
+      "share_abstain": 0.09090909090909091,
+      "missed_among_cleared": 0.0,
+      "cost_reduction": 0.21875,
+      "n_cleared": 13
+    }
+  },
+  "cv_check": {
+    "people": 14,
+    "meals": 286,
+    "ece_before": 0.0814158102826202,
+    "ece_after": 0.13789042199449067,
+    "by_person_before": {
+      "corr_spike_rate_vs_gap": -0.7473202748003661,
+      "rare_spikers": {
+        "people": 7,
+        "predicted": 0.3160934763981734,
+        "observed": 0.19863013698630136
+      },
+      "frequent_spikers": {
+        "people": 7,
+        "predicted": 0.44671955547001463,
+        "observed": 0.5857142857142857
+      }
+    },
+    "by_person_after": {
+      "corr_spike_rate_vs_gap": -0.6810398915699072,
+      "rare_spikers": {
+        "people": 7,
+        "predicted": 0.20462394228062197,
+        "observed": 0.19863013698630136
+      },
+      "frequent_spikers": {
+        "people": 7,
+        "predicted": 0.3563585308280117,
+        "observed": 0.5857142857142857
+      }
+    },
+    "validation_rule": {
+      "share_low_risk": 0.3916083916083916,
+      "share_caution": 0.6083916083916084,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.22321428571428573,
+      "cost_reduction": -0.2171428571428573,
+      "n_cleared": 112
+    },
+    "cost_only_rule": {
+      "share_low_risk": 0.11888111888111888,
+      "share_caution": 0.7797202797202797,
+      "share_abstain": 0.10139860139860139,
+      "missed_among_cleared": 0.11764705882352941,
+      "cost_reduction": 0.05428571428571427,
+      "n_cleared": 34
+    }
+  },
+  "stability": "failed (no cost saving or nothing cleared on the CV check)",
+  "sha256": "0407245816f43b03bccd64cd65e6aa658fa260eb0fb813eae65da979e49ebd44"
+}

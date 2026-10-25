@@ -1,0 +1,8 @@
+{
+  "rule": "validation-chosen on Platt-recalibrated risk (candidate for the final)",
+  "slope": 1.3963127722439816,
+  "intercept": -0.46661539498210153,
+  "low_risk_below": 0.17,
+  "caution_from": 0.17,
+  "sha256": "0407245816f43b03bccd64cd65e6aa658fa260eb0fb813eae65da979e49ebd44"
+}

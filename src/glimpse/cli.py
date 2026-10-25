@@ -147,6 +147,16 @@ def _amend(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _recalibrate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Validation-chosen cut-offs on Platt-recalibrated risk, checked on CV without the test people (no test labels)."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits
+    from glimpse.recalibrate import run_recalibration
+
+    run_recalibration(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
+    return 0
+
+
 def _evaluate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Main estimate, research questions, calibration, usefulness, fixed test (once), targets, figures."""
     from glimpse.data.dataset import MealDataset
@@ -222,6 +232,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
     sub.add_parser("evaluate", help="full evaluation into outputs/evaluation/ (scores the fixed test once)")
+    sub.add_parser(
+        "recalibrate", help="validation-chosen cut-offs on recalibrated risk, checked on CV (no test labels)"
+    )
     sub.add_parser("demo", help="worked cases, can't-judge cases and response time (Step 6a)")
     pr = sub.add_parser("predict", help="answer one meal from your own photo, CGM CSV and profile")
     pr.add_argument("--cgm", required=True, help="CSV with timestamp, glucose_mgdl (and optionally hr_bpm)")
@@ -258,6 +271,7 @@ def main(argv: list[str] | None = None) -> int:
         "final": _final,
         "amend-thresholds": _amend,
         "evaluate": _evaluate,
+        "recalibrate": _recalibrate,
         "demo": _demo,
         "predict": _predict,
         "selftest": _selftest,

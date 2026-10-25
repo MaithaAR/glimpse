@@ -53,6 +53,7 @@ just docker-demo                              # needs `just install` first, for 
 | `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · 28-person fusion + frozen cut-offs (`just train` runs all three) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
 | `just evaluate` | tables, figures, targets; scores the fixed test (refuses if the frozen cut-offs were changed) | 1 min |
+| `just recalibrate` | validation-chosen cut-offs on recalibrated risk, checked on CV without the test people (no test labels) -> `outputs/evaluation/recalibration.md` | 1 min |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`.
 
