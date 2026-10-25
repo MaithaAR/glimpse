@@ -26,3 +26,15 @@ def test_ece_perfect():
 
 def test_locked_hash():
     assert len(load_locked_set("splits/locked_final_set.json")) == 8
+
+
+def test_calibration_by_person_finds_rare_spikers_over_predicted():
+    """A model that predicts the same risk for everyone over-predicts for rare spikers and under-predicts for others."""
+    from glimpse.evaluation import calibration_by_person
+
+    person = np.repeat([1, 2, 3, 4], 10)
+    y = np.concatenate([np.zeros(10), np.r_[np.ones(2), np.zeros(8)], np.r_[np.ones(8), np.zeros(2)], np.ones(10)])
+    out = calibration_by_person(person, y, np.full(40, 0.5))
+    assert out["rare_spikers"]["predicted"] > out["rare_spikers"]["observed"]
+    assert out["frequent_spikers"]["predicted"] < out["frequent_spikers"]["observed"]
+    assert out["corr_spike_rate_vs_gap"] < -0.9

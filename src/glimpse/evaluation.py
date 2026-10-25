@@ -178,3 +178,23 @@ def coverage_report(lo, hi, y, sids):
     return dict(
         pooled=float(inside.mean()), person_averaged=float(np.mean(per_person)), mean_width=float(np.mean(hi - lo))
     )
+
+
+def calibration_by_person(person: np.ndarray, y: np.ndarray, p: np.ndarray) -> dict:
+    """Mean predicted risk vs observed spike rate per person, and for the people below/above the median spike rate.
+
+    A strong negative correlation between a person's spike rate and (predicted - observed) means the model cannot
+    tell rare from frequent spikers: it over-predicts for the first and under-predicts for the second.
+    """
+    ids = np.unique(person)
+    n = np.array([(person == q).sum() for q in ids])
+    obs = np.array([y[person == q].mean() for q in ids])
+    pred = np.array([p[person == q].mean() for q in ids])
+    low = obs < np.median(obs)
+
+    def half(m: np.ndarray) -> dict:
+        return {"people": int(m.sum()), "predicted": float(np.average(pred[m], weights=n[m])),
+                "observed": float(np.average(obs[m], weights=n[m]))}  # fmt: skip
+
+    return {"corr_spike_rate_vs_gap": float(np.corrcoef(obs, pred - obs)[0, 1]),
+            "rare_spikers": half(low), "frequent_spikers": half(~low)}  # fmt: skip

@@ -32,6 +32,7 @@ from glimpse.config import GlimpseConfig
 from glimpse.data.dataset import MealDataset
 from glimpse.data.splits import Splits, meal_rows
 from glimpse.evaluation import (
+    calibration_by_person,
     choose_thresholds,
     cost_only_thresholds,
     decide,
@@ -269,7 +270,8 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
                     "auroc": {c: _auc(y_nt, nt[c].to_numpy()) for c in ["profile_lr", "no_meal", "sensor_cnn",
                                                                        "photo", "logged_carbs"]},
                     "photo_gain": {"point": _auc(y_nt, nt.photo.to_numpy()) - _auc(y_nt, nt.no_meal.to_numpy()),
-                                   "ci95": [lo_nt, hi_nt]}}  # fmt: skip
+                                   "ci95": [lo_nt, hi_nt]},
+                    "calibration_by_person": calibration_by_person(s_nt, y_nt, nt.photo.to_numpy())}  # fmt: skip
     rq2 = gain("sensor_cnn", "no_meal")
     rq2["verdict"] = "CNN better" if rq2["ci95"][0] > cfg.targets.rq2_min_lower_bound else "tie or worse"
 
@@ -525,6 +527,17 @@ def _markdown(res: dict) -> None:
               "|---|---|---|"]  # fmt: skip
         L += [f"| {mp:.2f} | {ob:.2f} | {n} |" for mp, ob, n in bins]
         L.append("")
+    cb, v = res["cv_without_test_people"]["calibration_by_person"], res["test"]["validation"]
+    L += ["**Where the miscalibration comes from (no test labels used; added after the results)**", "",
+          "| Group | People | Mean predicted risk | Observed spike rate |", "|---|---|---|---|",
+          f"| CV without test people: rare spikers (below median) | {cb['rare_spikers']['people']} | "
+          f"{cb['rare_spikers']['predicted']:.2f} | {cb['rare_spikers']['observed']:.2f} |",
+          f"| CV without test people: frequent spikers | {cb['frequent_spikers']['people']} | "
+          f"{cb['frequent_spikers']['predicted']:.2f} | {cb['frequent_spikers']['observed']:.2f} |",
+          f"| Validation people, 28-person model | {v['people']} | {v['mean_predicted_risk']:.2f} | "
+          f"{v['spike_rate']:.2f} |", "",
+          f"Correlation between a person's spike rate and (predicted - observed): "
+          f"{cb['corr_spike_rate_vs_gap']:+.2f}.", ""]  # fmt: skip
     (OUT / "results.md").write_text("\n".join(L) + "\n")
 
 

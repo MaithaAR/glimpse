@@ -105,3 +105,13 @@ The bootstrap range of ECE is biased upward (resampled data always look less cal
 | 0.64 | 0.75 | 4 |
 | 0.69 | 0.83 | 6 |
 
+**Where the miscalibration comes from (no test labels used; added after the results)**
+
+| Group | People | Mean predicted risk | Observed spike rate |
+|---|---|---|---|
+| CV without test people: rare spikers (below median) | 9 | 0.30 | 0.16 |
+| CV without test people: frequent spikers | 9 | 0.42 | 0.54 |
+| Validation people, 28-person model | 4 | 0.31 | 0.19 |
+
+Correlation between a person's spike rate and (predicted - observed): -0.77.
+

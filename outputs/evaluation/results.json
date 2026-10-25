@@ -776,6 +776,19 @@
         -0.007243689913686784,
         0.07719950618047208
       ]
+    },
+    "calibration_by_person": {
+      "corr_spike_rate_vs_gap": -0.7692074189001162,
+      "rare_spikers": {
+        "people": 9,
+        "predicted": 0.30102876343611984,
+        "observed": 0.15609756097560976
+      },
+      "frequent_spikers": {
+        "people": 9,
+        "predicted": 0.42024644726595767,
+        "observed": 0.5444444444444444
+      }
     }
   }
 }
