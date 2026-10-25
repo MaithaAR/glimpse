@@ -2,7 +2,7 @@
 
 Fitted on: 4 validation people (99 meals), frozen 28-person model. Platt slope 1.40, intercept -0.47.
 
-Cut-offs chosen on the recalibrated validation predictions: low risk below 0.17, caution from 0.17. Frozen in `checkpoints/thresholds_validation_recal.json` (sha256 0407245816f4). Stability check: failed (no cost saving or nothing cleared on the CV check).
+Cut-offs chosen on the recalibrated validation predictions: low risk below 0.17, caution from 0.17. Frozen in `checkpoints/thresholds_validation_recal.json` (sha256 2442b2ff447e). Stability check: failed (misses the pre-registered cost-saving or missed-spike target on the CV check).
 
 | Split | Meals | ECE before | ECE after |
 |---|---|---|---|

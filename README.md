@@ -30,7 +30,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 ## Quick start (macOS or Linux; needs [uv](https://docs.astral.sh/uv/) and [just](https://just.systems/), no pip)
 ```bash
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
-just check       # ruff + 80+ tests
+just check       # ruff + 84 tests
 just demo        # worked cases, two can't-judge cases, response time  -> outputs/demo/cases.md
 just evaluate    # all metrics, baselines, calibration, fixed test     -> outputs/evaluation/ (about 1 min)
 just app         # local screen at http://127.0.0.1:7860 (optional extra: Gradio)

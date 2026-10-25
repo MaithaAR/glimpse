@@ -122,7 +122,12 @@ def run_recalibration(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     _, ece_c1 = reliability(q_c, y_c, cfg.targets.ece_bins)
     use_val_rule = usefulness_report(decide(q_c, lo, hi), y_c, costs, targets)
     use_cost_rule = usefulness_report(decide(p_c, main["low_risk_below"], main["caution_from"]), y_c, costs, targets)
-    stable = use_val_rule["cost_reduction"] > 0 and use_val_rule["n_cleared"] > 0
+    u = targets["usefulness"]  # the pre-registered usefulness targets decide, so "passed" means a usable rule
+    stable = (
+        use_val_rule["cost_reduction"] >= u["min_cost_reduction"]
+        and use_val_rule["missed_among_cleared"] <= u["max_missed_among_cleared"]
+        and use_val_rule["n_cleared"] > 0
+    )
     log.info("CV check ({} people, {} meals): ECE {:.3f} -> {:.3f}; validation rule clears {:.0%} ({:.0%} spike), "
              "cost saving {:+.0%}; cost-only rule clears {:.0%} ({:.0%} spike), cost saving {:+.0%}; stability {}",
              cv.person_id.nunique(), len(cv), ece_c0, ece_c1, use_val_rule["share_low_risk"],
@@ -145,8 +150,8 @@ def run_recalibration(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
                       "by_person_after": calibration_by_person(s_c, y_c, q_c),
                       "validation_rule": _slim(use_val_rule).model_dump(),
                       "cost_only_rule": _slim(use_cost_rule).model_dump()},
-         "stability": "passed (cost saving > 0 and some meals cleared on the CV check)" if stable
-                      else "failed (no cost saving or nothing cleared on the CV check)"}  # fmt: skip
+         "stability": "passed (meets the pre-registered cost-saving and missed-spike targets on the CV check)" if stable
+                      else "failed (misses the pre-registered cost-saving or missed-spike target on the CV check)"}  # fmt: skip
     d["sha256"] = hash_thresholds(d)
     res = Recalibration(**d)
     FROZEN.write_text(
