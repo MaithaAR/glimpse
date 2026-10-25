@@ -193,8 +193,13 @@ def _usefulness_ci(p, y, sids, lo, hi, costs, targets, B, seed) -> dict:
     return rep
 
 
-def _status(point: float, lo: float, hi: float, ok) -> str:
-    """met = the whole 95% range meets the target; on track = only the estimate does; otherwise at risk."""
+def _status(point: float, lo: float, hi: float, ok, lower_bound_rule: bool = False) -> str:
+    """met = the whole 95% range meets the target; on track = only the estimate does; otherwise at risk.
+
+    A lower-bound rule (RQ1 non-inferiority, RQ2 superiority) is judged on the lower end of the range only.
+    """
+    if lower_bound_rule:
+        return "met" if ok(lo) else "at risk"
     if ok(lo) and ok(hi):
         return "met"
     return "on track" if ok(point) else "at risk"
@@ -281,12 +286,13 @@ def run_evaluation(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     # 4. targets status (rules fixed before training)
     u, margin = cfg.targets.usefulness, cfg.targets.rq1_noninferiority_margin
     status = [
-        ("Photo adds to spike prediction (main result)", gains["photo"], lambda v: v > 0),
-        ("RQ1: photo not worse than logged carbs by > margin", rq1, lambda v: v > -margin),
-        ("RQ2: SensorCNN beats hand-made trends", rq2, lambda v: v > cfg.targets.rq2_min_lower_bound),
+        ("Photo adds to spike prediction (main result)", gains["photo"], lambda v: v > 0, False),
+        ("RQ1: photo not worse than logged carbs by > margin", rq1, lambda v: v > -margin, True),
+        ("RQ2: SensorCNN beats hand-made trends", rq2, lambda v: v > cfg.targets.rq2_min_lower_bound, True),
     ]  # fmt: skip
-    st = [{"target": n, "estimate": g["point"], "ci95": g["ci95"], "status": _status(g["point"], *g["ci95"], ok)}
-          for n, g, ok in status]  # fmt: skip
+    st = [{"target": n, "estimate": g["point"], "ci95": g["ci95"],
+           "status": _status(g["point"], *g["ci95"], ok, one_sided)}
+          for n, g, ok, one_sided in status]  # fmt: skip
     st.append({"target": f"Calibration: ECE <= {cfg.targets.ece_max}", "estimate": ece, "ci95": list(ece_ci[1:]),
                "status": _status(ece, *ece_ci[1:], lambda v: v <= cfg.targets.ece_max)})  # fmt: skip
     for key, name, ok in [("cost_reduction", f"Cost reduction >= {u.min_cost_reduction:.0%}",
@@ -495,12 +501,12 @@ def _markdown(res: dict) -> None:
         L.append(f"| {r['model']} | {r['auroc']:.3f} ({r['auroc_lo']:.3f}-{r['auroc_hi']:.3f}) | {r['auprc']:.3f} | "
                  f"{r['brier']:.3f} | {r['ece']:.3f} |")  # fmt: skip
     L += ["",
-          "| Cut-offs | low risk below | caution from | cleared | spikes among cleared | can't judge | cost change |",
+          "| Cut-offs | low risk below | caution from | cleared | spikes among cleared | can't judge | cost saving |",
           "|---|---|---|---|---|---|---|"]  # fmt: skip
     for k, d in t["decisions"].items():
         L.append(f"| {k} | {d['low_risk_below']:.3f} | {d['caution_from']:.3f} | {d['share_low_risk']:.0%} | "
                  f"{d['missed_among_cleared']:.0%} | {d['share_abstain']:.0%} | "
-                 f"{-d['cost_reduction']:+.0%} |")  # fmt: skip
+                 f"{d['cost_reduction']:+.0%} |")  # fmt: skip
     w = res["cv_without_test_people"]
     L += ["", f"## CV without the 5 test people ({w['people']} people, {w['meals']} meals; added after the results)",
           "", "| " + " | ".join(w["auroc"]) + " |", "|" + "---|" * len(w["auroc"]),

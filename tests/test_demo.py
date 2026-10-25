@@ -91,6 +91,10 @@ def test_meal_input_and_answer_are_validated():
         MealInput(meal_time=MEAL, glucose_times=[MEAL], glucose_mgdl=[], profile={})
     with pytest.raises(ValidationError):
         MealInput(meal_time=MEAL, glucose_times=[], glucose_mgdl=[], profile={"shoe_size": 40.0})
+    with pytest.raises(ValidationError):  # implausible profile value
+        MealInput(meal_time=MEAL, glucose_times=[], glucose_mgdl=[], profile={"bmi": 250.0})
+    ok = MealInput(meal_time=MEAL, glucose_times=[], glucose_mgdl=[], profile={"bmi": 31.0, "a1c_pct": float("nan")})
+    assert ok.profile["bmi"] == 31.0  # in range, and a missing value is allowed
     with pytest.raises(ValidationError):
         Answer(decision="maybe", sentence="x", reason="y")
     with pytest.raises(ValidationError):

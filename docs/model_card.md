@@ -21,7 +21,7 @@ USA; CC BY-NC-SA 4.0. Carb labels are "served" carbs (logged ÷ share eaten), wh
 - **Calibration:** ECE 0.052.
 - **Fixed test (5 people):** AUROC 0.742, ECE 0.129 (over-predicts).
 - **Decisions on the cross-validation:** 14% of meals cleared, 12% of those spiked; 11% *can't judge*.
-- **Speed:** p95 286 ms on a Mac CPU in the committed demo run (`outputs/demo/demo_summary.json`); runs vary by a few ms, and one earlier run reached 303 ms, so it is close to the 300 ms target.
+- **Speed:** p95 282 ms on a Mac CPU in the committed demo run (`outputs/demo/demo_summary.json`); runs vary by a few ms, and one earlier run reached 303 ms, so it is close to the 300 ms target.
 
 **Limitations:**
 

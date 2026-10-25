@@ -33,7 +33,7 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 ## Decision rules (from the proposal)
 - **RQ2:** the CNN beats engineered trends only if the lower end of the 95% range of the AUROC gain is above `targets.rq2_min_lower_bound` (0). Otherwise it is reported as a tie or a loss.
 - **Calibration:** ECE ≤ `targets.ece_max` (0.05).
-- **Status labels:** *met* only if the whole 95% range meets the target; *on track* if only the estimate does; otherwise *at risk*.
+- **Status labels:** *met* only if the whole 95% range meets the target; *on track* if only the estimate does; otherwise *at risk*. RQ1 and RQ2 are lower-bound rules, so they are *met* or *at risk* on the lower end alone (label rule corrected after the results; no number changed).
 
 ## Meal information (added in Step 4c, before running it)
 - **C grid widened** to `baselines.logreg_c_grid` = 0.001 ... 10: the old minimum (0.01) was chosen in 9 of 10 tunings,

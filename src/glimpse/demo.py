@@ -24,7 +24,7 @@ import joblib
 import numpy as np
 import torch
 from loguru import logger
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from glimpse.config import GlimpseConfig
 from glimpse.data.dataset import PROFILE
@@ -37,6 +37,7 @@ from glimpse.training.photo import load_photo_bundle
 CARB_BINS = ["under 30 g", "30-59 g", "60-89 g", "90 g or more"]
 PERSON_INPUTS = ["age", "bmi", "a1c_pct", "fasting_glucose_mgdl", "prior_spike_rate", "prior_rise"]
 Decision = Literal["low risk", "caution", "can't judge"]
+PROFILE_RANGES = {"age": (18, 100), "bmi": (12, 70), "a1c_pct": (3, 15), "fasting_glucose_mgdl": (40, 400)}
 
 
 class MealInput(BaseModel):
@@ -50,6 +51,16 @@ class MealInput(BaseModel):
     photo: Path | None = None
     hr_times: list[datetime] = Field(default_factory=list)
     hr_bpm: list[float] = Field(default_factory=list)
+
+    @field_validator("profile")
+    @classmethod
+    def _profile_in_range(cls, v: dict[str, float]) -> dict[str, float]:
+        """Profile values must be physiologically plausible; a missing value (NaN) is filled later."""
+        for key, (lo, hi) in PROFILE_RANGES.items():
+            x = v.get(key)
+            if x is not None and math.isfinite(x) and not lo <= x <= hi:
+                raise ValueError(f"{key} = {x} is outside the plausible range {lo}-{hi}")
+        return v
 
     @model_validator(mode="after")
     def _consistent(self) -> MealInput:

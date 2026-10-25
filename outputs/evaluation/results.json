@@ -706,7 +706,7 @@
         -0.015974737824978474,
         0.02157237388080867
       ],
-      "status": "on track"
+      "status": "at risk"
     },
     {
       "target": "Calibration: ECE <= 0.05",
@@ -755,7 +755,7 @@
     },
     {
       "target": "Response time p95 <= 300 ms (just demo)",
-      "estimate": 283.2716772463755,
+      "estimate": 282.1337495042826,
       "ci95": null,
       "status": "met"
     }

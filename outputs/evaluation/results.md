@@ -32,13 +32,13 @@ Base spike rate 33% (481 meals, 23 people).
 |---|---|---|---|
 | Photo adds to spike prediction (main result) | +0.037 | +0.003 to +0.073 | met |
 | RQ1: photo not worse than logged carbs by > margin | +0.007 | -0.020 to +0.032 | met |
-| RQ2: SensorCNN beats hand-made trends | +0.002 | -0.016 to +0.022 | on track |
+| RQ2: SensorCNN beats hand-made trends | +0.002 | -0.016 to +0.022 | at risk |
 | Calibration: ECE <= 0.05 | +0.052 | +0.052 to +0.125 | at risk |
 | Cost reduction >= 10% (CV, main cut-offs) | +0.090 | -0.045 to +0.225 | at risk |
 | Meals cleared >= 20% (CV, main cut-offs) | +0.143 | +0.076 to +0.225 | at risk |
 | Spikes among cleared <= 10% (CV, main cut-offs) | +0.116 | +0.030 to +0.208 | at risk |
 | Can't judge <= 20% (CV, main cut-offs) | +0.106 | +0.068 to +0.146 | met |
-| Response time p95 <= 300 ms (just demo) | 283 ms | - | met |
+| Response time p95 <= 300 ms (just demo) | 282 ms | - | met |
 
 ## Fixed test (sanity check): 5 people, 96 meals, spike rate 29%
 
@@ -51,11 +51,11 @@ Base spike rate 33% (481 meals, 23 people).
 | Profile + SensorCNN (from scratch) | 0.674 (0.563-0.815) | 0.466 | 0.208 | 0.173 |
 | + photo carbs (MAIN) | 0.742 (0.670-0.900) | 0.618 | 0.182 | 0.129 |
 
-| Cut-offs | low risk below | caution from | cleared | spikes among cleared | can't judge | cost change |
+| Cut-offs | low risk below | caution from | cleared | spikes among cleared | can't judge | cost saving |
 |---|---|---|---|---|---|---|
-| main (cost-only) | 0.143 | 0.200 | 3% | 0% | 9% | -7% |
-| pre-registered (validation) | 0.310 | 0.310 | 42% | 15% | 0% | -6% |
-| CV without test people | 0.180 | 0.180 | 9% | 11% | 0% | -4% |
+| main (cost-only) | 0.143 | 0.200 | 3% | 0% | 9% | +7% |
+| pre-registered (validation) | 0.310 | 0.310 | 42% | 15% | 0% | +6% |
+| CV without test people | 0.180 | 0.180 | 9% | 11% | 0% | +4% |
 
 ## CV without the 5 test people (18 people, 385 meals; added after the results)
 

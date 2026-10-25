@@ -42,3 +42,6 @@ def test_status_rule():
     assert _status(0.05, 0.01, 0.09, ok) == "met"
     assert _status(0.05, -0.01, 0.09, ok) == "on track"
     assert _status(-0.01, -0.05, 0.02, ok) == "at risk"
+    # lower-bound rules (RQ1, RQ2) look only at the lower end: a positive estimate with a range crossing 0 is at risk
+    assert _status(0.002, -0.016, 0.022, ok, lower_bound_rule=True) == "at risk"
+    assert _status(0.007, -0.020, 0.032, lambda v: v > -0.03, lower_bound_rule=True) == "met"

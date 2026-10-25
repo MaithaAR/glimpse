@@ -8,7 +8,7 @@
 - reason: risk 25% is at or above the caution cut-off 20%
 - carbs: most likely under 30 g (68% sure); unfamiliar-photo score 0.496
 - what happened: glucose rose 58 mg/dL (spike)
-- response time: 275 ms
+- response time: 276 ms
 
 ### Correct all-clear (low risk, no spike)
 - meal time: 2024-01-28 15:32; photo: 00000037-PHOTO-2024-1-28-15-32-0.jpg
@@ -16,7 +16,7 @@
 - reason: risk 11% is below the low-risk cut-off 14%
 - carbs: most likely under 30 g (58% sure); unfamiliar-photo score 0.493
 - what happened: glucose fell 33 mg/dL (no spike)
-- response time: 276 ms
+- response time: 280 ms
 
 ### Wrong answer (shown on purpose)
 - meal time: 2024-01-29 12:47; photo: 00000042-PHOTO-2024-1-29-12-47-0.jpg
@@ -24,7 +24,7 @@
 - reason: risk 48% is at or above the caution cut-off 20%
 - carbs: most likely 60-89 g (92% sure); unfamiliar-photo score 0.191
 - what happened: glucose rose 35 mg/dL (no spike)
-- response time: 273 ms
+- response time: 277 ms
 
 ### Can't judge: sensor gap (same meal, last 40 min of glucose removed)
 - meal time: 2024-01-28 19:03; photo: 00000040-PHOTO-2024-1-28-19-3-0.jpg
@@ -44,8 +44,8 @@
 - reason: the risk (17%) is borderline, between 14% and 20%
 - carbs: most likely under 30 g (52% sure); unfamiliar-photo score 0.195
 - what happened: glucose fell 2 mg/dL (no spike)
-- response time: 281 ms
+- response time: 283 ms
 
 
 
-Response time over 96 test meals on Darwin arm64: median 274 ms, 95th percentile 286 ms (target 300 ms).
+Response time over 96 test meals on Darwin arm64: median 272 ms, 95th percentile 282 ms (target 300 ms).
