@@ -82,6 +82,9 @@ ood *ARGS:
 robustness:
     uv run glimpse robustness
 
+probes:
+    uv run glimpse probes
+
 # final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
 train-final:
     uv run glimpse final
