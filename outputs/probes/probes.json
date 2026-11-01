@@ -1,0 +1,29 @@
+{
+  "what": "S13 counterfactual probes through the per-fold evaluation Pipelines, no history; settings and expectations pre-registered in docs/probes_s13.md",
+  "settings": {
+    "ramp_mgdl": 40.0,
+    "ramp_min": 45,
+    "ref_quantiles": [
+      0.1,
+      0.9
+    ]
+  },
+  "probe_a_photo_swap": {
+    "n": 460,
+    "share_direction_ok": 1.0,
+    "share_decision_unchanged": 0.6847826086956522,
+    "median_abs_swing": 0.10179574413859413,
+    "a1_direction_pass": true,
+    "a2_expected_fail_confirmed": true
+  },
+  "probe_b_cgm_trend": {
+    "n": 460,
+    "share_direction_ok": 0.08478260869565217,
+    "median_move": -0.04674400252047686,
+    "b1_direction_pass": false,
+    "b2_median_move_vs_a_swing": [
+      0.04916406424855184,
+      0.10179574413859413
+    ]
+  }
+}
