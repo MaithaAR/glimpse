@@ -10,7 +10,7 @@ import torch
 from glimpse.config import load_config
 from glimpse.data.dataset import PROFILE
 from glimpse.data.preprocess import resample_window
-from glimpse.demo import decision, knn_distance, leave_one_out_distances, profile_vector, sentence, window_problem
+from glimpse.serve import decision, knn_distance, leave_one_out_distances, profile_vector, sentence, window_problem
 
 MEAL = datetime(2020, 5, 1, 12, 0)
 
@@ -56,7 +56,7 @@ def test_cgm_csv_input(tmp_path):
     """The app's CSV: timestamp + glucose_mgdl (+ optional hr_bpm); a wrong header is refused clearly."""
     import pytest
 
-    from glimpse.demo import read_cgm_csv
+    from glimpse.serve import read_cgm_csv
 
     f = tmp_path / "cgm.csv"
     f.write_text("timestamp,glucose_mgdl,hr_bpm\n2020-05-01 11:55,101,70\n2020-05-01 12:00,,72\n")
@@ -85,7 +85,7 @@ def test_meal_input_and_answer_are_validated():
     import pytest
     from pydantic import ValidationError
 
-    from glimpse.demo import Answer, MealInput, cant_judge
+    from glimpse.serve import Answer, MealInput, cant_judge
 
     with pytest.raises(ValidationError):
         MealInput(meal_time=MEAL, glucose_times=[MEAL], glucose_mgdl=[], profile={})
@@ -107,7 +107,7 @@ def test_meal_input_and_answer_are_validated():
 
 def test_bad_input_files_give_a_structured_cant_judge(tmp_path):
     """Missing, empty or wrong files never crash: they come back as 'can't judge' with the reason."""
-    from glimpse.demo import answer_from_files
+    from glimpse.serve import answer_from_files
 
     empty = tmp_path / "empty.csv"
     empty.write_text("")
@@ -122,7 +122,7 @@ def test_bad_input_files_give_a_structured_cant_judge(tmp_path):
 
 def test_sample_cgm_file_is_valid():
     """The synthetic sample in samples/ reads cleanly: 24 readings in the 2 h before the meal."""
-    from glimpse.demo import read_cgm_csv
+    from glimpse.serve import read_cgm_csv
 
     gt, gv, ht, hv = read_cgm_csv(Path("samples/cgm_example.csv"))
     assert len(gt) == len(gv) == 24 and len(hv) == 24
@@ -132,7 +132,7 @@ def test_blank_photo_rule():
     """Plain white, black or grey pictures are caught before the photo model; a textured picture is not."""
     from PIL import Image
 
-    from glimpse.demo import photo_problem
+    from glimpse.serve import photo_problem
 
     for v in (0, 128, 255):
         assert "blank" in photo_problem(Image.new("RGB", (200, 200), (v, v, v)), 8.0)

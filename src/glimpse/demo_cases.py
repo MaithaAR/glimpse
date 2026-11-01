@@ -18,7 +18,7 @@ from glimpse.data.dataset import PROFILE, MealDataset, _person_series
 from glimpse.data.photos import eval_transform
 from glimpse.data.preprocess import resample_window
 from glimpse.data.splits import Splits, meal_rows
-from glimpse.demo import PERSON_INPUTS, Glimpse, MealInput, knn_distance, leave_one_out_distances
+from glimpse.serve import PERSON_INPUTS, Glimpse, MealInput, knn_distance, leave_one_out_distances
 from glimpse.models.photo_model import PhotoCarbModel
 from glimpse.models.weights import weights_path
 from glimpse.training.final import _photo_checkpoint

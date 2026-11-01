@@ -191,7 +191,7 @@ def _predict(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """One meal from your own files -> the validated answer as JSON on screen (bad input -> 'can't judge')."""
     import sys
 
-    from glimpse.demo import Glimpse, answer_from_files
+    from glimpse.serve import Glimpse, answer_from_files
 
     profile = {"age": args.age, "bmi": args.bmi, "a1c_pct": args.a1c, "fasting_glucose_mgdl": args.fasting,
                "prior_spike_rate": args.prior_rate, "prior_rise": args.prior_rise}  # fmt: skip
