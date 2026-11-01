@@ -1,0 +1,35 @@
+{
+  "what": "parameters vs the assignment caps, serving latency on instructor case 00_clean, sizes",
+  "params": {
+    "photo_backbone_pretrained": 27820128,
+    "photo_heads_scratch": 3845,
+    "sensor_cnn_scratch": 5217,
+    "fusion_lr_scratch": 20,
+    "largest_model_total": 27823973,
+    "pretrained_total": 27820128,
+    "scratch_total": 9082
+  },
+  "caps": {
+    "per_model": 200000000,
+    "pretrained_total": 1000000000,
+    "scratch_total": 50000000
+  },
+  "caps_ok": {
+    "per_model": true,
+    "pretrained_total": true,
+    "scratch_total": true
+  },
+  "latency_s": {
+    "cold_first_answer": 1.55,
+    "warm_median": 0.264,
+    "warm_p95": 0.27,
+    "reps": 15
+  },
+  "peak_rss_mb": 797.0,
+  "artifact_sizes_mb": {
+    "photo_convnext_e17_valmae26.2.pt": 31.0,
+    "fusion_final.joblib": 0.0,
+    "photo_ood_reference.pt": 1.3
+  },
+  "machine": "Darwin arm64, torch threads capped at 4"
+}
