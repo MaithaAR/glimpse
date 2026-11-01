@@ -60,7 +60,7 @@ def run_efficiency(cfg: GlimpseConfig) -> dict:
     rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss  # bytes on macOS, KiB on Linux
     rss_mb = rss / 1e6 if platform.system() == "Darwin" else rss / 1e3
     arts = {p.name: round(p.stat().st_size / 1e6, 1)
-            for p in [_photo_checkpoint(), FINAL, Path(cfg.prototype.ood_reference_file)] if p.is_file()}
+            for p in [_photo_checkpoint(), FINAL, Path(cfg.prototype.ood_reference_file)] if p.is_file()}  # fmt: skip
     res = {"what": "parameters vs the assignment caps, serving latency on instructor case 00_clean, sizes",
            "params": {"photo_backbone_pretrained": backbone, "photo_heads_scratch": heads,
                       "sensor_cnn_scratch": sensor, "fusion_lr_scratch": fusion_params,
