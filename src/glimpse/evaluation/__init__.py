@@ -5,10 +5,7 @@ this package only measures. Report: §3 evaluation and ablations."""
 from glimpse.evaluation.metrics import (
     apply_platt,
     calibration_by_person,
-    choose_thresholds,
-    cost_only_thresholds,
     coverage_report,
-    decide,
     ece_equal_mass,
     expected_cost,
     fit_platt,
@@ -25,10 +22,7 @@ from glimpse.evaluation.metrics import (
 __all__ = [
     "apply_platt",
     "calibration_by_person",
-    "choose_thresholds",
-    "cost_only_thresholds",
     "coverage_report",
-    "decide",
     "ece_equal_mass",
     "expected_cost",
     "fit_platt",

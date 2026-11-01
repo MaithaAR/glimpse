@@ -3,7 +3,8 @@
 import numpy as np
 
 from glimpse.config import load_config
-from glimpse.evaluation import cost_only_thresholds, person_bootstrap_ci, reliability
+from glimpse.evaluation import person_bootstrap_ci, reliability
+from glimpse.training.thresholds import cost_only_thresholds
 from glimpse.run_evaluation import _status
 from glimpse.training.final import cost_dict
 

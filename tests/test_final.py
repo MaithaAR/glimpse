@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 
 from glimpse.config import load_config
-from glimpse.evaluation import choose_thresholds, expected_cost
+from glimpse.evaluation import expected_cost
+from glimpse.training.thresholds import choose_thresholds
 from glimpse.training.final import cost_dict, hash_thresholds, load_thresholds
 
 

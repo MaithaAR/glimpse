@@ -29,8 +29,6 @@ from glimpse.data.splits import Splits, meal_rows
 from glimpse.evaluation import (
     apply_platt,
     calibration_by_person,
-    choose_thresholds,
-    decide,
     fit_platt,
     reliability,
     usefulness_report,
@@ -40,6 +38,7 @@ from glimpse.models.weights import weights_path
 from glimpse.training.final import FINAL, checkpoint_estimates, cost_dict, hash_thresholds, load_thresholds
 from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
 from glimpse.training.photo import build_cache, photo_rows
+from glimpse.training.thresholds import choose_thresholds, decide
 
 AMENDED = Path("checkpoints/thresholds_amended.json")
 FROZEN = Path("checkpoints/thresholds_validation_recal.json")

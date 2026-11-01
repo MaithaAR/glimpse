@@ -33,9 +33,6 @@ from glimpse.data.dataset import MealDataset
 from glimpse.data.splits import Splits, meal_rows
 from glimpse.evaluation import (
     calibration_by_person,
-    choose_thresholds,
-    cost_only_thresholds,
-    decide,
     expected_cost,
     noninferiority,
     paired_person_bootstrap,
@@ -49,6 +46,7 @@ from glimpse.training.baselines import trend_features
 from glimpse.training.final import FINAL, THRESHOLDS, checkpoint_estimates, cost_dict, hash_thresholds, load_thresholds
 from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
 from glimpse.training.photo import build_cache, photo_rows
+from glimpse.training.thresholds import choose_thresholds, cost_only_thresholds, decide
 
 AMENDED = Path("checkpoints/thresholds_amended.json")
 OUT = Path("outputs/evaluation")

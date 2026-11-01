@@ -52,3 +52,16 @@ def test_platt_recalibration_fixes_over_prediction():
     assert intercept < 0
     assert reliability(apply_platt(over, slope, intercept), y)[1] < reliability(over, y)[1]
     np.testing.assert_allclose(apply_platt(np.array([0.3, 0.7]), 1.0, 0.0), [0.3, 0.7], atol=1e-6)
+
+
+def test_evaluation_only_measures_it_never_decides():
+    """The S3 exit criterion, enforced: the evaluation package has no decision-making function, and no
+    module in it imports the training-side thresholds. Evaluation numbers come from Pipeline answers."""
+    from pathlib import Path
+
+    import glimpse.evaluation as ev
+
+    for name in ("decide", "choose_thresholds", "cost_only_thresholds"):
+        assert not hasattr(ev, name), f"{name} must live in glimpse.training.thresholds, not in evaluation"
+    for f in Path("src/glimpse/evaluation").glob("*.py"):
+        assert "training.thresholds" not in f.read_text(), f"{f} imports the decision layer"
