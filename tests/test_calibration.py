@@ -2,7 +2,6 @@
 two-hour label gate, and the joint (m, lo, hi) selection with its pre-registered tie-break."""
 
 import numpy as np
-import pytest
 
 from glimpse.calibration import (
     M_GRID,
