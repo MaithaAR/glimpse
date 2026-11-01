@@ -38,7 +38,7 @@ def test_schema_rejects_locked_person_in_dev():
 
 
 def test_assert_not_locked_is_a_hard_error():
-    assert_not_locked([1, 2], [90, 91], "test") # fine
+    assert_not_locked([1, 2], [90, 91], "test")  # fine
     with pytest.raises(RuntimeError, match=r"locked people \[90\]"):
         assert_not_locked([1, 90], [90, 91], "test")
 
