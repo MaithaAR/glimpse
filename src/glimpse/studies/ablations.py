@@ -72,15 +72,23 @@ def run_profile_excluded(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> d
         key = lambda i: (ds.samples[i].person_id, pd.Timestamp(ds.samples[i].meal_time))  # noqa: E731
         keep = np.array([i for i in tr if mm.get(key(i)) not in held_keys])
         dropped[kk] = {"training_meals": int(len(tr)), "dropped": int(len(tr) - len(keep))}
+        # size-matched control: the SAME number of training meals dropped at random, so the exclusion
+        # effect is separable from simply having less training data
+        rng = np.random.default_rng(cfg.seed + kk)
+        rand_keep = rng.choice(tr, size=len(keep), replace=False)
         te = meal_rows(ds, set(fold), scored_only=True)
         fx = {"photo": with_table(pt, len(PHOTO_COLS)), "no_meal": trend_features}
         cs = {"photo": c_photo[kk], "no_meal": c_none[kk]}
         pred = {a: logistic(cs[a], cfg.seed).fit(f(ds, keep), y[keep]).predict_proba(f(ds, te))[:, 1]
                 for a, f in fx.items()}  # fmt: skip
+        pred["photo_random_drop"] = (logistic(cs["photo"], cfg.seed)
+                                     .fit(fx["photo"](ds, rand_keep), y[rand_keep])
+                                     .predict_proba(fx["photo"](ds, te))[:, 1])  # fmt: skip
         for j, i in enumerate(te):
             rows_out.append({"fold": kk, "row": int(i), "person_id": ds.samples[i].person_id, "spike": int(y[i]),
                              "has_photo": int(i) in pt, "photo": float(pred["photo"][j]),
-                             "no_meal": float(pred["no_meal"][j])})  # fmt: skip
+                             "no_meal": float(pred["no_meal"][j]),
+                             "photo_random_drop": float(pred["photo_random_drop"][j])})  # fmt: skip
     df = pd.DataFrame(rows_out)
     B, seed = cfg.fusion.bootstrap_draws, cfg.seed
     res = {"what": "D8 profile-excluded split: training meals sharing an exact macro profile with a held-out "
@@ -89,13 +97,16 @@ def run_profile_excluded(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> d
            "share_dropped": float(sum(d["dropped"] for d in dropped.values())
                                   / sum(d["training_meals"] for d in dropped.values())),
            "gain_photo_vs_no_meal": _gain(df, "photo", "no_meal", B, seed),
-           "gain_photo_meals_only": _gain(df[df.has_photo.astype(bool)], "photo", "no_meal", B, seed)}  # fmt: skip
+           "gain_photo_meals_only": _gain(df[df.has_photo.astype(bool)], "photo", "no_meal", B, seed),
+           "control_random_drop_gain": _gain(df[df.has_photo.astype(bool)], "photo_random_drop", "no_meal",
+                                             B, seed)}  # fmt: skip
     OUT.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT / "d8_profile_excluded_oof.csv", index=False)
     (OUT / "d8_profile_excluded.json").write_text(json.dumps(res, indent=2))
-    g = res["gain_photo_meals_only"]
-    log.info("D8 profile-excluded: {:.0%} of training meals dropped; photo gain {:+.3f} ({:+.3f} to {:+.3f})",
-             res["share_dropped"], g["point"], *g["ci95"])  # fmt: skip
+    g, gc = res["gain_photo_meals_only"], res["control_random_drop_gain"]
+    log.info("D8 profile-excluded: {:.0%} of training meals dropped; photo gain {:+.3f} ({:+.3f} to {:+.3f}); "
+             "size-matched random-drop control {:+.3f} ({:+.3f} to {:+.3f})",
+             res["share_dropped"], g["point"], *g["ci95"], gc["point"], *gc["ci95"])  # fmt: skip
     return res
 
 
