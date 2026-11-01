@@ -68,3 +68,27 @@ photos are replaced with real phone photos.
 
 02-07 keep placeholder photos by design (their behaviours are decided before the photo matters);
 05's hr_missing flag was verified in the R1-R5 run.
+
+## R7 resolution — 2026-11-01, `just ood` (S10, budget pre-registered at <= 2%)
+
+The cut sweep on the training photos' own leave-one-out distances, scored against all 14 real phone
+photos and the key instructor cases:
+
+| quantile | cut | in-dist flagged | real phone photos flagged |
+|---|---|---|---|
+| 0.99 (deployed) | 0.609 | 1.0% | 0 / 14 |
+| 0.98 | 0.556 | 2.1% (over budget) | 1 / 14 |
+| 0.95 | 0.501 | 5.1% | 5 / 14 |
+| 0.90 | 0.465 | 10.1% | 7 / 14 |
+
+The check does its intended job: the screenshot scores 0.788 and the dark photo 0.682 -- both flagged
+at the deployed cut -- and none of the 14 legitimate phone photos false-flag. But the lamb-and-rice
+dish scores 0.346: MORE familiar than the clean tuna bowl (0.420), because it looks like the training
+set's rice plates. Catching it would need a cut below 0.35, which false-flags half of everything.
+
+**R7 is closed as an accepted limitation, with the cut unchanged (no --apply):** the kNN check detects
+VISUALLY unfamiliar images, not visually-familiar-but-nutritionally-misjudgeable dishes. Mitigations in
+the shipped design: the carb bin is always shown with its confidence, the confirm-carbs tier lets the
+user override the estimate, and mixed local dishes are named as a known failure mode in the report
+(§5) and the app's help text. A nutrition-aware embedding could close this properly; it is on the cut
+list with the reason recorded.
