@@ -69,3 +69,24 @@ def test_reconciliation_asserts_and_reports():
     md = reconciliation_v2(ds, Splits.load(Path("splits/dev_splits.json")), make_splits_v2(ds, cfg))
     assert "exactly once" in md and "| fold | people |" in md.replace("held-out meals |", "held-out meals |")
     assert "Where the intermediate's fixed groups landed" in md
+
+
+def test_fold_plan_v2_keeps_selection_target_only():
+    """D1: the 'select' side of every inner split holds target people only; T2D are spread across the
+    'exclude' sides so each gets a nested estimate from a model that never saw them."""
+    from glimpse.training.photo_cv import fold_plan_v2
+
+    cfg = load_config()
+    n_inner = cfg.cv.inner_folds
+    targets = list(range(1, 2 * n_inner + 1))
+    sp = SplitsV2(seed=1, locked=[90], dev_folds=[targets[:n_inner], targets[n_inner:]], t2d=[50, 51, 52, 53],
+                  inner_folds=[[[p] for p in targets[n_inner:]], [[p] for p in targets[:n_inner]]])  # fmt: skip
+    plan = fold_plan_v2(sp, cfg)
+    assert [f["fold"] for f in plan] == [1, 2]
+    for f in plan:
+        t2d_seen = []
+        for inner in f["inner"]:
+            assert not set(inner["select"]) & set(sp.t2d)  # selection never scores a T2D person
+            assert set(inner["select"]) <= set(inner["exclude"])
+            t2d_seen += [p for p in inner["exclude"] if p in sp.t2d]
+        assert sorted(t2d_seen) == sp.t2d  # every T2D person is excluded from exactly one inner fit

@@ -59,8 +59,8 @@ carbs-check:
     uv run glimpse carbs-check
 
 # photo cross-validation: recipe re-chosen inside each outer fold; OOF + nested carb estimates (~1.5 h, resumable)
-photo-cv:
-    uv run glimpse photo-cv
+photo-cv *ARGS:
+    uv run glimpse photo-cv {{ARGS}}
 
 # fusion: profile + trend with no meal / photo / logged carbs / shuffled photo (+ post-hoc ridge arm); ~2 min
 fusion:

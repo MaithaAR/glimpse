@@ -1,5 +1,6 @@
-"""Photo cross-validation (Step 4c-2): the photo model's carb estimate for every development meal, made by a model
-that never saw that person.
+"""Photo cross-validation on partition v2 (design D1): the photo model's carb estimate for every development
+meal, made by a model that never saw that person. Recipe selection error is measured on target people only;
+T2D people sit on the fit side of every inner split.
 
 - Out-of-fold (OOF) estimates: for each of the 5 outer folds, the 4b recipe is chosen again inside that fold's
   training people only (same 4 inner folds as Steps 3c and 4c-1), trained on all of them, and used on the held-out
@@ -29,11 +30,10 @@ from sklearn.preprocessing import StandardScaler
 
 from glimpse.config import GlimpseConfig
 from glimpse.data.dataset import MealDataset
-from glimpse.data.splits import Splits, meal_rows
+from glimpse.data.splits import Splits, SplitsV2, _folds, assert_not_locked, meal_rows
 from glimpse.models.photo_model import PhotoCarbModel, carb_bin
 from glimpse.models.weights import weights_path
 from glimpse.training.common import EpochLogger
-from glimpse.training.cv import _inner_folds, outer_training_people
 from glimpse.training.photo import (
     _last_stage_state,
     _subset_views,
@@ -51,13 +51,17 @@ from glimpse.training.photo import (
 BINS = ["p_bin0", "p_bin1", "p_bin2", "p_bin3"]
 
 
-def fold_plan(sp: Splits, groups: dict[int, str], cfg: GlimpseConfig) -> list[dict]:
-    """Who trains and who is held out, per outer fold and inner fold (the same folds as Steps 3c and 4c-1)."""
+def fold_plan_v2(sp: SplitsV2, cfg: GlimpseConfig) -> list[dict]:
+    """Who trains, who is held out, and the inner splits, per design D1: selection error is measured on
+    target people only ("select"); T2D people sit on the fit side of every inner split and are partitioned
+    across the inner fits ("exclude") only so their nested estimates also come from models that never saw
+    them -- they never decide a recipe."""
     plan = []
-    for k, fold in enumerate(sp.outer_folds):
-        people = outer_training_people(sp, k, groups)
-        plan.append({"fold": k + 1, "held": sorted(fold), "train": people,
-                     "inner": _inner_folds(people, groups, cfg.cv.inner_folds, cfg.seed + 100 + k)})  # fmt: skip
+    for k, held in enumerate(sp.dev_folds):
+        t2d_parts = _folds(list(sp.t2d), cfg.cv.inner_folds, np.random.default_rng(cfg.seed + 200 + k))
+        inner = [{"select": sorted(t), "exclude": sorted(t + o)}
+                 for t, o in zip(sp.inner_folds[k], t2d_parts, strict=True)]  # fmt: skip
+        plan.append({"fold": k + 1, "held": sorted(held), "train": sp.training_people(k), "inner": inner})
     return plan
 
 
@@ -125,7 +129,7 @@ def _run_key(cfg: GlimpseConfig, rows: np.ndarray, f: dict) -> str:
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 
-def run_photo_cv(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
+def run_photo_cv(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig, only_fold: int | None = None) -> dict:
     """OOF + nested photo estimates, baselines and a summary -> outputs/photo_cv/."""
     torch.set_num_threads(min(cfg.training.num_threads, os.cpu_count() or 1))
     log, out = logger.bind(stage="photo_cv"), Path(cfg.paths.outputs) / "photo_cv"
@@ -135,7 +139,7 @@ def run_photo_cv(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     root, pc = Path(cfg.data.cgmacros_root), cfg.photo
     rows = photo_rows(ds, dev, root)
     person = np.array([ds.samples[i].person_id for i in rows])
-    assert not set(person) & set(sp.locked), "a locked person's photo is in the photo CV"
+    assert_not_locked(person, sp.locked, "photo CV")
     g = grams(ds, rows)
     log.info("photo CV: {} photos of {} development people (locked people excluded)", len(rows), len(set(person)))
 
@@ -148,12 +152,14 @@ def run_photo_cv(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     emb_np = emb.numpy()
     recipe = _Recipe(model, maps_eval, maps_aug, emb, g, cfg)
     elog = EpochLogger(out / "photo_cv_history.csv")
-    target = {p for fold in sp.outer_folds for p in fold}  # the 23 development target people (scored)
+    target = {p for fold in sp.dev_folds for p in fold}  # the 23 development target people (scored)
     scored = set(meal_rows(ds, target, scored_only=True).tolist())
 
     oof_parts, nested_parts, choices = [], [], []
-    for f in fold_plan(sp, groups, cfg):
+    for f in fold_plan_v2(sp, cfg):
         k, t0 = f["fold"], time.time()
+        if only_fold is not None and k != only_fold:
+            continue
         key, saved = _run_key(cfg, rows, f), out / f"fold{k}.json"
         if saved.is_file() and json.loads(saved.read_text()).get("key") == key:
             log.info("fold {}: reusing saved results", k)
@@ -167,8 +173,9 @@ def run_photo_cv(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
         # 1. choose the recipe inside this fold's training people
         alphas = cfg.baselines.ridge_alpha_grid
         best, mae1, mae2, ridge_err = [], [], [], {a: [] for a in alphas}
-        for j, held in enumerate(f["inner"]):
-            fit, hold = pos_t[~np.isin(person[pos_t], held)], pos_t[np.isin(person[pos_t], held)]
+        for j, inner in enumerate(f["inner"]):
+            fit = pos_t[~np.isin(person[pos_t], inner["exclude"])]
+            hold = pos_t[np.isin(person[pos_t], inner["select"])]  # selection error on target people only (D1)
             e, m1, curve = recipe.select(fit, hold, cfg.seed + 10 * k + j, f"fold{k}-inner{j + 1}", elog)
             best.append(e)
             mae1.append(m1)
@@ -182,8 +189,9 @@ def run_photo_cv(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
 
         # 2. nested estimates: chosen recipe refitted per inner fold, used on that fold's held-out people
         nested = []
-        for j, held in enumerate(f["inner"]):
-            fit, hold = pos_t[~np.isin(person[pos_t], held)], pos_t[np.isin(person[pos_t], held)]
+        for j, inner in enumerate(f["inner"]):
+            fit = pos_t[~np.isin(person[pos_t], inner["exclude"])]
+            hold = pos_t[np.isin(person[pos_t], inner["exclude"])]  # targets + their T2D part: everyone gets one
             pg, pb = recipe.fit_predict(fit, hold, e1, keep, e2, cfg.seed + 10 * k + j, f"fold{k}-nested{j + 1}",
                                         elog)  # fmt: skip
             part = {"fold": k, "inner": j + 1, "row": rows[hold], "person_id": person[hold], "carbs_g": g[hold],

@@ -109,12 +109,13 @@ def _carbs_check(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
 
 
 def _photo_cv(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
-    """Photo carb estimates for every development meal from models that never saw that person (Step 4c-2)."""
+    """Photo carb estimates for every development meal from models that never saw that person (partition v2)."""
     from glimpse.data.dataset import MealDataset
-    from glimpse.data.splits import Splits
+    from glimpse.data.splits import SplitsV2
     from glimpse.training.photo_cv import run_photo_cv
 
-    run_photo_cv(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
+    sp = SplitsV2.load(Path("splits/dev_splits_v2.json"))
+    run_photo_cv(MealDataset.load(Path("data/dataset")), sp, cfg, only_fold=args.fold)
     return 0
 
 
@@ -261,7 +262,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     sub.add_parser("cv", help="5-fold person cross-validation of the CNN and the comparison models")
     sub.add_parser("carbs-check", help="does adding the logged carbs to profile + trend raise AUROC? (Step 4c-1)")
-    sub.add_parser("photo-cv", help="out-of-fold and nested photo carb estimates + baselines (Step 4c-2)")
+    pcv = sub.add_parser("photo-cv", help="out-of-fold and nested photo carb estimates + baselines (partition v2)")
+    pcv.add_argument("--fold", type=int, help="run this one fold only (dry run); default: every fold")
     sub.add_parser("fusion", help="add photo / logged carbs to profile + trend, with controls (Step 4c-3)")
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
