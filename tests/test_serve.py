@@ -4,6 +4,7 @@ estimate (the evaluation-equals-deployment seam, D2), and tier 2 (confirm-carbs)
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import numpy as np
 import pytest
 from loguru import logger
 
@@ -26,7 +27,7 @@ class _Fusion:
         self.risk = risk
 
     def predict_proba(self, x):
-        return [[1 - self.risk, self.risk]]
+        return np.array([[1 - self.risk, self.risk]])
 
 
 def bare_pipeline(risk: float, table: dict | None) -> Pipeline:
