@@ -1,53 +1,861 @@
 {
-  "note": "risks come from Pipeline.answer, one Pipeline per fold (D2); decisions use the pre-S5 frozen cut-offs and are PROVISIONAL -- the reported numbers here are AUROC and log-loss only",
+  "note": "every risk and decision from Pipeline.answer, one Pipeline per fold; m and cut-offs chosen inside each fold's inner folds only (D4 realised per fold; deployment values frozen later)",
   "meals": 481,
   "answered_with_risk": 460,
-  "cant_judge": 67,
-  "auroc_photo_dev": {
-    "point": 0.7256477849932488,
-    "ci95": [
-      0.658616559268149,
-      0.7973679997940457
-    ]
+  "risk_personal": {
+    "auroc": {
+      "point": 0.7623395272080413,
+      "ci95": [
+        0.6824158339864159,
+        0.8291196068227774
+      ]
+    },
+    "log_loss": 0.5370799244338427,
+    "n": 460
   },
-  "log_loss_photo_dev": 0.567039147212089,
-  "per_fold": [
+  "risk_platt_only": {
+    "auroc": {
+      "point": 0.7139672946269745,
+      "ci95": [
+        0.6428730103498436,
+        0.7889595408071474
+      ]
+    },
+    "log_loss": 0.5717718179388036,
+    "n": 460
+  },
+  "risk_raw": {
+    "auroc": {
+      "point": 0.7256477849932488,
+      "ci95": [
+        0.658616559268149,
+        0.7973679997940457
+      ]
+    },
+    "log_loss": 0.567039147212089,
+    "n": 460
+  },
+  "decisions": {
+    "share_low_risk": 0.22661122661122662,
+    "share_caution": 0.6361746361746362,
+    "share_abstain": 0.13721413721413722,
+    "cost": 0.5748440748440748,
+    "best_trivial_cost": 0.6715176715176715,
+    "cost_reduction": 0.14396284829721362,
+    "missed_among_cleared": 0.07339449541284404,
+    "n_cleared": 109,
+    "useful": true
+  },
+  "abstained_no_photo": 21,
+  "abstained_borderline": 45,
+  "calibration_by_person_personal": {
+    "corr_spike_rate_vs_gap": -0.8441959353303475,
+    "rare_spikers": {
+      "people": 11,
+      "predicted": 0.20882717839131856,
+      "observed": 0.14225941422594143
+    },
+    "frequent_spikers": {
+      "people": 12,
+      "predicted": 0.4255376481166982,
+      "observed": 0.5294117647058824
+    }
+  },
+  "calibration_by_person_platt_only": {
+    "corr_spike_rate_vs_gap": -0.812779552895062,
+    "rare_spikers": {
+      "people": 11,
+      "predicted": 0.2934574349500894,
+      "observed": 0.14225941422594143
+    },
+    "frequent_spikers": {
+      "people": 12,
+      "predicted": 0.369706695740096,
+      "observed": 0.5294117647058824
+    }
+  },
+  "folds": [
     {
       "fold": 1,
-      "meals": 96,
-      "answered": 90,
-      "auroc": 0.7419165196942975
+      "C": 0.03,
+      "platt_slope": 0.8047269770223671,
+      "platt_intercept": -0.19771134636749454,
+      "m": 1.0,
+      "low_risk_below": 0.21,
+      "caution_from": 0.21,
+      "inner_cost": 0.5246753246753246,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.15,
+          "caution_from": 0.22,
+          "cost": 0.5324675324675324
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.21,
+          "caution_from": 0.21,
+          "cost": 0.5246753246753246
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.21,
+          "caution_from": 0.23,
+          "cost": 0.5272727272727272
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.22,
+          "caution_from": 0.25,
+          "cost": 0.551948051948052
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.21,
+          "caution_from": 0.21,
+          "cost": 0.5558441558441558
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.2,
+          "caution_from": 0.23,
+          "cost": 0.5909090909090909
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.22,
+          "cost": 0.6
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.14,
+          "caution_from": 0.22,
+          "cost": 0.6220779220779221
+        }
+      ]
     },
     {
       "fold": 2,
-      "meals": 109,
-      "answered": 105,
-      "auroc": 0.6138698630136986
+      "C": 0.01,
+      "platt_slope": 1.168471304353664,
+      "platt_intercept": -0.11330643594434567,
+      "m": 2.0,
+      "low_risk_below": 0.13,
+      "caution_from": 0.23,
+      "inner_cost": 0.5201612903225806,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.11,
+          "caution_from": 0.28,
+          "cost": 0.5228494623655914
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.14,
+          "caution_from": 0.19,
+          "cost": 0.5241935483870968
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.13,
+          "caution_from": 0.23,
+          "cost": 0.5201612903225806
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.21,
+          "caution_from": 0.26,
+          "cost": 0.5241935483870968
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.23,
+          "cost": 0.5349462365591398
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.24,
+          "cost": 0.5376344086021505
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.17,
+          "caution_from": 0.23,
+          "cost": 0.5645161290322581
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.16,
+          "caution_from": 0.26,
+          "cost": 0.5793010752688172
+        }
+      ]
     },
     {
       "fold": 3,
-      "meals": 110,
-      "answered": 104,
-      "auroc": 0.7554240631163708
+      "C": 0.03,
+      "platt_slope": 0.8593082755928532,
+      "platt_intercept": -0.13528100569904958,
+      "m": 0.5,
+      "low_risk_below": 0.13,
+      "caution_from": 0.2,
+      "inner_cost": 0.5309973045822103,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.13,
+          "caution_from": 0.2,
+          "cost": 0.5309973045822103
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.13,
+          "caution_from": 0.22,
+          "cost": 0.5431266846361186
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.17,
+          "caution_from": 0.23,
+          "cost": 0.5512129380053908
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.5498652291105122
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.22,
+          "cost": 0.5579514824797843
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.24,
+          "cost": 0.5566037735849056
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.24,
+          "cost": 0.5539083557951483
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.19,
+          "caution_from": 0.24,
+          "cost": 0.5808625336927223
+        }
+      ]
     },
     {
       "fold": 4,
-      "meals": 71,
-      "answered": 67,
-      "auroc": 0.7566844919786095
+      "C": 0.01,
+      "platt_slope": 1.0329113687772937,
+      "platt_intercept": -0.2805139175848583,
+      "m": 1.0,
+      "low_risk_below": 0.15,
+      "caution_from": 0.17,
+      "inner_cost": 0.5280487804878049,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.16,
+          "caution_from": 0.16,
+          "cost": 0.5341463414634147
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.15,
+          "caution_from": 0.17,
+          "cost": 0.5280487804878049
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.18,
+          "cost": 0.5341463414634147
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.17,
+          "caution_from": 0.19,
+          "cost": 0.5585365853658537
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.17,
+          "caution_from": 0.26,
+          "cost": 0.5829268292682926
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.17,
+          "caution_from": 0.24,
+          "cost": 0.5902439024390244
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.17,
+          "caution_from": 0.23,
+          "cost": 0.6109756097560975
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.16,
+          "caution_from": 0.23,
+          "cost": 0.6195121951219512
+        }
+      ]
     },
     {
       "fold": 5,
-      "meals": 95,
-      "answered": 94,
-      "auroc": 0.7878787878787878
+      "C": 0.01,
+      "platt_slope": 1.0680762248900364,
+      "platt_intercept": -0.20785926637717156,
+      "m": 1.0,
+      "low_risk_below": 0.14,
+      "caution_from": 0.14,
+      "inner_cost": 0.533678756476684,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.13,
+          "caution_from": 0.13,
+          "cost": 0.5362694300518135
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.14,
+          "caution_from": 0.14,
+          "cost": 0.533678756476684
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.15,
+          "caution_from": 0.25,
+          "cost": 0.5479274611398963
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.25,
+          "cost": 0.5453367875647669
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.2,
+          "caution_from": 0.2,
+          "cost": 0.5414507772020726
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.5466321243523317
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.2,
+          "caution_from": 0.2,
+          "cost": 0.572538860103627
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.15,
+          "caution_from": 0.2,
+          "cost": 0.5919689119170984
+        }
+      ]
     }
   ],
-  "fusion_C": {
-    "fold1_C": 0.03,
-    "fold2_C": 0.01,
-    "fold3_C": 0.03,
-    "fold4_C": 0.01,
-    "fold5_C": 0.01
-  }
+  "cost_sweep": [
+    {
+      "missed_spike": 3.0,
+      "abstain_multiplier": 0.5,
+      "cutoffs_per_fold": {
+        "1": [
+          0.08,
+          0.39
+        ],
+        "2": [
+          0.13,
+          0.46
+        ],
+        "3": [
+          0.09,
+          0.46
+        ],
+        "4": [
+          0.15,
+          0.45
+        ],
+        "5": [
+          0.14,
+          0.47
+        ]
+      },
+      "cost_reduction": 0.40015479876160986,
+      "share_low_risk": 0.14553014553014554,
+      "share_abstain": 0.6174636174636174,
+      "missed_among_cleared": 0.07142857142857142
+    },
+    {
+      "missed_spike": 3.0,
+      "abstain_multiplier": 1.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.24,
+          0.24
+        ],
+        "2": [
+          0.27,
+          0.27
+        ],
+        "3": [
+          0.2,
+          0.2
+        ],
+        "4": [
+          0.23,
+          0.23
+        ],
+        "5": [
+          0.28,
+          0.28
+        ]
+      },
+      "cost_reduction": 0.22910216718266252,
+      "share_low_risk": 0.43451143451143454,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.15311004784688995
+    },
+    {
+      "missed_spike": 3.0,
+      "abstain_multiplier": 2.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.24,
+          0.24
+        ],
+        "2": [
+          0.27,
+          0.27
+        ],
+        "3": [
+          0.2,
+          0.2
+        ],
+        "4": [
+          0.23,
+          0.23
+        ],
+        "5": [
+          0.28,
+          0.28
+        ]
+      },
+      "cost_reduction": 0.16408668730650144,
+      "share_low_risk": 0.43451143451143454,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.15311004784688995
+    },
+    {
+      "missed_spike": 3.0,
+      "abstain_multiplier": 4.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.24,
+          0.24
+        ],
+        "2": [
+          0.27,
+          0.27
+        ],
+        "3": [
+          0.2,
+          0.2
+        ],
+        "4": [
+          0.23,
+          0.23
+        ],
+        "5": [
+          0.28,
+          0.28
+        ]
+      },
+      "cost_reduction": 0.034055727554179516,
+      "share_low_risk": 0.43451143451143454,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.15311004784688995
+    },
+    {
+      "missed_spike": 5.0,
+      "abstain_multiplier": 0.5,
+      "cutoffs_per_fold": {
+        "1": [
+          0.08,
+          0.39
+        ],
+        "2": [
+          0.1,
+          0.46
+        ],
+        "3": [
+          0.07,
+          0.46
+        ],
+        "4": [
+          0.04,
+          0.45
+        ],
+        "5": [
+          0.09,
+          0.47
+        ]
+      },
+      "cost_reduction": 0.3722910216718266,
+      "share_low_risk": 0.08316008316008316,
+      "share_abstain": 0.6798336798336798,
+      "missed_among_cleared": 0.075
+    },
+    {
+      "missed_spike": 5.0,
+      "abstain_multiplier": 1.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.21,
+          0.21
+        ],
+        "2": [
+          0.13,
+          0.23
+        ],
+        "3": [
+          0.13,
+          0.2
+        ],
+        "4": [
+          0.15,
+          0.17
+        ],
+        "5": [
+          0.14,
+          0.14
+        ]
+      },
+      "cost_reduction": 0.14396284829721362,
+      "share_low_risk": 0.22661122661122662,
+      "share_abstain": 0.13721413721413722,
+      "missed_among_cleared": 0.07339449541284404
+    },
+    {
+      "missed_spike": 5.0,
+      "abstain_multiplier": 2.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.21,
+          0.21
+        ],
+        "2": [
+          0.23,
+          0.23
+        ],
+        "3": [
+          0.13,
+          0.13
+        ],
+        "4": [
+          0.15,
+          0.15
+        ],
+        "5": [
+          0.14,
+          0.14
+        ]
+      },
+      "cost_reduction": 0.03095975232198145,
+      "share_low_risk": 0.2661122661122661,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.1171875
+    },
+    {
+      "missed_spike": 5.0,
+      "abstain_multiplier": 4.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.21,
+          0.21
+        ],
+        "2": [
+          0.23,
+          0.23
+        ],
+        "3": [
+          0.13,
+          0.13
+        ],
+        "4": [
+          0.15,
+          0.15
+        ],
+        "5": [
+          0.14,
+          0.14
+        ]
+      },
+      "cost_reduction": -0.09907120743034059,
+      "share_low_risk": 0.2661122661122661,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.1171875
+    },
+    {
+      "missed_spike": 7.0,
+      "abstain_multiplier": 0.5,
+      "cutoffs_per_fold": {
+        "1": [
+          0.08,
+          0.39
+        ],
+        "2": [
+          0.03,
+          0.46
+        ],
+        "3": [
+          0.02,
+          0.46
+        ],
+        "4": [
+          0.04,
+          0.45
+        ],
+        "5": [
+          0.03,
+          0.47
+        ]
+      },
+      "cost_reduction": 0.36842105263157887,
+      "share_low_risk": 0.018711018711018712,
+      "share_abstain": 0.7442827442827443,
+      "missed_among_cleared": 0.1111111111111111
+    },
+    {
+      "missed_spike": 7.0,
+      "abstain_multiplier": 1.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.08,
+          0.21
+        ],
+        "2": [
+          0.1,
+          0.23
+        ],
+        "3": [
+          0.07,
+          0.2
+        ],
+        "4": [
+          0.14,
+          0.17
+        ],
+        "5": [
+          0.14,
+          0.14
+        ]
+      },
+      "cost_reduction": 0.06501547987616096,
+      "share_low_risk": 0.11850311850311851,
+      "share_abstain": 0.24532224532224534,
+      "missed_among_cleared": 0.08771929824561403
+    },
+    {
+      "missed_spike": 7.0,
+      "abstain_multiplier": 2.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.21,
+          0.21
+        ],
+        "2": [
+          0.13,
+          0.13
+        ],
+        "3": [
+          0.09,
+          0.09
+        ],
+        "4": [
+          0.15,
+          0.15
+        ],
+        "5": [
+          0.14,
+          0.14
+        ]
+      },
+      "cost_reduction": 0.021671826625386914,
+      "share_low_risk": 0.20582120582120583,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.08080808080808081
+    },
+    {
+      "missed_spike": 7.0,
+      "abstain_multiplier": 4.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.21,
+          0.21
+        ],
+        "2": [
+          0.13,
+          0.13
+        ],
+        "3": [
+          0.09,
+          0.09
+        ],
+        "4": [
+          0.15,
+          0.15
+        ],
+        "5": [
+          0.14,
+          0.14
+        ]
+      },
+      "cost_reduction": -0.10835913312693513,
+      "share_low_risk": 0.20582120582120583,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.08080808080808081
+    },
+    {
+      "missed_spike": 10.0,
+      "abstain_multiplier": 0.5,
+      "cutoffs_per_fold": {
+        "1": [
+          0.03,
+          0.39
+        ],
+        "2": [
+          0.03,
+          0.46
+        ],
+        "3": [
+          0.02,
+          0.46
+        ],
+        "4": [
+          0.04,
+          0.45
+        ],
+        "5": [
+          0.03,
+          0.47
+        ]
+      },
+      "cost_reduction": 0.38235294117647056,
+      "share_low_risk": 0.004158004158004158,
+      "share_abstain": 0.7588357588357588,
+      "missed_among_cleared": 0.0
+    },
+    {
+      "missed_spike": 10.0,
+      "abstain_multiplier": 1.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.08,
+          0.21
+        ],
+        "2": [
+          0.1,
+          0.23
+        ],
+        "3": [
+          0.07,
+          0.2
+        ],
+        "4": [
+          0.04,
+          0.17
+        ],
+        "5": [
+          0.09,
+          0.14
+        ]
+      },
+      "cost_reduction": 0.04489164086687303,
+      "share_low_risk": 0.08316008316008316,
+      "share_abstain": 0.2806652806652807,
+      "missed_among_cleared": 0.075
+    },
+    {
+      "missed_spike": 10.0,
+      "abstain_multiplier": 2.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.08,
+          0.08
+        ],
+        "2": [
+          0.1,
+          0.1
+        ],
+        "3": [
+          0.07,
+          0.07
+        ],
+        "4": [
+          0.14,
+          0.14
+        ],
+        "5": [
+          0.14,
+          0.14
+        ]
+      },
+      "cost_reduction": -0.08049535603715174,
+      "share_low_risk": 0.11850311850311851,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.08771929824561403
+    },
+    {
+      "missed_spike": 10.0,
+      "abstain_multiplier": 4.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.08,
+          0.08
+        ],
+        "2": [
+          0.1,
+          0.1
+        ],
+        "3": [
+          0.07,
+          0.07
+        ],
+        "4": [
+          0.14,
+          0.14
+        ],
+        "5": [
+          0.14,
+          0.14
+        ]
+      },
+      "cost_reduction": -0.21052631578947367,
+      "share_low_risk": 0.11850311850311851,
+      "share_abstain": 0.04365904365904366,
+      "missed_among_cleared": 0.08771929824561403
+    }
+  ]
 }
