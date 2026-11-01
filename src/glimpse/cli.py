@@ -139,12 +139,12 @@ def _final(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
 
 
 def _amend(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
-    """Freeze the amended decision cut-offs before the test is opened (Step 5b)."""
-    from glimpse.data.splits import Splits
-    from glimpse.run_evaluation import amend_thresholds
-
-    amend_thresholds(Splits.load(Path("splits/dev_splits.json")), cfg)
-    return 0
+    """Decision cut-offs are being rebuilt on partition v2 (S5, design D4)."""
+    logger.bind(stage="thresholds").error(
+        "the cut-off amendment is being rebuilt on partition v2 (S5, design D4: minimum expected cost on "
+        "recalibrated inner-fold risk). The intermediate-stage amendment is commit 983dbbb."
+    )
+    return 2
 
 
 def _photo_seeds(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
@@ -158,22 +158,21 @@ def _photo_seeds(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
 
 
 def _recalibrate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
-    """Validation-chosen cut-offs on Platt-recalibrated risk, checked on CV without the test people (no test labels)."""
-    from glimpse.data.dataset import MealDataset
-    from glimpse.data.splits import Splits
-    from glimpse.recalibrate import run_recalibration
-
-    run_recalibration(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
-    return 0
+    """Recalibration is being rebuilt on partition v2 (S5, designs D3/D4)."""
+    logger.bind(stage="recalibrate").error(
+        "recalibration is being rebuilt on partition v2 (S5: Platt on inner-fold out-of-fold risk, then the "
+        "per-person expanding-window intercept). The intermediate-stage version is commit 983dbbb."
+    )
+    return 2
 
 
 def _evaluate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
-    """Main estimate, research questions, calibration, usefulness, fixed test (once), targets, figures."""
+    """Development evaluation on partition v2: every risk from Pipeline.answer, one Pipeline per fold (D2)."""
     from glimpse.data.dataset import MealDataset
-    from glimpse.data.splits import Splits
-    from glimpse.run_evaluation import run_evaluation
+    from glimpse.data.splits import SplitsV2
+    from glimpse.evaluation.run import evaluate_dev
 
-    run_evaluation(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
+    evaluate_dev(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
     return 0
 
 
@@ -206,18 +205,6 @@ def _predict_folder(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     from glimpse.serve.folder import predict_folder
 
     predict_folder(Pipeline(cfg), args.in_dir, args.out_dir)
-    return 0
-
-
-def _evaluate_dev(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
-    """Development evaluation on partition v2: every risk from Pipeline.answer, one Pipeline per fold (D2)."""
-    from pathlib import Path
-
-    from glimpse.data.dataset import MealDataset
-    from glimpse.data.splits import SplitsV2
-    from glimpse.evaluation.run import evaluate_dev
-
-    evaluate_dev(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
     return 0
 
 
@@ -278,7 +265,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("fusion", help="add photo / logged carbs to profile + trend, with controls (Step 4c-3)")
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
-    sub.add_parser("evaluate", help="full evaluation into outputs/evaluation/ (scores the fixed test once)")
+    sub.add_parser("evaluate", help="dev evaluation on partition v2: every risk from Pipeline.answer per fold")
     sub.add_parser("photo-seeds", help="retrain the final photo model with 2 more seeds; validation spread only")
     sub.add_parser(
         "recalibrate", help="validation-chosen cut-offs on recalibrated risk, checked on CV (no test labels)"
@@ -296,7 +283,6 @@ def main(argv: list[str] | None = None) -> int:
     pf.add_argument("in_dir", help="folder with one sub-folder per meal")
     pf.add_argument("out_dir", help="where results.jsonl and summary.md are written")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
-    sub.add_parser("evaluate-dev", help="dev evaluation on partition v2: risks from Pipeline.answer per fold")
     sub.add_parser("selftest", help="check the frozen pipeline loads offline and runs (no dataset needed)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
@@ -330,7 +316,6 @@ def main(argv: list[str] | None = None) -> int:
         "predict": _predict,
         "predict-folder": _predict_folder,
         "splits-v2": _splits_v2,
-        "evaluate-dev": _evaluate_dev,
         "selftest": _selftest,
     }
     return commands[args.command](cfg, args)

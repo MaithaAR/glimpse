@@ -16,6 +16,7 @@ from glimpse.evaluation.metrics import (
     person_bootstrap_ci,
     person_folds,
     reliability,
+    status,
     usefulness_report,
 )
 
@@ -33,5 +34,6 @@ __all__ = [
     "person_bootstrap_ci",
     "person_folds",
     "reliability",
+    "status",
     "usefulness_report",
 ]

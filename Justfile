@@ -19,10 +19,6 @@ prepare:
 splits-v2:
     uv run glimpse splits-v2
 
-# development evaluation on partition v2 (D2): every risk comes from Pipeline.answer, one Pipeline per fold
-evaluate-dev:
-    uv run glimpse evaluate-dev
-
 # run the test suite
 test:
     uv run pytest
@@ -74,11 +70,11 @@ fusion:
 train-final:
     uv run glimpse final
 
-# freeze the amended decision cut-offs (main = from the costs alone) before the test is opened; then commit them
+# cut-off amendment: being rebuilt on partition v2 (S5, D4); the command says so and exits
 amend-thresholds:
     uv run glimpse amend-thresholds
 
-# full evaluation -> outputs/evaluation/ (run `just cv` first if the C grid changed; scores the fixed test once)
+# development evaluation on partition v2 (D2): every risk comes from Pipeline.answer, one Pipeline per fold
 evaluate:
     uv run glimpse evaluate
 
@@ -86,7 +82,7 @@ evaluate:
 photo-seeds:
     uv run glimpse photo-seeds
 
-# validation-chosen cut-offs on Platt-recalibrated risk, checked on CV without the test people (uses no test labels)
+# recalibration: being rebuilt on partition v2 (S5, D3/D4); the command says so and exits
 recalibrate:
     uv run glimpse recalibrate
 

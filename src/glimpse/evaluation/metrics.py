@@ -183,3 +183,15 @@ def apply_platt(p: np.ndarray, slope: float, intercept: float) -> np.ndarray:
 def _logit(p: np.ndarray) -> np.ndarray:
     q = np.clip(np.asarray(p, dtype=float), 1e-6, 1 - 1e-6)
     return np.log(q / (1 - q))
+
+
+def status(point: float, lo: float, hi: float, ok, lower_bound_rule: bool = False) -> str:
+    """met = the whole 95% range meets the target; on track = only the estimate does; otherwise at risk.
+
+    A lower-bound rule (RQ1 non-inferiority, RQ2 superiority) is judged on the lower end of the range only.
+    """
+    if lower_bound_rule:
+        return "met" if ok(lo) else "at risk"
+    if ok(lo) and ok(hi):
+        return "met"
+    return "on track" if ok(point) else "at risk"

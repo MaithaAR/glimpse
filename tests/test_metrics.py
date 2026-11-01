@@ -3,8 +3,7 @@
 import numpy as np
 
 from glimpse.config import load_config
-from glimpse.evaluation import person_bootstrap_ci, reliability
-from glimpse.run_evaluation import _status
+from glimpse.evaluation import person_bootstrap_ci, reliability, status
 from glimpse.training.final import cost_dict
 from glimpse.training.thresholds import cost_only_thresholds
 
@@ -40,9 +39,9 @@ def test_reliability_of_honest_probabilities_is_near_zero():
 def test_status_rule():
     """met = whole range meets; on track = estimate only; otherwise at risk."""
     ok = lambda v: v > 0  # noqa: E731
-    assert _status(0.05, 0.01, 0.09, ok) == "met"
-    assert _status(0.05, -0.01, 0.09, ok) == "on track"
-    assert _status(-0.01, -0.05, 0.02, ok) == "at risk"
+    assert status(0.05, 0.01, 0.09, ok) == "met"
+    assert status(0.05, -0.01, 0.09, ok) == "on track"
+    assert status(-0.01, -0.05, 0.02, ok) == "at risk"
     # lower-bound rules (RQ1, RQ2) look only at the lower end: a positive estimate with a range crossing 0 is at risk
-    assert _status(0.002, -0.016, 0.022, ok, lower_bound_rule=True) == "at risk"
-    assert _status(0.007, -0.020, 0.032, lambda v: v > -0.03, lower_bound_rule=True) == "met"
+    assert status(0.002, -0.016, 0.022, ok, lower_bound_rule=True) == "at risk"
+    assert status(0.007, -0.020, 0.032, lambda v: v > -0.03, lower_bound_rule=True) == "met"
