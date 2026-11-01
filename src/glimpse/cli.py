@@ -209,6 +209,21 @@ def _predict_folder(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _splits_v2(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Partition v2 (design D1): dev folds + training-only T2D + locked, with the asserted reconciliation."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import Splits, make_splits_v2, reconciliation_v2
+
+    ds = MealDataset.load(Path("data/dataset"))
+    sp = make_splits_v2(ds, cfg)
+    sp.save(Path("splits/dev_splits_v2.json"))
+    Path("splits/reconciliation.md").write_text(reconciliation_v2(ds, Splits.load(Path("splits/dev_splits.json")), sp))
+    logger.bind(stage="splits").info("splits/dev_splits_v2.json and splits/reconciliation.md written")
+    return 0
+
+
 def _selftest(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Check that every frozen part loads offline and the full path runs (used inside the container)."""
     from glimpse.demo_cases import selftest
@@ -267,6 +282,7 @@ def main(argv: list[str] | None = None) -> int:
     pf = sub.add_parser("predict-folder", help="answer every meal folder under IN (photo.*, cgm.csv, profile.json)")
     pf.add_argument("in_dir", help="folder with one sub-folder per meal")
     pf.add_argument("out_dir", help="where results.jsonl and summary.md are written")
+    sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
     sub.add_parser("selftest", help="check the frozen pipeline loads offline and runs (no dataset needed)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
@@ -299,6 +315,7 @@ def main(argv: list[str] | None = None) -> int:
         "demo": _demo,
         "predict": _predict,
         "predict-folder": _predict_folder,
+        "splits-v2": _splits_v2,
         "selftest": _selftest,
     }
     return commands[args.command](cfg, args)

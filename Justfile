@@ -15,6 +15,10 @@ install:
 prepare:
     uv run glimpse prepare
 
+# partition v2 (final stage): splits/dev_splits_v2.json + the asserted meal-level reconciliation
+splits-v2:
+    uv run glimpse splits-v2
+
 # run the test suite
 test:
     uv run pytest

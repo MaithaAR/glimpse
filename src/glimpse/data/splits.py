@@ -107,3 +107,114 @@ def save_split_outputs(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> None:
     out.mkdir(parents=True, exist_ok=True)
     split_table(ds, sp).to_csv(out / "split_table.csv", index=False)
     (out / "split_people.json").write_text(json.dumps(sp.model_dump(), indent=2))
+
+
+class SplitsV2(BaseModel):
+    """Partition v2 (design D1, final stage): no fixed validation or test group. Each of the dev folds is
+    held out once (development estimate); the inner folds inside a fold's training targets are the
+    validation split for every selection. Type 2 diabetes people train in every fold, are never scored,
+    and never sit on an inner validation side. The locked people are scored once, at the very end."""
+
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
+    seed: int
+    locked: list[int]
+    dev_folds: list[list[int]]  # target development people; each fold held out once
+    t2d: list[int]  # training-only people, in every fold's training set
+    inner_folds: list[list[list[int]]]  # [outer fold][inner fold] -> that fold's training TARGETS only
+
+    @model_validator(mode="after")
+    def _partition(self) -> SplitsV2:
+        """Locked, dev and T2D are disjoint; every dev person sits in exactly one fold; each fold's inner
+        folds partition exactly the dev targets outside that fold (T2D never on a validation side)."""
+        dev = [p for f in self.dev_folds for p in f]
+        if len(dev) != len(set(dev)):
+            raise ValueError("a development person appears in more than one fold")
+        for a, b in (("locked", "dev"), ("locked", "t2d"), ("dev", "t2d")):
+            x = {"locked": set(self.locked), "dev": set(dev), "t2d": set(self.t2d)}
+            if x[a] & x[b]:
+                raise ValueError(f"{a} and {b} share people: {sorted(x[a] & x[b])}")
+        for k, inner in enumerate(self.inner_folds):
+            expect = set(dev) - set(self.dev_folds[k])
+            flat = [p for f in inner for p in f]
+            if len(flat) != len(set(flat)) or set(flat) != expect:
+                raise ValueError(f"inner folds of fold {k + 1} do not partition its training targets")
+        return self
+
+    def training_people(self, k: int) -> list[int]:
+        """Everyone fold k trains on: the dev targets outside the fold plus every T2D person."""
+        dev = [p for j, f in enumerate(self.dev_folds) if j != k for p in f]
+        return sorted(dev + list(self.t2d))
+
+    def save(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(self.model_dump_json(indent=2) + "\n")
+
+    @classmethod
+    def load(cls, path: Path) -> SplitsV2:
+        return cls.model_validate_json(Path(path).read_text())
+
+
+def make_splits_v2(ds: MealDataset, cfg: GlimpseConfig) -> SplitsV2:
+    """Seeded partition v2: same folds on every run with the same seed and dataset."""
+    locked = sorted(load_locked_set(cfg.splits.locked_file))
+    group = {s.person_id: s.group for s in ds.samples}
+    dev = sorted(set(group) - set(locked))
+    target = [p for p in dev if group[p] in cfg.cohort.target_groups]
+    t2d = sorted(p for p in dev if p not in target)
+    rng = np.random.default_rng(cfg.seed)
+    folds = _folds(target, cfg.cv.outer_folds, rng)
+    inner = [_folds(sorted(set(target) - set(f)), cfg.cv.inner_folds, rng) for f in folds]
+    return SplitsV2(seed=cfg.seed, locked=locked, dev_folds=folds, t2d=t2d, inner_folds=inner)
+
+
+def assert_not_locked(people, locked, context: str) -> None:
+    """Structural guard: any locked person reaching a development data path is a hard error. The locked set
+    is scored once, at the end, through its own recipe -- never as a side effect."""
+    hit = sorted(set(people) & set(locked))
+    if hit:
+        raise RuntimeError(f"{context}: locked people {hit} must never be loaded here; "
+                           f"they are scored once, at the final locked-set run")  # fmt: skip
+
+
+def reconciliation_v2(ds: MealDataset, old: Splits, new: SplitsV2) -> str:
+    """The meal-level accounting that makes partition v2 checkable: every development meal is scored in
+    exactly one held-out fold, fold training and held-out meals never overlap, T2D and locked people are
+    never scored. Raises on any violation; returns the markdown that is committed as splits/reconciliation.md."""
+    y = ds.labels()
+    held = [meal_rows(ds, set(f), scored_only=True) for f in new.dev_folds]
+    all_scored = meal_rows(ds, {p for f in new.dev_folds for p in f}, scored_only=True)
+    flat = np.concatenate(held)
+    if len(flat) != len(set(flat.tolist())) or set(flat.tolist()) != set(all_scored.tolist()):
+        raise RuntimeError("held-out fold meals do not cover every development meal exactly once")
+    for k in range(len(new.dev_folds)):
+        tr = meal_rows(ds, set(new.training_people(k)), scored_only=False)
+        if set(tr.tolist()) & set(held[k].tolist()):
+            raise RuntimeError(f"fold {k + 1}: training meals overlap its held-out meals")
+        assert_not_locked(new.training_people(k) + new.dev_folds[k], new.locked, f"fold {k + 1}")
+    where = {p: k + 1 for k, f in enumerate(new.dev_folds) for p in f}
+    lines = ["# Partition v2 reconciliation", "",
+             "Generated by `just splits-v2`; every statement below is asserted in code before this file is",
+             "written. Design decision D1 in docs/final_design.md.", "",
+             f"- development meals scored exactly once across the {len(new.dev_folds)} folds: "
+             f"{len(flat)} held-out meals = {len(all_scored)} isolated development meals, no meal twice",
+             "- no fold's training meals overlap its held-out meals (checked at meal level, not person level)",
+             f"- type 2 diabetes people ({len(new.t2d)}) train in every fold, are never scored, and never sit",
+             "  on an inner validation side (inner folds partition target training people only)",
+             f"- locked people ({len(new.locked)}): never loaded by any development recipe (structural guard",
+             "  `assert_not_locked`); scored once at the final locked-set run",
+             "", "## Fold sizes", "", "| fold | people | held-out meals | spike rate | training people |",
+             "|---|---|---|---|---|"]  # fmt: skip
+    for k, f in enumerate(new.dev_folds):
+        r = held[k]
+        lines.append(f"| {k + 1} | {len(f)} | {len(r)} | {float(y[r].mean()):.3f} | "
+                     f"{len(new.training_people(k))} |")  # fmt: skip
+    lines += ["", "## Where the intermediate's fixed groups landed", "",
+              "The intermediate's 4-person validation and 5-person test groups dissolve into development",
+              "(D1); their labels informed the intermediate's calibration diagnosis, so development numbers",
+              "are optimistic and the locked set is the only clean measurement.", "",
+              "| person | was | now in fold |", "|---|---|---|"]  # fmt: skip
+    for p in sorted(old.test):
+        lines.append(f"| {p} | test (intermediate, scored once) | {where[p]} |")
+    for p in sorted(old.validation):
+        lines.append(f"| {p} | validation (intermediate) | {where[p]} |")
+    return "\n".join(lines) + "\n"
