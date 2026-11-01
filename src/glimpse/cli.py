@@ -208,6 +208,18 @@ def _predict_folder(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _robustness(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """S9: decision-flip rates under the four pre-registered input perturbations."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.robustness import run_robustness
+
+    run_robustness(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _ood(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """S10: score the real phone photos under the unfamiliar-photo check and re-choose the cut (rule R7)."""
     from glimpse.studies.ood import run_ood
@@ -315,6 +327,7 @@ def main(argv: list[str] | None = None) -> int:
     pf.add_argument("out_dir", help="where results.jsonl and summary.md are written")
     sub.add_parser("ablate", help="D8 profile-excluded split + input-channel ablations (run `fusion` first)")
     sub.add_parser("wandb-export", help="offline W&B runs from every history CSV and summary in outputs/")
+    sub.add_parser("robustness", help="decision-flip rates under CGM dropout/gap and photo blur/dark (S9)")
     od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
@@ -353,6 +366,7 @@ def main(argv: list[str] | None = None) -> int:
         "ablate": _ablate,
         "wandb-export": _wandb_export,
         "ood": _ood,
+        "robustness": _robustness,
         "splits-v2": _splits_v2,
         "selftest": _selftest,
     }

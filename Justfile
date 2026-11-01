@@ -78,6 +78,10 @@ wandb-export:
 ood *ARGS:
     uv run glimpse ood {{ARGS}}
 
+# S9: decision-flip rates under the four pre-registered perturbations (CGM dropout/gap, photo blur/dark)
+robustness:
+    uv run glimpse robustness
+
 # final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
 train-final:
     uv run glimpse final
