@@ -1,0 +1,482 @@
+fold,row,person_id,spike,risk,decision,carb_source,reason
+1,543,15,0,0.03522761031086802,low risk,photo,risk 4% is below the low-risk cut-off 14%
+1,545,15,1,0.23151222764463034,caution,photo,risk 23% is at or above the caution cut-off 20%
+1,546,15,0,0.4441293694777253,caution,photo,risk 44% is at or above the caution cut-off 20%
+1,548,15,0,,can't judge,none,no precomputed photo estimate for this meal
+1,549,15,0,0.506873785673989,caution,photo,risk 51% is at or above the caution cut-off 20%
+1,550,15,0,0.29883760422150485,caution,photo,risk 30% is at or above the caution cut-off 20%
+1,551,15,0,0.22948547847656697,caution,photo,risk 23% is at or above the caution cut-off 20%
+1,553,15,0,0.2571069430506611,caution,photo,risk 26% is at or above the caution cut-off 20%
+1,554,15,0,0.31088045244673806,caution,photo,risk 31% is at or above the caution cut-off 20%
+1,555,15,1,0.43400805823529304,caution,photo,risk 43% is at or above the caution cut-off 20%
+1,557,15,0,0.13853814997314073,low risk,photo,risk 14% is below the low-risk cut-off 14%
+1,559,15,0,0.1864888031116677,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+1,560,15,0,0.49142302319782255,caution,photo,risk 49% is at or above the caution cut-off 20%
+1,561,15,0,0.19060888571305296,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+1,562,15,0,0.2147209040579795,caution,photo,risk 21% is at or above the caution cut-off 20%
+1,564,15,0,0.21011733560346824,caution,photo,risk 21% is at or above the caution cut-off 20%
+1,565,15,1,0.48590597844186467,caution,photo,risk 49% is at or above the caution cut-off 20%
+1,566,15,0,0.06477905127895124,low risk,photo,risk 6% is below the low-risk cut-off 14%
+1,571,15,0,0.21116100787278452,caution,photo,risk 21% is at or above the caution cut-off 20%
+1,573,15,0,0.24507838771397705,caution,photo,risk 25% is at or above the caution cut-off 20%
+1,574,15,0,0.5197692780762876,caution,photo,risk 52% is at or above the caution cut-off 20%
+1,575,15,1,0.44991785528330047,caution,photo,risk 45% is at or above the caution cut-off 20%
+1,576,15,0,0.397575946577779,caution,photo,risk 40% is at or above the caution cut-off 20%
+1,577,15,0,0.434233218180684,caution,photo,risk 43% is at or above the caution cut-off 20%
+1,683,19,0,0.16089933741649762,can't judge,photo,"the risk (16%) is borderline, between 14% and 20%"
+1,684,19,0,0.3348644319243034,caution,photo,risk 33% is at or above the caution cut-off 20%
+1,685,19,0,0.21609390622075617,caution,photo,risk 22% is at or above the caution cut-off 20%
+1,688,19,0,0.11686166677258537,low risk,photo,risk 12% is below the low-risk cut-off 14%
+1,690,19,0,,can't judge,none,no precomputed photo estimate for this meal
+1,692,19,0,0.1054077569158785,low risk,photo,risk 11% is below the low-risk cut-off 14%
+1,693,19,0,0.3409326355370694,caution,photo,risk 34% is at or above the caution cut-off 20%
+1,694,19,0,0.25921052470665906,caution,photo,risk 26% is at or above the caution cut-off 20%
+1,696,19,0,0.18963876853157802,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+1,697,19,0,0.2774019082047022,caution,photo,risk 28% is at or above the caution cut-off 20%
+1,698,19,0,0.11137210478265663,low risk,photo,risk 11% is below the low-risk cut-off 14%
+1,699,19,1,0.15178605184553526,can't judge,photo,"the risk (15%) is borderline, between 14% and 20%"
+1,700,19,0,0.07738756937098298,low risk,photo,risk 8% is below the low-risk cut-off 14%
+1,701,19,0,0.33385090836017495,caution,photo,risk 33% is at or above the caution cut-off 20%
+1,702,19,0,0.15879746198488265,can't judge,photo,"the risk (16%) is borderline, between 14% and 20%"
+1,704,19,0,0.3663821986186589,caution,photo,risk 37% is at or above the caution cut-off 20%
+1,705,19,1,0.3812097393994275,caution,photo,risk 38% is at or above the caution cut-off 20%
+1,744,21,1,0.6818547146379664,caution,photo,risk 68% is at or above the caution cut-off 20%
+1,745,21,1,0.7330201652837156,caution,photo,risk 73% is at or above the caution cut-off 20%
+1,746,21,0,0.4287630087243727,caution,photo,risk 43% is at or above the caution cut-off 20%
+1,747,21,0,0.5462655441055956,caution,photo,risk 55% is at or above the caution cut-off 20%
+1,748,21,0,0.671809739686085,caution,photo,risk 67% is at or above the caution cut-off 20%
+1,749,21,0,0.5609448308125105,caution,photo,risk 56% is at or above the caution cut-off 20%
+1,750,21,1,0.7295362974014729,caution,photo,risk 73% is at or above the caution cut-off 20%
+1,751,21,1,0.6158798159964479,caution,photo,risk 62% is at or above the caution cut-off 20%
+1,752,21,1,0.7389416541689674,caution,photo,risk 74% is at or above the caution cut-off 20%
+1,753,21,0,0.4903675108001978,caution,photo,risk 49% is at or above the caution cut-off 20%
+1,754,21,0,0.7065744320058975,caution,photo,risk 71% is at or above the caution cut-off 20%
+1,755,21,0,0.36181674625310023,caution,photo,risk 36% is at or above the caution cut-off 20%
+1,758,21,0,0.2588597484559462,caution,photo,risk 26% is at or above the caution cut-off 20%
+1,759,21,0,0.45442656484910926,caution,photo,risk 45% is at or above the caution cut-off 20%
+1,760,21,1,0.7250389652627098,caution,photo,risk 73% is at or above the caution cut-off 20%
+1,761,21,1,0.7043610344706511,caution,photo,risk 70% is at or above the caution cut-off 20%
+1,966,31,0,0.42505743989008854,caution,photo,risk 43% is at or above the caution cut-off 20%
+1,967,31,0,0.10487898728444126,low risk,photo,risk 10% is below the low-risk cut-off 14%
+1,968,31,0,0.13830273412543925,low risk,photo,risk 14% is below the low-risk cut-off 14%
+1,969,31,0,0.4083755963946842,caution,photo,risk 41% is at or above the caution cut-off 20%
+1,970,31,0,0.38353696852171787,caution,photo,risk 38% is at or above the caution cut-off 20%
+1,971,31,0,0.16816849112959004,can't judge,photo,"the risk (17%) is borderline, between 14% and 20%"
+1,972,31,1,0.49515052215852995,caution,photo,risk 50% is at or above the caution cut-off 20%
+1,973,31,0,0.33045528465896246,caution,photo,risk 33% is at or above the caution cut-off 20%
+1,977,31,0,,can't judge,none,no precomputed photo estimate for this meal
+1,978,31,0,0.40376649235613715,caution,photo,risk 40% is at or above the caution cut-off 20%
+1,979,31,0,0.13985076553516565,low risk,photo,risk 14% is below the low-risk cut-off 14%
+1,981,31,0,0.10813899539173194,low risk,photo,risk 11% is below the low-risk cut-off 14%
+1,982,31,0,,can't judge,none,no precomputed photo estimate for this meal
+1,983,31,0,0.504537547958297,caution,photo,risk 50% is at or above the caution cut-off 20%
+1,984,31,0,0.196970795401323,can't judge,photo,"the risk (20%) is borderline, between 14% and 20%"
+1,986,31,0,,can't judge,none,no precomputed photo estimate for this meal
+1,987,31,0,0.5049731252847363,caution,photo,risk 50% is at or above the caution cut-off 20%
+1,988,31,1,0.4207368582519895,caution,photo,risk 42% is at or above the caution cut-off 20%
+1,989,31,0,0.13250536627425802,low risk,photo,risk 13% is below the low-risk cut-off 14%
+1,992,31,0,0.21037739368548458,caution,photo,risk 21% is at or above the caution cut-off 20%
+1,1023,33,1,0.371231452522406,caution,photo,risk 37% is at or above the caution cut-off 20%
+1,1024,33,1,0.08042639678286961,low risk,photo,risk 8% is below the low-risk cut-off 14%
+1,1025,33,1,0.42148386880628885,caution,photo,risk 42% is at or above the caution cut-off 20%
+1,1026,33,1,0.4037333479556572,caution,photo,risk 40% is at or above the caution cut-off 20%
+1,1027,33,1,0.5807223296395083,caution,photo,risk 58% is at or above the caution cut-off 20%
+1,1028,33,0,0.3453297724295553,caution,photo,risk 35% is at or above the caution cut-off 20%
+1,1029,33,1,0.3213062143383092,caution,photo,risk 32% is at or above the caution cut-off 20%
+1,1030,33,0,0.041407049242905364,low risk,photo,risk 4% is below the low-risk cut-off 14%
+1,1031,33,1,0.2538970851493558,caution,photo,risk 25% is at or above the caution cut-off 20%
+1,1032,33,1,0.5088072859018511,caution,photo,risk 51% is at or above the caution cut-off 20%
+1,1033,33,0,0.09479196974474052,low risk,photo,risk 9% is below the low-risk cut-off 14%
+1,1034,33,1,,can't judge,none,no precomputed photo estimate for this meal
+1,1035,33,0,0.16179093316890747,can't judge,photo,"the risk (16%) is borderline, between 14% and 20%"
+1,1036,33,1,0.5319226287744743,caution,photo,risk 53% is at or above the caution cut-off 20%
+1,1037,33,1,0.07193378102699051,low risk,photo,risk 7% is below the low-risk cut-off 14%
+1,1038,33,0,0.1968354801528129,can't judge,photo,"the risk (20%) is borderline, between 14% and 20%"
+1,1039,33,1,0.42623003887093963,caution,photo,risk 43% is at or above the caution cut-off 20%
+1,1040,33,0,0.5415021662828418,caution,photo,risk 54% is at or above the caution cut-off 20%
+1,1041,33,1,0.4976088327998574,caution,photo,risk 50% is at or above the caution cut-off 20%
+2,230,6,0,0.33375035712260415,caution,photo,risk 33% is at or above the caution cut-off 20%
+2,231,6,0,0.515855622048983,caution,photo,risk 52% is at or above the caution cut-off 20%
+2,232,6,0,0.18304692841449918,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+2,233,6,1,0.30631512045907444,caution,photo,risk 31% is at or above the caution cut-off 20%
+2,234,6,0,0.292826056323532,caution,photo,risk 29% is at or above the caution cut-off 20%
+2,235,6,0,0.4677863969681779,caution,photo,risk 47% is at or above the caution cut-off 20%
+2,237,6,1,0.3140101240425008,caution,photo,risk 31% is at or above the caution cut-off 20%
+2,238,6,0,0.5045704988710906,caution,photo,risk 50% is at or above the caution cut-off 20%
+2,239,6,1,0.45265692850815464,caution,photo,risk 45% is at or above the caution cut-off 20%
+2,241,6,1,0.2340378833341183,caution,photo,risk 23% is at or above the caution cut-off 20%
+2,242,6,0,0.4152888739610372,caution,photo,risk 42% is at or above the caution cut-off 20%
+2,243,6,0,0.1967409277194958,can't judge,photo,"the risk (20%) is borderline, between 14% and 20%"
+2,245,6,0,0.3868020376108685,caution,photo,risk 39% is at or above the caution cut-off 20%
+2,246,6,0,0.2875065812214001,caution,photo,risk 29% is at or above the caution cut-off 20%
+2,247,6,0,0.4124147269308039,caution,photo,risk 41% is at or above the caution cut-off 20%
+2,248,6,0,0.200711006932619,caution,photo,risk 20% is at or above the caution cut-off 20%
+2,249,6,1,0.27752163636536753,caution,photo,risk 28% is at or above the caution cut-off 20%
+2,250,6,0,0.5373488436736628,caution,photo,risk 54% is at or above the caution cut-off 20%
+2,251,6,0,0.3874284236237674,caution,photo,risk 39% is at or above the caution cut-off 20%
+2,254,6,1,0.26310674783426813,caution,photo,risk 26% is at or above the caution cut-off 20%
+2,255,6,0,0.43516576253656114,caution,photo,risk 44% is at or above the caution cut-off 20%
+2,311,9,0,0.38602877360112925,caution,photo,risk 39% is at or above the caution cut-off 20%
+2,313,9,0,0.3313135420475803,caution,photo,risk 33% is at or above the caution cut-off 20%
+2,314,9,0,0.3137171684607215,caution,photo,risk 31% is at or above the caution cut-off 20%
+2,315,9,0,0.29212091025453857,caution,photo,risk 29% is at or above the caution cut-off 20%
+2,316,9,0,0.22156708139762754,caution,photo,risk 22% is at or above the caution cut-off 20%
+2,318,9,0,0.23619468974995653,caution,photo,risk 24% is at or above the caution cut-off 20%
+2,319,9,0,0.3009276404498705,caution,photo,risk 30% is at or above the caution cut-off 20%
+2,320,9,0,0.4505519752747574,caution,photo,risk 45% is at or above the caution cut-off 20%
+2,321,9,0,0.47319696734751304,caution,photo,risk 47% is at or above the caution cut-off 20%
+2,323,9,0,0.20120334511768095,caution,photo,risk 20% is at or above the caution cut-off 20%
+2,324,9,0,0.3356708145642035,caution,photo,risk 34% is at or above the caution cut-off 20%
+2,325,9,0,0.38167726608924213,caution,photo,risk 38% is at or above the caution cut-off 20%
+2,326,9,0,0.27853406412652587,caution,photo,risk 28% is at or above the caution cut-off 20%
+2,328,9,0,0.18628533492181568,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+2,329,9,0,0.3118158424444696,caution,photo,risk 31% is at or above the caution cut-off 20%
+2,330,9,0,0.1441572109417713,can't judge,photo,"the risk (14%) is borderline, between 14% and 20%"
+2,331,9,0,0.18837623184761193,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+2,332,9,0,0.28388045216554064,caution,photo,risk 28% is at or above the caution cut-off 20%
+2,333,9,0,0.2686607046171808,caution,photo,risk 27% is at or above the caution cut-off 20%
+2,334,9,0,0.23410873296360024,caution,photo,risk 23% is at or above the caution cut-off 20%
+2,335,9,1,0.13236486197609276,low risk,photo,risk 13% is below the low-risk cut-off 14%
+2,336,9,0,0.07322179350024448,low risk,photo,risk 7% is below the low-risk cut-off 14%
+2,337,9,0,0.33499834549325186,caution,photo,risk 33% is at or above the caution cut-off 20%
+2,338,9,0,0.5559894146442617,caution,photo,risk 56% is at or above the caution cut-off 20%
+2,339,9,1,0.33053112661706213,caution,photo,risk 33% is at or above the caution cut-off 20%
+2,352,10,1,0.4169990019535268,caution,photo,risk 42% is at or above the caution cut-off 20%
+2,353,10,0,0.3727779955326976,caution,photo,risk 37% is at or above the caution cut-off 20%
+2,354,10,0,0.6353475419759104,caution,photo,risk 64% is at or above the caution cut-off 20%
+2,355,10,0,0.32917944064143095,caution,photo,risk 33% is at or above the caution cut-off 20%
+2,358,10,0,0.3843542479106976,caution,photo,risk 38% is at or above the caution cut-off 20%
+2,359,10,0,0.34834378845422637,caution,photo,risk 35% is at or above the caution cut-off 20%
+2,360,10,0,0.580137080370541,caution,photo,risk 58% is at or above the caution cut-off 20%
+2,361,10,0,0.5868450875851469,caution,photo,risk 59% is at or above the caution cut-off 20%
+2,362,10,0,0.4003328395883128,caution,photo,risk 40% is at or above the caution cut-off 20%
+2,363,10,0,0.4076695557163457,caution,photo,risk 41% is at or above the caution cut-off 20%
+2,364,10,1,0.5856525339456985,caution,photo,risk 59% is at or above the caution cut-off 20%
+2,365,10,0,0.4115808618269139,caution,photo,risk 41% is at or above the caution cut-off 20%
+2,366,10,1,0.6112567426735342,caution,photo,risk 61% is at or above the caution cut-off 20%
+2,368,10,0,0.4803622011034519,caution,photo,risk 48% is at or above the caution cut-off 20%
+2,369,10,0,0.5976735881858487,caution,photo,risk 60% is at or above the caution cut-off 20%
+2,370,10,0,0.22350077098870513,caution,photo,risk 22% is at or above the caution cut-off 20%
+2,372,10,0,0.410139549570127,caution,photo,risk 41% is at or above the caution cut-off 20%
+2,373,10,1,0.6611611031504894,caution,photo,risk 66% is at or above the caution cut-off 20%
+2,374,10,1,0.35550640536881295,caution,photo,risk 36% is at or above the caution cut-off 20%
+2,376,10,0,0.1823662744220636,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+2,377,10,0,0.23292977929316427,caution,photo,risk 23% is at or above the caution cut-off 20%
+2,378,10,0,0.5561831330141269,caution,photo,risk 56% is at or above the caution cut-off 20%
+2,379,10,0,0.5252820713515923,caution,photo,risk 53% is at or above the caution cut-off 20%
+2,381,10,0,0.27216593933718664,caution,photo,risk 27% is at or above the caution cut-off 20%
+2,382,10,0,0.5991970948592635,caution,photo,risk 60% is at or above the caution cut-off 20%
+2,715,20,1,0.3133228804169427,caution,photo,risk 31% is at or above the caution cut-off 20%
+2,716,20,0,0.5117567143760153,caution,photo,risk 51% is at or above the caution cut-off 20%
+2,717,20,0,0.6526631869508134,caution,photo,risk 65% is at or above the caution cut-off 20%
+2,718,20,0,0.521634548514052,caution,photo,risk 52% is at or above the caution cut-off 20%
+2,719,20,0,0.6904148242103577,caution,photo,risk 69% is at or above the caution cut-off 20%
+2,720,20,0,0.39297646852767315,caution,photo,risk 39% is at or above the caution cut-off 20%
+2,721,20,1,0.6825005314663374,caution,photo,risk 68% is at or above the caution cut-off 20%
+2,722,20,1,0.6703571333813961,caution,photo,risk 67% is at or above the caution cut-off 20%
+2,724,20,1,0.40114089648409834,caution,photo,risk 40% is at or above the caution cut-off 20%
+2,725,20,0,0.24870252994629183,caution,photo,risk 25% is at or above the caution cut-off 20%
+2,726,20,1,0.6977750287203026,caution,photo,risk 70% is at or above the caution cut-off 20%
+2,727,20,1,0.41803114201153896,caution,photo,risk 42% is at or above the caution cut-off 20%
+2,728,20,1,0.6352856559369799,caution,photo,risk 64% is at or above the caution cut-off 20%
+2,730,20,0,0.3604588188743397,caution,photo,risk 36% is at or above the caution cut-off 20%
+2,731,20,1,0.2928166666665895,caution,photo,risk 29% is at or above the caution cut-off 20%
+2,732,20,0,0.6994981922803651,caution,photo,risk 70% is at or above the caution cut-off 20%
+2,733,20,1,0.7468243599303733,caution,photo,risk 75% is at or above the caution cut-off 20%
+2,734,20,0,0.6905321414550678,caution,photo,risk 69% is at or above the caution cut-off 20%
+2,1384,45,1,0.5492005162116584,caution,photo,risk 55% is at or above the caution cut-off 20%
+2,1386,45,1,0.2568591513459906,caution,photo,risk 26% is at or above the caution cut-off 20%
+2,1387,45,0,0.22598037779278723,caution,photo,risk 23% is at or above the caution cut-off 20%
+2,1388,45,1,0.4441884826390041,caution,photo,risk 44% is at or above the caution cut-off 20%
+2,1389,45,0,0.6533762696227605,caution,photo,risk 65% is at or above the caution cut-off 20%
+2,1390,45,1,0.45177212493401075,caution,photo,risk 45% is at or above the caution cut-off 20%
+2,1391,45,1,0.4173428226545022,caution,photo,risk 42% is at or above the caution cut-off 20%
+2,1392,45,0,0.5491154590163801,caution,photo,risk 55% is at or above the caution cut-off 20%
+2,1393,45,1,,can't judge,none,no precomputed photo estimate for this meal
+2,1394,45,0,,can't judge,none,no precomputed photo estimate for this meal
+2,1395,45,1,0.5203243537372628,caution,photo,risk 52% is at or above the caution cut-off 20%
+2,1396,45,0,0.08432524575065037,low risk,photo,risk 8% is below the low-risk cut-off 14%
+2,1398,45,0,0.3017413174450661,caution,photo,risk 30% is at or above the caution cut-off 20%
+2,1399,45,1,0.46338361370377124,caution,photo,risk 46% is at or above the caution cut-off 20%
+2,1400,45,0,0.3230883292727765,caution,photo,risk 32% is at or above the caution cut-off 20%
+2,1401,45,1,,can't judge,none,no precomputed photo estimate for this meal
+2,1402,45,1,0.5613698842767016,caution,photo,risk 56% is at or above the caution cut-off 20%
+2,1403,45,1,0.4585234536792339,caution,photo,risk 46% is at or above the caution cut-off 20%
+2,1404,45,1,0.26142723825110004,caution,photo,risk 26% is at or above the caution cut-off 20%
+2,1405,45,1,,can't judge,none,no precomputed photo estimate for this meal
+3,127,4,1,0.5933728615214694,caution,photo,risk 59% is at or above the caution cut-off 20%
+3,128,4,0,0.2256947076711542,caution,photo,risk 23% is at or above the caution cut-off 20%
+3,129,4,0,0.4651656457200803,caution,photo,risk 47% is at or above the caution cut-off 20%
+3,130,4,0,0.5522180960003543,caution,photo,risk 55% is at or above the caution cut-off 20%
+3,131,4,0,0.35344842057070436,caution,photo,risk 35% is at or above the caution cut-off 20%
+3,132,4,0,0.3914326082023055,caution,photo,risk 39% is at or above the caution cut-off 20%
+3,133,4,0,0.392729993024365,caution,photo,risk 39% is at or above the caution cut-off 20%
+3,135,4,0,0.3436086648587943,caution,photo,risk 34% is at or above the caution cut-off 20%
+3,136,4,0,0.5036390841000514,caution,photo,risk 50% is at or above the caution cut-off 20%
+3,137,4,0,0.7835329891077598,caution,photo,risk 78% is at or above the caution cut-off 20%
+3,139,4,0,0.3926193897696442,caution,photo,risk 39% is at or above the caution cut-off 20%
+3,140,4,0,0.46073344330273414,caution,photo,risk 46% is at or above the caution cut-off 20%
+3,141,4,1,0.5132497545696375,caution,photo,risk 51% is at or above the caution cut-off 20%
+3,142,4,1,0.6130580726480624,caution,photo,risk 61% is at or above the caution cut-off 20%
+3,144,4,0,0.35522304018840395,caution,photo,risk 36% is at or above the caution cut-off 20%
+3,148,4,0,0.21855026717967316,caution,photo,risk 22% is at or above the caution cut-off 20%
+3,149,4,0,0.43768905411480385,caution,photo,risk 44% is at or above the caution cut-off 20%
+3,150,4,0,0.17217392766088907,can't judge,photo,"the risk (17%) is borderline, between 14% and 20%"
+3,151,4,0,0.4358055304506769,caution,photo,risk 44% is at or above the caution cut-off 20%
+3,154,4,0,0.4102197148523638,caution,photo,risk 41% is at or above the caution cut-off 20%
+3,156,4,0,0.4342698411393027,caution,photo,risk 43% is at or above the caution cut-off 20%
+3,157,4,0,0.44197314328417986,caution,photo,risk 44% is at or above the caution cut-off 20%
+3,158,4,0,0.4383694728191002,caution,photo,risk 44% is at or above the caution cut-off 20%
+3,165,4,0,0.2985475524421476,caution,photo,risk 30% is at or above the caution cut-off 20%
+3,166,4,0,0.541043554264894,caution,photo,risk 54% is at or above the caution cut-off 20%
+3,167,4,1,0.767578860962542,caution,photo,risk 77% is at or above the caution cut-off 20%
+3,171,4,0,0.38102998901701884,caution,photo,risk 38% is at or above the caution cut-off 20%
+3,172,4,0,0.26276993098801615,caution,photo,risk 26% is at or above the caution cut-off 20%
+3,583,16,1,0.5421177871314674,caution,photo,risk 54% is at or above the caution cut-off 20%
+3,584,16,0,0.3137635850405044,caution,photo,risk 31% is at or above the caution cut-off 20%
+3,585,16,0,0.2616423840954295,caution,photo,risk 26% is at or above the caution cut-off 20%
+3,586,16,0,,can't judge,none,no precomputed photo estimate for this meal
+3,587,16,0,0.2958905038629363,caution,photo,risk 30% is at or above the caution cut-off 20%
+3,588,16,0,,can't judge,none,no precomputed photo estimate for this meal
+3,589,16,1,0.34515483669073915,caution,photo,risk 35% is at or above the caution cut-off 20%
+3,590,16,0,0.4734470068646001,caution,photo,risk 47% is at or above the caution cut-off 20%
+3,591,16,0,,can't judge,none,no precomputed photo estimate for this meal
+3,592,16,1,0.34852597092874554,caution,photo,risk 35% is at or above the caution cut-off 20%
+3,593,16,0,0.10774345007666593,low risk,photo,risk 11% is below the low-risk cut-off 14%
+3,594,16,0,,can't judge,none,no precomputed photo estimate for this meal
+3,595,16,1,0.4149358025631112,caution,photo,risk 41% is at or above the caution cut-off 20%
+3,596,16,1,0.1267529099952099,low risk,photo,risk 13% is below the low-risk cut-off 14%
+3,597,16,0,0.34715567630157257,caution,photo,risk 35% is at or above the caution cut-off 20%
+3,598,16,1,0.4063201839275362,caution,photo,risk 41% is at or above the caution cut-off 20%
+3,599,16,0,,can't judge,none,no precomputed photo estimate for this meal
+3,790,23,0,0.8438779575806447,caution,photo,risk 84% is at or above the caution cut-off 20%
+3,791,23,0,0.7505853447647645,caution,photo,risk 75% is at or above the caution cut-off 20%
+3,792,23,0,0.5777228521479462,caution,photo,risk 58% is at or above the caution cut-off 20%
+3,794,23,0,0.6691303687104065,caution,photo,risk 67% is at or above the caution cut-off 20%
+3,795,23,1,0.8068197617012736,caution,photo,risk 81% is at or above the caution cut-off 20%
+3,796,23,1,0.7757580333056113,caution,photo,risk 78% is at or above the caution cut-off 20%
+3,797,23,1,0.5083321467049561,caution,photo,risk 51% is at or above the caution cut-off 20%
+3,798,23,1,0.5468086069044134,caution,photo,risk 55% is at or above the caution cut-off 20%
+3,799,23,1,0.7891086487818251,caution,photo,risk 79% is at or above the caution cut-off 20%
+3,800,23,1,0.4673296464710075,caution,photo,risk 47% is at or above the caution cut-off 20%
+3,801,23,1,0.780783667273327,caution,photo,risk 78% is at or above the caution cut-off 20%
+3,802,23,1,0.6205933046077973,caution,photo,risk 62% is at or above the caution cut-off 20%
+3,803,23,0,0.7755024879067185,caution,photo,risk 78% is at or above the caution cut-off 20%
+3,804,23,1,0.8531860114789419,caution,photo,risk 85% is at or above the caution cut-off 20%
+3,1059,34,1,0.22557028923805353,caution,photo,risk 23% is at or above the caution cut-off 20%
+3,1061,34,0,0.0642975491078528,low risk,photo,risk 6% is below the low-risk cut-off 14%
+3,1063,34,0,0.06200544678980402,low risk,photo,risk 6% is below the low-risk cut-off 14%
+3,1064,34,0,0.16752535631449697,can't judge,photo,"the risk (17%) is borderline, between 14% and 20%"
+3,1065,34,0,0.06591679322083599,low risk,photo,risk 7% is below the low-risk cut-off 14%
+3,1067,34,0,0.03012092830652626,low risk,photo,risk 3% is below the low-risk cut-off 14%
+3,1068,34,0,0.09341050721604292,low risk,photo,risk 9% is below the low-risk cut-off 14%
+3,1069,34,0,0.08678094845200217,low risk,photo,risk 9% is below the low-risk cut-off 14%
+3,1070,34,0,0.051370479369538466,low risk,photo,risk 5% is below the low-risk cut-off 14%
+3,1071,34,0,0.21586172725249533,caution,photo,risk 22% is at or above the caution cut-off 20%
+3,1072,34,0,0.06378725201561371,low risk,photo,risk 6% is below the low-risk cut-off 14%
+3,1073,34,0,0.17658589119587348,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+3,1074,34,0,0.1143455996360375,low risk,photo,risk 11% is below the low-risk cut-off 14%
+3,1076,34,0,0.22974846666350177,caution,photo,risk 23% is at or above the caution cut-off 20%
+3,1078,34,0,0.08181452903397494,low risk,photo,risk 8% is below the low-risk cut-off 14%
+3,1079,34,0,0.1911965184956964,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+3,1080,34,0,0.042624863841423444,low risk,photo,risk 4% is below the low-risk cut-off 14%
+3,1081,34,0,0.07059505059397955,low risk,photo,risk 7% is below the low-risk cut-off 14%
+3,1082,34,0,0.1825422414604548,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+3,1083,34,0,0.04160493139801899,low risk,photo,risk 4% is below the low-risk cut-off 14%
+3,1086,34,0,0.04090013340923172,low risk,photo,risk 4% is below the low-risk cut-off 14%
+3,1087,34,0,0.19387415182568501,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+3,1089,34,0,0.23213235308746083,caution,photo,risk 23% is at or above the caution cut-off 20%
+3,1090,34,0,0.09721532310815403,low risk,photo,risk 10% is below the low-risk cut-off 14%
+3,1288,43,0,0.12525506147802712,low risk,photo,risk 13% is below the low-risk cut-off 14%
+3,1290,43,1,0.39781769686803886,caution,photo,risk 40% is at or above the caution cut-off 20%
+3,1291,43,0,0.1572613990277602,can't judge,photo,"the risk (16%) is borderline, between 14% and 20%"
+3,1292,43,0,0.5450583304752503,caution,photo,risk 55% is at or above the caution cut-off 20%
+3,1293,43,0,0.32676233775689106,caution,photo,risk 33% is at or above the caution cut-off 20%
+3,1294,43,0,0.4113972413798825,caution,photo,risk 41% is at or above the caution cut-off 20%
+3,1295,43,0,0.20310312758416932,caution,photo,risk 20% is at or above the caution cut-off 20%
+3,1298,43,1,0.24166932672027136,caution,photo,risk 24% is at or above the caution cut-off 20%
+3,1299,43,0,0.5969087475271238,caution,photo,risk 60% is at or above the caution cut-off 20%
+3,1300,43,0,0.7398308851716557,caution,photo,risk 74% is at or above the caution cut-off 20%
+3,1301,43,0,0.4570032128605979,caution,photo,risk 46% is at or above the caution cut-off 20%
+3,1304,43,0,0.16322481744495496,can't judge,photo,"the risk (16%) is borderline, between 14% and 20%"
+3,1305,43,0,0.5526160553847397,caution,photo,risk 55% is at or above the caution cut-off 20%
+3,1306,43,1,0.7165789636577243,caution,photo,risk 72% is at or above the caution cut-off 20%
+3,1308,43,1,0.33757453798020687,caution,photo,risk 34% is at or above the caution cut-off 20%
+3,1310,43,1,0.33420277704804907,caution,photo,risk 33% is at or above the caution cut-off 20%
+3,1311,43,0,0.5097143888433195,caution,photo,risk 51% is at or above the caution cut-off 20%
+3,1312,43,0,0.2808842785426623,caution,photo,risk 28% is at or above the caution cut-off 20%
+3,1315,43,0,0.4160669348088855,caution,photo,risk 42% is at or above the caution cut-off 20%
+3,1319,43,0,0.2638689818081025,caution,photo,risk 26% is at or above the caution cut-off 20%
+3,1320,43,0,,can't judge,none,no precomputed photo estimate for this meal
+3,1321,43,0,0.5847338848423559,caution,photo,risk 58% is at or above the caution cut-off 20%
+3,1325,43,0,0.194716157711678,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+3,1326,43,0,0.5417555906449754,caution,photo,risk 54% is at or above the caution cut-off 20%
+3,1327,43,1,0.7860974860854235,caution,photo,risk 79% is at or above the caution cut-off 20%
+3,1329,43,0,0.41973389506974296,caution,photo,risk 42% is at or above the caution cut-off 20%
+3,1332,43,0,0.41599797486804097,caution,photo,risk 42% is at or above the caution cut-off 20%
+4,281,8,1,0.5489760009251659,caution,photo,risk 55% is at or above the caution cut-off 20%
+4,282,8,0,0.5858216606688116,caution,photo,risk 59% is at or above the caution cut-off 20%
+4,283,8,0,0.5316463031886595,caution,photo,risk 53% is at or above the caution cut-off 20%
+4,284,8,1,0.6071338390616883,caution,photo,risk 61% is at or above the caution cut-off 20%
+4,285,8,0,0.611775050560712,caution,photo,risk 61% is at or above the caution cut-off 20%
+4,286,8,1,0.650967480682291,caution,photo,risk 65% is at or above the caution cut-off 20%
+4,287,8,0,0.26772116362656956,caution,photo,risk 27% is at or above the caution cut-off 20%
+4,288,8,1,0.6324885231213382,caution,photo,risk 63% is at or above the caution cut-off 20%
+4,289,8,1,0.49300698877044735,caution,photo,risk 49% is at or above the caution cut-off 20%
+4,290,8,1,0.5644569360291171,caution,photo,risk 56% is at or above the caution cut-off 20%
+4,291,8,1,0.590585411266535,caution,photo,risk 59% is at or above the caution cut-off 20%
+4,292,8,0,0.4478636661209802,caution,photo,risk 45% is at or above the caution cut-off 20%
+4,293,8,1,0.4834716280277688,caution,photo,risk 48% is at or above the caution cut-off 20%
+4,294,8,1,0.6160731772118991,caution,photo,risk 62% is at or above the caution cut-off 20%
+4,295,8,1,0.5694696270803669,caution,photo,risk 57% is at or above the caution cut-off 20%
+4,296,8,0,0.43623800775737903,caution,photo,risk 44% is at or above the caution cut-off 20%
+4,297,8,1,0.622383667442565,caution,photo,risk 62% is at or above the caution cut-off 20%
+4,298,8,1,0.744607958933358,caution,photo,risk 74% is at or above the caution cut-off 20%
+4,299,8,1,0.6110233752912391,caution,photo,risk 61% is at or above the caution cut-off 20%
+4,396,11,0,0.18097602968991494,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+4,397,11,0,0.2791231310807819,caution,photo,risk 28% is at or above the caution cut-off 20%
+4,398,11,0,0.4565563404619144,caution,photo,risk 46% is at or above the caution cut-off 20%
+4,399,11,0,0.32804160775550883,caution,photo,risk 33% is at or above the caution cut-off 20%
+4,401,11,0,0.28306489165927756,caution,photo,risk 28% is at or above the caution cut-off 20%
+4,402,11,0,0.21367054240809202,caution,photo,risk 21% is at or above the caution cut-off 20%
+4,403,11,0,0.42776251239868457,caution,photo,risk 43% is at or above the caution cut-off 20%
+4,404,11,1,0.46057535821154005,caution,photo,risk 46% is at or above the caution cut-off 20%
+4,405,11,0,0.19923090466282375,can't judge,photo,"the risk (20%) is borderline, between 14% and 20%"
+4,406,11,1,0.42720585695775515,caution,photo,risk 43% is at or above the caution cut-off 20%
+4,407,11,0,0.2853918446730291,caution,photo,risk 29% is at or above the caution cut-off 20%
+4,408,11,1,0.29773399367351466,caution,photo,risk 30% is at or above the caution cut-off 20%
+4,409,11,0,,can't judge,none,no precomputed photo estimate for this meal
+4,410,11,1,0.4213070209510091,caution,photo,risk 42% is at or above the caution cut-off 20%
+4,411,11,0,0.2158706388661192,caution,photo,risk 22% is at or above the caution cut-off 20%
+4,412,11,0,0.3173240889172067,caution,photo,risk 32% is at or above the caution cut-off 20%
+4,413,11,0,0.2896023478785941,caution,photo,risk 29% is at or above the caution cut-off 20%
+4,414,11,1,0.37236952244973015,caution,photo,risk 37% is at or above the caution cut-off 20%
+4,416,11,1,,can't judge,none,no precomputed photo estimate for this meal
+4,417,11,1,0.2661377812616228,caution,photo,risk 27% is at or above the caution cut-off 20%
+4,418,11,1,0.39528141201512307,caution,photo,risk 40% is at or above the caution cut-off 20%
+4,419,11,1,0.3409720882504837,caution,photo,risk 34% is at or above the caution cut-off 20%
+4,420,11,1,0.32771922295638645,caution,photo,risk 33% is at or above the caution cut-off 20%
+4,818,26,1,0.3206377469571131,caution,photo,risk 32% is at or above the caution cut-off 20%
+4,819,26,0,0.10559484191305273,low risk,photo,risk 11% is below the low-risk cut-off 14%
+4,821,26,0,0.18514611196965206,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+4,822,26,1,0.40448139496092844,caution,photo,risk 40% is at or above the caution cut-off 20%
+4,823,26,0,0.18135341829148038,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+4,824,26,1,0.32699138762388796,caution,photo,risk 33% is at or above the caution cut-off 20%
+4,825,26,1,0.22782673067812492,caution,photo,risk 23% is at or above the caution cut-off 20%
+4,826,26,0,0.2658908743781816,caution,photo,risk 27% is at or above the caution cut-off 20%
+4,827,26,1,0.40437268435162077,caution,photo,risk 40% is at or above the caution cut-off 20%
+4,828,26,0,0.12844028248712408,low risk,photo,risk 13% is below the low-risk cut-off 14%
+4,829,26,1,0.3025558946193548,caution,photo,risk 30% is at or above the caution cut-off 20%
+4,830,26,1,0.36507626243553876,caution,photo,risk 37% is at or above the caution cut-off 20%
+4,831,26,0,0.08183335073902169,low risk,photo,risk 8% is below the low-risk cut-off 14%
+4,832,26,1,,can't judge,none,no precomputed photo estimate for this meal
+4,833,26,0,0.38152764843866727,caution,photo,risk 38% is at or above the caution cut-off 20%
+4,834,26,1,0.35117649116244726,caution,photo,risk 35% is at or above the caution cut-off 20%
+4,835,26,1,,can't judge,none,no precomputed photo estimate for this meal
+4,836,26,1,0.30246983641234804,caution,photo,risk 30% is at or above the caution cut-off 20%
+4,1000,32,0,0.351749043230213,caution,photo,risk 35% is at or above the caution cut-off 20%
+4,1001,32,0,0.38021702283784986,caution,photo,risk 38% is at or above the caution cut-off 20%
+4,1002,32,0,0.282491275389063,caution,photo,risk 28% is at or above the caution cut-off 20%
+4,1003,32,0,0.38483413332959293,caution,photo,risk 38% is at or above the caution cut-off 20%
+4,1004,32,0,0.5116584776687985,caution,photo,risk 51% is at or above the caution cut-off 20%
+4,1005,32,1,0.3672361981110377,caution,photo,risk 37% is at or above the caution cut-off 20%
+4,1006,32,0,0.18265721815335165,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+4,1007,32,0,0.29985785195233017,caution,photo,risk 30% is at or above the caution cut-off 20%
+4,1008,32,0,0.1607300350466165,can't judge,photo,"the risk (16%) is borderline, between 14% and 20%"
+4,1009,32,0,0.35505613720425105,caution,photo,risk 36% is at or above the caution cut-off 20%
+4,1010,32,1,0.2802338143499087,caution,photo,risk 28% is at or above the caution cut-off 20%
+5,15,1,0,0.20646985527339035,caution,photo,risk 21% is at or above the caution cut-off 20%
+5,16,1,0,0.13141823882242573,low risk,photo,risk 13% is below the low-risk cut-off 14%
+5,17,1,0,0.18961644287355547,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+5,18,1,0,0.26128355037061624,caution,photo,risk 26% is at or above the caution cut-off 20%
+5,19,1,0,0.21042119309121937,caution,photo,risk 21% is at or above the caution cut-off 20%
+5,21,1,0,0.14062151626019345,low risk,photo,risk 14% is below the low-risk cut-off 14%
+5,22,1,0,0.2746420780164395,caution,photo,risk 27% is at or above the caution cut-off 20%
+5,23,1,0,0.38140399218562504,caution,photo,risk 38% is at or above the caution cut-off 20%
+5,25,1,0,0.1874126371685716,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+5,26,1,0,0.17137821258797012,can't judge,photo,"the risk (17%) is borderline, between 14% and 20%"
+5,27,1,0,0.3165292075112221,caution,photo,risk 32% is at or above the caution cut-off 20%
+5,28,1,0,0.16790357742285716,can't judge,photo,"the risk (17%) is borderline, between 14% and 20%"
+5,29,1,0,0.1832747866538862,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+5,30,1,0,0.3171584573924732,caution,photo,risk 32% is at or above the caution cut-off 20%
+5,31,1,0,0.1078046300289564,low risk,photo,risk 11% is below the low-risk cut-off 14%
+5,33,1,0,0.1697231702808692,can't judge,photo,"the risk (17%) is borderline, between 14% and 20%"
+5,34,1,0,0.13835919212243353,low risk,photo,risk 14% is below the low-risk cut-off 14%
+5,35,1,0,0.3711481513962614,caution,photo,risk 37% is at or above the caution cut-off 20%
+5,36,1,0,0.14654192367648244,can't judge,photo,"the risk (15%) is borderline, between 14% and 20%"
+5,38,1,0,0.15418267351798148,can't judge,photo,"the risk (15%) is borderline, between 14% and 20%"
+5,39,1,0,0.2693546926085622,caution,photo,risk 27% is at or above the caution cut-off 20%
+5,40,1,0,0.40724024230392775,caution,photo,risk 41% is at or above the caution cut-off 20%
+5,41,1,0,0.17296262597660234,can't judge,photo,"the risk (17%) is borderline, between 14% and 20%"
+5,463,13,0,0.22943235884965008,caution,photo,risk 23% is at or above the caution cut-off 20%
+5,464,13,0,0.5074401893037032,caution,photo,risk 51% is at or above the caution cut-off 20%
+5,465,13,0,0.2604996551322145,caution,photo,risk 26% is at or above the caution cut-off 20%
+5,466,13,1,0.31319375545576883,caution,photo,risk 31% is at or above the caution cut-off 20%
+5,467,13,0,0.31389991452803534,caution,photo,risk 31% is at or above the caution cut-off 20%
+5,468,13,1,0.45880552829348137,caution,photo,risk 46% is at or above the caution cut-off 20%
+5,469,13,1,0.32169909338036884,caution,photo,risk 32% is at or above the caution cut-off 20%
+5,472,13,0,0.3135023142071271,caution,photo,risk 31% is at or above the caution cut-off 20%
+5,473,13,1,0.49646821550564685,caution,photo,risk 50% is at or above the caution cut-off 20%
+5,474,13,1,0.23684600907703376,caution,photo,risk 24% is at or above the caution cut-off 20%
+5,475,13,0,0.3233639779476805,caution,photo,risk 32% is at or above the caution cut-off 20%
+5,476,13,0,0.2756246440659497,caution,photo,risk 28% is at or above the caution cut-off 20%
+5,477,13,0,0.5230643962956014,caution,photo,risk 52% is at or above the caution cut-off 20%
+5,478,13,0,0.19371193791659436,can't judge,photo,"the risk (19%) is borderline, between 14% and 20%"
+5,480,13,0,0.3114603503956091,caution,photo,risk 31% is at or above the caution cut-off 20%
+5,481,13,0,0.266223507550127,caution,photo,risk 27% is at or above the caution cut-off 20%
+5,482,13,0,0.39048494993991395,caution,photo,risk 39% is at or above the caution cut-off 20%
+5,483,13,1,0.42670223674615865,caution,photo,risk 43% is at or above the caution cut-off 20%
+5,484,13,0,0.23923854521926752,caution,photo,risk 24% is at or above the caution cut-off 20%
+5,485,13,0,0.234947839800532,caution,photo,risk 23% is at or above the caution cut-off 20%
+5,486,13,1,0.4737725294974514,caution,photo,risk 47% is at or above the caution cut-off 20%
+5,487,13,1,0.4838076076583011,caution,photo,risk 48% is at or above the caution cut-off 20%
+5,489,13,1,0.39731395373488954,caution,photo,risk 40% is at or above the caution cut-off 20%
+5,846,27,1,0.21125962189047662,caution,photo,risk 21% is at or above the caution cut-off 20%
+5,847,27,1,0.04639145871387408,low risk,photo,risk 5% is below the low-risk cut-off 14%
+5,848,27,0,0.33549943695157725,caution,photo,risk 34% is at or above the caution cut-off 20%
+5,849,27,0,0.12765579466885896,low risk,photo,risk 13% is below the low-risk cut-off 14%
+5,850,27,0,,can't judge,none,no precomputed photo estimate for this meal
+5,851,27,0,0.16159997033704301,can't judge,photo,"the risk (16%) is borderline, between 14% and 20%"
+5,852,27,1,0.3213353948789835,caution,photo,risk 32% is at or above the caution cut-off 20%
+5,853,27,0,0.07379503116609239,low risk,photo,risk 7% is below the low-risk cut-off 14%
+5,854,27,0,0.1790467557038313,can't judge,photo,"the risk (18%) is borderline, between 14% and 20%"
+5,855,27,0,0.22306885568472143,caution,photo,risk 22% is at or above the caution cut-off 20%
+5,856,27,1,0.119281120407838,low risk,photo,risk 12% is below the low-risk cut-off 14%
+5,857,27,0,0.04726650182633341,low risk,photo,risk 5% is below the low-risk cut-off 14%
+5,858,27,0,0.24202334613822232,caution,photo,risk 24% is at or above the caution cut-off 20%
+5,859,27,0,0.12057106443347068,low risk,photo,risk 12% is below the low-risk cut-off 14%
+5,861,27,0,0.1577151579220171,can't judge,photo,"the risk (16%) is borderline, between 14% and 20%"
+5,862,27,0,0.2486296488522332,caution,photo,risk 25% is at or above the caution cut-off 20%
+5,863,27,0,0.09757715674625728,low risk,photo,risk 10% is below the low-risk cut-off 14%
+5,864,27,1,0.08875271467588848,low risk,photo,risk 9% is below the low-risk cut-off 14%
+5,865,27,0,0.17379596558696034,can't judge,photo,"the risk (17%) is borderline, between 14% and 20%"
+5,866,27,1,0.2169506742746436,caution,photo,risk 22% is at or above the caution cut-off 20%
+5,868,27,0,0.15455418159173456,can't judge,photo,"the risk (15%) is borderline, between 14% and 20%"
+5,1217,41,0,0.2461634738442718,caution,photo,risk 25% is at or above the caution cut-off 20%
+5,1219,41,0,0.2676248475391994,caution,photo,risk 27% is at or above the caution cut-off 20%
+5,1220,41,0,0.4974046658779395,caution,photo,risk 50% is at or above the caution cut-off 20%
+5,1221,41,1,0.7263131343093221,caution,photo,risk 73% is at or above the caution cut-off 20%
+5,1222,41,0,0.326967995583857,caution,photo,risk 33% is at or above the caution cut-off 20%
+5,1224,41,1,0.35939878497567157,caution,photo,risk 36% is at or above the caution cut-off 20%
+5,1225,41,1,0.5290957898650966,caution,photo,risk 53% is at or above the caution cut-off 20%
+5,1226,41,1,0.6783475814311607,caution,photo,risk 68% is at or above the caution cut-off 20%
+5,1227,41,1,0.7218928800121108,caution,photo,risk 72% is at or above the caution cut-off 20%
+5,1229,41,1,0.21226418522318774,caution,photo,risk 21% is at or above the caution cut-off 20%
+5,1230,41,1,0.39125664198697013,caution,photo,risk 39% is at or above the caution cut-off 20%
+5,1231,41,1,0.6768880995270428,caution,photo,risk 68% is at or above the caution cut-off 20%
+5,1232,41,0,0.3289883438589807,caution,photo,risk 33% is at or above the caution cut-off 20%
+5,1233,41,0,0.32993905290365977,caution,photo,risk 33% is at or above the caution cut-off 20%
+5,1234,41,1,0.5676628594115037,caution,photo,risk 57% is at or above the caution cut-off 20%
+5,1235,41,1,0.4662517556905635,caution,photo,risk 47% is at or above the caution cut-off 20%
+5,1236,41,1,0.7423425222779876,caution,photo,risk 74% is at or above the caution cut-off 20%
+5,1237,41,0,0.24965137014772873,caution,photo,risk 25% is at or above the caution cut-off 20%
+5,1239,41,0,0.2820242729046657,caution,photo,risk 28% is at or above the caution cut-off 20%
+5,1240,41,1,0.5360106400443103,caution,photo,risk 54% is at or above the caution cut-off 20%
+5,1241,41,1,0.609829405590225,caution,photo,risk 61% is at or above the caution cut-off 20%
+5,1242,41,0,0.2284981428683677,caution,photo,risk 23% is at or above the caution cut-off 20%
+5,1243,41,1,0.533589216888,caution,photo,risk 53% is at or above the caution cut-off 20%
+5,1244,41,1,0.4394090889187015,caution,photo,risk 44% is at or above the caution cut-off 20%
+5,1245,41,0,0.6534210981825428,caution,photo,risk 65% is at or above the caution cut-off 20%
+5,1246,41,1,0.6270355533649459,caution,photo,risk 63% is at or above the caution cut-off 20%
+5,1247,41,1,0.5664299341982104,caution,photo,risk 57% is at or above the caution cut-off 20%
+5,1249,41,1,0.2908278783639912,caution,photo,risk 29% is at or above the caution cut-off 20%

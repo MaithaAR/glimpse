@@ -1,0 +1,53 @@
+{
+  "note": "risks come from Pipeline.answer, one Pipeline per fold (D2); decisions use the pre-S5 frozen cut-offs and are PROVISIONAL -- the reported numbers here are AUROC and log-loss only",
+  "meals": 481,
+  "answered_with_risk": 460,
+  "cant_judge": 67,
+  "auroc_photo_dev": {
+    "point": 0.7256477849932488,
+    "ci95": [
+      0.658616559268149,
+      0.7973679997940457
+    ]
+  },
+  "log_loss_photo_dev": 0.567039147212089,
+  "per_fold": [
+    {
+      "fold": 1,
+      "meals": 96,
+      "answered": 90,
+      "auroc": 0.7419165196942975
+    },
+    {
+      "fold": 2,
+      "meals": 109,
+      "answered": 105,
+      "auroc": 0.6138698630136986
+    },
+    {
+      "fold": 3,
+      "meals": 110,
+      "answered": 104,
+      "auroc": 0.7554240631163708
+    },
+    {
+      "fold": 4,
+      "meals": 71,
+      "answered": 67,
+      "auroc": 0.7566844919786095
+    },
+    {
+      "fold": 5,
+      "meals": 95,
+      "answered": 94,
+      "auroc": 0.7878787878787878
+    }
+  ],
+  "fusion_C": {
+    "fold1_C": 0.03,
+    "fold2_C": 0.01,
+    "fold3_C": 0.03,
+    "fold4_C": 0.01,
+    "fold5_C": 0.01
+  }
+}
