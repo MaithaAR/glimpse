@@ -47,6 +47,23 @@ scoring. It drops 115 of 481 development meals (23.9%), biases the scored set by
 noisiest meals, and reintroduces the gap between what is evaluated and what is deployed. The expanding window has
 none of these faults.
 
+**D3 amendments (S5 audit, 1 Nov, recorded before any run).** (i) *Label availability gate:* at
+deployment the CGM labels a meal two hours after it (feedback.py, `cgm_auto`), so the history at meal t
+contains exactly the earlier meals whose two-hour window closed before t — no label at or after t is ever
+visible, and the replay reproduces this information set. (ii) *History needs a logit:* the NLL term requires
+the meal's fusion logit, so a meal the system refused without producing one (no usable photo, failed input
+checks) cannot enter the sum; a borderline refusal has a logit and does. (iii) *Wording:* the penalty
+(m/2)b^2 is a Gaussian prior with precision m chosen by the inner-fold replay; the earlier sentence "the
+shrinkage uses the population variance" overstated it and is corrected here. (iv) *Selection and ties:* for
+each m in {0.5, 1, 2, 4, 8, 16, 32, inf} the cut-offs (lo, hi) are re-chosen by minimum expected cost on the
+replayed inner-fold risks (fixing them would score each m at the wrong operating point); exact cost ties
+break toward the LARGEST m — the most-shrunk model, closest to population, is the conservative default —
+and the full cost-versus-m curve is reported so a flat selection is visible. m = inf is exactly the
+no-intercept system, so it doubles as one D3b ablation arm. (v) *Two realisations of D4:* development
+decision metrics use cut-offs selected inside each fold's inner folds only, so no reported number uses
+thresholds that saw its own held-out labels; the config values are a deployment artifact frozen at the final
+stage by the identical procedure on all development data.
+
 **D3b — The intercept is a claim, so it is ablated.** Hypothesis: the population model cannot separate rare from
 frequent spikers (intermediate: 30% predicted against 16% observed for rare spikers, 42% against 54% for frequent,
 correlation −0.77), so a per-person offset should cut ECE within each spike-rate half without reducing AUROC.
