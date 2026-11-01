@@ -203,4 +203,3 @@ def photo_seed_check(ds: MealDataset, sp: Splits, cfg: GlimpseConfig, extra_seed
              len(runs), summary["mae_g"]["mean"], summary["mae_g"]["sd"], summary["bin_f1"]["mean"],
              summary["bin_f1"]["sd"], out / f"{MODEL}_seeds.json")  # fmt: skip
     return res
-

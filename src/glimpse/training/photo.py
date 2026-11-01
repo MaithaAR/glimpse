@@ -270,5 +270,3 @@ def load_photo_bundle(cfg: GlimpseConfig, path: Path) -> tuple[PhotoCarbModel, d
     model = PhotoCarbModel(cfg.photo.arch, weights=weights_path(cfg.photo), dropout=cfg.photo.dropout)
     model.load_state_dict({k: v.float() for k, v in b["state"].items()}, strict=False)
     return model.eval(), b
-
-
