@@ -66,6 +66,10 @@ photo-cv *ARGS:
 fusion:
     uv run glimpse fusion
 
+# S6 ablations: D8 profile-excluded training + input-channel ablations (same folds and C as `fusion`)
+ablate:
+    uv run glimpse ablate
+
 # final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
 train-final:
     uv run glimpse final

@@ -208,6 +208,21 @@ def _predict_folder(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _ablate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """S6 ablations: D8 profile-excluded split and input-channel ablations (needs `just fusion` outputs)."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.ablations import run_channel_ablation, run_profile_excluded
+
+    ds = MealDataset.load(Path("data/dataset"))
+    sp = SplitsV2.load(Path("splits/dev_splits_v2.json"))
+    run_profile_excluded(ds, sp, cfg)
+    run_channel_ablation(ds, sp, cfg)
+    return 0
+
+
 def _splits_v2(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Partition v2 (design D1): dev folds + training-only T2D + locked, with the asserted reconciliation."""
     from pathlib import Path
@@ -282,6 +297,7 @@ def main(argv: list[str] | None = None) -> int:
     pf = sub.add_parser("predict-folder", help="answer every meal folder under IN (photo.*, cgm.csv, profile.json)")
     pf.add_argument("in_dir", help="folder with one sub-folder per meal")
     pf.add_argument("out_dir", help="where results.jsonl and summary.md are written")
+    sub.add_parser("ablate", help="D8 profile-excluded split + input-channel ablations (run `fusion` first)")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
     sub.add_parser("selftest", help="check the frozen pipeline loads offline and runs (no dataset needed)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
@@ -315,6 +331,7 @@ def main(argv: list[str] | None = None) -> int:
         "demo": _demo,
         "predict": _predict,
         "predict-folder": _predict_folder,
+        "ablate": _ablate,
         "splits-v2": _splits_v2,
         "selftest": _selftest,
     }
