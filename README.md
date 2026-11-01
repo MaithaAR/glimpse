@@ -100,6 +100,21 @@ pilot/ scripts/ results/  proposal-pilot code and logs, frozen (GitHub only; lef
 Changes made after seeing results (C grid, ridge arm, carb-bin check, cut-off amendment) are listed and
 labelled in [`docs/evaluation_protocol.md`](docs/evaluation_protocol.md).
 
+## Repository map
+
+| Module | Job | Recipe | Output |
+|---|---|---|---|
+| `data/` (`meal_table.py` builds the labelled meals) | download, build, validate, split | `just install`, `just prepare` | `data/`, `outputs/data/` |
+| `models/` | SensorCNN, ConvNeXt-Tiny heads, budget | `just params` | `outputs/param_budget.csv` |
+| `training/photo.py` | shared photo-model library (caches, losses, loops) | – | used by the three below |
+| `training/train_photo.py`, `scratch.py`, `final.py` | the training runs | `just train-*`, `just photo-seeds` | `checkpoints/`, `outputs/training/` |
+| `training/cv.py`, `photo_cv.py`, `fusion.py` | person-level cross-validation | `just cv`, `just photo-cv`, `just fusion` | `outputs/cv,photo_cv,fusion/` |
+| `evaluation.py`, `run_evaluation.py`, `recalibrate.py` | metrics, calibration, cut-offs, fixed test | `just evaluate`, `just recalibrate` | `outputs/evaluation/` |
+| `demo.py`, `demo_cases.py`, `app.py`, `feedback.py` | the product path, worked cases, UI, feedback | `just demo`, `just predict`, `just app` | `outputs/demo,feedback/` |
+
+Proposal-era pilot analyses (`pilot/`, `scripts/`, `results/`) were removed from the tree and live at the git tag
+`proposal-era`; copies sit in the course proposal folder.
+
 ## Data and licence
 CGMacros v1.0.0 (PhysioNet, CC BY-NC-SA 4.0) is downloaded by `just install` and never committed.
 Pretrained weights: `timm/convnext_tiny.fb_in22k_ft_in1k`, pinned to a Hugging Face commit and checked by SHA-256.

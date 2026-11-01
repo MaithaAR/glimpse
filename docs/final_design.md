@@ -106,7 +106,10 @@ src/glimpse/
   calibration.py  cli.py  config.py  schemas.py
 ```
 
-Deleted: `data/legacy.py`, `demo_run.py`, and anything `vulture` reports with no call site. Archived to the git
+Correction (S2 audit, 1 Nov): `legacy.py` and `demo_run.py` turned out to be live, only misnamed — the first is
+the meal-table builder behind `just prepare`, the second builds the demo cases and selftest. They were renamed
+(`data/meal_table.py`, `demo_cases.py`), not deleted; nothing in the tree currently has zero call sites. The
+`run_evaluation.py` split moves to right after S3, which decides what survives in it. Archived to the git
 tag `proposal-era`: `pilot/`, `scripts/`, `results/`. The README carries a one-line map of every module and the
 recipe that runs it; each module's docstring names the report table or figure it produces. Budget: 4 hours.
 
