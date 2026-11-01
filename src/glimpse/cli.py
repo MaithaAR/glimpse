@@ -209,6 +209,18 @@ def _predict_folder(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _evaluate_dev(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Development evaluation on partition v2: every risk from Pipeline.answer, one Pipeline per fold (D2)."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.evaluation.run import evaluate_dev
+
+    evaluate_dev(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _splits_v2(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Partition v2 (design D1): dev folds + training-only T2D + locked, with the asserted reconciliation."""
     from pathlib import Path
@@ -284,6 +296,7 @@ def main(argv: list[str] | None = None) -> int:
     pf.add_argument("in_dir", help="folder with one sub-folder per meal")
     pf.add_argument("out_dir", help="where results.jsonl and summary.md are written")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
+    sub.add_parser("evaluate-dev", help="dev evaluation on partition v2: risks from Pipeline.answer per fold")
     sub.add_parser("selftest", help="check the frozen pipeline loads offline and runs (no dataset needed)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
@@ -317,6 +330,7 @@ def main(argv: list[str] | None = None) -> int:
         "predict": _predict,
         "predict-folder": _predict_folder,
         "splits-v2": _splits_v2,
+        "evaluate-dev": _evaluate_dev,
         "selftest": _selftest,
     }
     return commands[args.command](cfg, args)

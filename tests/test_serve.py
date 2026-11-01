@@ -219,3 +219,14 @@ def test_heic_photo_opens(tmp_path):
     Image.fromarray(arr).save(f)
     img = open_photo(f)
     assert img.size == (160, 120) and img.mode == "RGB"
+
+
+def test_fold_estimates_builds_the_pipeline_table():
+    """Out-of-fold CSV rows become validated PhotoEstimates keyed by meal row."""
+    import pandas as pd
+
+    from glimpse.evaluation.run import fold_estimates
+
+    df = pd.DataFrame([{"row": 7, "photo_g": 62.5, "p_bin0": 0.1, "p_bin1": 0.2, "p_bin2": 0.6, "p_bin3": 0.1}])
+    t = fold_estimates(df)
+    assert set(t) == {7} and t[7].grams == 62.5 and abs(sum(t[7].bin_probs) - 1.0) < 1e-9

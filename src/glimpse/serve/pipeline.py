@@ -47,19 +47,21 @@ class Pipeline:
     `photo_table` switches the carb-estimate source from the live photo model to precomputed per-fold estimates
     (evaluation); everything from the rules to the Answer is the same code either way."""
 
-    def __init__(self, cfg: GlimpseConfig, photo_table: dict[int, PhotoEstimate] | None = None):
+    def __init__(self, cfg: GlimpseConfig, photo_table: dict[int, PhotoEstimate] | None = None, fusion=None):
         """Load the fusion model, the frozen cut-offs (checked against the config) and, in live mode, the photo
-        model and the unfamiliar-photo reference, all from local files."""
+        model and the unfamiliar-photo reference, all from local files. Evaluation injects a fold-local fusion
+        (design D2: the same decision code, one model per outer fold); the app always loads the final one."""
         torch.set_num_threads(min(cfg.training.num_threads, 4))
         self.cfg, pc = cfg, cfg.prototype
-        self.fusion = joblib.load(FINAL)["models"]["photo"]
+        self.fusion = fusion if fusion is not None else joblib.load(FINAL)["models"]["photo"]
         frozen_all = load_thresholds(Path(pc.thresholds_file))
         frozen = frozen_all["main"]
         if max(abs(frozen["low_risk_below"] - pc.low_risk_below), abs(frozen["caution_from"] - pc.caution_from)) > 1e-9:
             raise ValueError("prototype cut-offs in the config differ from the frozen amendment file")
         self.lo, self.hi = pc.low_risk_below, pc.caution_from
         self.table = photo_table
-        self.model_versions = {"fusion": FINAL.name, "thresholds": str(frozen_all.get("sha256", ""))[:12]}
+        self.model_versions = {"fusion": "fold-local" if fusion is not None else FINAL.name,
+                               "thresholds": str(frozen_all.get("sha256", ""))[:12]}  # fmt: skip
         if photo_table is None:
             self.model, _ = load_photo_bundle(cfg, _photo_checkpoint())
             self.model.eval()

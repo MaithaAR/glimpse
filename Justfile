@@ -19,6 +19,10 @@ prepare:
 splits-v2:
     uv run glimpse splits-v2
 
+# development evaluation on partition v2 (D2): every risk comes from Pipeline.answer, one Pipeline per fold
+evaluate-dev:
+    uv run glimpse evaluate-dev
+
 # run the test suite
 test:
     uv run pytest
