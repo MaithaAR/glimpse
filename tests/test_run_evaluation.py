@@ -4,9 +4,9 @@ import numpy as np
 
 from glimpse.config import load_config
 from glimpse.evaluation import person_bootstrap_ci, reliability
-from glimpse.training.thresholds import cost_only_thresholds
 from glimpse.run_evaluation import _status
 from glimpse.training.final import cost_dict
+from glimpse.training.thresholds import cost_only_thresholds
 
 
 def test_cost_only_cutoffs_follow_from_the_costs():

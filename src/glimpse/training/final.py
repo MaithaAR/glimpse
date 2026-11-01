@@ -27,7 +27,6 @@ from glimpse.config import GlimpseConfig
 from glimpse.data.dataset import MealDataset
 from glimpse.data.splits import Splits, meal_rows
 from glimpse.evaluation import usefulness_report
-from glimpse.training.thresholds import choose_thresholds, decide
 from glimpse.models.photo_model import PhotoCarbModel
 from glimpse.models.weights import weights_path
 from glimpse.training.baselines import logistic, trend_features
@@ -36,6 +35,7 @@ from glimpse.training.cv import _tune_sklearn
 from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
 from glimpse.training.photo import build_cache, embed_maps, grams, load_photo_bundle, photo_rows, predict
 from glimpse.training.photo_cv import BINS, _Recipe
+from glimpse.training.thresholds import choose_thresholds, decide
 
 FINAL = Path("checkpoints/fusion_final.joblib")
 THRESHOLDS = Path("checkpoints/thresholds.json")

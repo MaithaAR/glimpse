@@ -7,8 +7,8 @@ import pytest
 
 from glimpse.config import load_config
 from glimpse.evaluation import expected_cost
-from glimpse.training.thresholds import choose_thresholds
 from glimpse.training.final import cost_dict, hash_thresholds, load_thresholds
+from glimpse.training.thresholds import choose_thresholds
 
 
 def test_thresholds_separate_clear_cases():
