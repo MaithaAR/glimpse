@@ -56,7 +56,8 @@ def run_efficiency(cfg: GlimpseConfig) -> dict:
             times.append(dt)
     backbone, heads = _count(app.model.backbone), _count(app.model.reg_head) + _count(app.model.bin_head)
     sensor = _count(SensorCNN())
-    fusion_params = int(app.fusion.coef_.size + app.fusion.intercept_.size)
+    lr = app.fusion[-1] if hasattr(app.fusion, "steps") else app.fusion  # sklearn Pipeline or bare LR
+    fusion_params = int(lr.coef_.size + lr.intercept_.size)
     rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss  # bytes on macOS, KiB on Linux
     rss_mb = rss / 1e6 if platform.system() == "Darwin" else rss / 1e3
     arts = {p.name: round(p.stat().st_size / 1e6, 1)
