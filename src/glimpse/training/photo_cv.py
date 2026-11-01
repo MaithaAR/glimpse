@@ -275,7 +275,7 @@ def ridge_estimates(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> tuple[
         splits = [(pos_t[~np.isin(person[pos_t], i["exclude"])], pos_t[np.isin(person[pos_t], i["exclude"])],
                    pos_t[np.isin(person[pos_t], i["select"])]) for i in f["inner"]]  # fmt: skip
         err = {a: np.mean([np.mean(np.abs(_ridge_predict(_ridge(emb[a_], g[a_], a), emb[sel]) - g[sel]))
-                           for a_, _b, sel in splits]) for a in grid}  # alpha error on target holds only (D1)
+                           for a_, _b, sel in splits]) for a in grid}  # target holds only (D1)  # fmt: skip
         alphas[k] = min(grid, key=lambda a: float(err[a]))
         for j, (fit, hold, _sel) in enumerate(splits):
             pr = _ridge_predict(_ridge(emb[fit], g[fit], alphas[k]), emb[hold])
