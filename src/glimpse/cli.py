@@ -220,6 +220,14 @@ def _robustness(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _efficiency(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """S12: parameters vs the caps, serving latency and artifact sizes of the deployed pipeline."""
+    from glimpse.studies.efficiency import run_efficiency
+
+    run_efficiency(cfg)
+    return 0
+
+
 def _probes(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """S13: photo-swap and flat-vs-rising CGM counterfactuals (pre-registered in docs/probes_s13.md)."""
     from pathlib import Path
@@ -341,6 +349,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("wandb-export", help="offline W&B runs from every history CSV and summary in outputs/")
     sub.add_parser("robustness", help="decision-flip rates under CGM dropout/gap and photo blur/dark (S9)")
     sub.add_parser("probes", help="photo-swap and flat-vs-rising CGM counterfactual probes (S13)")
+    sub.add_parser("efficiency", help="parameters vs caps, serving latency, artifact sizes (S12)")
     od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
@@ -381,6 +390,7 @@ def main(argv: list[str] | None = None) -> int:
         "ood": _ood,
         "robustness": _robustness,
         "probes": _probes,
+        "efficiency": _efficiency,
         "splits-v2": _splits_v2,
         "selftest": _selftest,
     }

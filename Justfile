@@ -85,6 +85,9 @@ robustness:
 probes:
     uv run glimpse probes
 
+efficiency:
+    uv run glimpse efficiency
+
 # final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
 train-final:
     uv run glimpse final

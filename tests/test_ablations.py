@@ -62,3 +62,13 @@ def test_probe_counterfactuals_shape_the_cgm_as_registered():
     assert bumps[:15] == [0.0] * 15  # readings before -45 min untouched; the -45 reading itself bumps 0
     assert all(b2 >= b1 for b1, b2 in zip(bumps[15:], bumps[16:], strict=False)) and 0 < max(bumps) <= 40
     assert r.glucose_times == times and r.meal_time == m.meal_time
+
+
+def test_scratch_models_fit_the_caps_by_construction():
+    """The scratch parameter count the efficiency table reports must stay far under the 50M cap."""
+    from glimpse.models.sensor_cnn import SensorCNN
+    from glimpse.studies.efficiency import CAPS, _count
+
+    sensor = _count(SensorCNN())
+    assert 0 < sensor < 100_000, "SensorCNN should be tens of thousands of parameters, not more"
+    assert sensor < CAPS["scratch_total"]
