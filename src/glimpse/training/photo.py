@@ -1,16 +1,10 @@
-"""Train the photo model (served carbohydrate from the before-meal photo).
-
-The backbone is pretrained and frozen, so each photo is passed through it ONCE and the result is saved (cache).
-Phase 1: only the two heads learn, from the saved 768 numbers (seconds per run).
-Phase 2 (trial): the backbone's last stage also learns, from saved stage-3 inputs with gentle augmentation.
-It is kept only if it lowers the inner folds' carb error by at least `last_stage_min_gain_g` grams.
-All choices are made inside the 28 training people; the 4 validation people are only watched for the curves."""
+"""Shared photo-model library: photo rows, feature caches, the two heads' losses and metrics, and the
+head/last-stage training loops used by train_photo, cv_photo, the final pipeline and evaluation."""
 
 from __future__ import annotations
 
 import hashlib
 import json
-import os
 from pathlib import Path
 
 import numpy as np
@@ -23,10 +17,9 @@ from torch import nn
 from glimpse.config import GlimpseConfig, PhotoTrainCfg
 from glimpse.data.dataset import MealDataset
 from glimpse.data.photos import eval_transform, open_photo, train_transform
-from glimpse.data.splits import Splits
 from glimpse.models.photo_model import PhotoCarbModel, carb_bin
 from glimpse.models.weights import weights_path
-from glimpse.training.common import EpochLogger, EpochRecord, plot_curves, warmup_cosine
+from glimpse.training.common import EpochRecord, warmup_cosine
 
 MODEL = "photo_convnext"
 CACHE_VERSION = 1
@@ -279,170 +272,3 @@ def load_photo_bundle(cfg: GlimpseConfig, path: Path) -> tuple[PhotoCarbModel, d
     return model.eval(), b
 
 
-def train_photo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
-    """Inner folds choose the head epochs and keep/reject phase 2; then the 28-person model is trained and saved."""
-    torch.set_num_threads(min(cfg.training.num_threads, os.cpu_count() or 1))
-    hp, pc, log = cfg.training.photo, cfg.photo, logger.bind(stage="train", model=MODEL)
-    out, cache = Path(cfg.paths.outputs) / "training", Path("data/cache")
-    root, views = Path(cfg.data.cgmacros_root), hp.augmented_views
-    model = PhotoCarbModel(pc.arch, weights=weights_path(pc), dropout=pc.dropout)
-    fresh_heads = {k: v.clone() for k, v in model.state_dict().items() if "head." in k and "backbone" not in k}
-    R, V = photo_rows(ds, set(sp.train), root), photo_rows(ds, set(sp.validation), root)
-    gR, gV = grams(ds, R), grams(ds, V)
-    log.info("photos: {} training (28 people), {} validation (4 people)", len(R), len(V))
-    maps_eval = build_cache(model, ds, np.concatenate([R, V]), cfg, "maps_eval", cache / "photo_maps_eval.pt")
-    mR, mV = maps_eval[: len(R)], maps_eval[len(R) :]
-    eR, eV = embed_maps(model, mR), embed_maps(model, mV)
-    maps_aug = build_cache(model, ds, R, cfg, "maps_aug", cache / "photo_maps_aug.pt") if hp.try_last_stage else None
-    person = np.array([ds.samples[i].person_id for i in R])
-    elog = EpochLogger(out / f"{MODEL}_history.csv")
-    pristine_stage = _last_stage_state(model)
-
-    best_epochs, mae1, mae2 = [], [], []
-    for k, held in enumerate(sp.inner_folds):
-        fit, hold = np.where(~np.isin(person, held))[0], np.where(np.isin(person, held))[0]
-        model.load_state_dict(fresh_heads, strict=False)
-        e = train_heads(
-            model,
-            eR[fit],
-            gR[fit],
-            hp,
-            hp.max_epochs,
-            cfg.seed + k,
-            f"inner-fold-{k + 1}",
-            elog,
-            (eR[hold], gR[hold]),
-            hp.patience,
-        )
-        best_epochs.append(e)
-        mae1.append(_evaluate(model, eR[hold], gR[hold], hp)[1])
-        if hp.try_last_stage:
-            curve = train_last_stage(
-                model,
-                _subset_views(maps_aug, fit, views),
-                views,
-                gR[fit],
-                hp,
-                hp.last_stage_max_epochs,
-                cfg.seed + k,
-                f"inner-fold-{k + 1}-last-stage",
-                elog,
-                (mR[hold], gR[hold]),
-                start_epoch=e,
-            )
-            mae2.append(curve)
-            model.load_state_dict(pristine_stage, strict=False)
-        log.info(
-            "inner fold {}: heads best epoch {}, carb error {:.1f} g{}",
-            k + 1,
-            e,
-            mae1[-1],
-            f"; with last stage per epoch {[round(m, 1) for m in mae2[-1]]}" if mae2 else "",
-        )
-    e1, keep, e2 = choose_recipe(best_epochs, mae1, mae2, hp)
-    choice = {
-        "heads_best_epochs": best_epochs,
-        "heads_epochs": e1,
-        "inner_mae_heads_only_g": mae1,
-        "inner_mae_last_stage_per_epoch_g": mae2,
-        "last_stage_kept": keep,
-        "last_stage_epochs": e2 if keep else 0,
-        "rule": f"keep the last stage only if the mean inner-fold error drops by >= {hp.last_stage_min_gain_g} g",
-    }
-    log.info(
-        "heads: {} epochs; last stage {} (inner-fold carb error {:.1f} g heads only{})",
-        e1,
-        f"KEPT for {e2} epochs" if keep else "rejected",
-        float(np.mean(mae1)),
-        f", {float(np.min(np.mean(mae2, axis=0))):.1f} g with last stage" if mae2 else "",
-    )
-
-    model.load_state_dict(fresh_heads, strict=False)
-    train_heads(model, eR, gR, hp, e1, cfg.seed, "final", elog, (eV, gV))
-    if keep:
-        train_last_stage(model, maps_aug, views, gR, hp, e2, cfg.seed, "final", elog, (mV, gV), start_epoch=e1)
-    elog.close()
-    pred, probs = predict(model, embed_maps(model, mV) if keep else eV)
-    val = measures(pred, probs, gV)
-    strategy = "frozen backbone, heads trained" + (" + last stage fine-tuned" if keep else "")
-    plot_curves(
-        elog.records,
-        "final",
-        out / f"{MODEL}_curves.png",
-        f"Photo model (ConvNeXt-Tiny): {strategy}",
-        marker_epoch=e1 if keep else None,
-    )
-    (out / f"{MODEL}_choice.json").write_text(json.dumps(choice | {"validation": val}, indent=2))
-    state = model.trainable_state(pc.weights_sha256)
-    if not keep:  # only the heads changed
-        state["state"] = {k: v for k, v in state["state"].items() if not k.startswith("backbone.")}
-    state["state"] = {k: v.half() for k, v in state["state"].items()}
-    ckpt_dir = Path("checkpoints")
-    for old in ckpt_dir.glob(f"{MODEL}_e*.pt"):
-        old.unlink()
-    path = ckpt_dir / f"{MODEL}_e{e1 + (e2 if keep else 0):02d}_valmae{val['mae_g']:.1f}.pt"
-    torch.save(
-        state
-        | {
-            "arch": pc.arch,
-            "strategy": strategy,
-            "heads_epochs": e1,
-            "last_stage_epochs": e2 if keep else 0,
-            "validation": val,
-            "seed": cfg.seed,
-        },
-        path,
-    )
-    (ckpt_dir / f"{MODEL}_latest.txt").write_text(path.name)
-    log.info(
-        "checkpoint {} ({:.2f} MB); validation carb error {:.1f} g, Spearman {:.2f}, bin F1 {:.2f}",
-        path,
-        path.stat().st_size / 1e6,
-        val["mae_g"],
-        val["spearman"],
-        val["bin_f1"],
-    )
-    return path
-
-
-def photo_seed_check(ds: MealDataset, sp: Splits, cfg: GlimpseConfig, extra_seeds: tuple[int, ...] = (1, 2)) -> dict:
-    """Seed spread of the final photo model (added after the results): retrain the chosen recipe (epochs from
-    `photo_convnext_choice.json`) on the 28 training people with other seeds and score the 4 validation people.
-    Nothing is saved to `checkpoints/`; the deployed checkpoint (seed 0) is untouched. No test labels are used."""
-    torch.set_num_threads(min(cfg.training.num_threads, os.cpu_count() or 1))
-    hp, pc, log = cfg.training.photo, cfg.photo, logger.bind(stage="train", model=MODEL)
-    out, cache = Path(cfg.paths.outputs) / "training", Path("data/cache")
-    root, views = Path(cfg.data.cgmacros_root), hp.augmented_views
-    choice = json.loads((out / f"{MODEL}_choice.json").read_text())
-    e1, e2 = int(choice["heads_epochs"]), int(choice["last_stage_epochs"])
-    model = PhotoCarbModel(pc.arch, weights=weights_path(pc), dropout=pc.dropout)
-    fresh_heads = {k: v.clone() for k, v in model.state_dict().items() if "head." in k and "backbone" not in k}
-    pristine_stage = _last_stage_state(model)
-    R, V = photo_rows(ds, set(sp.train), root), photo_rows(ds, set(sp.validation), root)
-    gR, gV = grams(ds, R), grams(ds, V)
-    maps_eval = build_cache(model, ds, np.concatenate([R, V]), cfg, "maps_eval", cache / "photo_maps_eval.pt")
-    mR, mV = maps_eval[: len(R)], maps_eval[len(R) :]
-    eR, eV = embed_maps(model, mR), embed_maps(model, mV)
-    maps_aug = build_cache(model, ds, R, cfg, "maps_aug", cache / "photo_maps_aug.pt") if e2 > 0 else None
-    runs = [{"seed": cfg.seed, "source": "deployed checkpoint", **choice["validation"]}]
-    for s in extra_seeds:
-        model.load_state_dict(fresh_heads, strict=False)
-        model.load_state_dict(pristine_stage, strict=False)
-        train_heads(model, eR, gR, hp, e1, cfg.seed + s, f"seed-{s}", None, (eV, gV))
-        if e2 > 0:
-            train_last_stage(model, maps_aug, views, gR, hp, e2, cfg.seed + s, f"seed-{s}", None, (mV, gV),
-                             start_epoch=e1)  # fmt: skip
-        pred, probs = predict(model, embed_maps(model, mV) if e2 > 0 else eV)
-        val = measures(pred, probs, gV)
-        runs.append({"seed": cfg.seed + s, "source": "retrained, not saved", **val})
-        log.info("seed {}: validation carb error {:.1f} g, Spearman {:.2f}, bin F1 {:.2f}",
-                 cfg.seed + s, val["mae_g"], val["spearman"], val["bin_f1"])  # fmt: skip
-    summary = {k: {"mean": float(np.mean([r[k] for r in runs])), "sd": float(np.std([r[k] for r in runs], ddof=1))}
-               for k in ("mae_g", "spearman", "bin_f1")}  # fmt: skip
-    res = {"recipe": {"heads_epochs": e1, "last_stage_epochs": e2}, "runs": runs, "summary": summary,
-           "note": "validation people only; the deployed checkpoint is the first run and is not replaced"}  # fmt: skip
-    (out / f"{MODEL}_seeds.json").write_text(json.dumps(res, indent=2))
-    log.info("photo seed spread over {} seeds: carb error {:.1f} +/- {:.1f} g, bin F1 {:.2f} +/- {:.2f} -> {}",
-             len(runs), summary["mae_g"]["mean"], summary["mae_g"]["sd"], summary["bin_f1"]["mean"],
-             summary["bin_f1"]["sd"], out / f"{MODEL}_seeds.json")  # fmt: skip
-    return res

@@ -82,7 +82,7 @@ def _train(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     if args.model == "scratch":
         train_scratch(ds, sp, cfg)
     else:
-        from glimpse.training.photo import train_photo
+        from glimpse.training.train_photo import train_photo
 
         train_photo(ds, sp, cfg)
     return 0
@@ -151,7 +151,7 @@ def _photo_seeds(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Seed spread of the final photo model on the validation people (the deployed checkpoint is untouched)."""
     from glimpse.data.dataset import MealDataset
     from glimpse.data.splits import Splits
-    from glimpse.training.photo import photo_seed_check
+    from glimpse.training.train_photo import photo_seed_check
 
     photo_seed_check(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
     return 0
