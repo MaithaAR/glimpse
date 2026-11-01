@@ -66,3 +66,26 @@ def test_evaluation_only_measures_it_never_decides():
     for f in Path("src/glimpse/evaluation").glob("*.py"):
         imports = [ln for ln in f.read_text().splitlines() if ln.startswith(("import ", "from "))]
         assert not any("training.thresholds" in ln for ln in imports), f"{f} imports the decision layer"
+
+
+def test_per_fold_auroc_platt_equals_raw_within_fold():
+    """Platt is monotone, so it cannot change AUROC inside a fold -- the table that defuses the pooled
+    platt-below-raw artefact must show auroc_platt == auroc_raw in every row."""
+    import pandas as pd
+
+    from glimpse.evaluation.run import _fold_auroc_table
+
+    rng = np.random.default_rng(3)
+    rows = []
+    for fold in (1, 2):
+        raw = rng.uniform(0.05, 0.95, size=40)
+        y = (rng.uniform(size=40) < raw).astype(int)
+        z = np.log(raw / (1 - raw))
+        platt = 1 / (1 + np.exp(-(0.8 * z - 0.3 * fold)))  # fold-specific monotone map
+        rows += [{"fold": fold, "spike": int(yy), "risk_raw": rr, "risk_platt": pp, "risk": pp}
+                 for yy, rr, pp in zip(y, raw, platt, strict=True)]  # fmt: skip
+    table = _fold_auroc_table(pd.DataFrame(rows))
+    assert [r["fold"] for r in table] == [1, 2]
+    for r in table:
+        assert r["n"] == 40
+        assert abs(r["auroc_platt"] - r["auroc_raw"]) < 1e-12

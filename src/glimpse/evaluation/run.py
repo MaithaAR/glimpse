@@ -116,6 +116,19 @@ def _risk_metrics(df: pd.DataFrame, col: str, B: int, seed: int) -> dict:
             "log_loss": float(log_loss(y, p, labels=[0, 1])), "n": int(len(d))}  # fmt: skip
 
 
+def _fold_auroc_table(df: pd.DataFrame) -> list[dict]:
+    """Per-fold AUROC of the three risk columns. Platt is a monotone map fitted per fold, so within every
+    fold auroc_platt == auroc_raw; only pooling across folds can reorder meals (the report's footnote)."""
+    out = []
+    for kk, g in df.dropna(subset=["risk"]).groupby("fold"):
+        yk = g.spike.to_numpy()
+        row = {"fold": int(kk), "n": int(len(g))}
+        for name, col in (("raw", "risk_raw"), ("platt", "risk_platt"), ("personal", "risk")):
+            row[f"auroc_{name}"] = float(roc_auc_score(yk, g[col].to_numpy()))
+        out.append(row)
+    return out
+
+
 def evaluate_dev(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
     """Every development meal answered by its fold's Pipeline -> dev_answers.csv + dev_summary.json."""
     log, pcv = logger.bind(stage="evaluate"), Path(cfg.paths.outputs) / "photo_cv"
@@ -162,6 +175,8 @@ def evaluate_dev(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
         "risk_personal": _risk_metrics(df, "risk", B, seed),
         "risk_platt_only": _risk_metrics(df, "risk_platt", B, seed),
         "risk_raw": _risk_metrics(df, "risk_raw", B, seed),
+        "per_fold_auroc": _fold_auroc_table(df),
+        "risk_personal_excluding_fold1": _risk_metrics(df[df.fold != 1], "risk", B, seed),
         "decisions": usefulness_report(actions, df.spike.to_numpy(), costs, targets),
         "abstained_no_photo": int((df.decision == "can't judge").sum() - (df.risk.notna()
                                   & (df.decision == "can't judge")).sum()),  # fmt: skip
