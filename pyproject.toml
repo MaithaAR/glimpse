@@ -23,6 +23,7 @@ dependencies = [
   "huggingface-hub>=0.26,<2",
   "safetensors>=0.4,<1",
   "pillow-heif>=0.18,<2",
+  "wandb>=0.18,<1",
 ]
 
 # `uv run glimpse ...` runs glimpse.cli:main

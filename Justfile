@@ -70,6 +70,10 @@ fusion:
 ablate:
     uv run glimpse ablate
 
+# offline W&B runs regenerated from the committed CSVs/JSONs (wandb sync outputs/wandb/... uploads them)
+wandb-export:
+    uv run glimpse wandb-export
+
 # final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
 train-final:
     uv run glimpse final
