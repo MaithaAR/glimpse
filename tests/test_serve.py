@@ -59,7 +59,8 @@ def test_same_decision_code_for_table_and_live_estimates():
     m = MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm())
     a = p.answer(m, key=7)
     assert a.decision == "caution" and a.carb_source == "photo" and a.carb_bin == "60-89 g"
-    assert a.checks_passed[:2] == ["cgm_window", "photo_present"] and a.checks_failed == []
+    assert a.checks_passed[:5] == ["cgm_units", "cgm_times", "cgm_window", "profile", "photo_present"]
+    assert a.checks_failed == []
 
 
 def test_confirm_carbs_tier_uses_the_users_number():
