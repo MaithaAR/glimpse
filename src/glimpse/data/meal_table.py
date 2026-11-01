@@ -1,4 +1,4 @@
-"""Builds the labelled meal table from CGMacros under the proposal's prespecified rules (live code, used by `just prepare`).
+"""Builds the labelled meal table from CGMacros under the proposal's prespecified rules; runs in `just prepare`.
 
 Produces the rows behind outputs/data/meal_counts.json and docs/data_card.md.
 
