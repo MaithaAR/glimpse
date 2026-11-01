@@ -21,6 +21,8 @@ docs/final_design.md §6; the observed result of the first naive run is recorded
 | 11_local_dish | unfamiliar local dish | confirm-carbs tier, not a confident bin |
 | 12_zero_byte | empty photo.jpg | per-item error entry; the run continues |
 
-Placeholder photos (synthetic plates) stand in for 00, 02-07, 10 until replaced with real phone
-photos; 11_local_dish MUST be replaced with a real photo of a local dish (e.g. harees or machboos)
-before the set is cited in the report -- a synthetic plate cannot test unfamiliarity.
+Real phone photos (EXIF-stripped, resized): 00_clean (tuna rice bowl), 10_exif_rotated (the same
+photo stored turned 90 CCW with EXIF orientation 6) and 11_local_dish (lamb with biryani-style
+rice, an Emirati home meal). Cases 02-07 keep synthetic plate placeholders: their behaviours are
+decided by the CGM or profile before the photo matters. samples/local_photos/ holds 14 more real
+phone photos (meals, desserts, a crepe, a croissant, a fruit plate) for the OOD evaluation set.
