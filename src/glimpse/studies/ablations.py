@@ -69,8 +69,8 @@ def run_profile_excluded(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> d
         pt = photo_table(p_nested[p_nested.fold == kk]) | photo_table(p_oof[p_oof.fold == kk])
         held_keys = {mm[key] for key in mm if key[0] in set(fold)}
         tr = meal_rows(ds, set(sp.training_people(k)), scored_only=False)
-        keep = np.array([i for i in tr
-                         if mm.get((ds.samples[i].person_id, pd.Timestamp(ds.samples[i].meal_time))) not in held_keys])
+        key = lambda i: (ds.samples[i].person_id, pd.Timestamp(ds.samples[i].meal_time))  # noqa: E731
+        keep = np.array([i for i in tr if mm.get(key(i)) not in held_keys])
         dropped[kk] = {"training_meals": int(len(tr)), "dropped": int(len(tr) - len(keep))}
         te = meal_rows(ds, set(fold), scored_only=True)
         fx = {"photo": with_table(pt, len(PHOTO_COLS)), "no_meal": trend_features}
