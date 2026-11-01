@@ -7,9 +7,9 @@ import pytest
 
 from glimpse.config import load_config
 from glimpse.training.photo import choose_recipe
-from glimpse.training.photo_cv import _one_hot_bins, _ridge, _ridge_predict, fold_plan
+from glimpse.training.photo_cv import _one_hot_bins, _ridge, _ridge_predict, fold_plan_v2
 
-HAVE_DATA = Path("data/dataset.json").is_file() and Path("splits/dev_splits.json").is_file()
+HAVE_DATA = Path("data/dataset.json").is_file() and Path("splits/dev_splits_v2.json").is_file()
 
 
 def test_recipe_rule():
@@ -28,18 +28,19 @@ def test_baseline_helpers():
     assert _one_hot_bins(np.array([10.0, 30.0, 60.0, 95.0])).argmax(1).tolist() == [0, 1, 2, 3]
 
 
-@pytest.mark.skipif(not HAVE_DATA, reason="run `just prepare` first")
+@pytest.mark.skipif(not HAVE_DATA, reason="run `just prepare` and `just splits-v2` first")
 @pytest.mark.parametrize("k", range(5))
 def test_no_person_is_predicted_by_a_model_that_saw_them(k):
-    """Outer fold k: held-out and locked people never train; the inner folds split the training people exactly
-    once, so every training person gets one nested estimate from a model without them."""
-    from glimpse.data.dataset import MealDataset
-    from glimpse.data.splits import Splits
+    """Fold k of partition v2: held-out and locked people never train; the inner "exclude" sides split the
+    training people exactly once, so every training person gets one nested estimate from a model without
+    them; selection holds are target people only."""
+    from glimpse.data.splits import SplitsV2
 
-    ds, sp = MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json"))
-    groups = {s.person_id: s.group for s in ds.samples}
-    f = fold_plan(sp, groups, load_config())[k]
+    sp = SplitsV2.load(Path("splits/dev_splits_v2.json"))
+    f = fold_plan_v2(sp, load_config())[k]
     train = set(f["train"])
     assert not train & set(f["held"]) and not train & set(sp.locked) and not set(f["held"]) & set(sp.locked)
-    inner_people = [p for held in f["inner"] for p in held]
-    assert sorted(inner_people) == sorted(train)  # each training person held out exactly once
+    excluded = [p for inner in f["inner"] for p in inner["exclude"]]
+    assert sorted(excluded) == sorted(train)  # each training person held out exactly once
+    for inner in f["inner"]:
+        assert not set(inner["select"]) & set(sp.t2d)  # selection error is measured on target people only
