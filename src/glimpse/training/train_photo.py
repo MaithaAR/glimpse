@@ -20,10 +20,10 @@ from glimpse.models.photo_model import PhotoCarbModel
 from glimpse.models.weights import weights_path
 from glimpse.training.common import EpochLogger, plot_curves
 from glimpse.training.photo import (
-    _evaluate,
-    _subset_views,
     MODEL,
+    _evaluate,
     _last_stage_state,
+    _subset_views,
     build_cache,
     choose_recipe,
     embed_maps,
@@ -34,6 +34,7 @@ from glimpse.training.photo import (
     train_heads,
     train_last_stage,
 )
+
 
 def train_photo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
     """Inner folds choose the head epochs and keep/reject phase 2; then the 28-person model is trained and saved."""
