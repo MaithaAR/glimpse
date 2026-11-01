@@ -31,6 +31,7 @@ from glimpse.training.baselines import trend_features
 from glimpse.training.final import FINAL, _photo_checkpoint, load_thresholds
 from glimpse.training.photo import load_photo_bundle
 
+
 class Glimpse:
     """Loads the frozen 28-person pipeline once; `predict` answers one meal."""
 

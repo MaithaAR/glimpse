@@ -14,6 +14,7 @@ from glimpse.data.dataset import PROFILE
 from glimpse.data.preprocess import passes_premeal_checks
 from glimpse.serve.schemas import Answer
 
+
 def cant_judge(reason: str, **extra) -> Answer:
     """The structured 'can't judge' result (escalation: the user decides, or asks their care team)."""
     return Answer(decision="can't judge", sentence=sentence("can't judge", None, reason), reason=reason, **extra)

@@ -14,9 +14,9 @@ from loguru import logger
 from glimpse.config import load_config
 from glimpse.data.dataset import MealDataset
 from glimpse.data.splits import Splits
-from glimpse.serve import Glimpse, answer_from_files
 from glimpse.demo_cases import write_example
 from glimpse.feedback import record_feedback
+from glimpse.serve import Glimpse, answer_from_files
 from glimpse.utils.logging import setup_logging
 
 COLOURS = {"low risk": "#1e8449", "caution": "#b9770e", "can't judge": "#5d6d7e"}
