@@ -183,3 +183,24 @@ def test_implausible_profile_message_is_one_plain_sentence(tmp_path):
     assert a.decision == "can't judge"
     assert "age = 7.0 is outside the plausible range 18-100" in a.reason
     assert "pydantic" not in a.reason and "https://" not in a.reason
+
+
+def test_exif_rotated_photo_opens_identically(tmp_path):
+    """Rule R6: a photo stored rotated with an EXIF orientation tag opens pixel-identical to the upright
+    original, so the stored rotation cannot change any decision downstream."""
+    import numpy as _np
+    from PIL import Image
+
+    from glimpse.data.photos import open_photo
+
+    rng = _np.random.default_rng(0)
+    arr = rng.integers(0, 255, size=(120, 160, 3), dtype=_np.uint8)
+    up = Image.fromarray(arr)
+    up.save(tmp_path / "up.jpg", quality=100, subsampling=0)
+    ex = Image.Exif()
+    ex[274] = 6  # stored rotated 90 degrees; the tag says how to display it
+    up.rotate(-90, expand=True).save(tmp_path / "rot.jpg", quality=100, subsampling=0, exif=ex)
+    a = _np.asarray(open_photo(tmp_path / "up.jpg"), dtype=_np.int16)
+    b = _np.asarray(open_photo(tmp_path / "rot.jpg"), dtype=_np.int16)
+    assert a.shape == b.shape
+    assert float(_np.abs(a - b).mean()) < 3  # identical up to JPEG round-trip noise

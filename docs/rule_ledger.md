@@ -33,15 +33,23 @@ All 13 cases returned without a crash and the run exited 0. Decisions:
 | R3 | 03_future_timestamps | any reading after the meal time -> can't judge naming the count and the latest offending time | shared CGM validation | 2026-11-01, S3-C6 |
 | R4 | 06_profile_implausible | implausible profile -> can't judge "age = 7 is outside the plausible range 18-100" (one plain sentence, no stack dump) | input boundary (answer_from_files) | 2026-11-01, S3-C6 |
 | R5 | 07_profile_blank | required profile fields all missing/blank -> can't judge naming the missing fields; never filled with defaults | shared profile validation | 2026-11-01, S3-C6 |
-| R6 | 10_exif_rotated (unproven) | photos are EXIF-transposed on open so stored rotation cannot change the decision | shared photo opener | pending (C7) |
+| R6 | 10_exif_rotated (unproven) | photos are EXIF-transposed on open so stored rotation cannot change the decision | shared photo opener (open_photo, already present) | 2026-11-01, S3-C7: pixel-identity unit test added; end-to-end proof still waits on real photos |
 
 Photo-set debt (blocks re-testing 00/10/11): replace the synthetic placeholder photos with real
 phone photos, including one local dish. Until then those three rows stay "untestable" and are not
 cited as passing anywhere.
 
-## After rules R1-R5 — verification pending
+## Verification run — 2026-11-01 17:25, after rules R1-R5 (commit 5e01186)
 
-The folder run is repeated after S3-C6; the five FAIL rows above are expected to flip (01 names the
-unit fix, 02 answers with a `timestamps_sorted` flag once its photo is real, 03 names the future
-readings, 06 shows one plain sentence, 07 names the blank fields). The observed summary is pasted
-here after the run.
+All five FAIL rows flipped; observed reasons:
+
+| case | observed after R1-R5 | verdict |
+|---|---|---|
+| 01_mmol | "the glucose values look like mmol/L; multiply by 18 or export the file in mg/dL" | pass (R1) |
+| 02_unsorted | "CGM timestamps were out of order; sorted before use (rule R2)" logged, window check passed; decision still blocked only by the placeholder photo | pass (R2) |
+| 03_future_timestamps | "11 glucose readings are timestamped after the meal time (latest 2024-06-01 12:55); check the export and the meal time" | pass (R3) |
+| 06_profile_implausible | "unsupported input (age = 7.0 is outside the plausible range 18-100)" — one sentence, no stack dump | pass (R4) |
+| 07_profile_blank | "profile fields missing or blank: age, bmi, a1c_pct, fasting_glucose_mgdl" | pass (R5) |
+
+04, 08, 09, 12 behave as in the naive run (pass). 00/10/11 remain untestable until the placeholder
+photos are replaced with real phone photos.
