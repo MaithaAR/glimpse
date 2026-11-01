@@ -3,34 +3,54 @@
 Written 1 November 2026, **before** any new result, as the gate for the final stage. Deadline 27 November 2026.
 Nothing is built that does not fill a row in the evidence table below.
 
-## 0. Hard constraint
+## 0. Standard of work
 
-The course total must not fall below 91. Points already decided: proposal 9.1/10, mini-project 21.0/25,
-intermediate 18.0/20 = 48.1 of 55. The remaining 45 points (presentation 10, final deliverable 20, viva 15)
-must therefore average **95.3%**, against a ceiling of 93.1 total. One day late costs 5 points and ends it.
-
-Consequences adopted here: a step is not done until it would survive a cold grading at 95%; the deliverable,
-the presentation and the viva are planned together, not sequentially; every freeze date is absolute.
+Every claim is judged by its interval, not its point estimate. A step is finished only when an independent cold
+reading would accept it. Freeze dates are absolute. Where the evidence does not support the product story, the
+report says so and the design changes, not the wording.
 
 ## 1. Pre-registered decisions (dated; no re-anchoring)
 
 **D1 — Partition v2 (post-intermediate redesign, declared before new results).** Development = 23 target people
 (5 outer folds) + 14 type 2 diabetes people (training only). The 4 inner folds inside each outer training set are
 **the validation split** for every selection: regularisation C, epochs, Platt parameters, shrinkage m, cut-offs.
-Test = the 8 locked people, scored once at the end. The intermediate's fixed 4-person validation and 5-person test
-groups dissolve into development; the intermediate scored those 5 once and that result stands as reported.
-Reason: the intermediate's three overlapping roles produced the double count the professor flagged.
+Test = the 8 locked people, scored once at the end; **this is the primary results table**, because it is the only
+split no selection has seen. The 23-person outer cross-validation is reported alongside it and labelled
+*development*: it is better powered but its people were already seen at the intermediate stage, so it is
+supporting evidence, not the headline. The intermediate's fixed 4-person validation and 5-person test groups
+dissolve into development; the intermediate scored those 5 once and that result stands as reported.
+
+Stated plainly in the report, because it is the honest cost of this redesign: those 5 people's labels informed the
+intermediate's calibration diagnosis, so development estimates are optimistic, and the locked 8 are the only clean
+measurement. The 8 are not pooled with the 23 for the headline — a clean test loses its meaning the moment it is
+averaged with a seen one.
 
 **D2 — One scoring path.** `Pipeline.answer(meal, history) -> Answer` is used by `evaluate`, `demo`, `predict`,
 `predict-folder` and the app. Evaluation builds one Pipeline per outer fold and calls it on every held-out meal;
 usefulness, abstention and cost come from `Answer.decision`. A missing photo is *can't judge* everywhere; the
 intermediate's average-photo fill is deleted. A test asserts demo and evaluate agree meal by meal.
 
-**D3 — Fix 1, per-person intercept.** Within each outer fold: fit on fold-training people → inner-fold out-of-fold
-risk → Platt recalibration → choose shrinkage m and cut-offs by minimum expected cost on that recalibrated risk.
-For each held-out person, their first 5 chronological meals set a shrunk intercept, are answered *caution*
-(cold start) and are **excluded from scoring**; the rest are scored. Held-out labels never touch a choice.
-Cold-start share is reported and must stay under 20%.
+**D3 — Fix 1, per-person intercept, expanding window.** The population risk is Platt-recalibrated on inner-fold
+out-of-fold predictions. Each person then carries an offset on the recalibrated logit, fitted only on their own
+*earlier* meals:
+
+    b_p(t) = argmin_b  sum over meals i < t of  NLL(y_i, sigmoid(f_i + b))  +  (m/2) b^2,
+    scored risk for meal t = sigmoid(f(x_t) + b_p(t)),  b_p(1) = 0.
+
+Every meal is scored, in the order the user would experience it, which is exactly what deployment does. The
+shrinkage m is mandatory, not cosmetic: with five identical labels the unpenalised estimate diverges. m is chosen
+by replaying this same protocol inside the 4 inner folds and minimising expected cost; it never sees a held-out
+label, and the shrinkage uses the population variance, not the person's own.
+
+Rejected alternative (recorded): fitting the offset on each person's first 5 meals and excluding those meals from
+scoring. It drops 115 of 481 development meals (23.9%), biases the scored set by removing the earliest and
+noisiest meals, and reintroduces the gap between what is evaluated and what is deployed. The expanding window has
+none of these faults.
+
+**D3b — The intercept is a claim, so it is ablated.** Hypothesis: the population model cannot separate rare from
+frequent spikers (intermediate: 30% predicted against 16% observed for rare spikers, 42% against 54% for frequent,
+correlation −0.77), so a per-person offset should cut ECE within each spike-rate half without reducing AUROC.
+The ablation reports the system with the offset, without it, and with a population-only recalibration.
 
 **D4 — Fix 2, operating thresholds.** Cut-offs chosen on the recalibrated inner-fold risk by minimum expected cost,
 stored in config, with a sensitivity sweep over the pre-registered cost settings.
@@ -42,9 +62,24 @@ stored in config, with a sensitivity sweep over the pre-registered cost settings
 **D6 — Scratch model.** SensorCNN stays as the required from-scratch model and the RQ2 answer only. One cheap
 4-hour-window / 3-seed check, one row, and it is not in the deployed Pipeline.
 
-**D7 — Both outcomes pre-written.** The main claim is the photo's AUROC gain. Before the seeds run, both the
-"shown" and the "not shown" paragraphs are written. If the lower bound stays at or below zero on 31 people, the
-product story becomes sensor + confirm-carbs, stated plainly, and the report says so rather than softening.
+**D7 — The primary test, and both outcomes pre-written.** The primary endpoint stays the one the proposal
+pre-registered: the photo arm's AUROC gain over profile + trend, with a person-clustered bootstrap interval, now
+reported on the locked 8 as the test and on development as supporting evidence.
+
+A secondary endpoint is **added at this stage and labelled as such**, with its reason recorded before any result:
+the paired difference in mean log-loss between the photo and no-meal arms, clustered by person, one-sided at 5%.
+It is added because the AUROC difference is underpowered — the person-level standard error of about 0.021 on 18
+people does not shrink enough at 31 to clear zero — not because it gives a friendlier answer. Both are reported
+whatever they say, and the primary remains primary.
+
+Before the seeds run, both result paragraphs are written. If the gain's lower bound stays at or below zero, the
+product story becomes sensor plus confirm-carbs, and the report states that the photo's contribution is not
+established rather than softening the sentence.
+
+**D8 — Recurring meal profiles.** 62% of isolated target meals share an exact macro profile with another person's
+meal, which the proposal flagged and the intermediate never tested. The profile-excluded split (meals sharing a
+macro profile with a held-out person are removed from that fold's training set) is run as the second half of the
+week-4 gate, and its result is reported next to the main gain whether or not it survives.
 
 **Cut now, not later:** Nutrition5k pre-training, conformal intervals, the carb-sensitivity slider, the CNN+GBM
 ensemble, DINOv2 (the kNN check is tuned instead), a full fine-tuning arm. Each gets one row in the proposal
@@ -53,24 +88,27 @@ status table with the reason.
 ## 2. Target code map
 
 Current: 5,172 lines over 29 modules; `run_evaluation.py` 583, `training/photo.py` 448, `demo_run.py` 237,
-`data/legacy.py` 136. The professor could not navigate it. Target: one job per module, ≤ 250 lines, named by
-pipeline stage, each docstring naming the report table or figure it produces.
+`data/legacy.py` 136. The professor could not navigate it, and named those files.
+
+A full re-architecture would cost 10–15 hours and earn part of one rubric bullet. The change is therefore
+confined to what was actually criticised: split the three named files, delete the two dead ones, add the two
+packages the new work needs, and give the reader a map. Existing `data/`, `models/` and `training/` stay.
 
 ```
 src/glimpse/
-  data/        download meals windows splits photos quality normalise dataset preprocess
-  models/      sensor_cnn photo_model fusion budget weights
-  training/    train_scratch train_photo train_final common
-  cv/          folds cv_sensor cv_photo cv_fusion
-  calibration/ recalibrate thresholds          # fix 1 and fix 2, nothing else
-  evaluation/  metrics tables figures locked_set
-  studies/     ablations robustness ood explain efficiency failures
-  serve/       pipeline predict demo app feedback monitoring
-  cli.py config.py schemas.py
+  data/        unchanged (legacy.py deleted)
+  models/      unchanged
+  training/    train_scratch, train_photo, train_final, common   # photo.py split, cv part moved out
+  cv/          cv_sensor, cv_photo, cv_fusion, folds
+  evaluation/  metrics, tables, figures, locked_set              # run_evaluation.py split
+  studies/     ablations, robustness, ood, explain, efficiency, failures   # new
+  serve/       pipeline, predict, demo, app, feedback, monitoring # demo_run.py merged in
+  calibration.py  cli.py  config.py  schemas.py
 ```
 
-Deleted: `data/legacy.py`, `demo_run.py`, any module with no call site. Archived to the git tag `proposal-era`:
-`pilot/`, `scripts/`, `results/`. No module imports from a later stage. CI fails on dead code.
+Deleted: `data/legacy.py`, `demo_run.py`, and anything `vulture` reports with no call site. Archived to the git
+tag `proposal-era`: `pilot/`, `scripts/`, `results/`. The README carries a one-line map of every module and the
+recipe that runs it; each module's docstring names the report table or figure it produces. Budget: 4 hours.
 
 ## 3. Evidence table
 
@@ -104,9 +142,26 @@ cites it. A step is closed only when its row points at a real file.
 | 6b development evidence | incremental commits, tracker exports | git, W&B | `experiments/` | appendix |
 | 6c instructor readiness | folder of unseen inputs | `just predict-folder` | `results.jsonl`, `summary.md` | §2 |
 | 6d README, lint, docstrings, tests | – | `just check` | CI log | – |
+| 2b fine-tuning items vs the 10,000 cap | ledger incl. anything planned | `just prepare` | `outputs/data/finetune_ledger.csv` | §2 |
+| 2e feedback → retraining | how records would retrain, simulated | `just app` | `outputs/feedback/feedback.jsonl` | §2 |
+| 4b test cost vs naive policies | always-caution, always-clear, baseline | `just evaluate` | `outputs/evaluation/results.md` | §5 |
+| 2c heart rate earns its place | modality-removal arm for HR alone | `just ablate` | `outputs/ablate/modality.csv` | §2, §4 |
+| 3e generalisation gap | hard set: profile-excluded, stressed, unfamiliar | `just efficiency` | `outputs/efficiency/gap.csv` | §6 |
+| 5c user and dietitian sessions | 3–5 users, 2 dietitians, structured notes | – | `docs/user_test.md` | §8 |
 
-New recipes to build: `predict-folder`, `ablate`, `robust`, `ood`, `probe`, `monitor`, `efficiency`, `failures`,
-`manifest`, `wordcount`. `just evaluate` becomes the umbrella that regenerates every table and figure.
+New recipes, in build order (each depends on the one before it):
+
+`wordcount` and `manifest` (0.5 h each, they enforce the freezes) → `serve/pipeline` with the demo-equals-evaluate
+test → `predict-folder` (5 h; it is what produces the observed failures the rules ledger needs) → `failures` (2 h)
+→ `ablate` (4 h) → `ood` (3 h) → `probe` (3.5 h) → `robust` (5 h) → `monitor` (2.5 h) → `efficiency` (2.5 h).
+`just evaluate` becomes the umbrella last, once the output paths have stopped moving. About 29 hours in total,
+most of it reusing the cross-validated predictions and photo feature caches that already exist; only the
+modality-removal arm and the blur and lighting arms need fresh photo passes, and those run overnight.
+
+Three tasks that will quietly consume an evening each, and the guard against it: HEIC and EXIF handling
+(pin the decoder, convert to JPEG at ingest, one fixture per format); the demo-equals-evaluate assertion
+(write it on day one against three meals, not on day twenty against seven hundred); and the twelve-row behaviour
+table (one parametrised test over `samples/instructor/`, written as each guard is added, never afterwards).
 
 ## 4. Report budget (≤ 3,000 words, 5–8 pages; tables and figures excluded)
 
