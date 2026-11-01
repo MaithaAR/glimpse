@@ -30,7 +30,7 @@ from sklearn.preprocessing import StandardScaler
 
 from glimpse.config import GlimpseConfig
 from glimpse.data.dataset import MealDataset
-from glimpse.data.splits import Splits, SplitsV2, _folds, assert_not_locked, meal_rows
+from glimpse.data.splits import SplitsV2, _folds, assert_not_locked, meal_rows
 from glimpse.models.photo_model import PhotoCarbModel, carb_bin
 from glimpse.models.weights import weights_path
 from glimpse.training.common import EpochLogger
@@ -255,10 +255,10 @@ def summarise_photo_cv(oof: pd.DataFrame, nested: pd.DataFrame, choices: list[di
     }  # fmt: skip
 
 
-def ridge_estimates(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
-    """POST-HOC (added after 4c-2): frozen ConvNeXt + ridge, with the alpha grid widened because 1000 (the old top)
-    won in every fold. Same folds; OOF estimates for held-out people and nested ones for training people, exactly
-    like the fine-tuned model, so ridge can be a secondary fusion arm. Takes about a minute (cached photos)."""
+def ridge_estimates(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+    """Frozen ConvNeXt + ridge on partition v2, the same folds and inner splits as run_photo_cv: alpha is
+    chosen on target holds only, nested estimates cover every training photo, OOF estimates the held-out
+    people -- so ridge can be a secondary fusion arm. Takes about a minute (cached photos)."""
     log, out = logger.bind(stage="photo_cv"), Path(cfg.paths.outputs) / "photo_cv"
     out.mkdir(parents=True, exist_ok=True)
     groups = {s.person_id: s.group for s in ds.samples}
@@ -269,14 +269,15 @@ def ridge_estimates(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> tuple[pd
     maps = build_cache(model, ds, rows, cfg, "maps_eval", Path("data/cache") / "photo_cv_maps_eval.pt")
     emb = embed_maps(model, maps).numpy()
     oof, nested, alphas = [], [], {}
-    for f in fold_plan(sp, groups, cfg):
+    for f in fold_plan_v2(sp, cfg):
         k = f["fold"]
         pos_t, pos_h = np.where(np.isin(person, f["train"]))[0], np.where(np.isin(person, f["held"]))[0]
-        splits = [(pos_t[~np.isin(person[pos_t], h)], pos_t[np.isin(person[pos_t], h)]) for h in f["inner"]]
-        err = {a: np.mean([np.mean(np.abs(_ridge_predict(_ridge(emb[a_], g[a_], a), emb[b_]) - g[b_]))
-                           for a_, b_ in splits]) for a in grid}  # fmt: skip
+        splits = [(pos_t[~np.isin(person[pos_t], i["exclude"])], pos_t[np.isin(person[pos_t], i["exclude"])],
+                   pos_t[np.isin(person[pos_t], i["select"])]) for i in f["inner"]]  # fmt: skip
+        err = {a: np.mean([np.mean(np.abs(_ridge_predict(_ridge(emb[a_], g[a_], a), emb[sel]) - g[sel]))
+                           for a_, _b, sel in splits]) for a in grid}  # alpha error on target holds only (D1)
         alphas[k] = min(grid, key=lambda a: float(err[a]))
-        for j, (fit, hold) in enumerate(splits):
+        for j, (fit, hold, _sel) in enumerate(splits):
             pr = _ridge_predict(_ridge(emb[fit], g[fit], alphas[k]), emb[hold])
             part = {"fold": k, "inner": j + 1, "row": rows[hold], "carbs_g": g[hold], "ridge_g": pr}
             nested.append(pd.DataFrame(part))
