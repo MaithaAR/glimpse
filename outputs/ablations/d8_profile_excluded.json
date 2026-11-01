@@ -1,0 +1,47 @@
+{
+  "what": "D8 profile-excluded split: training meals sharing an exact macro profile with a held-out person removed; same folds, same C as the main arms, nothing retuned",
+  "dropped_per_fold": {
+    "1": {
+      "training_meals": 766,
+      "dropped": 379
+    },
+    "2": {
+      "training_meals": 760,
+      "dropped": 391
+    },
+    "3": {
+      "training_meals": 735,
+      "dropped": 389
+    },
+    "4": {
+      "training_meals": 814,
+      "dropped": 395
+    },
+    "5": {
+      "training_meals": 779,
+      "dropped": 411
+    }
+  },
+  "share_dropped": 0.5098598858329009,
+  "gain_photo_vs_no_meal": {
+    "point": -0.005310185366618314,
+    "ci95": [
+      -0.028853323188995948,
+      0.02090114677833594
+    ]
+  },
+  "gain_photo_meals_only": {
+    "point": -0.004650764054094592,
+    "ci95": [
+      -0.02800313044940242,
+      0.022204346459887687
+    ]
+  },
+  "control_random_drop_gain": {
+    "point": 0.03652028547547104,
+    "ci95": [
+      -0.024211885431965046,
+      0.09959645411662883
+    ]
+  }
+}

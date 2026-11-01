@@ -1,0 +1,24 @@
+{
+  "what": "photo arm with one input channel removed; same folds, same C, nothing retuned",
+  "auroc": {
+    "full": 0.719461535446957,
+    "no_heart_rate": 0.7260061919504645,
+    "no_profile": 0.5970921346553278
+  },
+  "delta_vs_full": {
+    "no_heart_rate": {
+      "point": 0.00654465650350744,
+      "ci95": [
+        -0.01286531689012493,
+        0.023183954527742207
+      ]
+    },
+    "no_profile": {
+      "point": -0.12236940079162917,
+      "ci95": [
+        -0.19710788094839904,
+        -0.04123393467437517
+      ]
+    }
+  }
+}
