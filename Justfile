@@ -88,6 +88,9 @@ probes:
 efficiency:
     uv run glimpse efficiency
 
+monitoring:
+    uv run glimpse monitoring
+
 # final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
 train-final:
     uv run glimpse final
