@@ -12,6 +12,7 @@ from glimpse.config import load_config
 from glimpse.serve import Answer, MealInput, PhotoEstimate, Pipeline
 
 MEAL = datetime(2024, 1, 28, 12, 0)
+PROFILE = {"age": 40.0, "bmi": 28.0, "a1c_pct": 5.6, "fasting_glucose_mgdl": 95.0}
 
 
 def flat_cgm(n: int = 24, value: float = 100.0) -> dict:
@@ -55,7 +56,7 @@ def test_same_decision_code_for_table_and_live_estimates():
     """A precomputed estimate goes through the identical decision path: same checks, same fields."""
     est = PhotoEstimate(grams=75.0, bin_probs=[0.0, 0.0, 1.0, 0.0], unfamiliar_score=0.2)
     p = bare_pipeline(risk=0.45, table={7: est})
-    m = MealInput(meal_time=MEAL, profile={"age": 40.0, "bmi": 28.0}, **flat_cgm())
+    m = MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm())
     a = p.answer(m, key=7)
     assert a.decision == "caution" and a.carb_source == "photo" and a.carb_bin == "60-89 g"
     assert a.checks_passed[:2] == ["cgm_window", "photo_present"] and a.checks_failed == []
@@ -64,7 +65,7 @@ def test_same_decision_code_for_table_and_live_estimates():
 def test_confirm_carbs_tier_uses_the_users_number():
     """No usable photo + a typed carb estimate: the risk is still produced, flagged as user-supplied."""
     p = bare_pipeline(risk=0.45, table={})
-    base = dict(meal_time=MEAL, profile={"age": 40.0, "bmi": 28.0}, **flat_cgm())
+    base = dict(meal_time=MEAL, profile=PROFILE, **flat_cgm())
     asked = p.answer(MealInput(**base), key=None)  # no estimate, no user number -> escalate to confirm-carbs
     assert asked.decision == "can't judge" and asked.escalate_to == "confirm_carbs"
     answered = p.answer(MealInput(**base, user_carbs_g=75.0), key=None)
@@ -75,7 +76,7 @@ def test_confirm_carbs_tier_uses_the_users_number():
 def test_borderline_escalates_to_human():
     """A risk between the cut-offs is a structured abstention routed to review, not a guess."""
     p = bare_pipeline(risk=0.17, table={0: PhotoEstimate(grams=20.0, bin_probs=[1.0, 0.0, 0.0, 0.0])})
-    m = MealInput(meal_time=MEAL, profile={"age": 40.0, "bmi": 28.0}, **flat_cgm())
+    m = MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm())
     a = p.answer(m, key=0)
     assert a.decision == "can't judge" and a.escalate_to == "human" and a.checks_failed == ["borderline"]
 
@@ -133,3 +134,51 @@ def test_predict_folder_finishes_with_per_item_entries(tmp_path):
     assert lines[0]["escalate_to"] == "confirm_carbs"
     assert "error" in lines[1]
     assert (tmp_path / "out" / "summary.md").read_text().startswith("# Folder run: 2 meals")
+
+
+def test_mmol_values_get_the_conversion_hint():
+    """Rule R1: a mmol/L export (values 4-9) is named and the fix is stated, not a generic range error."""
+    cg = flat_cgm()
+    cg["glucose_mgdl"] = [v / 18 for v in cg["glucose_mgdl"]]
+    a = bare_pipeline(risk=0.45, table={}).answer(MealInput(meal_time=MEAL, profile=PROFILE, **cg))
+    assert a.decision == "can't judge" and "multiply by 18" in a.reason and a.checks_failed == ["cgm_units"]
+
+
+def test_future_timestamps_are_named():
+    """Rule R3: readings after the meal time are called out, not folded into a coverage complaint."""
+    cg = flat_cgm()
+    cg["glucose_times"] = [t + timedelta(hours=3) for t in cg["glucose_times"]]
+    cg["hr_times"] = cg["glucose_times"]
+    a = bare_pipeline(risk=0.45, table={}).answer(MealInput(meal_time=MEAL, profile=PROFILE, **cg))
+    assert a.decision == "can't judge" and "after the meal time" in a.reason and a.checks_failed == ["cgm_times"]
+
+
+def test_blank_profile_is_refused_not_defaulted():
+    """Rule R5: all-blank required fields -> can't judge naming them; nothing is filled in."""
+    blank = {k: float("nan") for k in PROFILE}
+    a = bare_pipeline(risk=0.45, table={}).answer(MealInput(meal_time=MEAL, profile=blank, **flat_cgm()))
+    assert a.decision == "can't judge" and "missing or blank" in a.reason and a.checks_failed == ["profile"]
+    assert all(k in a.reason for k in PROFILE)
+
+
+def test_unsorted_cgm_is_sorted_and_flagged(tmp_path):
+    """Rule R2: out-of-order rows are sorted before use and the repair is visible as a flag."""
+    from glimpse.serve import read_cgm_csv
+
+    f = tmp_path / "cgm.csv"
+    f.write_text("timestamp,glucose_mgdl\n2024-06-01 11:00,100\n2024-06-01 10:00,98\n2024-06-01 10:30,99\n")
+    gt, gv, ht, hv, fl = read_cgm_csv(f)
+    assert gv == [98.0, 99.0, 100.0] and fl == ["timestamps_sorted"] and gt == sorted(gt)
+
+
+def test_implausible_profile_message_is_one_plain_sentence(tmp_path):
+    """Rule R4: the boundary turns a validation error into plain words, never a validator stack dump."""
+    from glimpse.serve import answer_from_files
+
+    f = tmp_path / "cgm.csv"
+    f.write_text("timestamp,glucose_mgdl\n2024-06-01 11:00,100\n")
+    p = bare_pipeline(risk=0.45, table={})
+    a = answer_from_files(p, f, None, "2024-06-01T12:00", {"age": 7.0, "bmi": 28.0})
+    assert a.decision == "can't judge"
+    assert "age = 7.0 is outside the plausible range 18-100" in a.reason
+    assert "pydantic" not in a.reason and "https://" not in a.reason

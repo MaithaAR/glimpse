@@ -7,6 +7,7 @@ Report: system diagram in §2; the parity test in tests/test_serve.py is the eva
 
 from __future__ import annotations
 
+import math
 import time
 from pathlib import Path
 from types import SimpleNamespace
@@ -28,7 +29,7 @@ from glimpse.serve.rules import (
     sentence,
     window_problem,
 )
-from glimpse.serve.schemas import CARB_BINS, Answer, MealInput, PhotoEstimate
+from glimpse.serve.schemas import Answer, CARB_BINS, MealInput, PhotoEstimate, REQUIRED_PROFILE
 from glimpse.training.baselines import trend_features
 from glimpse.training.final import FINAL, _photo_checkpoint, load_thresholds
 from glimpse.training.photo import load_photo_bundle
@@ -118,14 +119,29 @@ class Pipeline:
         """The decision itself (timing and logging are added by `answer`)."""
         pc = self.cfg.pipeline
         passed: list[str] = []
-        flags: list[str] = [] if m.hr_times else ["hr_missing"]
+        flags: list[str] = list(m.input_flags) + ([] if m.hr_times else ["hr_missing"])
         base = {"flags": flags, "model_versions": self.model_versions}
+        if m.glucose_mgdl and max(m.glucose_mgdl) < 30:  # rule R1: a mmol/L export reads as 4-9, never as mg/dL
+            return cant_judge("the glucose values look like mmol/L; multiply by 18 or export the file in mg/dL",
+                              checks_failed=["cgm_units"], **base)  # fmt: skip
+        passed.append("cgm_units")
+        late = [t for t in m.glucose_times if t > m.meal_time]
+        if late:  # rule R3: a sensor cannot report the future; the clock or the export is wrong
+            return cant_judge(f"{len(late)} glucose readings are timestamped after the meal time "
+                              f"(latest {max(late):%Y-%m-%d %H:%M}); check the export and the meal time",
+                              checks_passed=passed.copy(), checks_failed=["cgm_times"], **base)  # fmt: skip
+        passed.append("cgm_times")
         g = resample_window(m.glucose_times, m.glucose_mgdl, m.meal_time, pc.cgm_lookback_min)
         h = resample_window(m.hr_times, m.hr_bpm, m.meal_time, pc.cgm_lookback_min)
         problem = window_problem(g, self.cfg)
         if problem:
             return cant_judge(problem, checks_failed=["cgm_window"], **base)
         passed.append("cgm_window")
+        blank = [k for k in REQUIRED_PROFILE if not math.isfinite(m.profile.get(k, float("nan")))]
+        if blank:  # rule R5: a missing profile is named, never silently filled with defaults
+            return cant_judge("profile fields missing or blank: " + ", ".join(blank),
+                              checks_passed=passed.copy(), checks_failed=["profile"], **base)  # fmt: skip
+        passed.append("profile")
         est = self.photo_estimate(m, key)
         if isinstance(est, tuple):
             check, reason, extra = est

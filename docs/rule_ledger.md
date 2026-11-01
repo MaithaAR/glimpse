@@ -28,13 +28,20 @@ All 13 cases returned without a crash and the run exited 0. Decisions:
 
 | id | trigger observed above | rule | lives in | added |
 |---|---|---|---|---|
-| R1 | 01_mmol | max glucose < 30 mg/dL -> can't judge: "values look like mmol/L; multiply by 18 or export in mg/dL" | read path shared by every entry point | pending (C6) |
-| R2 | 02_unsorted | unsorted timestamps are sorted before use and the repair is logged + flagged ("timestamps_sorted") | shared CGM reader | pending (C6) |
-| R3 | 03_future_timestamps | any reading after the meal time -> can't judge naming the count and the latest offending time | shared CGM validation | pending (C6) |
-| R4 | 06_profile_implausible | implausible profile -> can't judge "age = 7 is outside the plausible range 18-100" (one plain sentence, no stack dump) | input boundary (answer_from_files) | pending (C6) |
-| R5 | 07_profile_blank | required profile fields all missing/blank -> can't judge naming the missing fields; never filled with defaults | shared profile validation | pending (C6) |
+| R1 | 01_mmol | max glucose < 30 mg/dL -> can't judge: "values look like mmol/L; multiply by 18 or export in mg/dL" | read path shared by every entry point | 2026-11-01, S3-C6 |
+| R2 | 02_unsorted | unsorted timestamps are sorted before use and the repair is logged + flagged ("timestamps_sorted") | shared CGM reader | 2026-11-01, S3-C6 |
+| R3 | 03_future_timestamps | any reading after the meal time -> can't judge naming the count and the latest offending time | shared CGM validation | 2026-11-01, S3-C6 |
+| R4 | 06_profile_implausible | implausible profile -> can't judge "age = 7 is outside the plausible range 18-100" (one plain sentence, no stack dump) | input boundary (answer_from_files) | 2026-11-01, S3-C6 |
+| R5 | 07_profile_blank | required profile fields all missing/blank -> can't judge naming the missing fields; never filled with defaults | shared profile validation | 2026-11-01, S3-C6 |
 | R6 | 10_exif_rotated (unproven) | photos are EXIF-transposed on open so stored rotation cannot change the decision | shared photo opener | pending (C7) |
 
 Photo-set debt (blocks re-testing 00/10/11): replace the synthetic placeholder photos with real
 phone photos, including one local dish. Until then those three rows stay "untestable" and are not
 cited as passing anywhere.
+
+## After rules R1-R5 — verification pending
+
+The folder run is repeated after S3-C6; the five FAIL rows above are expected to flip (01 names the
+unit fix, 02 answers with a `timestamps_sorted` flag once its photo is real, 03 names the future
+readings, 06 shows one plain sentence, 07 names the blank fields). The observed summary is pasted
+here after the run.

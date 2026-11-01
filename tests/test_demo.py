@@ -60,7 +60,7 @@ def test_cgm_csv_input(tmp_path):
 
     f = tmp_path / "cgm.csv"
     f.write_text("timestamp,glucose_mgdl,hr_bpm\n2020-05-01 11:55,101,70\n2020-05-01 12:00,,72\n")
-    gt, gv, ht, hv = read_cgm_csv(f)
+    gt, gv, ht, hv, _fl = read_cgm_csv(f)
     assert gv == [101.0] and len(ht) == 2 and hv == [70.0, 72.0]
     f.write_text("time,value\n2020-05-01 12:00,100\n")
     with pytest.raises(ValueError, match="glucose_mgdl"):
@@ -124,7 +124,7 @@ def test_sample_cgm_file_is_valid():
     """The synthetic sample in samples/ reads cleanly: 24 readings in the 2 h before the meal."""
     from glimpse.serve import read_cgm_csv
 
-    gt, gv, ht, hv = read_cgm_csv(Path("samples/cgm_example.csv"))
+    gt, gv, ht, hv, _fl = read_cgm_csv(Path("samples/cgm_example.csv"))
     assert len(gt) == len(gv) == 24 and len(hv) == 24
 
 

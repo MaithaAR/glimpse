@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 CARB_BINS = ["under 30 g", "30-59 g", "60-89 g", "90 g or more"]
 PERSON_INPUTS = ["age", "bmi", "a1c_pct", "fasting_glucose_mgdl", "prior_spike_rate", "prior_rise"]
+REQUIRED_PROFILE = PERSON_INPUTS[:4]  # prior_* may be NaN for a new user; these four may not (rule R5)
 Decision = Literal["low risk", "caution", "can't judge"]
 PROFILE_RANGES = {"age": (18, 100), "bmi": (12, 70), "a1c_pct": (3, 15), "fasting_glucose_mgdl": (40, 400)}
 
@@ -30,6 +31,8 @@ class MealInput(BaseModel):
     hr_bpm: list[float] = Field(default_factory=list)
     # tier 2 (confirm-carbs): the user's own carb estimate, used only when the photo cannot be read or is unfamiliar
     user_carbs_g: float | None = Field(default=None, ge=0, le=500)
+    # repairs the readers made to the raw files (e.g. "timestamps_sorted", rule R2); surfaced in Answer.flags
+    input_flags: list[str] = Field(default_factory=list)
 
     @field_validator("profile")
     @classmethod
