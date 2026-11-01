@@ -117,7 +117,7 @@ def run_channel_ablation(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> d
         te = meal_rows(ds, set(fold), scored_only=True)
         pred = {}
         for name, cols in CHANNELS.items():
-            fx = base if not cols else (lambda d, r, c=cols: np.delete(base(d, r), c, axis=1))
+            fx = base if not cols else (lambda d, r, c=cols, b=base: np.delete(b(d, r), c, axis=1))
             pred[name] = logistic(c_photo[kk], cfg.seed).fit(fx(ds, tr), y[tr]).predict_proba(fx(ds, te))[:, 1]
         for j, i in enumerate(te):
             rows_out.append({"fold": kk, "row": int(i), "person_id": ds.samples[i].person_id, "spike": int(y[i]),
