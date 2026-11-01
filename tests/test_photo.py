@@ -112,7 +112,7 @@ def test_photo_seed_check_is_registered():
     """The seed-spread command exists and leaves the deployed checkpoint alone (it never writes to checkpoints/)."""
     import inspect
 
-    from glimpse.training import photo
+    from glimpse.training import train_photo
 
-    src = inspect.getsource(photo.photo_seed_check)
+    src = inspect.getsource(train_photo.photo_seed_check)
     assert "torch.save" not in src and "_latest.txt" not in src
