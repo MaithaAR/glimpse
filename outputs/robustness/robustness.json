@@ -1,0 +1,37 @@
+{
+  "what": "decision-flip rates under the four pre-registered perturbations; same per-fold Pipelines as the evaluation, no history (population operating point)",
+  "settings": {
+    "dropout_share": 0.3,
+    "gap_min": 25,
+    "blur_radius": 6,
+    "darken_factor": 0.25
+  },
+  "cgm_dropout": {
+    "n": 481,
+    "unchanged": 1.0,
+    "dangerous_flips": 0.0,
+    "newly_cant_judge": 0.0,
+    "recovered_answers": 0.0
+  },
+  "cgm_gap": {
+    "n": 481,
+    "unchanged": 0.11434511434511435,
+    "dangerous_flips": 0.0,
+    "newly_cant_judge": 0.8856548856548857,
+    "recovered_answers": 0.0
+  },
+  "photo_blur": {
+    "n": 460,
+    "unchanged": 0.9369565217391305,
+    "dangerous_flips": 0.013043478260869565,
+    "newly_cant_judge": 0.03695652173913044,
+    "recovered_answers": 0.013043478260869565
+  },
+  "photo_dark": {
+    "n": 460,
+    "unchanged": 0.9739130434782609,
+    "dangerous_flips": 0.002173913043478261,
+    "newly_cant_judge": 0.01956521739130435,
+    "recovered_answers": 0.004347826086956522
+  }
+}
