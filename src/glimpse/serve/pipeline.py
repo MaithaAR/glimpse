@@ -29,7 +29,7 @@ from glimpse.serve.rules import (
     sentence,
     window_problem,
 )
-from glimpse.serve.schemas import Answer, CARB_BINS, MealInput, PhotoEstimate, REQUIRED_PROFILE
+from glimpse.serve.schemas import CARB_BINS, REQUIRED_PROFILE, Answer, MealInput, PhotoEstimate
 from glimpse.training.baselines import trend_features
 from glimpse.training.final import FINAL, _photo_checkpoint, load_thresholds
 from glimpse.training.photo import load_photo_bundle
