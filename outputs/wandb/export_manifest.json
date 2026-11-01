@@ -1,0 +1,50 @@
+[
+  {
+    "name": "final/final_photo_history",
+    "source": "outputs/final/final_photo_history.csv",
+    "rows": 68
+  },
+  {
+    "name": "photo_cv/photo_cv_history",
+    "source": "outputs/photo_cv/photo_cv_history.csv",
+    "rows": 713
+  },
+  {
+    "name": "training/photo_convnext_history",
+    "source": "outputs/training/photo_convnext_history.csv",
+    "rows": 136
+  },
+  {
+    "name": "training/sensor_cnn_history",
+    "source": "outputs/training/sensor_cnn_history.csv",
+    "rows": 112
+  },
+  {
+    "name": "cv:cv_summary",
+    "source": "outputs/cv/cv_summary.json"
+  },
+  {
+    "name": "photo_cv:photo_cv_summary",
+    "source": "outputs/photo_cv/photo_cv_summary.json"
+  },
+  {
+    "name": "fusion:fusion_summary",
+    "source": "outputs/fusion/fusion_summary.json"
+  },
+  {
+    "name": "evaluation_v2:dev_summary",
+    "source": "outputs/evaluation_v2/dev_summary.json"
+  },
+  {
+    "name": "ablations:d8_profile_excluded",
+    "source": "outputs/ablations/d8_profile_excluded.json"
+  },
+  {
+    "name": "ablations:channels",
+    "source": "outputs/ablations/channels.json"
+  },
+  {
+    "name": "demo:demo_summary",
+    "source": "outputs/demo/demo_summary.json"
+  }
+]
