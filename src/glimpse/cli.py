@@ -200,6 +200,15 @@ def _predict(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _predict_folder(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Every meal folder under IN -> OUT/results.jsonl + OUT/summary.md (bad meals become per-item entries)."""
+    from glimpse.serve import Pipeline
+    from glimpse.serve.folder import predict_folder
+
+    predict_folder(Pipeline(cfg), args.in_dir, args.out_dir)
+    return 0
+
+
 def _selftest(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Check that every frozen part loads offline and the full path runs (used inside the container)."""
     from glimpse.demo_cases import selftest
@@ -255,6 +264,9 @@ def main(argv: list[str] | None = None) -> int:
         pr.add_argument(f"--{name}", type=float, required=True)
     pr.add_argument("--prior-rate", type=float, help="spike rate in your onboarding week (0-1), optional")
     pr.add_argument("--prior-rise", type=float, help="mean rise in your onboarding week (mg/dL), optional")
+    pf = sub.add_parser("predict-folder", help="answer every meal folder under IN (photo.*, cgm.csv, profile.json)")
+    pf.add_argument("in_dir", help="folder with one sub-folder per meal")
+    pf.add_argument("out_dir", help="where results.jsonl and summary.md are written")
     sub.add_parser("selftest", help="check the frozen pipeline loads offline and runs (no dataset needed)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
@@ -286,6 +298,7 @@ def main(argv: list[str] | None = None) -> int:
         "photo-seeds": _photo_seeds,
         "demo": _demo,
         "predict": _predict,
+        "predict-folder": _predict_folder,
         "selftest": _selftest,
     }
     return commands[args.command](cfg, args)

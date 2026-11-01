@@ -107,3 +107,29 @@ def test_live_and_table_pipelines_agree_meal_by_meal():
         d1 = a_live.model_dump(exclude={"latency_ms", "model_versions"})
         d2 = a_tab.model_dump(exclude={"latency_ms", "model_versions"})
         assert d1 == d2, f"row {row}: live and table answers differ"
+
+
+def test_predict_folder_finishes_with_per_item_entries(tmp_path):
+    """One good-shaped meal, one broken one: both appear in results.jsonl and the run still finishes."""
+    import json
+
+    from glimpse.serve.folder import predict_folder
+
+    good = tmp_path / "in" / "a_good"
+    good.mkdir(parents=True)
+    rows = ["timestamp,glucose_mgdl,hr_bpm"]
+    rows += [f"2024-06-01 {10 + i // 12:02d}:{(i % 12) * 5:02d}:00,{100 + i},70" for i in range(24)]
+    (good / "cgm.csv").write_text("\n".join(rows) + "\n")
+    (good / "profile.json").write_text(
+        json.dumps({"age": 42, "bmi": 27.5, "a1c": 5.8, "fasting_glucose": 102, "meal_time": "2024-06-01T12:00"})
+    )
+    bad = tmp_path / "in" / "b_broken"
+    bad.mkdir()
+    (bad / "profile.json").write_text("{not json")
+    results = predict_folder(bare_pipeline(risk=0.45, table={}), tmp_path / "in", tmp_path / "out")
+    lines = [json.loads(ln) for ln in results.read_text().splitlines()]
+    assert [r["meal_id"] for r in lines] == ["a_good", "b_broken"]
+    assert lines[0]["decision"] == "can't judge"  # no photo estimate in the bare pipeline -> confirm-carbs
+    assert lines[0]["escalate_to"] == "confirm_carbs"
+    assert "error" in lines[1]
+    assert (tmp_path / "out" / "summary.md").read_text().startswith("# Folder run: 2 meals")

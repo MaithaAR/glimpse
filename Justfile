@@ -90,6 +90,10 @@ demo:
 predict *ARGS:
     uv run glimpse predict {{ARGS}}
 
+# answer every meal folder under IN (the instructor's entry point), e.g. just predict-folder samples/instructor outputs/folder_run
+predict-folder IN OUT="outputs/folder_run":
+    uv run glimpse predict-folder {{IN}} {{OUT}}
+
 # offline check that every frozen part loads and the full path runs (no dataset needed)
 selftest:
     uv run glimpse selftest
