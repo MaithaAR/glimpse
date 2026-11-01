@@ -20,7 +20,7 @@ from glimpse.data.preprocess import resample_window
 from glimpse.data.splits import Splits, meal_rows
 from glimpse.models.photo_model import PhotoCarbModel
 from glimpse.models.weights import weights_path
-from glimpse.serve import PERSON_INPUTS, Glimpse, MealInput, knn_distance, leave_one_out_distances
+from glimpse.serve import PERSON_INPUTS, MealInput, Pipeline, knn_distance, leave_one_out_distances
 from glimpse.training.final import _photo_checkpoint
 from glimpse.training.photo import build_cache, embed_maps, load_photo_bundle, photo_rows
 
@@ -105,13 +105,13 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     OUT.mkdir(parents=True, exist_ok=True)
     ref_file = Path(cfg.prototype.ood_reference_file)
     check = build_ood_reference(ds, sp, cfg) if not ref_file.is_file() else torch.load(ref_file)["check"]
-    app = Glimpse(cfg)
+    app = Pipeline(cfg)
     rows = [int(r) for r in meal_rows(ds, set(sp.test), scored_only=True)]
-    app.predict(meal_input(cfg, ds, rows[0]))  # warm-up (first call loads libraries)
+    app.answer(meal_input(cfg, ds, rows[0]))  # warm-up (first call loads libraries)
     results = []
     for r in rows:
         m, s = meal_input(cfg, ds, r), ds.samples[r]
-        a = app.predict(m)
+        a = app.answer(m)
         w = resample_window(m.glucose_times, m.glucose_mgdl, m.meal_time, cfg.pipeline.cgm_lookback_min)
         gap = float(np.max(np.abs(np.nan_to_num(ds.glucose[r]) - np.nan_to_num(w.values))))
         results.append({"row": r, "person": s.person_id, "spike": s.spike, "rise_mgdl": s.rise_mgdl,
@@ -138,7 +138,7 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
             continue
         m, s = meal_input(cfg, ds, r), ds.samples[r]
         truth = f"{_change(s.rise_mgdl)} ({'spike' if s.spike else 'no spike'})"
-        md.append(card(title, m, app.predict(m), truth))
+        md.append(card(title, m, app.answer(m), truth))
     # mocked feedback loop: the CGM labels each worked case 2 h later (same rule as the training label)
     from glimpse.feedback import auto_rise, record_feedback
 
@@ -160,17 +160,17 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     gap_m = m.model_copy(update={"glucose_times": [m.glucose_times[i] for i in keep],
                                  "glucose_mgdl": [m.glucose_mgdl[i] for i in keep]})  # fmt: skip
     title = "Can't judge: sensor gap (same meal, last 40 min of glucose removed)"
-    md.append(card(title, gap_m, app.predict(gap_m), None))
+    md.append(card(title, gap_m, app.answer(gap_m), None))
     blank = OUT / "blank_photo.jpg"
     synthetic_images()["white"].save(blank)
     blank_m = m.model_copy(update={"photo": blank})
-    md.append(card("Can't judge: not a meal photo (plain white picture)", blank_m, app.predict(blank_m), None))
+    md.append(card("Can't judge: not a meal photo (plain white picture)", blank_m, app.answer(blank_m), None))
     border = df[df.reason.str.startswith("the risk")]  # first borderline meal in row order (fixed rule)
     if len(border):
         r = int(border.row.iloc[0])
         m_b, s_b = meal_input(cfg, ds, r), ds.samples[r]
         truth = f"{_change(s_b.rise_mgdl)} ({'spike' if s_b.spike else 'no spike'})"
-        md.append(card("Can't judge: borderline risk (between the two cut-offs)", m_b, app.predict(m_b), truth))
+        md.append(card("Can't judge: borderline risk (between the two cut-offs)", m_b, app.answer(m_b), truth))
     p50, p95 = float(np.percentile(lat, 50)), float(np.percentile(lat, 95))
     summary = {"test_meals": len(df), "decisions": df.decision.value_counts().to_dict(),
                "latency_ms_p50": p50, "latency_ms_p95": p95, "latency_target_ms": cfg.targets.latency_p95_ms,
@@ -209,7 +209,7 @@ def selftest(cfg: GlimpseConfig) -> dict:
     import tempfile
     from datetime import datetime, timedelta
 
-    app = Glimpse(cfg)
+    app = Pipeline(cfg)
     folder = Path(tempfile.mkdtemp())
     photo, grey = folder / "noise.jpg", folder / "grey.jpg"
     synthetic_images()["noise"].save(photo)  # textured but not a meal: caught by the unfamiliar-photo check
@@ -219,11 +219,11 @@ def selftest(cfg: GlimpseConfig) -> dict:
     m = MealInput(meal_time=meal, glucose_times=times, glucose_mgdl=[95 + 0.2 * k for k in range(len(times))],
                   profile={"age": 50, "bmi": 29, "a1c_pct": 5.9, "fasting_glucose_mgdl": 104,
                            "prior_spike_rate": float("nan"), "prior_rise": float("nan")}, photo=photo)  # fmt: skip
-    unfamiliar = app.predict(m)
-    blank = app.predict(m.model_copy(update={"photo": grey}))
-    no_photo = app.predict(m.model_copy(update={"photo": None}))
+    unfamiliar = app.answer(m)
+    blank = app.answer(m.model_copy(update={"photo": grey}))
+    no_photo = app.answer(m.model_copy(update={"photo": None}))
     app.ood_cut = float("inf")  # let the noise picture through, only to exercise the scoring path end to end
-    scored = app.predict(m)
+    scored = app.answer(m)
     checks = {"unfamiliar photo -> can't judge": unfamiliar.decision == "can't judge" and "unlike" in unfamiliar.reason,
               "blank photo -> can't judge": blank.decision == "can't judge" and "blank" in blank.reason,
               "no photo -> can't judge": no_photo.decision == "can't judge",

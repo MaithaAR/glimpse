@@ -16,7 +16,7 @@ from glimpse.data.dataset import MealDataset
 from glimpse.data.splits import Splits
 from glimpse.demo_cases import write_example
 from glimpse.feedback import record_feedback
-from glimpse.serve import Glimpse, answer_from_files
+from glimpse.serve import Pipeline, answer_from_files
 from glimpse.utils.logging import setup_logging
 
 COLOURS = {"low risk": "#1e8449", "caution": "#b9770e", "can't judge": "#5d6d7e"}
@@ -39,7 +39,7 @@ def _examples(cfg) -> dict[str, dict]:
 def build(cfg=None) -> gr.Blocks:
     """The page: inputs on the left, the answer, examples and the feedback form on the right."""
     cfg = cfg or load_config()
-    app = Glimpse(cfg)
+    app = Pipeline(cfg)
     examples = _examples(cfg)
 
     def answer(photo, csv, meal_time, age, bmi, a1c, fasting, prior_rate, prior_rise):

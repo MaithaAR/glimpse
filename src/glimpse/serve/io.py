@@ -13,7 +13,7 @@ from glimpse.serve.rules import cant_judge
 from glimpse.serve.schemas import Answer, MealInput
 
 if TYPE_CHECKING:
-    from glimpse.serve.pipeline import Glimpse
+    from glimpse.serve.pipeline import Pipeline
 
 
 def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[datetime], list[float]]:
@@ -31,7 +31,7 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
             list(h.timestamp.dt.to_pydatetime()), h.hr_bpm.astype(float).tolist() if len(h) else [])  # fmt: skip
 
 
-def answer_from_files(app: Glimpse, cgm: str | Path | None, photo: str | Path | None, meal_time: str | None,
+def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path | None, meal_time: str | None,
                       profile: dict[str, float | None]) -> Answer:  # fmt: skip
     """The app's entry point for user files: anything malformed, empty or unsupported becomes a structured
     'can't judge' with the reason, never a crash."""
@@ -49,4 +49,4 @@ def answer_from_files(app: Glimpse, cgm: str | Path | None, photo: str | Path | 
         a = cant_judge(f"unsupported input ({e})")
         logger.bind(stage="predict").warning("can't judge: {}", a.reason)
         return a
-    return app.predict(m)
+    return app.answer(m)

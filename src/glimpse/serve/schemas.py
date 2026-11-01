@@ -28,6 +28,8 @@ class MealInput(BaseModel):
     photo: Path | None = None
     hr_times: list[datetime] = Field(default_factory=list)
     hr_bpm: list[float] = Field(default_factory=list)
+    # tier 2 (confirm-carbs): the user's own carb estimate, used only when the photo cannot be read or is unfamiliar
+    user_carbs_g: float | None = Field(default=None, ge=0, le=500)
 
     @field_validator("profile")
     @classmethod
@@ -50,6 +52,24 @@ class MealInput(BaseModel):
         return self
 
 
+class PhotoEstimate(BaseModel):
+    """What a photo is worth to the fusion: served grams, the four carb-range probabilities, and how unusual
+    the photo looked. Produced live by the photo model, or read from a per-fold table in evaluation (seam D2)."""
+
+    model_config = ConfigDict(strict=True, extra="forbid")
+    grams: float = Field(ge=0)
+    bin_probs: list[float] = Field(min_length=4, max_length=4)
+    unfamiliar_score: float | None = None
+
+    @field_validator("bin_probs")
+    @classmethod
+    def _probs(cls, v: list[float]) -> list[float]:
+        """Each entry is a probability."""
+        if any(not 0 <= p <= 1 for p in v):
+            raise ValueError("bin probabilities must be in [0, 1]")
+        return v
+
+
 class Answer(BaseModel):
     """What the user sees (decision + sentence + reason) and what was measured; JSON at the boundary."""
 
@@ -58,6 +78,12 @@ class Answer(BaseModel):
     sentence: str = Field(min_length=1)
     reason: str = Field(min_length=1)
     risk: float | None = Field(default=None, ge=0, le=1)
+    checks_passed: list[str] = Field(default_factory=list)
+    checks_failed: list[str] = Field(default_factory=list)
+    flags: list[str] = Field(default_factory=list)
+    model_versions: dict[str, str] = Field(default_factory=dict)
+    carb_source: Literal["photo", "user", "none"] = "none"
+    escalate_to: Literal["none", "confirm_carbs", "human"] = "none"
     # point estimate from the regression head; kept in results, not shown (the two heads were trained separately
     # and their agreement is not yet measured, so the user sees the bin head's range and confidence only)
     carbs_g: float | None = Field(default=None, ge=0)
