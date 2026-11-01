@@ -63,7 +63,6 @@ def ece_equal_mass(p, y, bins=15):
 ACTIONS = ("low_risk", "caution", "abstain")
 
 
-
 def expected_cost(actions, y, costs):
     """Mean cost of the chosen actions (0 low risk, 1 caution, 2 abstain) given the true spike labels."""
     c = np.array(
@@ -97,8 +96,6 @@ def usefulness_report(actions, y, costs, targets):
         and rep["share_abstain"] <= u["max_abstain"]
     )
     return rep
-
-
 
 
 def person_bootstrap_ci(sids, fn, B=2000, seed=0):
