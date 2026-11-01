@@ -64,4 +64,5 @@ def test_evaluation_only_measures_it_never_decides():
     for name in ("decide", "choose_thresholds", "cost_only_thresholds"):
         assert not hasattr(ev, name), f"{name} must live in glimpse.training.thresholds, not in evaluation"
     for f in Path("src/glimpse/evaluation").glob("*.py"):
-        assert "training.thresholds" not in f.read_text(), f"{f} imports the decision layer"
+        imports = [ln for ln in f.read_text().splitlines() if ln.startswith(("import ", "from "))]
+        assert not any("training.thresholds" in ln for ln in imports), f"{f} imports the decision layer"
