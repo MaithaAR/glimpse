@@ -208,6 +208,14 @@ def _predict_folder(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _ood(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """S10: score the real phone photos under the unfamiliar-photo check and re-choose the cut (rule R7)."""
+    from glimpse.studies.ood import run_ood
+
+    run_ood(cfg, apply=args.apply)
+    return 0
+
+
 def _wandb_export(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Replay every history CSV and results summary into offline W&B runs under outputs/wandb/."""
     from glimpse.wandb_export import export_wandb
@@ -307,6 +315,8 @@ def main(argv: list[str] | None = None) -> int:
     pf.add_argument("out_dir", help="where results.jsonl and summary.md are written")
     sub.add_parser("ablate", help="D8 profile-excluded split + input-channel ablations (run `fusion` first)")
     sub.add_parser("wandb-export", help="offline W&B runs from every history CSV and summary in outputs/")
+    od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
+    od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
     sub.add_parser("selftest", help="check the frozen pipeline loads offline and runs (no dataset needed)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
@@ -342,6 +352,7 @@ def main(argv: list[str] | None = None) -> int:
         "predict-folder": _predict_folder,
         "ablate": _ablate,
         "wandb-export": _wandb_export,
+        "ood": _ood,
         "splits-v2": _splits_v2,
         "selftest": _selftest,
     }

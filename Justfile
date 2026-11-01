@@ -74,6 +74,10 @@ ablate:
 wandb-export:
     uv run glimpse wandb-export
 
+# S10: unfamiliar-photo check against the 14 real phone photos; --apply writes the re-chosen cut (R7)
+ood *ARGS:
+    uv run glimpse ood {{ARGS}}
+
 # final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
 train-final:
     uv run glimpse final
