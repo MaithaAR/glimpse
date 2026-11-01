@@ -53,3 +53,18 @@ All five FAIL rows flipped; observed reasons:
 
 04, 08, 09, 12 behave as in the naive run (pass). 00/10/11 remain untestable until the placeholder
 photos are replaced with real phone photos.
+
+## Verification run — 2026-11-01 17:36, real phone photos in 00/10/11 (commit 71abb13)
+
+| case | observed | verdict |
+|---|---|---|
+| 00_clean | caution, risk 47%, carb bin 30-59 g — a real answer end to end | pass |
+| 10_exif_rotated | caution, risk 47%, same carb bin as 00_clean; risk differs from 00 by 0.2 pp (JPEG re-encode noise from storing the rotated copy, not an orientation effect) | pass (R6 end to end: identical decision) |
+| 11_local_dish | caution, risk 51%, confident carb bin "under 30 g" (p=0.67), unfamiliar score 0.35 below the cut — the OOD check did NOT flag the local lamb-and-rice dish, and "under 30 g" for a rice dish is likely far too low | FAIL — recorded as R7, remediation in S10 |
+
+| id | trigger observed above | rule | lives in | added |
+|---|---|---|---|---|
+| R7 | 11_local_dish | the unfamiliar-photo cut must flag local dishes absent from CGMacros before the carb bin is trusted; to be re-tuned on samples/local_photos/ (14 real phone photos) with the ≤2% false-flag budget | OOD check (knn cut) | pending (S10) |
+
+02-07 keep placeholder photos by design (their behaviours are decided before the photo matters);
+05's hr_missing flag was verified in the R1-R5 run.
