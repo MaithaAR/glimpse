@@ -263,3 +263,13 @@ def test_platt_and_history_adjust_the_risk_in_order():
     p3 = bare_pipeline(risk=0.45, table={7: _est()}, calibration=(1.0, -0.8))
     c = p3.answer(m, key=7, history=spiky)
     assert c.risk == c.risk_platt  # m = inf: the same history changes nothing (D3b population arm)
+
+
+def test_decision_parity_with_the_vectorised_rule():
+    """Fix 2's parity requirement: the vectorised cut-off rule used by the sensitivity sweep and
+    Pipeline.answer give the same decision meal by meal on clean inputs, across the whole risk range."""
+    for risk in (0.05, 0.142, 0.143, 0.17, 0.2, 0.45, 0.95):
+        p = bare_pipeline(risk=risk, table={0: _est()})
+        a = p.answer(MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm()), key=0)
+        vec = "low risk" if a.risk < p.lo else "caution" if a.risk >= p.hi else "can't judge"
+        assert a.decision == vec, (risk, a.decision, vec)

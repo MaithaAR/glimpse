@@ -75,5 +75,13 @@ def choose_m_and_cutoffs(p_platt: np.ndarray, y: np.ndarray, person: np.ndarray,
     for row in curve:  # ascending m; ties (within 1e-12) go to the later, larger m
         if best is None or row["cost"] < best["cost"] - 1e-12 or abs(row["cost"] - best["cost"]) <= 1e-12:
             best = row
+    risks = personal_risks(f, y, person, times, best["m"])  # the replayed inner risks at the chosen m
     return {"m": best["m"], "low_risk_below": best["low_risk_below"], "caution_from": best["caution_from"],
-            "cost": best["cost"], "curve": curve}  # fmt: skip
+            "cost": best["cost"], "curve": curve, "inner_risks": risks}  # fmt: skip
+
+
+def sweep_cutoffs(risks: np.ndarray, y: np.ndarray, costs: dict) -> tuple[float, float]:
+    """(lo, hi) by minimum expected cost on the replayed inner risks for one sweep cost setting (D4
+    sensitivity: the main m stays fixed; only the cut-offs move with the costs)."""
+    lo, hi, _ = choose_thresholds(np.asarray(risks, float), np.asarray(y, float), costs)
+    return lo, hi

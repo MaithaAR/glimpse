@@ -49,7 +49,8 @@ class Pipeline:
     (evaluation); everything from the rules to the Answer is the same code either way."""
 
     def __init__(self, cfg: GlimpseConfig, photo_table: dict[int, PhotoEstimate] | None = None, fusion=None,
-                 *, calibration: tuple[float, float] | None = None, m_personal: float = float("inf")):  # fmt: skip
+                 *, calibration: tuple[float, float] | None = None, m_personal: float = float("inf"),
+                 cutoffs: tuple[float, float] | None = None):  # fmt: skip
         """Load the fusion model, the frozen cut-offs (checked against the config) and, in live mode, the photo
         model and the unfamiliar-photo reference, all from local files. Evaluation injects a fold-local fusion
         (design D2: the same decision code, one model per outer fold); the app always loads the final one."""
@@ -60,7 +61,8 @@ class Pipeline:
         frozen = frozen_all["main"]
         if max(abs(frozen["low_risk_below"] - pc.low_risk_below), abs(frozen["caution_from"] - pc.caution_from)) > 1e-9:
             raise ValueError("prototype cut-offs in the config differ from the frozen amendment file")
-        self.lo, self.hi = pc.low_risk_below, pc.caution_from
+        # D4: evaluation injects each fold's inner-chosen cut-offs; the app uses the frozen config values
+        self.lo, self.hi = cutoffs if cutoffs is not None else (pc.low_risk_below, pc.caution_from)
         # fix 1 (D3): Platt (slope, intercept) on the fusion logit + the personal-intercept prior precision.
         # The defaults are the identity, so demo/predict/the app behave exactly as before until S16 freezes them.
         self.calib, self.m_personal = calibration, m_personal
