@@ -15,6 +15,7 @@ from glimpse.serve.schemas import Answer, MealInput
 if TYPE_CHECKING:
     from glimpse.serve.pipeline import Glimpse
 
+
 def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[datetime], list[float]]:
     """A sensor export as the app accepts it: columns `timestamp`, `glucose_mgdl` and optionally `hr_bpm`."""
     import pandas as pd
