@@ -11,6 +11,7 @@ import numpy as np
 from glimpse.evaluation.metrics import _logit
 from glimpse.training.thresholds import choose_thresholds
 
+
 def logit(p):
     """log-odds with the same clipping as the metrics module (shared by the Pipeline and the replay)."""
     return _logit(np.asarray(p, dtype=float))
