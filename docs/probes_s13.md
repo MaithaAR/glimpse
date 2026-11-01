@@ -37,6 +37,24 @@ Expected outcomes (committed):
 Report use: section 5 (explainability & failure), one small table + two sentences; A2 is quoted as the
 designed expected-fail.
 
-## Results
+## Results (run 1 Nov 2026, 23:56; outputs/probes/probes.json; n=397 answered meals)
 
-(to be appended after the run; nothing above this line changes)
+Probe A: direction ok 100% of meals (A1 PASS); decision unchanged 68% (A2 expected-fail CONFIRMED);
+median |risk_high - risk_low| = 0.102. The fusion uses the photo in the right direction on every single
+meal, and even the bottom-decile <-> top-decile plate swap leaves two thirds of decisions where they
+were: the photo nudges, the trend and profile arms decide -- the S8 gate, mechanistically.
+
+Probe B: risk_rising > risk_flat on only 8% of meals (B1 FAIL as registered); median move -0.047;
+median |move| 0.049 vs probe A's 0.102.
+
+B1 is a genuine failed pre-registration, and the failure is OURS, not the model's. The label is
+rise = max(post-meal glucose) - mean(pre-meal baseline window): a spike is measured RELATIVE to the
+pre-meal baseline. The +40 mg/dL ramp raises that baseline, so the identical post-meal curve clears
++50 less often, and a model that has learned the label's definition should -- and does -- lower the
+risk for a trace rising into the meal. Our registered direction encoded the naive physiological
+intuition ("already rising = more danger") instead of the label's arithmetic. The marginal correlation
+of pre-meal slope with the spike label is weakly positive (+0.06 slope60, +0.10 slope20), but the
+counterfactual holds everything else fixed and moves last reading, window rise and slope together --
+the conditional direction, which is negative. Report use: section 5 quotes B1 verbatim as the probe
+that caught the authors' wrong intuition while confirming the model respects the baseline-relative
+label; no retuning follows from it.
