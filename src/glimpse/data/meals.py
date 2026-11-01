@@ -1,4 +1,4 @@
-"""Build the labelled meal table with the proposal's rules (legacy.build_meals, unchanged), then validate every
+"""Build the labelled meal table with the proposal's rules (meal_table.build_meals), then validate every
 row against the MealRecord schema. Rows that fail are dropped and logged with the reason."""
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ from loguru import logger
 from pydantic import ValidationError
 
 from glimpse.config import GlimpseConfig
-from glimpse.data.legacy import add_personal_prior, build_meals, evaluation_set
+from glimpse.data.meal_table import add_personal_prior, build_meals, evaluation_set
 from glimpse.schemas import MealRecord
 
 

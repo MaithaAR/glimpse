@@ -1,4 +1,6 @@
-"""Meal-level dataset construction from CGMacros under the proposal's prespecified rules.
+"""Builds the labelled meal table from CGMacros under the proposal's prespecified rules (live code, used by `just prepare`).
+
+Produces the rows behind outputs/data/meal_counts.json and docs/data_card.md.
 
 Only information available BEFORE eating is used as model input. Consumed macros and share eaten are used
 solely to reconstruct the served-macro reference (consumed / share, proportional-consumption assumption).
