@@ -181,7 +181,7 @@ def _demo(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Worked cases, can't-judge cases and response time with the frozen pipeline (Step 6a)."""
     from glimpse.data.dataset import MealDataset
     from glimpse.data.splits import Splits
-    from glimpse.demo_run import run_demo
+    from glimpse.demo_cases import run_demo
 
     run_demo(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
     return 0
@@ -202,7 +202,7 @@ def _predict(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
 
 def _selftest(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Check that every frozen part loads offline and the full path runs (used inside the container)."""
-    from glimpse.demo_run import selftest
+    from glimpse.demo_cases import selftest
 
     selftest(cfg)
     return 0

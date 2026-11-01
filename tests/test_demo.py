@@ -75,7 +75,7 @@ def test_selftest_runs_when_weights_are_present():
     weights = Path(cfg.photo.weights_dir)
     if not (Path(cfg.prototype.ood_reference_file).is_file() and weights.is_dir() and any(weights.iterdir())):
         pytest.skip("photo weights not downloaded (run `just install`)")
-    from glimpse.demo_run import selftest
+    from glimpse.demo_cases import selftest
 
     assert all(selftest(cfg).values())
 

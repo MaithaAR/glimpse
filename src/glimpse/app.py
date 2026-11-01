@@ -15,7 +15,7 @@ from glimpse.config import load_config
 from glimpse.data.dataset import MealDataset
 from glimpse.data.splits import Splits
 from glimpse.demo import Glimpse, answer_from_files
-from glimpse.demo_run import write_example
+from glimpse.demo_cases import write_example
 from glimpse.feedback import record_feedback
 from glimpse.utils.logging import setup_logging
 
