@@ -131,9 +131,11 @@ class Pipeline:
     def _risk(self, raw: float, history: list[tuple[float, int]] | None) -> tuple[float, float, float]:
         """raw fusion probability -> (risk_raw, risk_platt, final risk): Platt on the logit, then the
         personal offset fitted on the (equally recalibrated) history logits (D3). Identity by default."""
+        if self.calib is None and not history:
+            return raw, raw, raw  # the identity path is literally the identity (no logit round-trip)
         z = float(np.log(max(raw, 1e-6) / max(1.0 - raw, 1e-6)))
         f = self.calib[0] * z + self.calib[1] if self.calib is not None else z
-        platt = 1.0 / (1.0 + float(np.exp(-f)))
+        platt = raw if self.calib is None else 1.0 / (1.0 + float(np.exp(-f)))
         if history:
             hz = np.array([h[0] for h in history], dtype=float)
             hf = self.calib[0] * hz + self.calib[1] if self.calib is not None else hz
