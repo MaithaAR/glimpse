@@ -35,11 +35,11 @@ def perturb_cgm(m: MealInput, kind: str, rng: np.random.Generator) -> MealInput:
     if kind == "cgm_dropout":
         keep = rng.uniform(size=len(t)) > DROP_SHARE
         keep[-1] = True  # the sensor's latest reading is always there
-        t, v = [x for x, k in zip(t, keep) if k], [x for x, k in zip(v, keep) if k]
+        t, v = [x for x, k in zip(t, keep, strict=True) if k], [x for x, k in zip(v, keep, strict=True) if k]
     else:  # cgm_gap
         end = m.meal_time - pd.Timedelta(minutes=30)
         start = end - pd.Timedelta(minutes=GAP_MIN)
-        pairs = [(x, y) for x, y in zip(t, v) if not (start <= x < end)]
+        pairs = [(x, y) for x, y in zip(t, v, strict=True) if not (start <= x < end)]
         t, v = [p[0] for p in pairs], [p[1] for p in pairs]
     return m.model_copy(update={"glucose_times": t, "glucose_mgdl": v})
 
@@ -114,9 +114,9 @@ def run_robustness(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
            "cgm_dropout": _flips(base_tab, pert["cgm_dropout"]),
            "cgm_gap": _flips(base_tab, pert["cgm_gap"]),
            "photo_blur": _flips([b for b in base_live if b is not None],
-                                [p for p, h in zip(pert["photo_blur"], has_photo) if h]),
+                                [p for p, h in zip(pert["photo_blur"], has_photo, strict=True) if h]),
            "photo_dark": _flips([b for b in base_live if b is not None],
-                                [p for p, h in zip(pert["photo_dark"], has_photo) if h])}  # fmt: skip
+                                [p for p, h in zip(pert["photo_dark"], has_photo, strict=True) if h])}  # fmt: skip
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "robustness.json").write_text(json.dumps(res, indent=2))
     for kind in ("cgm_dropout", "cgm_gap", "photo_blur", "photo_dark"):
