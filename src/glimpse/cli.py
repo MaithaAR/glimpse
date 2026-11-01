@@ -99,13 +99,12 @@ def _cv(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
 
 
 def _carbs_check(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
-    """Logged-carbs check: does adding the TRUE carbs to profile + trend raise AUROC enough to try photo carbs?"""
-    from glimpse.data.dataset import MealDataset
-    from glimpse.data.splits import Splits
-    from glimpse.training.fusion import run_carbs_check
-
-    run_carbs_check(MealDataset.load(Path("data/dataset")), Splits.load(Path("splits/dev_splits.json")), cfg)
-    return 0
+    """The logged-carbs gate was answered at the intermediate stage; its result stands as submitted."""
+    logger.bind(stage="fusion").error(
+        "the logged-carbs check (Step 4c-1) was answered at the intermediate stage and its result stands "
+        "(commit 983dbbb); it is not rerun on partition v2."
+    )
+    return 2
 
 
 def _photo_cv(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
@@ -120,12 +119,13 @@ def _photo_cv(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
 
 
 def _fusion(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
-    """Profile + trend with each kind of meal information (Step 4c-3). Being moved to partition v2."""
-    logger.bind(stage="fusion").error(
-        "fusion is being moved to partition v2 (S5); run it again once that lands. "
-        "The intermediate-stage fusion results are in the submitted intermediate (commit 983dbbb)."
-    )
-    return 2
+    """Profile + trend with each kind of meal information, on partition v2 (the gate's arm comparison)."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.training.fusion import run_fusion
+
+    run_fusion(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
 
 
 def _final(cfg: GlimpseConfig, args: argparse.Namespace) -> int:

@@ -18,7 +18,7 @@ from sklearn.metrics import roc_auc_score
 
 from glimpse.config import GlimpseConfig
 from glimpse.data.dataset import MealDataset
-from glimpse.data.splits import Splits, meal_rows
+from glimpse.data.splits import Splits, SplitsV2, assert_not_locked, meal_rows
 from glimpse.evaluation import noninferiority, paired_person_bootstrap
 from glimpse.training.baselines import logistic, trend_features
 from glimpse.training.cv import _inner_folds, _tune_sklearn, outer_training_people
@@ -143,8 +143,9 @@ def _slope(est: np.ndarray, true: np.ndarray) -> float:
     return float(np.polyfit(np.log1p(est), np.log1p(true), 1)[0])
 
 
-def run_fusion(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
-    """Profile + trend logistic regression with each kind of meal information, same folds; gains with 95% ranges."""
+def run_fusion(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
+    """Profile + trend logistic regression with each kind of meal information on partition v2 -- the same
+    folds and inner folds as the photo CV and the evaluation; gains with person-paired 95% ranges."""
     from glimpse.training.photo_cv import ridge_estimates
 
     log, out = logger.bind(stage="fusion"), Path(cfg.paths.outputs) / "fusion"
@@ -154,17 +155,18 @@ def run_fusion(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
         raise FileNotFoundError("run `just photo-cv` first")
     p_oof, p_nested = pd.read_csv(pcv / "photo_oof.csv"), pd.read_csv(pcv / "photo_nested.csv")
     r_oof, r_nested, ridge_info = ridge_estimates(ds, sp, cfg)
-    groups, y, grid = {s.person_id: s.group for s in ds.samples}, ds.labels(), cfg.baselines.logreg_c_grid
+    y, grid = ds.labels(), cfg.baselines.logreg_c_grid
     rows_out, tuning = [], []
-    for k, fold in enumerate(sp.outer_folds):
+    for k, fold in enumerate(sp.dev_folds):
         kk = k + 1
-        people = outer_training_people(sp, k, groups)
+        people = sp.training_people(k)
+        assert_not_locked(list(people) + list(fold), sp.locked, f"fusion fold {kk}")
         tr, te = meal_rows(ds, set(people), scored_only=False), meal_rows(ds, set(fold), scored_only=True)
         assert not {ds.samples[i].person_id for i in tr} & set(fold), "a held-out person is in training"
         # training side = nested estimates (model never saw that person); test side = out-of-fold estimates
         pt = photo_table(p_nested[p_nested.fold == kk]) | photo_table(p_oof[p_oof.fold == kk])
         rt = ridge_table(r_nested[r_nested.fold == kk]) | ridge_table(r_oof[r_oof.fold == kk])
-        inner = _inner_folds(people, groups, cfg.cv.inner_folds, cfg.seed + 100 + k)
+        inner = sp.inner_folds[k]  # the one validation split (D1): target holds only
         gt = {r: v[:1] for r, v in pt.items()}  # log grams only, no bin probabilities
         X = {"no_meal": trend_features, "photo": with_table(pt, len(PHOTO_COLS)),
              "logged_carbs": arm_features("logged_carbs"), "ridge_photo": with_table(rt, 1),
@@ -220,6 +222,22 @@ def summarise_fusion(oof: pd.DataFrame, cfg: GlimpseConfig) -> dict:
         return {"point": _auc(y_, df[a].to_numpy()) - _auc(y_, df[b].to_numpy()), "bootstrap_mean": mean,
                 "ci95": [lo, hi]}  # fmt: skip
 
+    def logloss_secondary(df: pd.DataFrame) -> dict:
+        """Secondary endpoint (D7, added at the final stage and labelled as such): paired per-meal log-loss,
+        photo vs no-meal, clustered by person, one-sided at 5%. Positive = the photo arm is better."""
+        eps, y_ = 1e-6, df.spike.to_numpy().astype(float)
+        la = -(y_ * np.log(np.clip(df.photo, eps, 1 - eps)) + (1 - y_) * np.log(np.clip(1 - df.photo, eps, 1 - eps)))
+        lb = -(y_ * np.log(np.clip(df.no_meal, eps, 1 - eps))
+               + (1 - y_) * np.log(np.clip(1 - df.no_meal, eps, 1 - eps)))  # fmt: skip
+        d, s_ = (lb - la).to_numpy(), df.person_id.to_numpy()
+        ids, rng = np.unique(s_), np.random.default_rng(seed)
+        where = {p: np.where(s_ == p)[0] for p in ids}
+        stats = np.array([float(np.mean(d[np.concatenate([where[p] for p in rng.choice(ids, len(ids))])]))
+                          for _ in range(B)])  # fmt: skip
+        return {"point": float(d.mean()), "ci95": [float(np.percentile(stats, 2.5)),
+                                                   float(np.percentile(stats, 97.5))],
+                "p_one_sided": float(np.mean(stats <= 0))}  # fmt: skip
+
     rq1 = gain("photo", "logged_carbs")
     rq1["margin"] = cfg.targets.rq1_noninferiority_margin
     rq1["verdict"] = noninferiority(rq1["ci95"][0], rq1["ci95"][1], rq1["margin"])
@@ -231,6 +249,7 @@ def summarise_fusion(oof: pd.DataFrame, cfg: GlimpseConfig) -> dict:
                                                      for _, f in oof.groupby("fold")])) for a in FUSION_ARMS},
         "gains_vs_no_meal": {a: gain(a, "no_meal") for a in FUSION_ARMS if a != "no_meal"},
         "primary_photo_meals_only": gain("photo", "no_meal", oof[oof.has_photo]),
+        "secondary_logloss_photo_vs_no_meal": logloss_secondary(oof[oof.has_photo.astype(bool)]),
         "rq1_photo_vs_logged": rq1,
         "post_hoc_arms": POST_HOC,
     }  # fmt: skip
