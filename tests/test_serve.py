@@ -198,8 +198,8 @@ def test_exif_rotated_photo_opens_identically(tmp_path):
     up = Image.fromarray(arr)
     up.save(tmp_path / "up.jpg", quality=100, subsampling=0)
     ex = Image.Exif()
-    ex[274] = 6  # stored rotated 90 degrees; the tag says how to display it
-    up.rotate(-90, expand=True).save(tmp_path / "rot.jpg", quality=100, subsampling=0, exif=ex)
+    ex[274] = 6  # "rotate 90 CW to display": the stored pixels are the upright image turned 90 CCW
+    up.rotate(90, expand=True).save(tmp_path / "rot.jpg", quality=100, subsampling=0, exif=ex)
     a = _np.asarray(open_photo(tmp_path / "up.jpg"), dtype=_np.int16)
     b = _np.asarray(open_photo(tmp_path / "rot.jpg"), dtype=_np.int16)
     assert a.shape == b.shape
