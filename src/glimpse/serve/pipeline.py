@@ -17,6 +17,7 @@ import numpy as np
 import torch
 from loguru import logger
 
+from glimpse.calibration import personal_offset
 from glimpse.config import GlimpseConfig
 from glimpse.data.photos import PhotoError, eval_transform, open_photo
 from glimpse.data.preprocess import resample_window
@@ -47,7 +48,8 @@ class Pipeline:
     `photo_table` switches the carb-estimate source from the live photo model to precomputed per-fold estimates
     (evaluation); everything from the rules to the Answer is the same code either way."""
 
-    def __init__(self, cfg: GlimpseConfig, photo_table: dict[int, PhotoEstimate] | None = None, fusion=None):
+    def __init__(self, cfg: GlimpseConfig, photo_table: dict[int, PhotoEstimate] | None = None, fusion=None,
+                 *, calibration: tuple[float, float] | None = None, m_personal: float = float("inf")):  # fmt: skip
         """Load the fusion model, the frozen cut-offs (checked against the config) and, in live mode, the photo
         model and the unfamiliar-photo reference, all from local files. Evaluation injects a fold-local fusion
         (design D2: the same decision code, one model per outer fold); the app always loads the final one."""
@@ -59,6 +61,9 @@ class Pipeline:
         if max(abs(frozen["low_risk_below"] - pc.low_risk_below), abs(frozen["caution_from"] - pc.caution_from)) > 1e-9:
             raise ValueError("prototype cut-offs in the config differ from the frozen amendment file")
         self.lo, self.hi = pc.low_risk_below, pc.caution_from
+        # fix 1 (D3): Platt (slope, intercept) on the fusion logit + the personal-intercept prior precision.
+        # The defaults are the identity, so demo/predict/the app behave exactly as before until S16 freezes them.
+        self.calib, self.m_personal = calibration, m_personal
         self.table = photo_table
         self.model_versions = {"fusion": "fold-local" if fusion is not None else FINAL.name,
                                "thresholds": str(frozen_all.get("sha256", ""))[:12]}  # fmt: skip
@@ -108,16 +113,33 @@ class Pipeline:
         probs = torch.softmax(logits, 1)[0].tolist()
         return PhotoEstimate(grams=grams, bin_probs=probs, unfamiliar_score=score)
 
-    def answer(self, m: MealInput, key: int | None = None) -> Answer:
-        """One meal -> one validated Answer. Rules first; the models only see inputs that passed them."""
+    def answer(self, m: MealInput, key: int | None = None,
+               history: list[tuple[float, int]] | None = None) -> Answer:  # fmt: skip
+        """One meal -> one validated Answer. Rules first; the models only see inputs that passed them.
+        history: the person EARLIER meals as (raw fusion logit, label) pairs -- only meals whose CGM
+        label was already available at this meal time (the caller enforces the two-hour gate; the app
+        gets this for free because labels only exist once the window closes)."""
         t0 = time.perf_counter()
-        a = self._answer(m, key)
+        a = self._answer(m, key, history)
         a.latency_ms = (time.perf_counter() - t0) * 1000
         msg = "{} ({:.0f} ms): {}"
         (self.log.info if a.decision == "can't judge" else self.log.debug)(msg, a.decision, a.latency_ms, a.reason)
         return a
 
-    def _answer(self, m: MealInput, key: int | None = None) -> Answer:
+    def _risk(self, raw: float, history: list[tuple[float, int]] | None) -> tuple[float, float, float]:
+        """raw fusion probability -> (risk_raw, risk_platt, final risk): Platt on the logit, then the
+        personal offset fitted on the (equally recalibrated) history logits (D3). Identity by default."""
+        z = float(np.log(max(raw, 1e-6) / max(1.0 - raw, 1e-6)))
+        f = self.calib[0] * z + self.calib[1] if self.calib is not None else z
+        platt = 1.0 / (1.0 + float(np.exp(-f)))
+        if history:
+            hz = np.array([h[0] for h in history], dtype=float)
+            hf = self.calib[0] * hz + self.calib[1] if self.calib is not None else hz
+            f += personal_offset(hf, np.array([h[1] for h in history], dtype=float), self.m_personal)
+        return raw, platt, float(1.0 / (1.0 + np.exp(-f)))
+
+    def _answer(self, m: MealInput, key: int | None = None,
+                history: list[tuple[float, int]] | None = None) -> Answer:  # fmt: skip
         """The decision itself (timing and logging are added by `answer`)."""
         pc = self.cfg.pipeline
         passed: list[str] = []
@@ -163,7 +185,10 @@ class Pipeline:
         ns = SimpleNamespace(glucose=g.values[None], heart_rate=h.values[None],
                              profile=profile_vector(m.profile, m.meal_time)[None])  # fmt: skip
         x = np.hstack([trend_features(ns, np.array([0])), [[np.log1p(est.grams), *probs[1:]]]])
-        risk = float(self.fusion.predict_proba(x)[0, 1])
+        raw = float(self.fusion.predict_proba(x)[0, 1])
+        risk_raw, risk_platt, risk = self._risk(raw, history)
+        base |= {"fusion_logit": float(np.log(max(raw, 1e-6) / max(1.0 - raw, 1e-6))),
+                 "risk_raw": risk_raw, "risk_platt": risk_platt}  # fmt: skip
         dec = decision(risk, self.lo, self.hi)
         if dec == "can't judge":
             return cant_judge(f"the risk ({risk:.0%}) is borderline, between {self.lo:.0%} and {self.hi:.0%}",

@@ -94,6 +94,11 @@ class Answer(BaseModel):
     carb_bin_prob: float | None = Field(default=None, ge=0, le=1)
     unfamiliar_photo_score: float | None = None
     latency_ms: float | None = Field(default=None, ge=0)
+    # the calibration trail (D3): raw fusion logit (fed back as history by the replay and the app),
+    # the risk before any correction, and after Platt only; `risk` itself is the final, personal one
+    fusion_logit: float | None = None
+    risk_raw: float | None = Field(default=None, ge=0, le=1)
+    risk_platt: float | None = Field(default=None, ge=0, le=1)
 
     @model_validator(mode="after")
     def _risk_when_answered(self) -> Answer:

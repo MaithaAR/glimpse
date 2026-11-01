@@ -11,6 +11,11 @@ import numpy as np
 from glimpse.evaluation.metrics import _logit
 from glimpse.training.thresholds import choose_thresholds
 
+def logit(p):
+    """log-odds with the same clipping as the metrics module (shared by the Pipeline and the replay)."""
+    return _logit(np.asarray(p, dtype=float))
+
+
 M_GRID = [0.5, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, float("inf")]
 LABEL_LAG_MIN = 120  # the CGM labels a meal two hours after it (feedback.py, cgm_auto)
 

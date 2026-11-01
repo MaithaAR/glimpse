@@ -31,13 +31,15 @@ class _Fusion:
         return np.array([[1 - self.risk, self.risk]])
 
 
-def bare_pipeline(risk: float, table: dict | None) -> Pipeline:
+def bare_pipeline(risk: float, table: dict | None, calibration: tuple | None = None,
+                  m_personal: float = float("inf")) -> Pipeline:  # fmt: skip
     """A Pipeline without loading any model file: config, stub fusion, frozen cut-offs, optional estimate table."""
     p = object.__new__(Pipeline)
     p.cfg = load_config()
     p.fusion = _Fusion(risk)
     p.lo, p.hi = p.cfg.prototype.low_risk_below, p.cfg.prototype.caution_from
     p.table = table if table is not None else {}
+    p.calib, p.m_personal = calibration, m_personal
     p.model_versions = {"fusion": "stub", "thresholds": "stub", "photo": "precomputed-table"}
     p.log = logger.bind(stage="predict")
     return p
@@ -230,3 +232,34 @@ def test_fold_estimates_builds_the_pipeline_table():
     df = pd.DataFrame([{"row": 7, "photo_g": 62.5, "p_bin0": 0.1, "p_bin1": 0.2, "p_bin2": 0.6, "p_bin3": 0.1}])
     t = fold_estimates(df)
     assert set(t) == {7} and t[7].grams == 62.5 and abs(sum(t[7].bin_probs) - 1.0) < 1e-9
+
+
+def _est() -> PhotoEstimate:
+    return PhotoEstimate(grams=75.0, bin_probs=[0.0, 0.0, 1.0, 0.0], unfamiliar_score=0.2)
+
+
+def test_defaults_are_the_identity_calibration():
+    """Golden regression for fix 1's plumbing: without calibration and history, the final risk equals the
+    raw fusion risk exactly, so demo, predict and the app are provably unchanged."""
+    p = bare_pipeline(risk=0.45, table={7: _est()})
+    a = p.answer(MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm()), key=7)
+    assert a.risk == a.risk_raw == a.risk_platt == 0.45
+    assert abs(a.fusion_logit - np.log(0.45 / 0.55)) < 1e-9
+
+
+def test_platt_and_history_adjust_the_risk_in_order():
+    """Platt moves the logit first; the personal offset (fitted on equally recalibrated history) moves it
+    further; the decision is made on the final risk."""
+    m = MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm())
+    p = bare_pipeline(risk=0.45, table={7: _est()}, calibration=(1.0, -0.8))
+    a = p.answer(m, key=7)
+    z = np.log(0.45 / 0.55)
+    assert abs(a.risk_platt - 1 / (1 + np.exp(-(z - 0.8)))) < 1e-9
+    assert a.risk == a.risk_platt  # no history -> no offset
+    p2 = bare_pipeline(risk=0.45, table={7: _est()}, calibration=(1.0, -0.8), m_personal=1.0)
+    spiky = [(1.5, 1), (0.8, 1), (1.1, 1)]  # a frequent spiker's past
+    b = p2.answer(m, key=7, history=spiky)
+    assert b.risk > b.risk_platt  # the offset pushes a frequent spiker's risk up
+    p3 = bare_pipeline(risk=0.45, table={7: _est()}, calibration=(1.0, -0.8))
+    c = p3.answer(m, key=7, history=spiky)
+    assert c.risk == c.risk_platt  # m = inf: the same history changes nothing (D3b population arm)
