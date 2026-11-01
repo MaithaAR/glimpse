@@ -204,3 +204,18 @@ def test_exif_rotated_photo_opens_identically(tmp_path):
     b = _np.asarray(open_photo(tmp_path / "rot.jpg"), dtype=_np.int16)
     assert a.shape == b.shape
     assert float(_np.abs(a - b).mean()) < 3  # identical up to JPEG round-trip noise
+
+
+def test_heic_photo_opens(tmp_path):
+    """An iPhone HEIC photo goes through the same shared opener as JPEG and PNG."""
+    pytest.importorskip("pillow_heif")
+    import numpy as _np
+    from PIL import Image
+
+    from glimpse.data.photos import open_photo
+
+    f = tmp_path / "meal.heic"
+    arr = _np.random.default_rng(1).integers(0, 255, size=(120, 160, 3), dtype=_np.uint8)
+    Image.fromarray(arr).save(f)
+    img = open_photo(f)
+    assert img.size == (160, 120) and img.mode == "RGB"

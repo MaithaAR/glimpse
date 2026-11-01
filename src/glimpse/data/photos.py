@@ -9,6 +9,13 @@ from pathlib import Path
 import torch
 from PIL import Image, ImageOps, UnidentifiedImageError
 
+try:  # iPhone exports: registering the plugin makes HEIC open like any other format
+    from pillow_heif import register_heif_opener
+
+    register_heif_opener()
+except ImportError:  # every other format still works without it
+    pass
+
 
 class PhotoError(ValueError):
     """The photo cannot be used (unreadable, or too small)."""
