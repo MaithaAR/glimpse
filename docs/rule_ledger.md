@@ -92,3 +92,23 @@ the shipped design: the carb bin is always shown with its confidence, the confir
 user override the estimate, and mixed local dishes are named as a known failure mode in the report
 (§5) and the app's help text. A nutrition-aware embedding could close this properly; it is on the cut
 list with the reason recorded.
+
+## Stress hardening (5 Nov, naive run first: commit 3ee062b, `just stress` over samples/stress)
+
+The professor stress-tests the final system, so a 23-case hostile set was built (samples/stress,
+MANIFEST.md) and run against the untouched serve layer. 20 of 23 cases already degraded to a
+structured "can't judge" naming the problem. Three did not; each becomes a rule, added only against
+its observed failure, exactly like R1-R6:
+
+| rule | observed failure (naive run) | fix |
+|---|---|---|
+| R8 | timestamps with a UTC offset (+04:00, a normal Dexcom/Libre export) crashed the comparison with the meal time: raw error row "TypeError: can't compare offset-naive and offset-aware datetimes" | offsets are dropped after parsing (all readings and the meal time are treated in the user's local clock) and the repair is flagged `timezone_dropped`, like R2's sort |
+| R9 | a profile.json that is not valid JSON produced a raw error row ("JSONDecodeError: Expecting value...") instead of an answer | the folder runner turns it into a structured can't judge: "profile.json is not valid JSON (...)" |
+| R10 | one file mixing ISO precisions ("...T10:00:00" rows with an appended "...T10:00") was rejected whole with a pandas format message | timestamps parse per row (mixed ISO precisions accepted); files mixing DIFFERENT UTC offsets are still refused with a plain sentence, since silently converting between zones could misplace the meal window |
+
+Also observed, no rule needed: an Excel-style export (UTF-8 BOM + CRLF) already parses; CMYK, RGBA
+and GIF-renamed-to-.jpg photos are all read or refused in plain words; a truncated JPEG is refused
+("image file is truncated"). After the fixes, `just stress` must show zero raw error rows, and
+tests/test_stress.py enforces the invariant (one structured answer per meal folder, never an error
+row) on every `just check` from here to submission. The suite is re-run against the frozen final
+artifacts at S16 before the app freeze.

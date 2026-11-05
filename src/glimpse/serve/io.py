@@ -26,8 +26,14 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
     missing = {"timestamp", "glucose_mgdl"} - set(d.columns)
     if missing:
         raise ValueError(f"the CSV needs the columns timestamp and glucose_mgdl (missing: {sorted(missing)})")
-    d["timestamp"] = pd.to_datetime(d["timestamp"])
+    d["timestamp"] = pd.to_datetime(d["timestamp"], format="mixed")  # rule R10: mixed ISO precisions are fine
+    if d["timestamp"].dtype == object:  # rows disagree on the UTC offset; converting could misplace the window
+        raise ValueError("the timestamps mix different UTC offsets; export the file in one timezone")
     flags: list[str] = []
+    if getattr(d["timestamp"].dt, "tz", None) is not None:  # rule R8: offsets dropped, local clock kept
+        d["timestamp"] = d["timestamp"].dt.tz_localize(None)
+        flags.append("timezone_dropped")
+        logger.bind(stage="predict").warning("CGM timestamps carried a UTC offset; dropped before use (rule R8)")
     if not d["timestamp"].is_monotonic_increasing:
         d = d.sort_values("timestamp")
         flags.append("timestamps_sorted")
@@ -49,6 +55,9 @@ def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path |
         if not gt:
             raise ValueError("the CGM export has no glucose readings")
         when = datetime.fromisoformat(meal_time) if meal_time else max(gt)
+        if when.tzinfo is not None:  # rule R8, same treatment as the readings
+            when = when.replace(tzinfo=None)
+            fl.append("timezone_dropped")
         prof = {k: float("nan") if v is None else float(v) for k, v in profile.items()}
         m = MealInput(meal_time=when, glucose_times=gt, glucose_mgdl=gv, hr_times=ht, hr_bpm=hv, profile=prof,
                       photo=Path(photo) if photo else None, input_flags=fl)  # fmt: skip

@@ -3,7 +3,7 @@
 Built 5 Nov 2026 against the instructor's documented folder command. The invariant under test: every
 case produces one structured answer row (a decision and a plain-sentence reason), never a crash and
 never a raw error row, and the run exits 0. Naive observed behaviour and fixes: docs/rule_ledger.md
-(R8 timezone, R9 malformed profile.json, R10 Excel BOM export).
+(R8 timezone, R9 malformed profile.json, R10 mixed timestamp precision).
 
 | case | hostile input | expected behaviour |
 |---|---|---|
@@ -14,10 +14,10 @@ never a raw error row, and the run exits 0. Naive observed behaviour and fixes: 
 | 05_negative_glucose | all readings negative | can't judge (reads as not mg/dL, R1 family) |
 | 06_absurd_glucose | all readings 1e9 | structured answer or refusal, never a crash |
 | 07_one_reading | a single reading 5 min before the meal | can't judge, incomplete window |
-| 08_duplicate_timestamps | repeated timestamps appended out of order | answered; timestamps_sorted flag (R2) |
+| 08_duplicate_timestamps | out-of-order duplicates, mixed ISO precision | parsed per row (R10); timestamps_sorted flag (R2) |
 | 09_header_only | CSV with a header and no rows | can't judge, no glucose readings |
 | 10_binary_cgm | 2 KB of raw bytes named cgm.csv | can't judge, unsupported input |
-| 11_bom_crlf_csv | UTF-8 BOM + CRLF (Excel export) | accepted and answered (R10) |
+| 11_bom_crlf_csv | UTF-8 BOM + CRLF (Excel export) | CSV parses natively (no rule needed) |
 | 12_wrong_columns | columns time,sugar | can't judge, names the required columns |
 | 13_profile_strings | numbers quoted as strings | accepted and answered |
 | 14_profile_not_json | profile.json is not JSON | can't judge, says profile.json invalid (R9) |

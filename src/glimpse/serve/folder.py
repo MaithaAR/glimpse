@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from loguru import logger
 
 from glimpse.serve.io import answer_from_files
+from glimpse.serve.rules import cant_judge
 
 if TYPE_CHECKING:
     from glimpse.serve.pipeline import Pipeline
@@ -40,7 +41,12 @@ def predict_folder(app: Pipeline, in_dir: str | Path, out_dir: str | Path) -> Pa
 def _one_case(app: Pipeline, case: Path) -> dict:
     """One meal folder -> one validated Answer as a plain dict (or an error entry; the batch continues)."""
     try:
-        raw = json.loads((case / "profile.json").read_text()) if (case / "profile.json").exists() else {}
+        try:
+            raw = json.loads((case / "profile.json").read_text()) if (case / "profile.json").exists() else {}
+        except json.JSONDecodeError as e:  # rule R9: a broken profile file is named, never a raw error row
+            a = cant_judge(f"profile.json is not valid JSON ({e.msg} at line {e.lineno})",
+                           checks_failed=["input_valid"])  # fmt: skip
+            return {"meal_id": case.name, **a.model_dump(mode="json")}
         meal_time = raw.pop("meal_time", None)
         profile = {PROFILE_KEYS[k]: v for k, v in raw.items() if k in PROFILE_KEYS}
         photo = next((case / n for n in PHOTO_NAMES if (case / n).exists()), None)
