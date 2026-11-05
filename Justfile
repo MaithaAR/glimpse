@@ -148,3 +148,6 @@ app:
 clean:
     rm -rf logs .pytest_cache .ruff_cache outputs/feedback outputs/demo/examples outputs/demo/test_meals.csv outputs/demo/blank_photo.jpg
     find . -name "__pycache__" -type d -prune -exec rm -rf {} +
+
+wordcount:
+    uv run python -c "import re; t=open('docs/final_report.md').read(); print(len(re.sub(r'<!--.*?-->','',t,flags=re.S).split()), 'words (budget 3,000)')"
