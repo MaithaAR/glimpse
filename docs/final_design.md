@@ -249,10 +249,15 @@ procedure; S16 (22 Nov) then only scores the locked 8 against these frozen artif
 fresh-clone check. Nothing in this amendment re-opens the S8 gate, the evaluation protocol, or any
 shipped verdict; the dev numbers in the report remain the per-fold evaluation's.
 
-1. **Photo serving model.** The two heads are retrained on the cached backbone embeddings of ALL
-   non-locked people (23 dev targets + 14 T2D); epochs = the median of the five per-fold choices from
-   photo CV v2 (no new selection). The frozen backbone is unchanged.
-2. **Unfamiliar-photo reference.** Rebuilt from all non-locked training photos' backbone embeddings;
+1. **Photo serving model.** CORRECTED 5 Nov, before execution (the first wording said "heads only,
+   frozen backbone" — that is NOT the CV recipe and would ship a different model class than the one
+   evaluated): the final model follows the photo-CV v2 recipe exactly, at the all-development level —
+   heads trained on ALL non-locked people's photos (23 dev targets + 14 T2D) for the MEDIAN of the five
+   per-fold epoch choices (12), then the last backbone stage fine-tuned for the median choice (2
+   epochs). No new selection of any kind.
+2. **Unfamiliar-photo reference.** Rebuilt from all non-locked training photos' embeddings UNDER THE
+   FINAL MODEL (the fine-tuned last stage changes embeddings, so the reference must match the model
+   that serves);
    the cut is re-derived by the deployed rule unchanged (leave-one-out distance quantile 0.99) and
    re-checked against the S10 criteria: <=2% in-distribution flags, 0/14 real phone photos flagged,
    screenshot and dark instructor cases still flagged. No sweep, no new rule.
