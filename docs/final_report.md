@@ -110,7 +110,20 @@ pending line.]
 ## 5. Explainability and failure analysis
 <!-- 475 words: probes A+B; R7; D8 as failure insight; S14 taxonomy (false-cleared + abstention
 breakdown) TODO 10 Nov; label-definition discussion. -->
-TODO prose + S14 taxonomy. MUST-APPEAR SENTENCE 2: "Probe B failed exactly as a label-correct model
+Failure taxonomy (every class observed, none hypothetical). **T1 rule refusals:** malformed or
+degraded input never reaches a model — 13 instructor and 23 stress cases all end in a structured
+refusal naming the problem (§4). **T2 missing-photo abstentions:** 21 of 481 dev meals have no usable
+photo; the system abstains rather than guessing carbs. **T3 borderline abstentions:** 45 meals, all in
+folds 2–4 — folds 1 and 5 chose no abstention band, so where the band exists is itself a product of
+per-fold cost optimisation, and we report it as such rather than as a stable property. **T4 near-cut
+false-clears:** 3 of the 8 missed-among-cleared sat within 0.03 of their fold's cut — boundary
+sensitivity, the price of any hard threshold. **T5 confident false-clears, the genuine blind spot:**
+the other 5 were cleared at risks 0.03–0.13, far from the cut, each with 10–20 meals of personal
+history available — personalisation had data and still cleared them; they spread across 5 people, so
+no single outlier explains them. **T6 confident-wrong carb estimate (R7):** a visually familiar,
+nutritionally unfamiliar local dish passes the kNN check and gets a wrong bin — structural, detailed
+below. **T7 label-definition surprise (probe B):** not a model failure but a communication one; also
+below. MUST-APPEAR SENTENCE 2: "Probe B failed exactly as a label-correct model
 should: the label is baseline-relative, so a rising pre-meal trace lowers predicted spike probability
 — the registration, not the model, encoded naive physiology (pre-registered with a committed
 expected-fail, 17da63a)." Probe A: risk moves in the photo's direction on 100% of meals, yet the
