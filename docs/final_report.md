@@ -177,11 +177,11 @@ pre-meal trace lowers predicted spike probability — the registration, not the 
 physiology (pre-registered with a committed expected-fail, commit 17da63a). Probe A: risk moves in the photo's direction on 100% of meals, yet the
 extreme bottom↔top-decile plate swap leaves 68% of decisions unchanged (median swing 0.102) — the
 gate's verdict seen mechanistically. R7 (rule ledger): the kNN check measures visual, not nutritional,
-familiarity — a local lamb-and-rice dish scored 0.346 against the then-deployed 0.609 cut (more
-familiar than a clean tuna bowl at 0.420) and got a confident wrong carb bin; the cut sweep under a
-≤2% false-flag budget showed no threshold fixes it [OOD-RERUN: scores under the final model and the
-0.614 cut]; mitigations are the confirm-carbs tier and monitoring; a nutrition-aware embedding is
-named future work. Clinical note the probe forces: a user already rising into a meal may see "low
+familiarity — a local lamb-and-rice dish scores 0.318 against the deployed 0.614 cut (more familiar
+than the clean tuna-bowl case at 0.406) and gets a confident wrong carb bin; the sweep under a ≤2%
+false-flag budget shows the deployed cut is already the strictest, so no threshold fixes it — the
+finding survived the final model's regenerated reference unchanged; mitigations are the confirm-carbs
+tier and per-answer distance monitoring; a nutrition-aware embedding is named future work. Clinical note the probe forces: a user already rising into a meal may see "low
 risk" while clinically ascending — a rise-over-last-value label is worth future work; whether the
 app should add a separate "your glucose is rising now" note is one of the three questions put to the
 dietitians (§4).
