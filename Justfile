@@ -91,6 +91,9 @@ efficiency:
 monitoring:
     uv run glimpse monitoring
 
+finalize:
+    uv run glimpse finalize
+
 stress:
     uv run glimpse predict-folder samples/stress outputs/stress_run
 

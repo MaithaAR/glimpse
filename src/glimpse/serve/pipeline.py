@@ -56,7 +56,15 @@ class Pipeline:
         (design D2: the same decision code, one model per outer fold); the app always loads the final one."""
         torch.set_num_threads(min(cfg.training.num_threads, 4))
         self.cfg, pc = cfg, cfg.prototype
-        self.fusion = fusion if fusion is not None else joblib.load(FINAL)["models"]["photo"]
+        if fusion is None:  # serving: the frozen bundle carries the fusion AND its calibration (D3/D4 final)
+            bundle = joblib.load(FINAL)
+            self.fusion = bundle["models"]["photo"]
+            if calibration is None and "calibration" in bundle:
+                calibration = tuple(bundle["calibration"])
+            if m_personal == float("inf") and "m_personal" in bundle:
+                m_personal = float(bundle["m_personal"])
+        else:
+            self.fusion = fusion
         frozen_all = load_thresholds(Path(pc.thresholds_file))
         frozen = frozen_all["main"]
         if max(abs(frozen["low_risk_below"] - pc.low_risk_below), abs(frozen["caution_from"] - pc.caution_from)) > 1e-9:

@@ -220,6 +220,18 @@ def _robustness(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _finalize(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Regenerate the serving artifacts per the pre-registered 5 Nov amendment (docs/final_design.md)."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.training.finalize import finalize
+
+    finalize(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _monitoring(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """S11: draw the drift baseline the deployed monitor would redraw weekly (docs/monitoring.md)."""
     from glimpse.studies.monitoring import run_monitoring
@@ -359,6 +371,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("probes", help="photo-swap and flat-vs-rising CGM counterfactual probes (S13)")
     sub.add_parser("efficiency", help="parameters vs caps, serving latency, artifact sizes (S12)")
     sub.add_parser("monitoring", help="drift-baseline figure for the monitoring design (S11)")
+    sub.add_parser("finalize", help="regenerate the frozen serving artifacts (pre-registered amendment)")
     od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
@@ -401,6 +414,7 @@ def main(argv: list[str] | None = None) -> int:
         "probes": _probes,
         "efficiency": _efficiency,
         "monitoring": _monitoring,
+        "finalize": _finalize,
         "splits-v2": _splits_v2,
         "selftest": _selftest,
     }

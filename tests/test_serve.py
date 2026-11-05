@@ -274,3 +274,15 @@ def test_decision_parity_with_the_vectorised_rule():
         a = p.answer(MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm()), key=0)
         vec = "low risk" if a.risk < p.lo else "caution" if a.risk >= p.hi else "can't judge"
         assert a.decision == vec, (risk, a.decision, vec)
+
+
+def test_serving_bundle_calibration_reaches_the_risk_path(tmp_path, monkeypatch):
+    """A bundle that carries (a, b) and m must shape the served risk exactly like injected seams."""
+    est = PhotoEstimate(grams=75.0, bin_probs=[0.0, 0.0, 1.0, 0.0], unfamiliar_score=0.2)
+    injected = bare_pipeline(risk=0.45, table={7: est}, calibration=(0.8, -0.2), m_personal=2.0)
+    served = bare_pipeline(risk=0.45, table={7: est})
+    served.calib, served.m_personal = (0.8, -0.2), 2.0  # what __init__ now reads from the bundle
+    m = MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm())
+    hist = [(0.3, 1), (0.1, 0)]
+    a, b = injected.answer(m, key=7, history=hist), served.answer(m, key=7, history=hist)
+    assert a.risk == b.risk and a.risk_platt == b.risk_platt and a.risk_raw == b.risk_raw
