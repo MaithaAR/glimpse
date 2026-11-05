@@ -240,3 +240,33 @@ Behaviours fixed now and tested in `samples/instructor/`:
 
 App 17 November · repository 21 November · locked set scored once on 22 November · documentation only after that.
 No retuning after the 12 November gate verdict. One overnight job per night, logged the next morning.
+
+## Amendment (5 Nov 2026, pre-registered BEFORE any run): serving-artifact regeneration, pulled forward
+
+The deployed demo/app/folder command still serve intermediate-era artifacts (fusion and thresholds fit
+on the old 28-person split). They are regenerated ONCE, now, from partition v2, by the following fixed
+procedure; S16 (22 Nov) then only scores the locked 8 against these frozen artifacts and re-runs the
+fresh-clone check. Nothing in this amendment re-opens the S8 gate, the evaluation protocol, or any
+shipped verdict; the dev numbers in the report remain the per-fold evaluation's.
+
+1. **Photo serving model.** The two heads are retrained on the cached backbone embeddings of ALL
+   non-locked people (23 dev targets + 14 T2D); epochs = the median of the five per-fold choices from
+   photo CV v2 (no new selection). The frozen backbone is unchanged.
+2. **Unfamiliar-photo reference.** Rebuilt from all non-locked training photos' backbone embeddings;
+   the cut is re-derived by the deployed rule unchanged (leave-one-out distance quantile 0.99) and
+   re-checked against the S10 criteria: <=2% in-distribution flags, 0/14 real phone photos flagged,
+   screenshot and dark instructor cases still flagged. No sweep, no new rule.
+3. **Fusion.** One logistic regression; C chosen by the existing recipe with the five dev folds as the
+   holds; fit on all non-locked meals. Photo features for training rows come from the committed CV
+   tables: dev targets use their out-of-fold estimates; T2D rows use fold 1's nested estimates (an
+   arbitrary fixed choice, recorded here; T2D people are never scored).
+4. **Calibration.** Platt (a, b) fit on the pooled out-of-fold fusion risks of the five-fold
+   evaluation (the standard out-of-fold proxy for a final model); then (m, lo, hi) chosen by the
+   committed choose_m_and_cutoffs on those replayed risks in deployment order — D4's "frozen from an
+   all-development replay", executed.
+5. **Freeze.** thresholds.json v2 carries lo, hi, m and the Platt pair under the existing sha-256
+   guard; config prototype values updated to match; the final bundle carries the fusion and the
+   calibration so the served Pipeline uses them by default.
+6. **Verification before the app freeze.** just selftest, the 13-case instructor suite, the 23-case
+   stress suite and the app run against the new artifacts; outputs committed as the final-model
+   evidence the professor's stress testing will hit.
