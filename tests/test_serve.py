@@ -135,7 +135,8 @@ def test_predict_folder_finishes_with_per_item_entries(tmp_path):
     assert [r["meal_id"] for r in lines] == ["a_good", "b_broken"]
     assert lines[0]["decision"] == "can't judge"  # no photo estimate in the bare pipeline -> confirm-carbs
     assert lines[0]["escalate_to"] == "confirm_carbs"
-    assert "error" in lines[1]
+    assert lines[1]["decision"] == "can't judge"  # rule R9: named in plain words, not an error row
+    assert "profile.json is not valid JSON" in lines[1]["reason"]
     assert (tmp_path / "out" / "summary.md").read_text().startswith("# Folder run: 2 meals")
 
 
