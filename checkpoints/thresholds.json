@@ -1,25 +1,13 @@
 {
-  "model": "fusion: profile + trend + photo (fine-tuned ConvNeXt-Tiny)",
-  "low_risk_below": 0.31,
-  "caution_from": 0.31,
-  "chosen_on": "4 validation people (99 meals)",
-  "costs": {
-    "low_risk": [
-      5.0,
-      0.0
-    ],
-    "caution": [
-      0.0,
-      1.0
-    ],
-    "abstain": [
-      2.0,
-      0.5
-    ]
+  "main": {
+    "low_risk_below": 0.15,
+    "caution_from": 0.16
   },
-  "stability_check_pooled_cv": {
-    "low_risk_below": 0.18,
-    "caution_from": 0.21
-  },
-  "sha256": "462799bcd5bbc245350e96cb657d8fa29865625c2e238f82124bfcdd2eeb3a46"
+  "m_personal": 1.0,
+  "platt": [
+    0.9620214824742062,
+    -0.19738383484309358
+  ],
+  "provenance": "all-development replay; amendment of 5 Nov 2026 in docs/final_design.md",
+  "sha256": "34607e06e24751d6e651067cacdb94e3847894689ec40374ffa8e153a503b641"
 }

@@ -1,1 +1,1 @@
-photo_convnext_e17_valmae26.2.pt
+photo_convnext_final_v2_e14.pt
