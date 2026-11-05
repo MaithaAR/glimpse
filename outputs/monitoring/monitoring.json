@@ -1,9 +1,9 @@
 {
   "what": "drift baseline for the deployed monitor (design: docs/monitoring.md)",
-  "deployed_cut": 0.6087613701820374,
-  "training_loo_median": 0.29347342252731323,
-  "training_loo_q90": 0.4652980983257294,
-  "real_photos_median": 0.45847924053668976,
+  "deployed_cut": 0.6140460968017578,
+  "training_loo_median": 0.29124245047569275,
+  "training_loo_q90": 0.4448011517524719,
+  "real_photos_median": 0.4326874613761902,
   "real_photos_above_cut": 0,
   "real_photos_n": 14
 }

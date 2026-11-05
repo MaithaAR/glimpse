@@ -1,67 +1,67 @@
 {
-  "deployed_cut": 0.6087613701820374,
+  "deployed_cut": 0.6140460968017578,
   "budget": 0.02,
   "chosen": {
     "quantile": 0.99,
-    "cut": 0.608764111995697,
-    "in_dist_flagged": 0.010404624044895172,
+    "cut": 0.6140533685684204,
+    "in_dist_flagged": 0.010647010989487171,
     "local_flagged": 0,
     "flags_local_dish": false
   },
   "sweep": [
     {
       "quantile": 0.9,
-      "cut": 0.4652980864048004,
-      "in_dist_flagged": 0.10057803243398666,
-      "local_flagged": 7,
-      "flags_local_dish": false
-    },
-    {
-      "quantile": 0.92,
-      "cut": 0.4772840738296509,
-      "in_dist_flagged": 0.080924853682518,
+      "cut": 0.4448011517524719,
+      "in_dist_flagged": 0.09991809725761414,
       "local_flagged": 6,
       "flags_local_dish": false
     },
     {
-      "quantile": 0.94,
-      "cut": 0.49434277415275574,
-      "in_dist_flagged": 0.06011560559272766,
+      "quantile": 0.92,
+      "cut": 0.45434725284576416,
+      "in_dist_flagged": 0.08026207983493805,
       "local_flagged": 5,
+      "flags_local_dish": false
+    },
+    {
+      "quantile": 0.94,
+      "cut": 0.4718657433986664,
+      "in_dist_flagged": 0.06060606241226196,
+      "local_flagged": 3,
       "flags_local_dish": false
     },
     {
       "quantile": 0.95,
-      "cut": 0.5013262033462524,
-      "in_dist_flagged": 0.050867050886154175,
-      "local_flagged": 5,
+      "cut": 0.4835144877433777,
+      "in_dist_flagged": 0.04995904862880707,
+      "local_flagged": 3,
       "flags_local_dish": false
     },
     {
       "quantile": 0.96,
-      "cut": 0.5154723525047302,
-      "in_dist_flagged": 0.040462426841259,
-      "local_flagged": 4,
+      "cut": 0.49463823437690735,
+      "in_dist_flagged": 0.040131039917469025,
+      "local_flagged": 3,
       "flags_local_dish": false
     },
     {
       "quantile": 0.97,
-      "cut": 0.5352420210838318,
-      "in_dist_flagged": 0.03005780279636383,
+      "cut": 0.5255782008171082,
+      "in_dist_flagged": 0.03030303120613098,
       "local_flagged": 2,
       "flags_local_dish": false
     },
     {
       "quantile": 0.98,
-      "cut": 0.5559414625167847,
-      "in_dist_flagged": 0.020809248089790344,
+      "cut": 0.5629846453666687,
+      "in_dist_flagged": 0.02047502063214779,
       "local_flagged": 1,
       "flags_local_dish": false
     },
     {
       "quantile": 0.99,
-      "cut": 0.608764111995697,
-      "in_dist_flagged": 0.010404624044895172,
+      "cut": 0.6140533685684204,
+      "in_dist_flagged": 0.010647010989487171,
       "local_flagged": 0,
       "flags_local_dish": false
     }
@@ -70,97 +70,97 @@
     {
       "set": "local_photos",
       "photo": "bagel_sandwich.jpg",
-      "score": 0.4307768940925598
+      "score": 0.4215124249458313
     },
     {
       "set": "local_photos",
       "photo": "beef_bowl_closeup.jpg",
-      "score": 0.444526344537735
+      "score": 0.41529402136802673
     },
     {
       "set": "local_photos",
       "photo": "beef_bowl_labneh.jpg",
-      "score": 0.41780799627304077
+      "score": 0.40754109621047974
     },
     {
       "set": "local_photos",
       "photo": "burger_fries.jpg",
-      "score": 0.33010271191596985
+      "score": 0.3340776562690735
     },
     {
       "set": "local_photos",
       "photo": "chicken_corn_soup.jpg",
-      "score": 0.3690275251865387
+      "score": 0.35948845744132996
     },
     {
       "set": "local_photos",
       "photo": "chocolate_crepe.jpg",
-      "score": 0.521504819393158
+      "score": 0.5294626355171204
     },
     {
       "set": "local_photos",
       "photo": "croissant_car.jpg",
-      "score": 0.5843771696090698
+      "score": 0.5705876350402832
     },
     {
       "set": "local_photos",
       "photo": "french_toast.jpg",
-      "score": 0.49136990308761597
+      "score": 0.4438624978065491
     },
     {
       "set": "local_photos",
       "photo": "fruit_plate_pool.jpg",
-      "score": 0.5086148381233215
+      "score": 0.4690508246421814
     },
     {
       "set": "local_photos",
       "photo": "penne_rosa.jpg",
-      "score": 0.47243213653564453
+      "score": 0.4454129636287689
     },
     {
       "set": "local_photos",
       "photo": "schnitzel_potatoes.jpg",
-      "score": 0.37282004952430725
+      "score": 0.3352122902870178
     },
     {
       "set": "local_photos",
       "photo": "shrimp_noodle_soup.jpg",
-      "score": 0.4111610949039459
+      "score": 0.40299567580223083
     },
     {
       "set": "local_photos",
       "photo": "two_desserts.jpg",
-      "score": 0.522741436958313
+      "score": 0.4660719931125641
     },
     {
       "set": "local_photos",
       "photo": "yogurt_blueberry_dark.jpg",
-      "score": 0.5394309163093567
+      "score": 0.5180610418319702
     },
     {
       "set": "instructor",
       "photo": "00_clean",
-      "score": 0.4202879071235657
+      "score": 0.40598005056381226
     },
     {
       "set": "instructor",
       "photo": "08_dark_photo",
-      "score": 0.6819092035293579
+      "score": 0.613351047039032
     },
     {
       "set": "instructor",
       "photo": "09_screenshot",
-      "score": 0.7875181436538696
+      "score": 0.7706112861633301
     },
     {
       "set": "instructor",
       "photo": "10_exif_rotated",
-      "score": 0.42720240354537964
+      "score": 0.4124636650085449
     },
     {
       "set": "instructor",
       "photo": "11_local_dish",
-      "score": 0.3458377718925476
+      "score": 0.3180341124534607
     }
   ],
   "applied": false
