@@ -91,6 +91,9 @@ efficiency:
 monitoring:
     uv run glimpse monitoring
 
+stress:
+    uv run glimpse predict-folder samples/stress outputs/stress_run
+
 # final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
 train-final:
     uv run glimpse final
