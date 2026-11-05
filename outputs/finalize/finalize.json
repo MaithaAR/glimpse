@@ -1,0 +1,91 @@
+{
+  "photo_checkpoint": "photo_convnext_final_v2_e14.pt",
+  "reference": {
+    "in_dist_flagged": 0.010647010989487171,
+    "in_dist_budget_ok": true,
+    "real_photos_flagged": 0,
+    "real_photos_ok": true,
+    "instructor_flagged_ok": true,
+    "dark_refused_by_contrast": true,
+    "instructor_scores": {
+      "09_screenshot": 0.7706758379936218
+    },
+    "cut": 0.6140460968017578,
+    "real_photo_scores": {
+      "bagel_sandwich.jpg": 0.4215148985385895,
+      "beef_bowl_closeup.jpg": 0.4153153896331787,
+      "beef_bowl_labneh.jpg": 0.40747886896133423,
+      "burger_fries.jpg": 0.3340667486190796,
+      "chicken_corn_soup.jpg": 0.3595741391181946,
+      "chocolate_crepe.jpg": 0.529495120048523,
+      "croissant_car.jpg": 0.570634663105011,
+      "french_toast.jpg": 0.44391027092933655,
+      "fruit_plate_pool.jpg": 0.4690501093864441,
+      "penne_rosa.jpg": 0.44533175230026245,
+      "schnitzel_potatoes.jpg": 0.3352370858192444,
+      "shrimp_noodle_soup.jpg": 0.4030129015445709,
+      "two_desserts.jpg": 0.4661538600921631,
+      "yogurt_blueberry_dark.jpg": 0.5180257558822632
+    }
+  },
+  "fusion_C": 0.01,
+  "platt": [
+    0.9620214824742062,
+    -0.19738383484309358
+  ],
+  "m": 1.0,
+  "low_risk_below": 0.15,
+  "caution_from": 0.16,
+  "replay_cost": 0.5173913043478261,
+  "cost_vs_m_curve": [
+    {
+      "m": 0.5,
+      "low_risk_below": 0.11,
+      "caution_from": 0.17,
+      "cost": 0.5217391304347826
+    },
+    {
+      "m": 1.0,
+      "low_risk_below": 0.15,
+      "caution_from": 0.16,
+      "cost": 0.5173913043478261
+    },
+    {
+      "m": 2.0,
+      "low_risk_below": 0.18,
+      "caution_from": 0.2,
+      "cost": 0.5347826086956522
+    },
+    {
+      "m": 4.0,
+      "low_risk_below": 0.17,
+      "caution_from": 0.2,
+      "cost": 0.5380434782608695
+    },
+    {
+      "m": 8.0,
+      "low_risk_below": 0.19,
+      "caution_from": 0.2,
+      "cost": 0.5228260869565218
+    },
+    {
+      "m": 16.0,
+      "low_risk_below": 0.19,
+      "caution_from": 0.2,
+      "cost": 0.5380434782608695
+    },
+    {
+      "m": 32.0,
+      "low_risk_below": 0.19,
+      "caution_from": 0.19,
+      "cost": 0.5456521739130434
+    },
+    {
+      "m": Infinity,
+      "low_risk_below": 0.18,
+      "caution_from": 0.2,
+      "cost": 0.5554347826086956
+    }
+  ],
+  "oof_meals": 460
+}

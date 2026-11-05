@@ -1,0 +1,15 @@
+model,run,epoch,lr,train_loss,val_loss,val_metric,val_metric_name
+photo_convnext,finalize-heads,1,0.0003333333333333333,3.7269087017412366,,,mae_g
+photo_convnext,finalize-heads,2,0.0006666666666666666,1.7835564105653254,,,mae_g
+photo_convnext,finalize-heads,3,0.001,1.1317216823766898,,,mae_g
+photo_convnext,finalize-heads,4,0.0009755282581475768,0.9502128853747144,,,mae_g
+photo_convnext,finalize-heads,5,0.0009045084971874737,0.8802478406196925,,,mae_g
+photo_convnext,finalize-heads,6,0.0007938926261462366,0.8161396759636181,,,mae_g
+photo_convnext,finalize-heads,7,0.0006545084971874737,0.7981659840795469,,,mae_g
+photo_convnext,finalize-heads,8,0.0005,0.7531932934105738,,,mae_g
+photo_convnext,finalize-heads,9,0.00034549150281252633,0.7272636217723412,,,mae_g
+photo_convnext,finalize-heads,10,0.00020610737385376348,0.7308096890562777,,,mae_g
+photo_convnext,finalize-heads,11,9.549150281252633e-05,0.7160926715552465,,,mae_g
+photo_convnext,finalize-heads,12,2.4471741852423235e-05,0.7096226957369592,,,mae_g
+photo_convnext,finalize-last-stage,13,0.0001,0.8441051376051438,,,mae_g
+photo_convnext,finalize-last-stage,14,0.0001,0.5638836842887622,,,mae_g
