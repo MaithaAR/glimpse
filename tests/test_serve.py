@@ -79,6 +79,7 @@ def test_confirm_carbs_tier_uses_the_users_number():
 def test_borderline_escalates_to_human():
     """A risk between the cut-offs is a structured abstention routed to review, not a guess."""
     p = bare_pipeline(risk=0.17, table={0: PhotoEstimate(grams=20.0, bin_probs=[1.0, 0.0, 0.0, 0.0])})
+    p.lo, p.hi = 0.10, 0.20  # a band around the stub risk, independent of the deployed cut-offs
     m = MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm())
     a = p.answer(m, key=0)
     assert a.decision == "can't judge" and a.escalate_to == "human" and a.checks_failed == ["borderline"]

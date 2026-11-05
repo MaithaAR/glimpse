@@ -155,7 +155,7 @@ def finalize(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
               "m_personal": sel["m"], "platt": [a, b],
               "provenance": "all-development replay; amendment of 5 Nov 2026 in docs/final_design.md"}  # fmt: skip
     frozen["sha256"] = hash_thresholds(frozen)
-    THRESHOLDS.write_text(json.dumps(frozen, indent=2))
+    Path(cfg.prototype.thresholds_file).write_text(json.dumps(frozen, indent=2))  # the file the Pipeline loads
     joblib.dump({"models": {"photo": lr}, "calibration": (a, b), "m_personal": sel["m"], "C": c,
                  "photo_checkpoint": ckpt.name, "train_people": non_locked}, FINAL)  # fmt: skip
     _write_config_cutoffs(sel["low_risk_below"], sel["caution_from"])

@@ -71,9 +71,9 @@ fusion:                                      # meal information added to profile
   carbs_check_min_gain: 0.02                 # logged-carbs check: skip the photo CV only if the WHOLE 95% range is below this
   ridge_alpha_grid_posthoc: [1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0]  # POST-HOC (after 4c-2): ridge hit 1000 in all folds
 prototype:                                   # the app (glimpse demo / predict / app); rules run before the model
-  low_risk_below: 0.14285714285714285        # decision cut-offs = the frozen amendment (costs alone, no data); must match
-  caution_from: 0.2                          #   checkpoints/thresholds_amended.json, which the app checks at start-up
-  thresholds_file: checkpoints/thresholds_amended.json
+  low_risk_below: 0.15        # decision cut-offs frozen by `just finalize`; must match
+  caution_from: 0.16                          #   checkpoints/thresholds.json, which the app checks at start-up
+  thresholds_file: checkpoints/thresholds.json  # frozen by `just finalize` (all-dev replay amendment)
   ood_reference_file: checkpoints/photo_ood_reference.pt
   min_photo_contrast: 8.0                    # near-blank photo (grey-level spread below this, 0-255 scale) -> can't judge
   ood_neighbours: 5                          # unfamiliar photo: mean distance to the 5 nearest training photos ...
