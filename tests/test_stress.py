@@ -7,9 +7,8 @@ import json
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from test_serve import bare_pipeline
-
 from glimpse.serve.folder import predict_folder
+from test_serve import bare_pipeline
 
 MEAL = "2024-06-01T12:00"
 GOOD_PROFILE = {"age": 42, "bmi": 27.5, "a1c": 5.8, "fasting_glucose": 102, "meal_time": MEAL}
