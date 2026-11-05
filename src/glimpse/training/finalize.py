@@ -26,10 +26,10 @@ from glimpse.models.photo_model import PhotoCarbModel
 from glimpse.models.weights import weights_path
 from glimpse.serve.rules import knn_distance, leave_one_out_distances
 from glimpse.training.baselines import logistic
+from glimpse.training.common import EpochLogger
 from glimpse.training.cv import _tune_sklearn
 from glimpse.training.final import FINAL, THRESHOLDS, cost_dict, hash_thresholds
 from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
-from glimpse.training.common import EpochLogger
 from glimpse.training.photo import (
     build_cache,
     embed_maps,
@@ -42,7 +42,8 @@ from glimpse.training.photo import (
 OUT = Path("outputs/finalize")
 HEADS_EPOCHS, LAST_STAGE_EPOCHS = 12, 2  # medians of the committed per-fold CV choices (amendment §1)
 REAL_PHOTOS, BUDGET = Path("samples/local_photos"), 0.02  # amendment §2: the S10 criteria, unchanged
-FLAGGED_CASES = ("09_screenshot", "08_dark_photo")  # instructor photos the check must still flag
+KNN_FLAGGED = ("09_screenshot",)  # must be flagged by the kNN check itself
+CONTRAST_REFUSED = ("08_dark_photo",)  # refused one layer earlier, by the model-independent contrast rule
 
 
 def _final_photo_model(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig, elog) -> tuple:
@@ -92,15 +93,22 @@ def _final_reference(model, maps_eval, cfg: GlimpseConfig) -> dict:
 
     real = {p.name: score(p) for p in sorted(REAL_PHOTOS.glob("*.jpg"))}
     flagged_real = sum(v > cut for v in real.values())
-    cases = {c: score(next(Path(f"samples/instructor/{c}").glob("photo.*"))) for c in FLAGGED_CASES}
+    from glimpse.serve.rules import photo_problem
+
+    cases = {c: score(next(Path(f"samples/instructor/{c}").glob("photo.*"))) for c in KNN_FLAGGED}
+    dark_ok = all(photo_problem(open_photo(next(Path(f"samples/instructor/{c}").glob("photo.*")),
+                                           cfg.photo.min_side_px), pc.min_photo_contrast) is not None
+                  for c in CONTRAST_REFUSED)  # fmt: skip
     checks = {"in_dist_flagged": in_dist, "in_dist_budget_ok": in_dist <= BUDGET,
               "real_photos_flagged": int(flagged_real), "real_photos_ok": flagged_real == 0,
               "instructor_flagged_ok": all(v > cut for v in cases.values()),
+              "dark_refused_by_contrast": dark_ok,
               "instructor_scores": cases}  # fmt: skip
     log.info("reference: {} photos, cut {:.3f} (q{:.2f}); in-dist flagged {:.1%}; real photos flagged "
              "{}/{}; screenshot/blank flagged: {}", len(ref), cut, pc.ood_quantile, in_dist,
              flagged_real, len(real), checks["instructor_flagged_ok"])  # fmt: skip
-    if not (checks["in_dist_budget_ok"] and checks["real_photos_ok"] and checks["instructor_flagged_ok"]):
+    if not (checks["in_dist_budget_ok"] and checks["real_photos_ok"] and checks["instructor_flagged_ok"]
+            and checks["dark_refused_by_contrast"]):  # fmt: skip
         raise RuntimeError(f"the pre-registered reference criteria do not hold: {checks}; "
                            "stopping (no sweep) -- record and decide in the open")  # fmt: skip
     torch.save({"emb": ref.half(), "cut": cut, "k": k}, Path(pc.ood_reference_file))

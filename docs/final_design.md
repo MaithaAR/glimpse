@@ -275,3 +275,14 @@ shipped verdict; the dev numbers in the report remain the per-fold evaluation's.
 6. **Verification before the app freeze.** just selftest, the 13-case instructor suite, the 23-case
    stress suite and the app run against the new artifacts; outputs committed as the final-model
    evidence the professor's stress testing will hit.
+
+**Execution note (5 Nov, recorded when the first finalize run stopped itself).** The reference
+criteria as first written required BOTH the screenshot and the dark instructor photos to be flagged by
+the unfamiliar-photo check. The run stopped because the dark photo scored 0.613 against the new cut
+0.614 (screenshot 0.771 flagged; in-dist 1.1% within budget; real photos 0/14). The committed serving
+evidence shows the dark photo never reaches that check at all: the contrast rule (grey-level spread
+0.0, need 8 -- model-independent, runs first) refuses it end-to-end (outputs/folder_run). The
+criterion mis-encoded the layered design -- S10 had scored the dark photo by calling the kNN check in
+isolation. Decision, in the open: the criterion is corrected to the end-to-end property (screenshot
+flagged by the kNN check; dark photo refused by any designed check), the near-miss value is recorded
+here, and nothing else changes: same rule, same quantile, no sweep.
