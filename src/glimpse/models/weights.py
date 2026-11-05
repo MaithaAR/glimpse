@@ -26,9 +26,14 @@ def weights_path(pc: PhotoCfg, download: bool = False) -> Path:
     """Local path of the pinned weights file. With download=True it is fetched if missing; otherwise it must
     already be on disk (offline). A file whose fingerprint does not match is deleted and an error is raised."""
     from huggingface_hub import hf_hub_download
+    from huggingface_hub.errors import LocalEntryNotFoundError
 
-    path = Path(hf_hub_download(pc.hf_repo, FILENAME, revision=pc.revision, cache_dir=pc.weights_dir,
-                                local_files_only=not download))  # fmt: skip
+    try:
+        path = Path(hf_hub_download(pc.hf_repo, FILENAME, revision=pc.revision, cache_dir=pc.weights_dir,
+                                    local_files_only=not download))  # fmt: skip
+    except LocalEntryNotFoundError as e:  # a fresh clone before `just install`: say what to do, plainly
+        raise FileNotFoundError("the photo model's weights are not on disk yet; run `just install` once "
+                                "(or `uv run glimpse download-weights`) and retry") from e  # fmt: skip
     digest = sha256(path)
     if digest != pc.weights_sha256:
         path.unlink(missing_ok=True)
