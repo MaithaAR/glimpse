@@ -39,28 +39,34 @@ def build_stress_folder(root: Path) -> int:
     cases: dict[str, tuple] = {
         "01_semicolon_csv": ("\n".join(ln.replace(",", ";") for ln in _cgm_lines()), ok_prof),
         "02_tz_aware_timestamps": ("\n".join(_cgm_lines(tz="+04:00")), ok_prof),
-        "03_ampm_meal_time": ("\n".join(_cgm_lines()),
-                              json.dumps({**GOOD_PROFILE, "meal_time": "06/01/2024 12:00 PM"})),  # fmt: skip
+        "03_ampm_meal_time": (
+            "\n".join(_cgm_lines()),
+            json.dumps({**GOOD_PROFILE, "meal_time": "06/01/2024 12:00 PM"}),
+        ),  # fmt: skip
         "04_strings_in_glucose": ("timestamp,glucose_mgdl\n2024-06-01T10:00,high\n2024-06-01T10:05,low", ok_prof),
         "05_negative_glucose": ("\n".join(_cgm_lines(value=-50.0)), ok_prof),
         "06_absurd_glucose": ("\n".join(_cgm_lines(value=1e9)), ok_prof),
         "07_one_reading": ("timestamp,glucose_mgdl\n2024-06-01T11:55,100", ok_prof),
-        "08_duplicate_timestamps": ("\n".join(_cgm_lines()) + "\n2024-06-01T10:00,99,70\n2024-06-01T10:00,101,70",
-                                    ok_prof),  # fmt: skip
+        "08_duplicate_timestamps": (
+            "\n".join(_cgm_lines()) + "\n2024-06-01T10:00,99,70\n2024-06-01T10:00,101,70",
+            ok_prof,
+        ),  # fmt: skip
         "09_header_only": ("timestamp,glucose_mgdl", ok_prof),
         "10_binary_cgm": (bytes(range(256)) * 8, ok_prof),
         "11_bom_crlf_csv": ("﻿" + "\r\n".join(_cgm_lines()), ok_prof),
         "12_wrong_columns": ("time,sugar\n2024-06-01T10:00,100", ok_prof),
-        "13_profile_strings": ("\n".join(_cgm_lines()),
-                               json.dumps({"age": "42", "bmi": "27.5", "a1c": "5.8",
-                                           "fasting_glucose": "102", "meal_time": MEAL})),  # fmt: skip
+        "13_profile_strings": (
+            "\n".join(_cgm_lines()),
+            json.dumps({"age": "42", "bmi": "27.5", "a1c": "5.8", "fasting_glucose": "102", "meal_time": MEAL}),
+        ),  # fmt: skip
         "14_profile_not_json": ("\n".join(_cgm_lines()), "age: 42, bmi: 27.5 <-- not json"),
-        "15_profile_nested": ("\n".join(_cgm_lines()),
-                              json.dumps({**GOOD_PROFILE, "age": {"value": 42}})),  # fmt: skip
+        "15_profile_nested": ("\n".join(_cgm_lines()), json.dumps({**GOOD_PROFILE, "age": {"value": 42}})),  # fmt: skip
         "16_no_cgm_at_all": (None, ok_prof),
         "17_empty_folder": (None, None, None),
-        "18_future_meal_time": ("\n".join(_cgm_lines()),
-                                json.dumps({**GOOD_PROFILE, "meal_time": "2024-06-01T09:00"})),  # fmt: skip
+        "18_future_meal_time": (
+            "\n".join(_cgm_lines()),
+            json.dumps({**GOOD_PROFILE, "meal_time": "2024-06-01T09:00"}),
+        ),  # fmt: skip
     }
     for name, spec in cases.items():
         _write_case(root, name, spec[0], spec[1], *(spec[2:] or (b"junk",)))
