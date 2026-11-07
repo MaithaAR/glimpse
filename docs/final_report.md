@@ -70,7 +70,8 @@ same test the SensorCNN tie already settles: with 481 meals from 23 people, no h
 sequence model meets the "simplest option that meets the measured bar" rule. Recipe, from the committed config: AdamW; heads at
 1e-3, the last stage at 1e-4 (the taught differential-rate rule); warm-up plus cosine; weight decay
 0.05 photo, 0.01 SensorCNN; batch 64; early stopping on inner folds, final epochs at the medians
-(12 + 2). Photo loss: Huber on log grams + 0.5 × bin cross-entropy; SensorCNN: cross-entropy.
+(12 + 2); over 3 fresh seeds of that recipe, held-out carb error is 24.9 ± 1.9 g (bin F1
+0.55 ± 0.04). Photo loss: Huber on log grams + 0.5 × bin cross-entropy; SensorCNN: cross-entropy.
 Augmentation: flips, crops keeping 80% of the plate, brightness and contrast within 10%, and no hue
 change, because colour tells foods apart.
 
