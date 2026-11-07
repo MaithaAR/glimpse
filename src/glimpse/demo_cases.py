@@ -104,7 +104,13 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     log = logger.bind(stage="demo")
     OUT.mkdir(parents=True, exist_ok=True)
     ref_file = Path(cfg.prototype.ood_reference_file)
-    check = build_ood_reference(ds, sp, cfg) if not ref_file.is_file() else torch.load(ref_file)["check"]
+    if not ref_file.is_file():
+        check = build_ood_reference(ds, sp, cfg)
+    else:  # the frozen finalize reference has no "check" block; describe it instead of rebuilding it
+        d = torch.load(ref_file)
+        check = d.get("check") or {"source": "frozen finalize reference (criteria in outputs/finalize)",
+                                   "training_photos": int(d["emb"].shape[0]), "k": int(d["k"]),
+                                   "cut": float(d["cut"])}  # fmt: skip
     app = Pipeline(cfg)
     rows = [int(r) for r in meal_rows(ds, set(sp.test), scored_only=True)]
     app.answer(meal_input(cfg, ds, rows[0]))  # warm-up (first call loads libraries)
@@ -131,7 +137,7 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
              "Correct all-clear (low risk, no spike)": first(ok[clear & (ok.spike == 0)]),
              "Wrong answer (shown on purpose)": first(ok[(clear & (ok.spike == 1))
                                                          | (warn & (ok.spike == 0))])}  # fmt: skip
-    md = ["# GLIMPSE demo: worked cases (test people, frozen 28-person pipeline)", ""]
+    md = ["# GLIMPSE demo: worked cases (test people, frozen final pipeline)", ""]
     for title, r in picks.items():
         if r is None:
             md.append(f"### {title}\n- none among the test meals")
