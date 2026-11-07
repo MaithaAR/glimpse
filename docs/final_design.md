@@ -291,3 +291,14 @@ here, and nothing else changes: same rule, same quantile, no sweep.
 from committed evidence files only (`just figures`). In particular the reliability diagram and ECE
 visualise the already-shipped calibration: no threshold, Platt parameter, shrinkage m or cut-off may
 change in response to how any figure looks. An ugly panel becomes a limitation sentence, not a refit.
+
+**Additions pre-registered 7 Nov, before either runs; both are descriptive and change nothing
+shipped.** (a) Meal-time shift robustness: every development meal re-answered with the stated meal
+time moved 15 minutes earlier and 15 minutes later, through the same per-fold pipelines as S9.
+Expectation, committed now: the earlier claim should be refused by rule R3 for most meals (readings
+would sit after the claimed time, and the sensor cannot report the future), the later claim should
+mostly still be answered from a slightly staler window; dangerous flips should stay near zero. The
+result is reported whatever it shows. (b) SHAP attributions for the frozen final fusion: exact
+linear SHAP (coefficient times feature minus background mean, in logit space) over the answered
+development meals, one global summary and one local explanation whose terms are checked to sum to
+the model's logit. No parameter, threshold or verdict may change in response to either result.
