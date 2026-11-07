@@ -15,6 +15,9 @@ product is sensor + confirmed carbs, with the photo head as a carb-entry assist.
 cleared meals spiked (7.3%, interval 2.9–14.2% against a pre-registered 10% cap), degraded input
 triggers refusal, with dangerous flips at most 1.5%, and a 23-case adversarial input suite produces zero
 crashes and zero raw error rows. [S16: one sentence with the locked-8 result, scored once on 22 Nov, whatever it shows.]
+<!-- S16 bottom-line template (fill from the one scoring run, as measured): "On the 8 locked people
+(N meals, XX% spike rate), scored exactly once: personal AUROC 0.XXX (0.XXX-0.XXX), raw 0.XXX;
+XX cleared / XX caution / XX can't judge; missed-among-cleared X of XX." -->
 
 ## 1. System and tooling
 <!-- 350 words: condensed user/workflow from the intermediate; ONE scoring path (D2); the instructor
@@ -32,8 +35,7 @@ One scoring path: every number here, the demo, the app and the grader's
 `just predict-folder <in> <out>` go through the same `Pipeline.answer`; plain-code input rules run
 first (§4). Tooling: uv + Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for
 every number, 130 tests in CI, W&B offline exports, and a git history (from 2 Nov; earlier
-ordering in the dated design docs) in which every pre-registration precedes its run. The system trains and runs
-on one laptop. Figure 1 shows the single path.
+ordering in the dated design docs) in which every pre-registration precedes its run. It trains and runs on one laptop; Figure 1 shows the single path.
 
 ![Figure 1: the one scoring path](../outputs/figures/f1_system.png)
 
@@ -53,8 +55,7 @@ Three parts. A pinned, SHA-verified ConvNeXt-Tiny backbone (ImageNet-22k) feeds 
 regression and a 4-bin carb classifier, with only the last backbone stage fine-tuned; on
 held-out people the photo head reaches 22.6 g MAE, Spearman 0.53 and bin F1 0.61 (a ridge on true
 macros gets a better MAE, 20.4 g, but F1 0.38; the heads earn their 3,845 parameters on the bins;
-patients' own carb counts err by ~15–20% of meal content, so this error band has company: Brazeau et
-al. 2013, Vasiloglou et al. 2018).
+patients' own carb counts err by ~15–20% of meal content: Brazeau 2013, Vasiloglou 2018).
 The profile comprises eight inputs: age, BMI, HbA1c, fasting glucose, meal hour (as sine and
 cosine) and two onboarding priors (spike rate and mean rise); it is the channel whose removal costs
 the most (0.122 AUROC). Hand-made trend features summarise the 2-h CGM/HR window; SensorCNN, the required from-scratch model
@@ -102,8 +103,8 @@ definition, with per-person rates from 0% to 68%: per-person calibration is the 
 five outer folds; four inner folds inside each
 fold's training people are the validation split for every choice (fusion C, Platt, the shrinkage m,
 the cut-offs); 14 T2D people are training-only and never scored; 8 people have been locked since the
-proposal. A committed reconciliation (splits/reconciliation.md) asserts that the 481 development meals
-are scored exactly once, the intermediate's double-count answered in kind. One declared caveat:
+proposal. A committed reconciliation (splits/reconciliation.md) asserts the 481 development meals are
+scored exactly once, answering the intermediate's double-count. One declared caveat:
 fold 1 contains the five people the intermediate evaluation already scored (the same seeded draw), so
 the pooled development estimate is optimistic. The personalised model beats raw in all five outer
 folds; the pooled estimate excluding the previously-scored fold 1 is 0.757 (0.651–0.833) against
@@ -144,8 +145,7 @@ Discrimination is even across glycaemic status: AUROC 0.738 for the 11 healthy p
 21% spike rate), 0.736 for the 12 prediabetic (243 meals, 43%); no subgroup gap, though the cohort
 limits firmer fairness claims. Per-person gaps halved: rare spikers
 predicted 20.9% vs observed 14.2% (was 29.3%); frequent 42.6% vs
-52.9% (was 37.0%). Cut-off variation (two folds chose no abstention band) is reported as a finding:
-the cost optimiser priced abstention at zero value for those inner distributions. The cost-vs-m curve
+52.9% (was 37.0%). The cost-vs-m curve
 is a flat basin (m ∈ [0.5, 2] across folds). The deployed values were frozen from the all-development
 replay by a pre-registered procedure (docs/final_design.md amendment): Platt (0.96, −0.20), m = 1.0,
 cut-offs (0.15, 0.16). The replay, like two of the five folds, chose a near-degenerate abstention
@@ -221,7 +221,10 @@ one of the three dietitian questions (§4).
 <!-- 300 words: fresh-clone chain; one-Mac story + CSCC sentence; W&B; manifest; locked-8 protocol. -->
 The 8 locked subjects are scored once, on 22 Nov, from frozen artifacts verified by a fresh-clone
 run; every reported number comes from the same Pipeline.answer path the instructor command invokes.
-[S16: locked-8 tables here.] We pre-commit, before that run: the result is reported as measured, in
+[S16: locked-8 tables here.]
+<!-- S16 section template: one table in the S3 format (raw / personal AUROC + log-loss, locked 8),
+one decisions line, one sentence comparing with dev (higher/lower/within CI), zero interpretation
+beyond the pre-committed paragraph. Budget ~55 words; headroom is reserved. --> We pre-commit, before that run: the result is reported as measured, in
 the same form as §3, and no re-tuning follows. A fresh-clone dry-run (5 Nov) proved the chain:
 clone, `uv sync`, one documented weights step (pinned revision, SHA-256) reproduce the selftest and
 both input suites, and the dry run itself found and fixed two onboarding defects. The serving
