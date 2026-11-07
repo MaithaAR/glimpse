@@ -183,6 +183,8 @@ guessing is established practice for medical ML (Kompa et al. 2021).
 | 25-min pre-meal gap | 11% | 0.0% | **89% (refusal, by design)** |
 | photo blur r=6 | 94% | 1.3% | 4% |
 | photo darken ×0.25 | 97% | 0.2% | 2% |
+| meal time stated 15 min early | 11% | 0.0% | **89% (R3 refusal, as pre-registered)** |
+| meal time stated 15 min late | 96% | 1.5% | 1% |
 
 Stress suite: 23 hostile inputs (timezone offsets, malformed JSON, binary CSVs, truncated and
 mislabelled photos, empty folders) give zero crashes and zero raw error rows; rules R8-R10 were

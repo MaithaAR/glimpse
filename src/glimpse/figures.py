@@ -184,12 +184,10 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     background mean) in the standardised space; the local panel's terms are checked to sum to the logit."""
     import joblib
 
-    from glimpse.config import load_config
     from glimpse.data.dataset import MealDataset
     from glimpse.training.final import FINAL
     from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
 
-    cfg = load_config()
     ds = MealDataset.load(Path("data/dataset"))
     oof = pd.read_csv("outputs/photo_cv/photo_oof.csv")
     nested = pd.read_csv("outputs/photo_cv/photo_nested.csv")
