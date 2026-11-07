@@ -1,7 +1,7 @@
 # Folder run: 13 meals
 
-- can't judge: 9
-- caution: 4
+- can't judge: 8
+- caution: 5
 
 | meal | decision | reason |
 |---|---|---|
@@ -10,7 +10,7 @@
 | 02_unsorted | caution | risk 32% is at or above the caution cut-off 16% |
 | 03_future_timestamps | can't judge | 11 glucose readings are timestamped after the meal time (latest 2024-06-01 12:55); check the export and the meal time |
 | 04_gap_in_window | can't judge | glucose data incomplete: 5 readings in the last 30 min (need 3), 71% of the 2 h covered (need 70%), longest gap 35 min (max 20) |
-| 05_no_heart_rate | can't judge | the photo looks unlike the meal photos the model learned from |
+| 05_no_heart_rate | caution | risk 28% is at or above the caution cut-off 16% |
 | 06_profile_implausible | can't judge | unsupported input (age = 7.0 is outside the plausible range 18-100) |
 | 07_profile_blank | can't judge | profile fields missing or blank: age, bmi, a1c_pct, fasting_glucose_mgdl |
 | 08_dark_photo | can't judge | the photo is almost blank (grey-level spread 0.0, need 8); no meal visible |

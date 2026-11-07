@@ -14,6 +14,33 @@
       "window sd"
     ]
   },
+  "ece_equal_mass_10bins": {
+    "risk_raw": 0.04939413946446653,
+    "risk": 0.03531406110033508
+  },
+  "missed_among_cleared": {
+    "misses": 8,
+    "cleared": 109,
+    "rate": 0.07339449541284404,
+    "ci95_person_bootstrap": [
+      0.02898202341137124,
+      0.14154312668463592
+    ]
+  },
+  "subgroups": {
+    "healthy": {
+      "auroc_personal": 0.7376048817696416,
+      "meals": 217,
+      "people": 11,
+      "spike_rate": 0.2119815668202765
+    },
+    "prediabetes": {
+      "auroc_personal": 0.7360248447204969,
+      "meals": 243,
+      "people": 12,
+      "spike_rate": 0.43209876543209874
+    }
+  },
   "files": [
     "f1_system.png",
     "f2_per_fold_auroc.png",

@@ -1,8 +1,8 @@
 [
   {
-    "name": "final/final_photo_history",
-    "source": "outputs/final/final_photo_history.csv",
-    "rows": 68
+    "name": "finalize/finalize_history",
+    "source": "outputs/finalize/finalize_history.csv",
+    "rows": 14
   },
   {
     "name": "photo_cv/photo_cv_history",
