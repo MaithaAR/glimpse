@@ -12,7 +12,7 @@ to 0.762 and improves every one of the five folds individually, while halving th
 calibration gaps the intermediate diagnosed. The photo went through a pre-registered gate and did not pass (+0.025
 AUROC, interval −0.010 to +0.061), so, per the paragraph committed before the run, the shipped
 product is sensor + confirmed carbs, with the photo head as a carb-entry assist. Safety behaves by design: 8 of 109
-cleared meals spiked (7.3%, interval 2.6–14.4% against a pre-registered 10% cap), degraded input
+cleared meals spiked (7.3%, interval 2.9–14.2% against a pre-registered 10% cap), degraded input
 triggers refusal, with dangerous flips at most 1.5%, and a 23-case adversarial input suite produces zero
 crashes and zero raw error rows. [S16: one sentence with the locked-8 result, scored once on 22 Nov, whatever it shows.]
 
@@ -165,7 +165,7 @@ still spike, which the programme's dietitian sees because the CGM reports every 
 the final all-development replay, chose a (near-)degenerate abstention band: the cost optimiser
 honestly prices borderline abstention at almost nothing for those risk distributions, and we report
 that as a finding rather than forcing a band.
-8 of 109 cleared meals spiked (7.3%; 95% CI 2.6–14.4%): within the cap at the point estimate,
+8 of 109 cleared meals spiked (7.3%; 95% CI 2.9–14.2%): within the cap at the point estimate,
 though with only 17 people contributing cleared meals the upper bound exceeds it, a cohort-size
 limit, monitored continuously in deployment through cgm_auto. The 8 misses spread across 6 people.
 Abstaining instead of guessing is established practice for medical ML (Kompa et al. 2021).

@@ -51,10 +51,12 @@ def _plain(e: Exception) -> str:
     if "could not convert string to float" in t:
         return "a glucose or heart-rate value is not a number (" + t.rsplit(":", 1)[-1].strip() + ")"
     if "Invalid isoformat string" in t:
-        tail = t.rsplit(":", 1)[-1].strip()
+        tail = t.split("Invalid isoformat string:", 1)[-1].strip()
         return "the meal time " + tail + " is not an understood format (use e.g. 2024-06-01T12:00)"
     if "tokenizing" in t.lower():
         return "the CGM file could not be read as a table of readings"
+    if "float() argument" in t:
+        return "a profile value is not a number"
     return t
 
 
