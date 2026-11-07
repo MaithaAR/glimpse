@@ -123,6 +123,10 @@ photo-seeds:
 recalibrate:
     uv run glimpse recalibrate
 
+# the intermediate's promised comparisons, run once against the frozen evidence (pre-registered 8 Nov; ~20 min)
+promised:
+    uv run glimpse promised
+
 # demo with the frozen pipeline: worked cases from the test people, two can't-judge cases, response time
 demo:
     uv run glimpse demo

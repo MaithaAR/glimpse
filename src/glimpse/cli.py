@@ -232,6 +232,18 @@ def _timing(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _promised(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """The intermediate's promised comparisons, run once (pre-registered 8 Nov, docs/final_design.md)."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.promised import run_promised
+
+    run_promised(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _figures(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Render the report figures from committed evidence files (pre-commitment: nothing retuned)."""
     from glimpse.figures import run_figures
@@ -388,6 +400,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("ablate", help="D8 profile-excluded split + input-channel ablations (run `fusion` first)")
     sub.add_parser("wandb-export", help="offline W&B runs from every history CSV and summary in outputs/")
     sub.add_parser("robustness", help="decision-flip rates under CGM dropout/gap and photo blur/dark (S9)")
+    sub.add_parser("promised", help="the intermediate's promised comparisons, run once (pre-registered 8 Nov)")
     sub.add_parser("probes", help="photo-swap and flat-vs-rising CGM counterfactual probes (S13)")
     sub.add_parser("efficiency", help="parameters vs caps, serving latency, artifact sizes (S12)")
     sub.add_parser("monitoring", help="drift-baseline figure for the monitoring design (S11)")
@@ -433,6 +446,7 @@ def main(argv: list[str] | None = None) -> int:
         "wandb-export": _wandb_export,
         "ood": _ood,
         "robustness": _robustness,
+        "promised": _promised,
         "probes": _probes,
         "efficiency": _efficiency,
         "monitoring": _monitoring,
