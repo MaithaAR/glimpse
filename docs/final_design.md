@@ -310,3 +310,26 @@ epochs) and re-run with 3 fresh seeds trained on the 28 training people and scor
 people. The deployed checkpoint is dropped as a row because it trained on all 37 non-locked people,
 validation included, so scoring it there would be train-on-test. Descriptive only: mean and sd go in
 the report as measured, and no artifact, threshold or selection changes whatever the spread shows.
+
+**Promised-study execution (8 Nov, pre-registered before any run).** An external audit found that
+three comparisons promised in the intermediate (its lines 136-138) were never run and never formally
+cut. They are executed now, once each, against the frozen artifacts and the committed out-of-fold
+evidence (`just promised` -> outputs/promised/), with the October bars quoted unchanged: (R1) fusion
+vs gradient boosting on the same inputs, same folds and inner folds, person-paired bootstrap, the
+shipped logistic regression non-inferior if the paired lower bound > -0.03; (R2) class-weighted
+logistic regression, adopt only if the lower bound > 0 - adoption is impossible under the freeze, so
+the bar reads as a descriptive verdict; (R3) spike-label sensitivity: the frozen risk scores scored
+against 30 and 70 mg/dL labels rebuilt from the committed per-meal rises, both reported; (R4) the
+branch-masking check, translated to the shipped design (a missing photo abstains by rule R1 rather
+than falling back): photo features at their imputation medians must carry no photo information, the
+paired AUROC difference against the no-meal arm reported, expected near zero - the refit photo arm
+must first reproduce the committed out-of-fold predictions exactly, or the study stops; (R5) the
+grams-head vs classifier-head bin agreement on committed out-of-fold predictions, against the old
+90% figure; (R6) missing heart rate and missing labs through the per-fold pipelines, reported in the
+originally promised metric (delta AUROC >= -0.03, delta ECE) next to the decision-flip rates, with
+refusals counted as the designed response. Each study runs once; every result is reported whatever
+it shows; nothing shipped changes. Two decisions recorded while we are here: S9 reported decision
+flips rather than the promised delta-AUROC because decisions, not scores, are the product - R6 now
+adds the promised metric for the two arms the channels ablation did not cover; and the protocol's
+"three seeds in the final" for the photo CV was executed at the final-recipe level (the 7 Nov seed
+study) rather than as three full CV passes, a compute trade-off recorded here.

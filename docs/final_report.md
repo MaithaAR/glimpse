@@ -87,7 +87,8 @@ established risk signal. Three results corroborate the verdict. RQ1: even the pa
 +0.024 (−0.003, +0.056) over profile + trend, and the photo estimate lands within +0.002 of them
 (non-inferior): an information ceiling no photo encoder can break (the taught ceiling analysis). D8: excluding training meals that share an
 exact macro profile with a held person's meal kills the photo gain (−0.005) while a size-matched
-random drop keeps it (+0.037): the small gain rides on CGMacros' repeated standardised meals.
+random drop keeps it (+0.037, interval −0.024 to +0.099, a point contrast only): the small gain
+rides on CGMacros' repeated standardised meals.
 Channel ablations: dropping heart rate changes +0.007 (it stays only because the feature set was
 fixed before the ablation); dropping the profile costs −0.122. The tabular core carries the system.
 
@@ -105,8 +106,9 @@ fold's training people are the validation split for every choice (fusion C, Plat
 the cut-offs); 14 T2D people are training-only and never scored; 8 people have been locked since the
 proposal. A committed reconciliation (splits/reconciliation.md) asserts the 481 development meals are
 scored exactly once, answering the intermediate's double-count. One declared caveat:
-fold 1 contains the five people the intermediate evaluation already scored (the same seeded draw), so
-the pooled development estimate is optimistic. The personalised model beats raw in all five outer
+fold 1 contains the five people the intermediate evaluation already scored (the same seeded draw),
+and the calibration fix was chosen after a diagnosis made on those people, so the development
+estimate carries selection pressure the locked eight do not. The personalised model beats raw in all five outer
 folds; the pooled estimate excluding the previously-scored fold 1 is 0.757 (0.651–0.833) against
 0.762 overall, and the locked eight, scored once in §6, are the only fully clean measurement.
 
@@ -158,7 +160,8 @@ sensitivity sweep; usefulness vs pre-registered targets; robustness table; stres
 Decisions are priced, not guessed: a missed spike costs 5× an unnecessary caution, abstention
 (2, 0.5), declared assumptions (the 5:1 ratio is a ~17% action threshold in decision-curve terms:
 Vickers & Elkin 2006), with a pre-registered cost sensitivity sweep committed alongside. All four usefulness targets were fixed before any result
-(docs/evaluation_protocol.md) and all four hold at the point estimate: cost reduction 14% (min 10%),
+(docs/evaluation_protocol.md) and all four hold at the point estimate, the protocol's on-track
+label: cost reduction 14% (min 10%),
 cleared 23% (min 20%), abstain 14% (max 20%), missed-among-cleared 7.3% (max 10%). In plain terms: of
 every 100 meals, the app clears about 23, flags 64 and declines 14; of the cleared, about 7 in 100
 still spike, which the programme's dietitian sees because the CGM reports every outcome at +2 h. Two folds, and
@@ -243,16 +246,15 @@ is a dated commit.
 ## 7. Limitations and conclusion
 <!-- 200 words -->
 CGMacros is a de-identified public PhysioNet dataset collected under the source study's ethics
-approval; no new human data were collected. Forty-five people from one study, with repeated standardised meals that D8 shows inflate any
-photo-memorisation effect; no local-cuisine data, and R7 names exactly the dish class that would
-suffer. T2D participants are training-only, so no claim is made for them. Heart rate adds nothing
+approval; no new human data. Forty-five people from one study, with repeated standardised meals
+that D8 shows inflate any photo-memorisation effect; no local-cuisine data, and R7 names the dish
+class that would suffer. T2D participants are training-only, so no claim is made for them. Heart rate adds nothing
 here. The photo is not established as a risk signal, and the label's baseline-relative definition can
-diverge from a user's intuition (probe B). This is an advisory prototype on an open dataset, with no
-clinical validation and no regulatory review, built so that a clinical study could evaluate it: one
-scoring path, pre-registered targets and gates, continuous outcome monitoring for free from the CGM
-itself. That discipline is checkable: the gate shipped its
+diverge from a user's intuition (probe B). This is an advisory prototype with no clinical validation and no
+regulatory review, built so that a clinical study could evaluate it: one scoring path,
+pre-registered targets and gates, outcome monitoring for free from the CGM. That discipline is checkable: the gate shipped its
 losing paragraph, the probes caught their authors, the guard that froze the final artifacts stopped
-its own first run, and the locked eight were touched exactly once.
+its own first run, and the locked eight are touched exactly once.
 
 **Appendix: taught-technique coverage.** Group split, pristine locked set (weeks 4-5); nested CV,
 thresholds over class weights (week 2); wall-clock as a first-class number (week 3); frozen
