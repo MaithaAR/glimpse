@@ -286,3 +286,8 @@ criterion mis-encoded the layered design -- S10 had scored the dark photo by cal
 isolation. Decision, in the open: the criterion is corrected to the end-to-end property (screenshot
 flagged by the kNN check; dark photo refused by any designed check), the near-miss value is recorded
 here, and nothing else changes: same rule, same quantile, no sweep.
+
+**Figure pre-commitment (7 Nov, before any figure is rendered).** The report's figures are rendered
+from committed evidence files only (`just figures`). In particular the reliability diagram and ECE
+visualise the already-shipped calibration: no threshold, Platt parameter, shrinkage m or cut-off may
+change in response to how any figure looks. An ugly panel becomes a limitation sentence, not a refit.
