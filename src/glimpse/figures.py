@@ -37,7 +37,7 @@ def f1_system(plt) -> None:
 
     box(0.0, 2.6, 1.9, 1.0, "meal photo")
     box(0.0, 1.3, 1.9, 1.0, "CGM + HR\n(2 h window)")
-    box(0.0, 0.0, 1.9, 1.0, "profile (4 fields)")
+    box(0.0, 0.0, 1.9, 1.0, "profile (4 fields → 8 inputs)")
     box(2.5, 1.3, 2.4, 1.0, "input rules R1\u2013R10:\nrefuse + name\nthe problem")
     box(5.5, 2.6, 2.8, 1.0, "ConvNeXt-Tiny (pinned;\nlast stage tuned) + 2 heads")
     box(5.5, 1.3, 2.8, 1.0, "engineered trend features")
@@ -104,7 +104,7 @@ def f3_reliability(plt, da: pd.DataFrame) -> dict:
         ece = ece_equal_mass(p, y)
         out[col] = ece
         ax.plot(mids, obs, "o-", color=c, label=f"{label}  (ECE {ece:.3f})", ms=4)
-    ax.set_xlabel("predicted spike probability (10 equal-mass bins)")
+    ax.set_xlabel("predicted spike probability (curve: 10 equal-mass bins; ECE: 15)")
     ax.set_ylabel("observed spike rate")
     ax.set_xlim(0, 0.9)
     ax.set_ylim(0, 0.9)
@@ -122,7 +122,7 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
         ("photo gain (gate, photo meals)", fu["primary_photo_meals_only"]["point"],
          fu["primary_photo_meals_only"]["ci95"], BLUE),
         ("shuffled-photo control", g["photo_shuffled"]["point"], g["photo_shuffled"]["ci95"], GREY),
-        ("true logged carbs (RQ1 ceiling)", fu["rq1_photo_vs_logged"]["point"],
+        ("photo − true carbs (RQ1, other bars are vs no-meal)", fu["rq1_photo_vs_logged"]["point"],
          fu["rq1_photo_vs_logged"]["ci95"], GREY),
         ("D8: profile-matched meals removed", d8["gain_photo_meals_only"]["point"],
          d8["gain_photo_meals_only"]["ci95"], RED),
@@ -230,6 +230,30 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
             "top_global": [FEATURE_NAMES[j] for j in np.argsort(-mean_abs)[:5]]}  # fmt: skip
 
 
+def _answer_stats(da: pd.DataFrame) -> dict:
+    """Committed provenance for three report numbers derived from the committed answers: ECE at a second
+    bin count (the 0.05 target is passed by 0.001, so the pass must not be a binning artifact), the
+    person-clustered interval on missed-among-cleared, and the per-group breakdown. Descriptive only."""
+    from sklearn.metrics import roc_auc_score
+
+    from glimpse.evaluation.metrics import ece_equal_mass, person_bootstrap_ci
+
+    ans = da[da.risk.notna()]
+    ece10 = {c: float(ece_equal_mass(ans[c].to_numpy(float), ans.spike.to_numpy(), 10))
+             for c in ("risk_raw", "risk")}  # fmt: skip
+    cl = da[da.decision == "low risk"].reset_index(drop=True)
+    point, lo, hi = person_bootstrap_ci(cl.person_id.to_numpy(),
+                                        lambda i: float(np.mean(cl.spike.to_numpy()[i])))  # fmt: skip
+    group = pd.read_csv("outputs/cv/oof_predictions.csv").groupby("person_id").group.first()
+    sub = {g: {"auroc_personal": float(roc_auc_score(q.spike, q.risk)), "meals": int(len(q)),
+               "people": int(q.person_id.nunique()), "spike_rate": float(q.spike.mean())}
+           for g, q in ans.assign(group=ans.person_id.map(group)).groupby("group")}  # fmt: skip
+    return {"ece_equal_mass_10bins": ece10,
+            "missed_among_cleared": {"misses": int(cl.spike.sum()), "cleared": int(len(cl)),
+                                     "rate": point, "ci95_person_bootstrap": [float(lo), float(hi)]},
+            "subgroups": sub}  # fmt: skip
+
+
 def run_figures(cfg=None) -> dict:
     """Render F1-F5 from committed evidence; write the ECE numbers next to them."""
     import matplotlib
@@ -254,6 +278,7 @@ def run_figures(cfg=None) -> dict:
     report = {"what": "report figures rendered from committed evidence only (pre-commitment in "
                       "docs/final_design.md); ECE = equal-mass, 15 bins, answered dev meals",
               "ece_raw": ece["risk_raw"], "ece_personal": ece["risk"], "shap": shap_report,
+              **_answer_stats(da),
               "files": sorted(p.name for p in OUT.glob("*.png"))}  # fmt: skip
     (OUT / "figures.json").write_text(json.dumps(report, indent=2))
     logger.bind(stage="figures").info("6 figures -> {}; ECE raw {:.3f} -> personal {:.3f}; SHAP sum "

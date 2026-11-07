@@ -44,6 +44,20 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
             list(h.timestamp.dt.to_pydatetime()), h.hr_bpm.astype(float).tolist() if len(h) else [], flags)  # fmt: skip
 
 
+def _plain(e: Exception) -> str:
+    """Rule R4 applied to library errors too: the common parser messages in plain words, anything else
+    verbatim but on one line, so a reason never shows a developer-facing phrase or breaks a table."""
+    t = " ".join(str(e).split())
+    if "could not convert string to float" in t:
+        return "a glucose or heart-rate value is not a number (" + t.rsplit(":", 1)[-1].strip() + ")"
+    if "Invalid isoformat string" in t:
+        tail = t.rsplit(":", 1)[-1].strip()
+        return "the meal time " + tail + " is not an understood format (use e.g. 2024-06-01T12:00)"
+    if "tokenizing" in t.lower():
+        return "the CGM file could not be read as a table of readings"
+    return t
+
+
 def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path | None, meal_time: str | None,
                       profile: dict[str, float | None]) -> Answer:  # fmt: skip
     """The app's entry point for user files: anything malformed, empty or unsupported becomes a structured
@@ -67,7 +81,7 @@ def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path |
         logger.bind(stage="predict").warning("can't judge: {}", a.reason)
         return a
     except (ValueError, OSError, TypeError) as e:
-        a = cant_judge(f"unsupported input ({e})")
+        a = cant_judge(f"unsupported input ({_plain(e)})")
         logger.bind(stage="predict").warning("can't judge: {}", a.reason)
         return a
     return app.answer(m)

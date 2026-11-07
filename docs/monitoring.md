@@ -8,8 +8,8 @@ monitor is therefore a consumer of existing signals, not new modelling.
 
 1. **Input drift (photo).** Every live answer already computes the kNN distance of the photo's
    embedding to the training reference (the unfamiliar-photo check, rule R6/R7). Logged per answer,
-   summarised weekly as the share of photos above the deployed cut (0.609) and the median distance.
-   Alert: weekly median above the training LOO 90th percentile (0.465) — the user's camera, lighting
+   summarised weekly as the share of photos above the deployed cut (0.614) and the median distance.
+   Alert: weekly median above the training LOO 90th percentile (0.445) — the user's camera, lighting
    or cuisine has drifted from the training distribution. The S10 study is the baseline drawn once:
    training LOO distances vs the 14 real phone photos (figure below).
 2. **Outcome drift (labels arrive free).** Because `cgm_auto` labels every meal at +2 h, rolling

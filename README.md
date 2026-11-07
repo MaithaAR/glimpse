@@ -58,21 +58,19 @@ just docker-demo                              # needs `just install` first, for 
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`.
 
-## Results (5-fold person cross-validation, 23 people, 481 meals; 95% ranges by person)
-| Model | AUROC |
+## Results (final; 5-fold person cross-validation, 23 people, 481 meals; 95% ranges by person)
+| Risk model | AUROC |
 |---|---|
-| Profile only | 0.672 (0.567–0.764) |
-| Profile + CGM trend | 0.686 (0.604–0.772) |
-| Profile + SensorCNN (from scratch) | 0.689 (0.603–0.773) |
-| **+ photo (main)** | **0.724 (0.659–0.796)** |
-| + logged carbs (reference) | 0.717 (0.648–0.796) |
+| raw fusion | 0.726 (0.659–0.797) |
+| **+ per-person calibration (shipped)** | **0.762 (0.682–0.829)** |
 
-**What the results show:**
+**What the final results show (details and evidence in [`docs/final_report.md`](docs/final_report.md)):**
 
-- The photo adds +0.037 (+0.003 to +0.073), and it matches logged carbs (non-inferior at 0.03).
-- Calibration: ECE 0.052 on the cross-validation, 0.129 on the fixed test (over-predicts).
-- Usefulness targets are not met yet: 9% cost saving, 14% of meals cleared.
-- Full tables are in `outputs/evaluation/results.md`.
+- Per-person calibration improves every fold (5/5) and halves the largest per-person gaps; ECE 0.059 raw → 0.049 shipped.
+- The photo is NOT established as a risk signal: pre-registered gate +0.025 (−0.010, +0.061). It ships as a carb-entry assist.
+- Usefulness targets met: 23% of meals cleared, 14% cost saving, 7.3% missed-among-cleared against a 10% cap.
+- The 8 locked test people are scored exactly once, on 22 Nov, from the frozen artifacts.
+- Full tables: `outputs/evaluation_v2/` and `just evaluate`.
 
 ## Repository
 ```
@@ -87,7 +85,7 @@ samples/               synthetic CGM CSV for `just predict`
 pilot/ scripts/ results/  proposal-pilot code and logs, frozen (GitHub only; left out of the submitted zip)
 ```
 
-## Promised in the proposal vs delivered (intermediate)
+## Promised in the proposal vs delivered (as of the intermediate; kept for the record)
 | Proposal | Now | Why |
 |---|---|---|
 | EfficientNet-B0 photo model | ConvNeXt-Tiny + carb-bin head | instructor feedback |

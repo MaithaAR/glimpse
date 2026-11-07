@@ -83,7 +83,7 @@ photos and the key instructor cases:
 
 The check does its intended job: the screenshot scores 0.788 and the dark photo 0.682 -- both flagged
 at the deployed cut -- and none of the 14 legitimate phone photos false-flag. But the lamb-and-rice
-dish scores 0.346: MORE familiar than the clean tuna bowl (0.420), because it looks like the training
+dish scores 0.346 (under the final 6 Nov reference: 0.318, tuna bowl 0.406, cut 0.614 — same picture): MORE familiar than the clean tuna bowl (0.420), because it looks like the training
 set's rice plates. Catching it would need a cut below 0.35, which false-flags half of everything.
 
 **R7 is closed as an accepted limitation, with the cut unchanged (no --apply):** the kNN check detects

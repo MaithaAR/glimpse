@@ -18,8 +18,8 @@ docs/final_design.md §6; the observed result of the first naive run is recorded
 | 08_dark_photo | near-black photo | can't judge or caution; never low risk |
 | 09_screenshot | app screenshot, not food | unfamiliar -> confirm-carbs tier |
 | 10_exif_rotated | 00's photo stored rotated with EXIF orientation | identical decision to 00_clean |
-| 11_local_dish | unfamiliar local dish | confirm-carbs tier, not a confident bin |
-| 12_zero_byte | empty photo.jpg | per-item error entry; the run continues |
+| 11_local_dish | unfamiliar local dish | ideally confirm-carbs; the shipped check passes it (documented limitation, report §5 T6) |
+| 12_zero_byte | empty photo.jpg | structured can't judge; the run continues |
 
 Real phone photos (EXIF-stripped, resized): 00_clean (tuna rice bowl), 10_exif_rotated (the same
 photo stored turned 90 CCW with EXIF orientation 6) and 11_local_dish (lamb with biryani-style
