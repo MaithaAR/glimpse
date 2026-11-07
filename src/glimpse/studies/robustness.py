@@ -124,3 +124,48 @@ def run_robustness(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
         log.info("{:<12} unchanged {:.0%} | dangerous flips {:.1%} | newly can't-judge {:.0%} (n={})",
                  kind, r["unchanged"], r["dangerous_flips"], r["newly_cant_judge"], r["n"])  # fmt: skip
     return res
+
+
+def run_timing(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
+    """Pre-registered 7 Nov (docs/final_design.md): every development meal re-answered with the stated
+    meal time 15 minutes earlier and 15 minutes later, same per-fold pipelines, nothing retuned."""
+    from glimpse.calibration import choose_m_and_cutoffs
+    from glimpse.demo_cases import meal_input
+    from glimpse.training.final import cost_dict
+
+    log, pcv, y = logger.bind(stage="timing"), Path(cfg.paths.outputs) / "photo_cv", ds.labels()
+    oof, nested = pd.read_csv(pcv / "photo_oof.csv"), pd.read_csv(pcv / "photo_nested.csv")
+    base, minus, plus = [], [], []
+    for k, held in enumerate(sp.dev_folds):
+        kk = k + 1
+        of, nf = oof[oof.fold == kk], nested[nested.fold == kk]
+        pt = photo_table(nf) | photo_table(of)
+        lr, c = fold_fusion(ds, sp, cfg, k, pt)
+        rows_i, p_i = inner_oof(ds, sp, cfg, k, pt, c)
+        a_k, b_k = fit_platt(p_i, y[rows_i])
+        if a_k <= 0:
+            a_k, b_k = 1.0, 0.0
+        times_i = np.array([ds.samples[i].meal_time for i in rows_i], dtype="datetime64[s]")
+        person_i = np.array([ds.samples[i].person_id for i in rows_i])
+        sel = choose_m_and_cutoffs(apply_platt(p_i, a_k, b_k), y[rows_i], person_i, times_i, cost_dict(cfg))
+        tab = Pipeline(cfg, photo_table=fold_estimates(of), fusion=lr, calibration=(a_k, b_k),
+                       cutoffs=(sel["low_risk_below"], sel["caution_from"]))  # fmt: skip
+        for row in meal_rows(ds, set(held), scored_only=True):
+            m = meal_input(cfg, ds, int(row))
+            base.append(tab.answer(m, key=int(row)).decision)
+            early = m.model_copy(update={"meal_time": m.meal_time - pd.Timedelta(minutes=15)})
+            late = m.model_copy(update={"meal_time": m.meal_time + pd.Timedelta(minutes=15)})
+            minus.append(tab.answer(early, key=int(row)).decision)
+            plus.append(tab.answer(late, key=int(row)).decision)
+        log.info("fold {} shifted", kk)
+    res = {"what": "stated meal time moved 15 min earlier / later; same per-fold pipelines as S9; "
+                   "pre-registered expectation: earlier -> R3 refusals, later -> mostly answered",
+           "meal_time_minus_15min": _flips(base, minus),
+           "meal_time_plus_15min": _flips(base, plus)}  # fmt: skip
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "timing.json").write_text(json.dumps(res, indent=2))
+    for k2 in ("meal_time_minus_15min", "meal_time_plus_15min"):
+        r = res[k2]
+        log.info("{:<22} unchanged {:.0%} | dangerous {:.1%} | newly can't-judge {:.0%}",
+                 k2, r["unchanged"], r["dangerous_flips"], r["newly_cant_judge"])  # fmt: skip
+    return res

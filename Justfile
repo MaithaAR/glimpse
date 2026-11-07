@@ -97,6 +97,9 @@ finalize:
 figures:
     uv run glimpse figures
 
+timing:
+    uv run glimpse timing
+
 stress:
     uv run glimpse predict-folder samples/stress outputs/stress_run
 

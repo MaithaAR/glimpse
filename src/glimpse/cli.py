@@ -220,6 +220,18 @@ def _robustness(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _timing(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Pre-registered meal-time shift robustness (docs/final_design.md, 7 Nov)."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.robustness import run_timing
+
+    run_timing(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _figures(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Render the report figures from committed evidence files (pre-commitment: nothing retuned)."""
     from glimpse.figures import run_figures
@@ -381,6 +393,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("monitoring", help="drift-baseline figure for the monitoring design (S11)")
     sub.add_parser("finalize", help="regenerate the frozen serving artifacts (pre-registered amendment)")
     sub.add_parser("figures", help="render the report figures from committed evidence (outputs/figures)")
+    sub.add_parser("timing", help="meal-time shift robustness, 15 min earlier and later (pre-registered)")
     od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
@@ -425,6 +438,7 @@ def main(argv: list[str] | None = None) -> int:
         "monitoring": _monitoring,
         "finalize": _finalize,
         "figures": _figures,
+        "timing": _timing,
         "splits-v2": _splits_v2,
         "selftest": _selftest,
     }

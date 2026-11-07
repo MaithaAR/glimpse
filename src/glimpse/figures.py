@@ -173,6 +173,63 @@ def f5_robustness(plt, rb: dict) -> None:
     plt.close(fig)
 
 
+FEATURE_NAMES = ["last glucose", "slope 30 min", "slope 60 min", "window mean", "window sd",
+                 "window rise", "heart rate", "age", "BMI", "HbA1c", "fasting glucose", "hour (sin)",
+                 "hour (cos)", "prior spike rate", "prior rise", "log photo grams", "p(bin 30-60g)",
+                 "p(bin 60-90g)", "p(bin 90g+)"]  # fmt: skip
+
+
+def f6_shap(plt, da: pd.DataFrame) -> dict:
+    """Exact linear SHAP for the frozen fusion (pre-registered 7 Nov): coefficient times (feature minus
+    background mean) in the standardised space; the local panel's terms are checked to sum to the logit."""
+    import joblib
+
+    from glimpse.config import load_config
+    from glimpse.data.dataset import MealDataset
+    from glimpse.training.final import FINAL
+    from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
+
+    cfg = load_config()
+    ds = MealDataset.load(Path("data/dataset"))
+    oof = pd.read_csv("outputs/photo_cv/photo_oof.csv")
+    nested = pd.read_csv("outputs/photo_cv/photo_nested.csv")
+    fx = with_table(photo_table(nested[nested.fold == 1]) | photo_table(oof), len(PHOTO_COLS))
+    answered = da.dropna(subset=["risk"])
+    rows = answered.row.astype(int).to_numpy()
+    x_raw = fx(ds, rows)
+    pipe = joblib.load(FINAL)["models"]["photo"]
+    z = pipe[:-1].transform(x_raw)
+    lr = pipe[-1]
+    coefs = lr.coef_[0]
+    base_logit = float((z @ coefs).mean() + lr.intercept_[0])
+    contrib = (z - z.mean(axis=0)) * coefs  # (n, 19) exact SHAP for a linear model
+    # local meal: the answered meal whose raw risk is closest to 0.5 (stated, deterministic)
+    i = int(np.argmin(np.abs(answered.risk_raw.to_numpy() - 0.5)))
+    logit_i = float(z[i] @ coefs + lr.intercept_[0])
+    recon = base_logit + float(contrib[i].sum())
+    assert abs(recon - logit_i) < 1e-6, f"SHAP terms do not sum to the logit: {recon} vs {logit_i}"
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 3.8))
+    mean_abs = np.abs(contrib).mean(axis=0)
+    order = np.argsort(mean_abs)
+    axes[0].barh(np.arange(len(order)), mean_abs[order], color=BLUE)
+    axes[0].set_yticks(np.arange(len(order)), [FEATURE_NAMES[j] for j in order], fontsize=6.8)
+    axes[0].set_xlabel("mean |SHAP| (logit units)")
+    axes[0].set_title("Global: what moves the fusion", fontsize=9)
+    top = np.argsort(-np.abs(contrib[i]))[:8]
+    vals = contrib[i][top]
+    axes[1].barh(np.arange(len(top))[::-1], vals, color=[BLUE if v > 0 else ORANGE for v in vals])
+    axes[1].set_yticks(np.arange(len(top))[::-1], [FEATURE_NAMES[j] for j in top], fontsize=6.8)
+    axes[1].axvline(0, color=GREY, lw=0.8)
+    axes[1].set_xlabel("SHAP contribution (logit units)")
+    axes[1].set_title(f"One meal (raw risk {answered.risk_raw.iloc[i]:.2f}): terms sum to its logit",
+                      fontsize=9)  # fmt: skip
+    fig.tight_layout()
+    fig.savefig(OUT / "f6_shap.png")
+    plt.close(fig)
+    return {"base_logit": base_logit, "local_logit": logit_i, "sum_check_abs_err": abs(recon - logit_i),
+            "top_global": [FEATURE_NAMES[j] for j in np.argsort(-mean_abs)[:5]]}  # fmt: skip
+
+
 def run_figures(cfg=None) -> dict:
     """Render F1-F5 from committed evidence; write the ECE numbers next to them."""
     import matplotlib
@@ -193,11 +250,13 @@ def run_figures(cfg=None) -> dict:
     ece = f3_reliability(plt, da)
     f4_effects(plt, fu, ch, d8)
     f5_robustness(plt, rb)
+    shap_report = f6_shap(plt, da)
     report = {"what": "report figures rendered from committed evidence only (pre-commitment in "
                       "docs/final_design.md); ECE = equal-mass, 15 bins, answered dev meals",
-              "ece_raw": ece["risk_raw"], "ece_personal": ece["risk"],
+              "ece_raw": ece["risk_raw"], "ece_personal": ece["risk"], "shap": shap_report,
               "files": sorted(p.name for p in OUT.glob("*.png"))}  # fmt: skip
     (OUT / "figures.json").write_text(json.dumps(report, indent=2))
-    logger.bind(stage="figures").info("5 figures -> {}; ECE raw {:.3f} -> personal {:.3f}",
-                                      OUT, ece["risk_raw"], ece["risk"])  # fmt: skip
+    logger.bind(stage="figures").info("6 figures -> {}; ECE raw {:.3f} -> personal {:.3f}; SHAP sum "
+                                      "check {:.1e}; top features {}", OUT, ece["risk_raw"], ece["risk"],
+                                      shap_report["sum_check_abs_err"], shap_report["top_global"])  # fmt: skip
     return report
