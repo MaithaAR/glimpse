@@ -24,39 +24,39 @@ def _style(plt):
 
 def f1_system(plt) -> None:
     """The one scoring path: inputs -> rules -> arms -> fusion -> calibration -> decision."""
-    fig, ax = plt.subplots(figsize=(8.2, 3.4))
+    fig, ax = plt.subplots(figsize=(11.2, 3.9))
     ax.axis("off")
 
-    def box(x, y, w, h, text, fc="#edf2f7", ec=GREY):
-        ax.add_patch(plt.Rectangle((x, y), w, h, facecolor=fc, edgecolor=ec, lw=1.0, zorder=2))
-        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=8.2, zorder=3)
+    def box(x, y, w, h, text, fc="#edf2f7"):
+        ax.add_patch(plt.Rectangle((x, y), w, h, facecolor=fc, edgecolor=GREY, lw=1.0, zorder=2))
+        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=7.6, zorder=3)
 
     def arrow(x0, y0, x1, y1):
         ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
                     arrowprops={"arrowstyle": "->", "color": GREY, "lw": 1.1})  # fmt: skip
 
-    box(0.0, 2.4, 1.7, 0.75, "meal photo")
-    box(0.0, 1.3, 1.7, 0.75, "CGM + HR\n(2 h window)")
-    box(0.0, 0.2, 1.7, 0.75, "profile\n(4 fields)")
-    box(2.2, 1.3, 1.9, 0.75, "input rules R1–R10\n(refuse, name the problem)")
-    box(4.6, 2.4, 2.2, 0.75, "ConvNeXt-Tiny (frozen,\nlast stage tuned) + 2 heads")
-    box(4.6, 1.3, 2.2, 0.75, "trend features\n(engineered, resampled)")
-    box(4.6, 0.2, 2.2, 0.75, "kNN unfamiliar-photo\ncheck (cut 0.614)")
-    box(7.3, 1.3, 1.9, 0.75, "logistic fusion (20 par.)\nPlatt (0.96, −0.20)\n+ personal intercept m=1")
-    box(9.7, 1.3, 1.9, 0.75, "cut-offs (0.15, 0.16)\nlow risk / caution /\ncan't judge + reason")
-    for y in (2.77, 1.67, 0.57):
-        arrow(1.7, y, 2.2, 1.67 if y != 1.67 else 1.67)
-    arrow(4.1, 1.67, 4.6, 1.67)
-    ax.annotate("", xy=(4.6, 2.77), xytext=(4.1, 1.8), arrowprops={"arrowstyle": "->", "color": GREY, "lw": 1.1})
-    ax.annotate("", xy=(4.6, 0.57), xytext=(4.1, 1.5), arrowprops={"arrowstyle": "->", "color": GREY, "lw": 1.1})
-    arrow(6.8, 2.77, 7.3, 1.8)
-    arrow(6.8, 1.67, 7.3, 1.67)
-    arrow(6.8, 0.57, 7.3, 1.5)
-    arrow(9.2, 1.67, 9.7, 1.67)
-    ax.text(5.7, 3.45, "one scoring path: report numbers = demo = app = the grader's folder command",
-            ha="center", fontsize=8.6, style="italic", color=GREY)  # fmt: skip
-    ax.set_xlim(-0.2, 11.8)
-    ax.set_ylim(-0.1, 3.7)
+    box(0.0, 2.6, 1.9, 1.0, "meal photo")
+    box(0.0, 1.3, 1.9, 1.0, "CGM + HR\n(2 h window)")
+    box(0.0, 0.0, 1.9, 1.0, "profile (4 fields)")
+    box(2.5, 1.3, 2.4, 1.0, "input rules R1\u2013R10:\nrefuse + name\nthe problem")
+    box(5.5, 2.6, 2.8, 1.0, "ConvNeXt-Tiny (pinned;\nlast stage tuned) + 2 heads")
+    box(5.5, 1.3, 2.8, 1.0, "engineered trend features")
+    box(5.5, 0.0, 2.8, 1.0, "kNN unfamiliar-photo\ncheck (cut 0.614)")
+    box(8.9, 1.3, 2.6, 1.0, "logistic fusion (20 par.)\nPlatt (0.96, \u22120.20)\npersonal intercept, m = 1.0")
+    box(12.1, 1.3, 2.6, 1.0, "cut-offs (0.15, 0.16)\nlow risk / caution /\ncan't judge + reason")
+    for y0 in (3.1, 1.8, 0.5):
+        arrow(1.9, y0, 2.5, 1.8)
+    arrow(4.9, 1.8, 5.5, 1.8)
+    arrow(4.9, 2.05, 5.5, 3.1)
+    arrow(4.9, 1.55, 5.5, 0.5)
+    arrow(8.3, 3.1, 8.9, 2.05)
+    arrow(8.3, 1.8, 8.9, 1.8)
+    arrow(8.3, 0.5, 8.9, 1.55)
+    arrow(11.5, 1.8, 12.1, 1.8)
+    ax.text(7.35, 3.95, "one scoring path: report numbers = demo = app = the grader's folder command",
+            ha="center", fontsize=8.8, style="italic", color=GREY)  # fmt: skip
+    ax.set_xlim(-0.2, 15.0)
+    ax.set_ylim(-0.2, 4.2)
     fig.savefig(OUT / "f1_system.png")
     plt.close(fig)
 
@@ -75,12 +75,12 @@ def f2_per_fold(plt, ev: dict) -> None:
         a = ev[key]["auroc"]
         ax.errorbar([x], [a["point"]], yerr=[[a["point"] - a["ci95"][0]], [a["ci95"][1] - a["point"]]],
                     fmt="o", color=c, capsize=3)  # fmt: skip
-        ax.text(x, 0.595, name, ha="center", fontsize=7.5)
+        ax.text(x, a["ci95"][1] + 0.012, name, ha="center", fontsize=7.2, color=c)
     ax.axhline(ev["risk_raw"]["auroc"]["point"], color=GREY, lw=0.8, ls=":")
     ax.text(5.4, ev["risk_raw"]["auroc"]["point"] + 0.004, "pooled raw 0.726", fontsize=7.5, color=GREY)
     ax.set_xticks(xs, [f"fold {f['fold']}\nn={f['n']}" for f in folds], fontsize=7.5)
     ax.set_ylabel("AUROC (held-out people)")
-    ax.set_ylim(0.58, 0.87)
+    ax.set_ylim(0.58, 0.9)
     ax.legend(frameon=False, fontsize=8, loc="upper left")
     ax.set_title("Personalisation improves every fold (5/5); pooled CIs are person-clustered", fontsize=9)
     fig.savefig(OUT / "f2_per_fold_auroc.png")
@@ -167,7 +167,7 @@ def f5_robustness(plt, rb: dict) -> None:
     ax.set_xticks(xs, labels, fontsize=7.5)
     ax.set_ylim(0, 1.12)
     ax.set_ylabel("share of meals")
-    ax.legend(frameon=False, fontsize=7.5, ncol=2, loc="lower right")
+    ax.legend(frameon=False, fontsize=7.5, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.14))
     ax.set_title("Degraded input triggers refusal, not a silently changed answer", fontsize=9)
     fig.savefig(OUT / "f5_robustness.png")
     plt.close(fig)

@@ -1,0 +1,12 @@
+{
+  "what": "report figures rendered from committed evidence only (pre-commitment in docs/final_design.md); ECE = equal-mass, 15 bins, answered dev meals",
+  "ece_raw": 0.05903813811230171,
+  "ece_personal": 0.04904761090603793,
+  "files": [
+    "f1_system.png",
+    "f2_per_fold_auroc.png",
+    "f3_reliability.png",
+    "f4_effects.png",
+    "f5_robustness.png"
+  ]
+}
