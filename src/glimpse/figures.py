@@ -164,9 +164,8 @@ def f5_robustness(plt, rb: dict) -> None:
                            (other, "other benign flips", GREY), (danger, "dangerous flips", RED)):  # fmt: skip
         ax.bar(xs, vals, bottom=bottom, label=label, color=c, width=0.62)
         bottom += np.array(vals)
-    for i, d in enumerate(danger):
-        ax.text(i, 1.03, f"dangerous: {d:.1%}", ha="center", fontsize=7.5,
-                color=RED if d else GREEN)  # fmt: skip
+    for i, d in enumerate(danger):  # the word is in the legend; six bars leave room for the number only
+        ax.text(i, 1.03, f"{d:.1%}", ha="center", fontsize=7.5, color=RED if d else GREEN)
     ax.set_xticks(xs, labels, fontsize=7.0)
     ax.set_ylim(0, 1.12)
     ax.set_ylabel("share of meals")
