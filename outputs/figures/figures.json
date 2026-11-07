@@ -2,11 +2,24 @@
   "what": "report figures rendered from committed evidence only (pre-commitment in docs/final_design.md); ECE = equal-mass, 15 bins, answered dev meals",
   "ece_raw": 0.05903813811230171,
   "ece_personal": 0.04904761090603793,
+  "shap": {
+    "base_logit": -0.7146975218368059,
+    "local_logit": 0.053870186543246656,
+    "sum_check_abs_err": 6.106226635438361e-16,
+    "top_global": [
+      "prior rise",
+      "age",
+      "heart rate",
+      "prior spike rate",
+      "window sd"
+    ]
+  },
   "files": [
     "f1_system.png",
     "f2_per_fold_auroc.png",
     "f3_reliability.png",
     "f4_effects.png",
-    "f5_robustness.png"
+    "f5_robustness.png",
+    "f6_shap.png"
   ]
 }
