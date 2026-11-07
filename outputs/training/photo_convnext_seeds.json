@@ -1,44 +1,44 @@
 {
   "recipe": {
-    "heads_epochs": 15,
+    "heads_epochs": 12,
     "last_stage_epochs": 2
   },
   "runs": [
     {
-      "seed": 20260927,
-      "source": "deployed checkpoint",
-      "mae_g": 26.1671199798584,
-      "spearman": 0.46025236470963743,
-      "bin_f1": 0.5515450925897543
-    },
-    {
       "seed": 20260928,
       "source": "retrained, not saved",
-      "mae_g": 27.630386352539062,
-      "spearman": 0.44876901457486085,
-      "bin_f1": 0.5580202911709125
+      "mae_g": 25.174022674560547,
+      "spearman": 0.4857667403577142,
+      "bin_f1": 0.5643494050949631
     },
     {
       "seed": 20260929,
       "source": "retrained, not saved",
-      "mae_g": 22.76868438720703,
-      "spearman": 0.5144953736208007,
-      "bin_f1": 0.5244385682385091
+      "mae_g": 22.852659225463867,
+      "spearman": 0.5146969882191011,
+      "bin_f1": 0.5060243552223428
+    },
+    {
+      "seed": 20260930,
+      "source": "retrained, not saved",
+      "mae_g": 26.68398094177246,
+      "spearman": 0.4143083528758838,
+      "bin_f1": 0.575599968052108
     }
   ],
   "summary": {
     "mae_g": {
-      "mean": 25.522063573201496,
-      "sd": 2.494215272536669
+      "mean": 24.903554280598957,
+      "sd": 1.9299278192625697
     },
     "spearman": {
-      "mean": 0.4745055843017663,
-      "sd": 0.03510490378729208
+      "mean": 0.4715906938175664,
+      "sd": 0.05167387877980223
     },
     "bin_f1": {
-      "mean": 0.5446679839997253,
-      "sd": 0.017815835531808894
+      "mean": 0.5486579094564713,
+      "sd": 0.03734780785653896
     }
   },
-  "note": "validation people only; the deployed checkpoint is the first run and is not replaced"
+  "note": "validation people only; fresh seeds of the shipped 12+2 recipe; the deployed checkpoint is not a row (it trained on the validation people) and is not replaced"
 }
