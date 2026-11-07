@@ -214,7 +214,14 @@ below.
 
 Probe B failed exactly as a label-correct model should: the label is baseline-relative, so a rising
 pre-meal trace lowers predicted spike probability; the registration, not the model, encoded naive
-physiology (pre-registered with a committed expected-fail, commit 17da63a). Probe A: risk moves in the photo's direction on 100% of meals, yet the
+physiology (pre-registered with a committed expected-fail, commit 17da63a). Exact SHAP attributions for the linear fusion (Figure 6; terms verified to sum to each meal's
+logit) put the personal priors first, matching the ablation's profile verdict; where the two
+disagree (heart rate ranks high by attribution, near zero by ablation) the reason is correlated
+inputs: attribution measures use, ablation measures loss.
+
+![Figure 6: SHAP for the fusion](../outputs/figures/f6_shap.png)
+
+Probe A: risk moves in the photo's direction on 100% of meals, yet the
 extreme bottom↔top-decile plate swap leaves 68.5% of decisions unchanged (median swing 0.102): the
 gate's verdict seen mechanistically. R7 (rule ledger): the kNN check measures visual, not nutritional,
 familiarity: a local lamb-and-rice dish scores 0.318 against the deployed 0.614 cut (more familiar
