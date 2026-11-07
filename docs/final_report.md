@@ -78,9 +78,9 @@ Whether the photo helps at all was decided by a gate, not by us. The pre-registe
 +0.025 AUROC (−0.010, +0.061; shuffled-photo control −0.010); per the pre-commitment
 (docs/gate_s8.md, both outcome paragraphs committed before the run, the losing one deleted in git),
 the shipped product is sensor + confirmed carbs, with the photo head as a carb-entry assist, not an
-established risk signal. Three results corroborate the verdict rather than soften it. RQ1: replacing
-the photo estimate with the participants' true logged carbs gains only +0.002 over profile + trend:
-an information ceiling no better photo encoder can break (the taught ceiling analysis, run for real). D8: excluding training meals that share an
+established risk signal. Three results corroborate the verdict. RQ1: replacing the photo estimate with the participants'
+true logged carbs gains only +0.002 over profile + trend, an information ceiling no photo encoder
+can break (the taught ceiling analysis, run for real). D8: excluding training meals that share an
 exact macro profile with a held person's meal kills the photo gain (−0.005) while a size-matched
 random drop keeps it (+0.037): the small gain rides on CGMacros' repeated standardised meals.
 Channel ablations: dropping heart rate changes +0.007 (it stays only because the feature set was
@@ -105,11 +105,10 @@ the pooled development estimate is optimistic. The personalised model beats raw 
 folds; the pooled estimate excluding the previously-scored fold 1 is 0.757 (0.651–0.833) against
 0.762 overall, and the locked eight, scored once in §6, are the only fully clean measurement.
 
-Postprandial response is strongly person-specific (Zeevi et al. 2015; Berry et al. 2020), and the
-calibration fix (the intermediate's central criticism) is a per-fold Platt map on inner
-out-of-fold fusion risks plus a penalised per-person intercept b_p(t), fitted only on the person's
-earlier meals and replayed in deployment order under a 2-hour label-availability gate; deployment
-gets those labels free from the CGM itself. One reading note on the table below: within every fold
+Postprandial response is strongly person-specific (Zeevi et al. 2015; Berry et al. 2020). The
+calibration fix: a per-fold Platt map on inner out-of-fold risks plus a penalised per-person
+intercept b_p(t), fitted only on the person's earlier meals and replayed in deployment order under
+a 2-hour label-availability gate; deployment gets those labels free from the CGM. One reading note on the table below: within every fold
 the Platt AUROC equals the raw AUROC exactly, because a monotone per-fold map cannot reorder meals
 inside its fold; the pooled Platt figure (0.714) below raw (0.726) is an artefact of mixing five
 fold-specific maps, and the calibration evidence is the reliability diagram (Figure 3), the
@@ -152,15 +151,13 @@ band; §4 reports that as a finding.
 <!-- 550 words: cost matrix as declared assumption (missed spike 5× unnecessary caution; abstain 2,
 0.5) with DCA framing (Vickers & Elkin 2006: the threshold IS the harm ratio) and the pre-registered
 sensitivity sweep; usefulness vs pre-registered targets; robustness table; stress suite; monitoring. -->
-Decisions are priced, not guessed: a missed spike costs 5× an unnecessary caution and abstention
-costs (2, 0.5), declared assumptions (in decision-curve terms the 5:1 ratio IS a ~17% action
-threshold: Vickers & Elkin 2006), with a pre-registered sensitivity sweep over missed-spike ∈ {3,5,7,10} × abstention
-multipliers committed alongside. All four usefulness targets were fixed before any result
+Decisions are priced, not guessed: a missed spike costs 5× an unnecessary caution, abstention
+(2, 0.5), declared assumptions (the 5:1 ratio is a ~17% action threshold in decision-curve terms:
+Vickers & Elkin 2006), with a pre-registered cost sensitivity sweep committed alongside. All four usefulness targets were fixed before any result
 (docs/evaluation_protocol.md) and all four hold at the point estimate: cost reduction 14% (min 10%),
-cleared 23% (min 20%), abstain 14% (max 20%), missed-among-cleared 7.3% (max 10%). In plain terms:
-of every 100 meals a user eats, the app lets about 23 pass without any caution, flags 64, declines
-to answer 14, and of the meals it clears about 7 in 100 still spike, which the programme's dietitian
-sees because the CGM reports every outcome two hours later. Two folds, and
+cleared 23% (min 20%), abstain 14% (max 20%), missed-among-cleared 7.3% (max 10%). In plain terms: of
+every 100 meals, the app clears about 23, flags 64 and declines 14; of the cleared, about 7 in 100
+still spike, which the programme's dietitian sees because the CGM reports every outcome at +2 h. Two folds, and
 the final all-development replay, chose a (near-)degenerate abstention band: the cost optimiser
 honestly prices borderline abstention at almost nothing for those risk distributions, and we report
 that as a finding rather than forcing a band.
@@ -172,10 +169,9 @@ Abstaining instead of guessing is established practice for medical ML (Kompa et 
 ![Figure 4: effect sizes](../outputs/figures/f4_effects.png)
 ![Figure 5: six perturbations, same per-fold pipelines, no history](../outputs/figures/f5_robustness.png)
 
-Stress suite: 23 hostile inputs (timezone offsets, malformed JSON, binary CSVs, truncated and
-mislabelled photos, empty folders) give zero crashes and zero raw error rows; rules R8-R10 were
-added only against observed failures of a recorded naive run (3ee062b to 3cf9973), like R1-R6, and
-tests enforce the invariant on every commit. Monitoring: four signals with alert rules
+Stress suite: 23 hostile inputs (timezone offsets, malformed JSON, binary CSVs, broken photos,
+empty folders) give zero crashes and zero raw error rows; rules R8-R10 were added only against
+observed failures of a recorded naive run, like R1-R6, and tests enforce this on every commit. Monitoring: four signals with alert rules
 (docs/monitoring.md); drift baseline committed. [DIET: two dietitians, three structured questions:
 cap acceptability, label wording, the rising-baseline case; responses folded in here, or the honest
 pending line.]
@@ -184,11 +180,10 @@ pending line.]
 <!-- 475 words: probes A+B; R7; D8 as failure insight; S14 taxonomy (false-cleared + abstention
 breakdown) TODO 10 Nov; label-definition discussion. -->
 Failure taxonomy (every class observed, none hypothetical). **T1 rule refusals:** malformed or
-degraded input never reaches a model: 13 instructor and 23 stress cases all end in a structured
-refusal naming the problem (§4). **T2 missing-photo abstentions:** 21 of 481 dev meals have no usable
-photo; the system abstains rather than guessing carbs. **T3 borderline abstentions:** 45 meals, all in
-folds 2–4; folds 1 and 5 chose no abstention band, so where the band exists is itself a product of
-per-fold cost optimisation, and we report it as such rather than as a stable property. **T4 near-cut
+degraded input never reaches a model; all 13 instructor and 23 stress cases end in a structured
+refusal naming the problem (§4). **T2 missing-photo abstentions:** 21 of 481 meals, no photo, no
+guess. **T3 borderline abstentions:** 45 meals, all in folds 2–4; folds 1 and 5 chose no band, so
+where the band exists is itself a product of per-fold cost optimisation. **T4 near-cut
 false-clears:** 3 of the 8 missed-among-cleared sat within 0.03 of their fold's cut: boundary
 sensitivity, the price of any hard threshold. **T5 confident false-clears, the genuine blind spot:**
 the other 5 were cleared at risks 0.03–0.13, far from the cut; four of the five had ten or more
@@ -209,15 +204,14 @@ measures loss.
 
 Probe A: risk moves in the photo's direction on 100% of meals, yet the
 extreme bottom↔top-decile plate swap leaves 68.5% of decisions unchanged (median swing 0.102): the
-gate's verdict seen mechanistically. R7 (rule ledger): the kNN check measures visual, not nutritional,
-familiarity: a local lamb-and-rice dish scores 0.318 against the deployed 0.614 cut (more familiar
-than the clean tuna-bowl case at 0.406) and gets a confident wrong carb bin; the sweep under a ≤2%
-false-flag budget shows the deployed cut is already the strictest, so no threshold fixes it; the
-finding survived the final model's regenerated reference unchanged; mitigations are the confirm-carbs
-tier and per-answer distance monitoring; a nutrition-aware embedding is named future work. Clinical note the probe forces: a user already rising into a meal may see "low
-risk" while clinically ascending; a rise-over-last-value label is worth future work; whether the
-app should add a separate "your glucose is rising now" note is one of the three questions put to the
-dietitians (§4).
+gate's verdict seen mechanistically. R7 (rule ledger): the kNN check measures visual, not nutritional, familiarity. A local
+lamb-and-rice dish scores 0.318 against the 0.614 cut (more familiar than the clean tuna bowl at
+0.406) and gets a confident wrong carb bin; the sweep under a ≤2% false-flag budget shows no
+threshold fixes it, and the finding survived the final model's regenerated reference. Mitigations:
+the confirm-carbs tier and per-answer distance monitoring; a nutrition-aware embedding is future
+work. Clinical note the probe forces: a user already rising into a meal may see "low risk" while
+clinically ascending; whether the app should add a separate "your glucose is rising now" note is
+one of the three dietitian questions (§4).
 
 ## 6. Reproducibility
 <!-- 300 words: fresh-clone chain; one-Mac story + CSCC sentence; W&B; manifest; locked-8 protocol. -->
@@ -253,15 +247,13 @@ itself. That discipline is the contribution that survives any single number: the
 losing paragraph, the probes caught their authors, the guard that froze the final artifacts stopped
 its own first run, and the locked eight were touched exactly once.
 
-**Appendix: taught-technique coverage.** Group split by person; pristine locked set scored once
-(weeks 4-5). Nested cross-validation for every selection; thresholds moved instead of class
-weights (week 2). Wall-clock as a first-class number (week 3, section 1). Frozen pretrained
-features + simple classifier, differential learning rates, augmentation without hue change
-(weeks 5-6). Shuffled-label control, ceiling analysis, error taxonomy, pre-registered hypotheses,
-subgroup caution, graceful degradation (week 11, sections 2-5). Cost-chosen thresholds, refusal to
-human review, validated outputs only, worst-slice reporting (week 9, sections 4-5). Sequence models
-measured against the bar (weeks 8-10, RQ2). Not used, reasons in the text: attention heads, full
-fine-tuning, ensembles, self-supervised pretraining.
+**Appendix: taught-technique coverage.** Group split, pristine locked set (weeks 4-5); nested CV,
+thresholds over class weights (week 2); wall-clock as a first-class number (week 3); frozen
+features + simple classifier, differential rates, hue-preserving augmentation (weeks 5-6);
+shuffled-label control, ceiling analysis, error taxonomy, pre-registration, subgroup caution,
+graceful degradation (week 11); cost-chosen thresholds, refusal to human review, validated outputs,
+worst-slice reporting (week 9); sequence models measured against the bar (weeks 8-10, RQ2). Not
+used, reasons in the text: attention, full fine-tuning, ensembles, self-supervised pretraining.
 
 **References.** Zeevi et al., Cell 2015 · Berry et al., Nature Medicine 2020 · Vickers & Elkin,
 Med Decis Making 2006 · Brazeau et al., Diabetes Res Clin Pract 2013 · Vasiloglou et al.,
