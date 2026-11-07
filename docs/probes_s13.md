@@ -37,9 +37,9 @@ Expected outcomes (committed):
 Report use: section 5 (explainability & failure), one small table + two sentences; A2 is quoted as the
 designed expected-fail.
 
-## Results (run 1 Nov 2026, 23:56; outputs/probes/probes.json; n=397 answered meals)
+## Results (run 1 Nov 2026, 23:56; outputs/probes/probes.json; n=460 answered meals; n corrected 7 Nov — the first write-up said 397 without reading it from the output)
 
-Probe A: direction ok 100% of meals (A1 PASS); decision unchanged 68% (A2 expected-fail CONFIRMED);
+Probe A: direction ok 100% of meals (A1 PASS); decision unchanged 68.5% (A2 expected-fail CONFIRMED);
 median |risk_high - risk_low| = 0.102. The fusion uses the photo in the right direction on every single
 meal, and even the bottom-decile <-> top-decile plate swap leaves two thirds of decisions where they
 were: the photo nudges, the trend and profile arms decide -- the S8 gate, mechanistically.

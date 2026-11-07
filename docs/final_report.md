@@ -54,8 +54,9 @@ macros gets a better MAE, 20.4 g, but F1 0.38 — the heads earn their 3,845 par
 patients' own carb counts err by ~15–20% of meal content, so this error band has company: Brazeau et
 al. 2013, Vasiloglou et al. 2018).
 Hand-made trend features summarise the 2-h CGM/HR window; SensorCNN, the required from-scratch model
-(5,217 parameters), is kept as the RQ2 baseline only: 0.696 AUROC against the engineered-feature
-logistic regression's 0.691, a gain of +0.004 (−0.040, +0.045) that fails the pre-registered bar.
+(5,217 parameters), is kept as the RQ2 baseline only: at the intermediate evaluation, on its held-out
+five people, 0.696 AUROC against the engineered-feature logistic regression's 0.691 — a gain of
++0.004 (−0.040, +0.045) that fails the pre-registered bar, so the hand-made features stayed.
 Fusion is a 20-parameter logistic regression — with 23 development people and four inner folds behind
 every choice, that is the capacity the data supports.
 
@@ -109,7 +110,7 @@ the halved per-person gaps, not AUROC.
 | 1 | 90 | .742 | .790 | 1.0 | .21, .21 |
 | 2 | 105 | .614 | .661 | 2.0 | .13, .23 |
 | 3 | 104 | .755 | .772 | 0.5 | .13, .20 |
-| 4 | 67 | .757 | .787 | 1.0 | .15, .17 |
+| 4 | 67 | .757 | .786 | 1.0 | .15, .17 |
 | 5 | 94 | .788 | .809 | 1.0 | .14, .14 |
 
 Per-person gaps halved: rare spikers predicted 20.9% vs observed 14.2% (was 29.3%); frequent 42.6% vs
@@ -165,9 +166,9 @@ folds 2–4 — folds 1 and 5 chose no abstention band, so where the band exists
 per-fold cost optimisation, and we report it as such rather than as a stable property. **T4 near-cut
 false-clears:** 3 of the 8 missed-among-cleared sat within 0.03 of their fold's cut — boundary
 sensitivity, the price of any hard threshold. **T5 confident false-clears, the genuine blind spot:**
-the other 5 were cleared at risks 0.03–0.13, far from the cut, each with 10–20 meals of personal
-history available — personalisation had data and still cleared them; they spread across 5 people, so
-no single outlier explains them. **T6 confident-wrong carb estimate (R7):** a visually familiar,
+the other 5 were cleared at risks 0.03–0.13, far from the cut; four of the five had ten or more
+earlier labelled meals available (the fifth had one), so personalisation mostly had data and still
+cleared them; they spread across 4 people, so no single outlier explains them. **T6 confident-wrong carb estimate (R7):** a visually familiar,
 nutritionally unfamiliar local dish passes the kNN check and gets a wrong bin — structural, detailed
 below. **T7 label-definition surprise (probe B):** not a model failure but a communication one; also
 below.
@@ -175,7 +176,7 @@ below.
 Probe B failed exactly as a label-correct model should: the label is baseline-relative, so a rising
 pre-meal trace lowers predicted spike probability — the registration, not the model, encoded naive
 physiology (pre-registered with a committed expected-fail, commit 17da63a). Probe A: risk moves in the photo's direction on 100% of meals, yet the
-extreme bottom↔top-decile plate swap leaves 68% of decisions unchanged (median swing 0.102) — the
+extreme bottom↔top-decile plate swap leaves 68.5% of decisions unchanged (median swing 0.102) — the
 gate's verdict seen mechanistically. R7 (rule ledger): the kNN check measures visual, not nutritional,
 familiarity — a local lamb-and-rice dish scores 0.318 against the deployed 0.614 cut (more familiar
 than the clean tuna-bowl case at 0.406) and gets a confident wrong carb bin; the sweep under a ≤2%
