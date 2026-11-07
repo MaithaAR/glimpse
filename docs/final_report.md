@@ -20,7 +20,9 @@ crashes and zero raw error rows. [S16: one sentence with the locked-8 result, sc
 ## 1. System and tooling
 <!-- 350 words: condensed user/workflow from the intermediate; ONE scoring path (D2); the instructor
 command; efficiency table below; tooling line (uv, pydantic, loguru, ruff, 129 tests, CI, W&B). -->
-An adult with prediabetes in a 10–14 day CGM programme wants fewer spikes but stops logging food
+The objective: develop and internally validate, on person-grouped splits, a pre-meal spike-risk
+model, and test under pre-registered gates whether the meal photo adds signal beyond sensors and
+profile. An adult with prediabetes in a 10–14 day CGM programme wants fewer spikes but stops logging food
 within days. Before eating they photograph the meal and get **low risk**, **caution** (with a nudge:
 smaller carb portion, a short walk), or **can't judge** with the reason in one plain sentence. The
 CGM labels every meal itself two hours later (`cgm_auto`, the same spike rule as training), so the
@@ -54,7 +56,9 @@ held-out people the photo head reaches 22.6 g MAE, Spearman 0.53 and bin F1 0.61
 macros gets a better MAE, 20.4 g, but F1 0.38; the heads earn their 3,845 parameters on the bins;
 patients' own carb counts err by ~15–20% of meal content, so this error band has company: Brazeau et
 al. 2013, Vasiloglou et al. 2018).
-Hand-made trend features summarise the 2-h CGM/HR window; SensorCNN, the required from-scratch model
+The profile comprises eight inputs: age, BMI, HbA1c, fasting glucose, meal hour (as sine and
+cosine) and two onboarding priors (spike rate and mean rise); it is the channel whose removal costs
+the most (0.122 AUROC). Hand-made trend features summarise the 2-h CGM/HR window; SensorCNN, the required from-scratch model
 (5,217 parameters), is kept as the RQ2 baseline only: at the intermediate evaluation, on its held-out
 five people, 0.696 AUROC against the engineered-feature logistic regression's 0.691, a gain of
 +0.004 (−0.040, +0.045) that fails the pre-registered bar, so the hand-made features stayed.
@@ -90,7 +94,12 @@ fixed before the ablation); dropping the profile costs −0.122. The tabular cor
 481 dev meals scored exactly once, splits/reconciliation.md; fold 1 declared = intermediate's scored
 people); the headline and per-fold tables; calibration method (Platt on inner-OOF + penalised personal
 intercept, 2-h label gate, replay); (m, lo, hi) by min expected cost on replayed inner risks; m basin. -->
-Partition v2: the 23 development target people form five outer folds; four inner folds inside each
+The 45 CGMacros participants are healthy, prediabetic and T2D adults (ages 18 to 69, 64% female),
+each wearing a CGM for about ten days of standardised and free-living meals; meals without a usable
+2-hour pre-meal window are excluded by the same checks the app applies. Of the 481 development
+meals, 158 (32.8%) met the spike definition, with per-person rates from 0% to 68%, which is why
+per-person calibration is the central problem. Partition v2: the 23 development target people form
+five outer folds; four inner folds inside each
 fold's training people are the validation split for every choice (fusion C, Platt, the shrinkage m,
 the cut-offs); 14 T2D people are training-only and never scored; 8 people have been locked since the
 proposal. A committed reconciliation (splits/reconciliation.md) asserts that the 481 development meals
@@ -132,7 +141,10 @@ parameter per person.
 | 4 | 67 | .757 | .786 | 1.0 | .15, .17 |
 | 5 | 94 | .788 | .809 | 1.0 | .14, .14 |
 
-Per-person gaps halved: rare spikers predicted 20.9% vs observed 14.2% (was 29.3%); frequent 42.6% vs
+Discrimination is even across glycaemic status: AUROC 0.738 for the 11 healthy people (217 meals,
+21% spike rate) and 0.736 for the 12 prediabetic people (243 meals, 43%), so the small cohort shows
+no subgroup gap, though it limits any firmer fairness claim. Per-person gaps halved: rare spikers
+predicted 20.9% vs observed 14.2% (was 29.3%); frequent 42.6% vs
 52.9% (was 37.0%). Cut-off variation (two folds chose no abstention band) is reported as a finding:
 the cost optimiser priced abstention at zero value for those inner distributions. The cost-vs-m curve
 is a flat basin (m ∈ [0.5, 2] across folds). The deployed values were frozen from the all-development
@@ -237,7 +249,8 @@ is a dated commit.
 
 ## 7. Limitations and conclusion
 <!-- 200 words -->
-Forty-five people from one study, with repeated standardised meals that D8 shows inflate any
+CGMacros is a de-identified public PhysioNet dataset collected under the source study's ethics
+approval; no new human data were collected. Forty-five people from one study, with repeated standardised meals that D8 shows inflate any
 photo-memorisation effect; no local-cuisine data, and R7 names exactly the dish class that would
 suffer. T2D participants are training-only, so no claim is made for them. Heart rate adds nothing
 here. The photo is not established as a risk signal, and the label's baseline-relative definition can
