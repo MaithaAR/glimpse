@@ -33,7 +33,9 @@ There is exactly one scoring path: every number in this report, the demo, the ap
 before any model (§4). Tooling: uv + Python 3.14 (locked), strict Pydantic on config, data and
 outputs, `just` recipes for every number, ruff + 130 tests in CI, W&B offline exports, and an
 incremental git history in which every pre-registration precedes its run. The system trains and runs
-on one laptop:
+on one laptop. Figure 1 shows the single path.
+
+![Figure 1: the one scoring path](../outputs/figures/f1_system.png)
 
 | Measured on the shipped pipeline | value | cap |
 |---|---|---|
@@ -57,8 +59,20 @@ Hand-made trend features summarise the 2-h CGM/HR window; SensorCNN, the require
 (5,217 parameters), is kept as the RQ2 baseline only: at the intermediate evaluation, on its held-out
 five people, 0.696 AUROC against the engineered-feature logistic regression's 0.691 — a gain of
 +0.004 (−0.040, +0.045) that fails the pre-registered bar, so the hand-made features stayed.
-Fusion is a 20-parameter logistic regression — with 23 development people and four inner folds behind
-every choice, that is the capacity the data supports.
+Fusion is a 20-parameter logistic regression. With 23 development people and four inner folds behind
+every choice, that is the capacity the data supports; it is also the course's own prescription for
+this data size (frozen pretrained features plus a simple classifier). Gradient boosting, the usual
+tabular default, was tried at the intermediate stage and lost clearly (AUROC 0.596 against the
+logistic regression's 0.691), and an attention or transformer head on the CGM sequence fails the
+same test the SensorCNN tie already settles: with 481 meals from 23 people, no higher-capacity
+sequence model meets the "simplest option that meets the measured bar" rule. Training recipe, read
+from the committed config: AdamW throughout; heads at learning rate 1e-3, the fine-tuned last stage
+at 1e-4 (ten times smaller, the taught differential-rate rule); warm-up plus cosine schedule; weight
+decay 0.05 (photo) and 0.01 (SensorCNN); batch 64; early stopping by patience on inner folds, final
+epochs fixed at the medians (12 heads + 2 last-stage). Photo loss: Huber on log grams plus 0.5 times
+cross-entropy on the bin; SensorCNN: binary cross-entropy. Augmentation during last-stage training:
+horizontal flips, crops keeping at least 80% of the plate, brightness and contrast within 10%, and
+deliberately no hue change, because colour tells foods apart.
 
 Whether the photo helps at all was decided by a gate, not by us. The pre-registered gate returned
 +0.025 AUROC (−0.010, +0.061; shuffled-photo control −0.010); per the pre-commitment
@@ -66,7 +80,8 @@ Whether the photo helps at all was decided by a gate, not by us. The pre-registe
 the shipped product is sensor + confirmed carbs, with the photo head as a carb-entry assist, not an
 established risk signal. Three results corroborate the verdict rather than soften it. RQ1: replacing
 the photo estimate with the participants' true logged carbs gains only +0.002 over profile + trend —
-an information ceiling no better photo encoder can break. D8: excluding training meals that share an
+an information ceiling no better photo encoder can break (ceiling analysis: replace a stage with its
+ground-truth output; a small jump means the stage is not the bottleneck). D8: excluding training meals that share an
 exact macro profile with a held person's meal kills the photo gain (−0.005) while a size-matched
 random drop keeps it (+0.037) — the small gain rides on CGMacros' repeated standardised meals.
 Channel ablations: dropping heart rate changes +0.007 (it stays only because the feature set was
@@ -95,8 +110,15 @@ earlier meals and replayed in deployment order under a 2-hour label-availability
 gets those labels free from the CGM itself. One reading note on the table below: within every fold
 the Platt AUROC equals the raw AUROC exactly, because a monotone per-fold map cannot reorder meals
 inside its fold; the pooled Platt figure (0.714) below raw (0.726) is an artefact of mixing five
-fold-specific maps, and the calibration evidence is the log-loss (0.537 personal vs 0.572/0.567) and
-the halved per-person gaps, not AUROC.
+fold-specific maps, and the calibration evidence is the reliability diagram (Figure 3), the
+equal-mass ECE (0.059 raw to 0.049 shipped), the log-loss (0.537 personal vs 0.572/0.567) and the
+halved per-person gaps, not AUROC. For binary logits, Platt scaling is temperature scaling plus a
+bias term, a strict generalisation of the taught one-parameter fix, fitted here on inner
+out-of-fold risks only; the personal intercept extends the same post-hoc principle by one penalised
+parameter per person.
+
+![Figure 2: per-fold AUROC](../outputs/figures/f2_per_fold_auroc.png)
+![Figure 3: reliability and ECE](../outputs/figures/f3_reliability.png)
 
 | risk (dev, 481 meals) | AUROC (95% person-clustered) | log-loss |
 |---|---|---|
@@ -130,7 +152,10 @@ costs (2, 0.5) — declared assumptions (in decision-curve terms the 5:1 ratio I
 threshold: Vickers & Elkin 2006), with a pre-registered sensitivity sweep over missed-spike ∈ {3,5,7,10} × abstention
 multipliers committed alongside. All four usefulness targets were fixed before any result
 (docs/evaluation_protocol.md) and all four hold at the point estimate: cost reduction 14% (min 10%),
-cleared 23% (min 20%), abstain 14% (max 20%), missed-among-cleared 7.3% (max 10%). Two folds — and
+cleared 23% (min 20%), abstain 14% (max 20%), missed-among-cleared 7.3% (max 10%). In plain terms:
+of every 100 meals a user eats, the app lets about 23 pass without any caution, flags 64, declines
+to answer 14, and of the meals it clears about 7 in 100 still spike, which the programme's dietitian
+sees because the CGM reports every outcome two hours later. Two folds — and
 the final all-development replay — chose a (near-)degenerate abstention band: the cost optimiser
 honestly prices borderline abstention at almost nothing for those risk distributions, and we report
 that as a finding rather than forcing a band.
@@ -139,6 +164,9 @@ within the cap at the point estimate, though with only 17 people contributing cl
 interval's upper bound exceeds it — a limit of cohort size, monitored continuously in deployment,
 where the CGM labels every meal at +2 h (cgm_auto). The 8 misses spread across 6 people. Abstaining instead of
 guessing is established practice for medical ML (Kompa et al. 2021).
+
+![Figure 4: effect sizes](../outputs/figures/f4_effects.png)
+![Figure 5: robustness as refusal](../outputs/figures/f5_robustness.png)
 
 | perturbation (same per-fold pipelines, no history) | unchanged | dangerous flips | newly can't-judge |
 |---|---|---|---|
@@ -203,6 +231,14 @@ exports and the full incremental git history are committed. Cluster access exist
 system trains and runs on one Mac overnight, and the reproducibility environment was deliberately not
 split.
 
+**AI-assisted development, verified.** The code was built with an LLM assistant, as the course
+expects, and the defence is the verification trail rather than the authorship: a probe write-up
+stated n=397 where the committed output says 460, caught by a line-by-line check against the
+evidence files and corrected in a dated commit; a fold-level AUROC was rounded the wrong way (.787
+for 0.786) and fixed the same way; and the artifact-freeze procedure the assistant wrote stopped its
+own first run over a 0.001 criterion near-miss, with the decision recorded before the rerun. Every
+such correction is in the git history by design.
+
 ## 7. Limitations and conclusion
 <!-- 200 words -->
 Forty-five people from one study, with repeated standardised meals that D8 shows inflate any
@@ -215,6 +251,18 @@ scoring path, pre-registered targets and gates, continuous outcome monitoring fo
 itself. That discipline is the contribution that survives any single number: the gate shipped its
 losing paragraph, the probes caught their authors, the guard that froze the final artifacts stopped
 its own first run, and the locked eight were touched exactly once.
+
+**Appendix: taught-technique coverage.** Group split by person and a pristine locked test set
+scored once (weeks 4-5); nested cross-validation for every selection, thresholds moved instead of
+class weights, loss separated from metric (week 2); capacity, data and compute treated as
+currencies, wall-clock reported as a first-class number (week 3, section 1); frozen pretrained
+features with a simple classifier, differential learning rates, augmentation without hue change,
+transfer learning over training from scratch (weeks 5-6); shuffled-label control, ceiling analysis,
+error taxonomy, pre-registered hypotheses, seed-noise caution, subgroup reporting, graceful
+degradation (week 11, sections 2-5); cost-chosen confidence thresholds, refusal to human review,
+validated outputs only, worst-slice reporting, scope-limited deployment (week 9, sections 4-5);
+sequence models considered and measured against the bar (weeks 8-10, RQ2). Not used, with reasons
+in the text: attention heads, full fine-tuning, ensembles, self-supervised pretraining.
 
 **References.** Zeevi et al., Cell 2015 · Berry et al., Nature Medicine 2020 · Vickers & Elkin,
 Med Decis Making 2006 · Brazeau et al., Diabetes Res Clin Pract 2013 · Vasiloglou et al.,
