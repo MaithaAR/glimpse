@@ -135,7 +135,7 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
     ]  # fmt: skip
     fig, ax = plt.subplots(figsize=(5.8, 3.4))
     ys = np.arange(len(rows))[::-1]
-    for yv, (label, pt, ci, c) in zip(ys, rows, strict=True):
+    for yv, (_label, pt, ci, c) in zip(ys, rows, strict=True):
         ax.plot(ci, [yv, yv], color=c, lw=1.4)
         ax.plot([pt], [yv], "o", color=c, ms=5)
     ax.axvline(0, color=GREY, lw=0.8, ls="--")
