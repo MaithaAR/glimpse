@@ -220,6 +220,14 @@ def _robustness(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _figures(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Render the report figures from committed evidence files (pre-commitment: nothing retuned)."""
+    from glimpse.figures import run_figures
+
+    run_figures(cfg)
+    return 0
+
+
 def _finalize(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Regenerate the serving artifacts per the pre-registered 5 Nov amendment (docs/final_design.md)."""
     from pathlib import Path
@@ -372,6 +380,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("efficiency", help="parameters vs caps, serving latency, artifact sizes (S12)")
     sub.add_parser("monitoring", help="drift-baseline figure for the monitoring design (S11)")
     sub.add_parser("finalize", help="regenerate the frozen serving artifacts (pre-registered amendment)")
+    sub.add_parser("figures", help="render the report figures from committed evidence (outputs/figures)")
     od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
@@ -415,6 +424,7 @@ def main(argv: list[str] | None = None) -> int:
         "efficiency": _efficiency,
         "monitoring": _monitoring,
         "finalize": _finalize,
+        "figures": _figures,
         "splits-v2": _splits_v2,
         "selftest": _selftest,
     }

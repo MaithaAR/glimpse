@@ -94,6 +94,9 @@ monitoring:
 finalize:
     uv run glimpse finalize
 
+figures:
+    uv run glimpse figures
+
 stress:
     uv run glimpse predict-folder samples/stress outputs/stress_run
 
