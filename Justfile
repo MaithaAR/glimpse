@@ -115,7 +115,7 @@ amend-thresholds:
 evaluate:
     uv run glimpse evaluate
 
-# seed spread of the final photo model: 2 more seeds scored on the validation people (~10 min; nothing deployed changes)
+# seed spread of the shipped 12+2 recipe: 3 fresh seeds scored on the validation people (~15 min; nothing deployed changes)
 photo-seeds:
     uv run glimpse photo-seeds
 

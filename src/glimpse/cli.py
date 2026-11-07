@@ -369,7 +369,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
     sub.add_parser("evaluate", help="dev evaluation on partition v2: every risk from Pipeline.answer per fold")
-    sub.add_parser("photo-seeds", help="retrain the final photo model with 2 more seeds; validation spread only")
+    sub.add_parser("photo-seeds", help="retrain the shipped 12+2 recipe with 3 fresh seeds; validation spread only")
     sub.add_parser(
         "recalibrate", help="validation-chosen cut-offs on recalibrated risk, checked on CV (no test labels)"
     )

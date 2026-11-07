@@ -302,3 +302,11 @@ result is reported whatever it shows. (b) SHAP attributions for the frozen final
 linear SHAP (coefficient times feature minus background mean, in logit space) over the answered
 development meals, one global summary and one local explanation whose terms are checked to sum to
 the model's logit. No parameter, threshold or verdict may change in response to either result.
+
+**Seed-study refresh (7 Nov, pre-registered before the run).** The committed seed spread
+(outputs/training/photo_convnext_seeds.json) was measured under the superseded 15-epoch recipe. `just
+photo-seeds` is repointed at the shipped recipe (the finalize constants, 12 heads + 2 last-stage
+epochs) and re-run with 3 fresh seeds trained on the 28 training people and scored on the 4 validation
+people. The deployed checkpoint is dropped as a row because it trained on all 37 non-locked people,
+validation included, so scoring it there would be train-on-test. Descriptive only: mean and sd go in
+the report as measured, and no artifact, threshold or selection changes whatever the spread shows.
