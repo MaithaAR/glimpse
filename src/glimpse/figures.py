@@ -147,10 +147,13 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
 
 
 def f5_robustness(plt, rb: dict) -> None:
-    """Decision behaviour under the four pre-registered perturbations: refusal, not silent change."""
-    kinds = ["cgm_dropout", "cgm_gap", "photo_blur", "photo_dark"]
-    labels = ["CGM dropout 30%", "25-min pre-meal gap", "photo blur r=6", "photo darken ×0.25"]
-    fig, ax = plt.subplots(figsize=(5.6, 3.0))
+    """Decision behaviour under the six pre-registered perturbations: refusal, not silent change."""
+    tm = json.loads((Path("outputs/robustness") / "timing.json").read_text())
+    rb = rb | {"t_minus": tm["meal_time_minus_15min"], "t_plus": tm["meal_time_plus_15min"]}
+    kinds = ["cgm_dropout", "cgm_gap", "photo_blur", "photo_dark", "t_minus", "t_plus"]
+    labels = ["CGM dropout\n30%", "25-min\npre-meal gap", "photo blur\nr=6", "photo darken\n×0.25",
+              "meal time\n15 min early", "meal time\n15 min late"]  # fmt: skip
+    fig, ax = plt.subplots(figsize=(6.6, 3.1))
     xs = np.arange(len(kinds))
     unchanged = [rb[k]["unchanged"] for k in kinds]
     newcj = [rb[k]["newly_cant_judge"] for k in kinds]
@@ -164,7 +167,7 @@ def f5_robustness(plt, rb: dict) -> None:
     for i, d in enumerate(danger):
         ax.text(i, 1.03, f"dangerous: {d:.1%}", ha="center", fontsize=7.5,
                 color=RED if d else GREEN)  # fmt: skip
-    ax.set_xticks(xs, labels, fontsize=7.5)
+    ax.set_xticks(xs, labels, fontsize=7.0)
     ax.set_ylim(0, 1.12)
     ax.set_ylabel("share of meals")
     ax.legend(frameon=False, fontsize=7.5, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.14))
