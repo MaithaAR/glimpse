@@ -42,8 +42,8 @@ on one laptop. Figure 1 shows the single path.
 | largest model (ConvNeXt-Tiny + heads) | 27.8M | 200M |
 | pretrained total | 27.8M | 1B |
 | trained from scratch (heads 3,845 + SensorCNN 5,217 + fusion 20) | 9,082 | 50M |
-| cold first answer / warm median / p95 | 1.55 s / 264 ms / 270 ms | ≤300 ms p95 |
-| peak memory / checkpoint | 797 MB / 31 MB | – |
+| cold first answer / warm median / p95 | 1.57 s / 265 ms / 271 ms | ≤300 ms p95 |
+| peak memory / checkpoint | 796 MB / 31 MB | – |
 
 ## 2. Multimodal design and the photo gate
 <!-- 525 words: architecture (frozen backbone + two heads, SensorCNN as RQ2 baseline only, LR fusion

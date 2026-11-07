@@ -20,16 +20,16 @@
     "scratch_total": true
   },
   "latency_s": {
-    "cold_first_answer": 1.55,
-    "warm_median": 0.264,
-    "warm_p95": 0.27,
+    "cold_first_answer": 1.57,
+    "warm_median": 0.265,
+    "warm_p95": 0.271,
     "reps": 15
   },
-  "peak_rss_mb": 797.0,
+  "peak_rss_mb": 796.0,
   "artifact_sizes_mb": {
-    "photo_convnext_e17_valmae26.2.pt": 31.0,
+    "photo_convnext_final_v2_e14.pt": 31.0,
     "fusion_final.joblib": 0.0,
-    "photo_ood_reference.pt": 1.3
+    "photo_ood_reference.pt": 1.9
   },
   "machine": "Darwin arm64, torch threads capped at 4"
 }
