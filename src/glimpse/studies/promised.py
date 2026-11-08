@@ -37,8 +37,12 @@ def weighted(c: float, seed: int):
 
 
 def _paired(y, a, b, person) -> dict:
-    point, lo, hi = paired_person_bootstrap(np.asarray(y), np.asarray(a), np.asarray(b), np.asarray(person))
-    return {"point": point, "ci95": [lo, hi]}
+    """Full-sample paired AUROC difference as the point; the person bootstrap gives the interval
+    (its first return value is the bootstrap-replicate mean, kept under its own name)."""
+    y, a, b = np.asarray(y), np.asarray(a), np.asarray(b)
+    bmean, lo, hi = paired_person_bootstrap(y, a, b, np.asarray(person))
+    point = float(roc_auc_score(y, a) - roc_auc_score(y, b))
+    return {"point": point, "bootstrap_mean": bmean, "ci95": [lo, hi]}
 
 
 def run_promised(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:

@@ -23,10 +23,16 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
     import pandas as pd
 
     d = pd.read_csv(path)
+    d.columns = d.columns.str.strip()  # a header like "timestamp " is visually identical to the real one
     missing = {"timestamp", "glucose_mgdl"} - set(d.columns)
     if missing:
         raise ValueError(f"the CSV needs the columns timestamp and glucose_mgdl (missing: {sorted(missing)})")
+    if d["timestamp"].astype(str).str.contains("/").any():  # rule R11: 06/01/2024 is ambiguous (day/month)
+        raise ValueError("dates with slashes (06/01/2024) are ambiguous; export ISO dates such as 2024-06-01")
     d["timestamp"] = pd.to_datetime(d["timestamp"], format="mixed")  # rule R10: mixed ISO precisions are fine
+    years = d["timestamp"].dt.year.dropna()
+    if len(years) and int(years.max()) < 2000:  # rule R11: epoch numbers parse as 1970 nanoseconds
+        raise ValueError("the timestamps look like epoch numbers, not dates; export readable dates")
     if d["timestamp"].dtype == object:  # rows disagree on the UTC offset; converting could misplace the window
         raise ValueError("the timestamps mix different UTC offsets; export the file in one timezone")
     flags: list[str] = []
@@ -34,6 +40,11 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
         d["timestamp"] = d["timestamp"].dt.tz_localize(None)
         flags.append("timezone_dropped")
         logger.bind(stage="predict").warning("CGM timestamps carried a UTC offset; dropped before use (rule R8)")
+    if "hr_bpm" in d:  # rule R11: a heart rate outside 25-250 bpm is sensor noise, dropped and flagged
+        bad = d["hr_bpm"].notna() & ~d["hr_bpm"].between(25, 250)
+        if bad.any():
+            d.loc[bad, "hr_bpm"] = float("nan")
+            flags.append("hr_out_of_range_dropped")
     if not d["timestamp"].is_monotonic_increasing:
         d = d.sort_values("timestamp")
         flags.append("timestamps_sorted")
@@ -57,6 +68,8 @@ def _plain(e: Exception) -> str:
         return "the CGM file could not be read as a table of readings"
     if "float() argument" in t:
         return "a profile value is not a number"
+    if "Mixed timezones" in t:  # pandas >= 2 raises before the object-dtype branch below is reached
+        return "the timestamps mix different UTC offsets; export the file in one timezone"
     return t
 
 
@@ -70,7 +83,7 @@ def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path |
         gt, gv, ht, hv, fl = read_cgm_csv(cgm)
         if not gt:
             raise ValueError("the CGM export has no glucose readings")
-        when = datetime.fromisoformat(meal_time) if meal_time else max(gt)
+        when = datetime.fromisoformat(str(meal_time)) if meal_time else max(gt)
         if when.tzinfo is not None:  # rule R8, same treatment as the readings
             when = when.replace(tzinfo=None)
             fl.append("timezone_dropped")

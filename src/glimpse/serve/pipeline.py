@@ -203,7 +203,7 @@ class Pipeline:
                  "risk_raw": risk_raw, "risk_platt": risk_platt}  # fmt: skip
         dec = decision(risk, self.lo, self.hi)
         if dec == "can't judge":
-            return cant_judge(f"the risk ({risk:.0%}) is borderline, between {self.lo:.0%} and {self.hi:.0%}",
+            return cant_judge(f"the risk ({risk:.1%}) is borderline, between {self.lo:.0%} and {self.hi:.0%}",
                               risk=risk, checks_passed=passed, checks_failed=["borderline"],
                               escalate_to="human", **base, **carb)  # fmt: skip
         passed.append("borderline")

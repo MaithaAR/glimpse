@@ -15,7 +15,8 @@ CARB_BINS = ["under 30 g", "30-59 g", "60-89 g", "90 g or more"]
 PERSON_INPUTS = ["age", "bmi", "a1c_pct", "fasting_glucose_mgdl", "prior_spike_rate", "prior_rise"]
 REQUIRED_PROFILE = PERSON_INPUTS[:4]  # prior_* may be NaN for a new user; these four may not (rule R5)
 Decision = Literal["low risk", "caution", "can't judge"]
-PROFILE_RANGES = {"age": (18, 100), "bmi": (12, 70), "a1c_pct": (3, 15), "fasting_glucose_mgdl": (40, 400)}
+PROFILE_RANGES = {"age": (18, 100), "bmi": (12, 70), "a1c_pct": (3, 15), "fasting_glucose_mgdl": (40, 400),
+                  "prior_spike_rate": (0, 1)}  # fmt: skip
 
 
 class MealInput(BaseModel):

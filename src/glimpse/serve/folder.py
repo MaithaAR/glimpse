@@ -1,6 +1,6 @@
 """Batch entry point for a folder of meals, as the instructor will run it: one sub-folder per meal
 (photo.*, cgm.csv, profile.json) -> results.jsonl + summary.md. A bad meal becomes a per-item entry,
-never a crash, and the run always exits 0. Report: instructor-readiness in §6c."""
+never a crash, and the per-meal loop always finishes (a missing or empty input folder is still an error). Report: instructor-readiness in §6c."""
 
 from __future__ import annotations
 
@@ -25,11 +25,11 @@ PHOTO_NAMES = ("photo.jpg", "photo.jpeg", "photo.png", "photo.heic")
 
 def predict_folder(app: Pipeline, in_dir: str | Path, out_dir: str | Path) -> Path:
     """Answer every meal folder under `in_dir`; write results.jsonl and summary.md under `out_dir`."""
-    cases = sorted(p for p in Path(in_dir).iterdir() if p.is_dir())
+    out = Path(out_dir)
+    cases = sorted(p for p in Path(in_dir).iterdir() if p.is_dir() and p.resolve() != out.resolve())
     if not cases:
         raise ValueError(f"no meal folders under {in_dir}")
     rows = [_one_case(app, case) for case in cases]
-    out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     results = out / "results.jsonl"
     results.write_text("".join(json.dumps(r) + "\n" for r in rows))
@@ -47,9 +47,12 @@ def _one_case(app: Pipeline, case: Path) -> dict:
             a = cant_judge(f"profile.json is not valid JSON ({e.msg} at line {e.lineno})",
                            checks_failed=["input_valid"])  # fmt: skip
             return {"meal_id": case.name, **a.model_dump(mode="json")}
+        except OSError as e:  # rule R11: an unreadable profile file is named too
+            a = cant_judge(f"profile.json cannot be read ({e.strerror or e})", checks_failed=["input_valid"])
+            return {"meal_id": case.name, **a.model_dump(mode="json")}
         meal_time = raw.pop("meal_time", None)
         profile = {PROFILE_KEYS[k]: v for k, v in raw.items() if k in PROFILE_KEYS}
-        photo = next((case / n for n in PHOTO_NAMES if (case / n).exists()), None)
+        photo = next((f for f in sorted(case.iterdir()) if f.name.lower() in PHOTO_NAMES), None)
         cgm = case / "cgm.csv"
         a = answer_from_files(app, cgm if cgm.exists() else None, photo, meal_time, profile)
         return {"meal_id": case.name, **a.model_dump(mode="json")}

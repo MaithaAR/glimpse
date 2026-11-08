@@ -203,6 +203,9 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     coefs = lr.coef_[0]
     base_logit = float((z @ coefs).mean() + lr.intercept_[0])
     contrib = (z - z.mean(axis=0)) * coefs  # (n, 19) exact SHAP for a linear model
+    zdf = pd.DataFrame(z, columns=FEATURE_NAMES)
+    zdf.insert(0, "row", rows)
+    zdf.to_csv(OUT / "shap_features_z.csv", index=False)  # a grader can redo the sum check without data/
     # local meal: the answered meal whose raw risk is closest to 0.5 (stated, deterministic)
     i = int(np.argmin(np.abs(answered.risk_raw.to_numpy() - 0.5)))
     logit_i = float(z[i] @ coefs + lr.intercept_[0])
@@ -227,6 +230,8 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     fig.savefig(OUT / "f6_shap.png")
     plt.close(fig)
     return {"base_logit": base_logit, "local_logit": logit_i, "sum_check_abs_err": abs(recon - logit_i),
+            "coefs": dict(zip(FEATURE_NAMES, (float(c) for c in coefs), strict=True)),
+            "intercept": float(lr.intercept_[0]),
             "top_global": [FEATURE_NAMES[j] for j in np.argsort(-mean_abs)[:5]]}  # fmt: skip
 
 

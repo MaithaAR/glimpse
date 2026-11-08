@@ -333,3 +333,13 @@ flips rather than the promised delta-AUROC because decisions, not scores, are th
 adds the promised metric for the two arms the channels ablation did not cover; and the protocol's
 "three seeds in the final" for the photo CV was executed at the final-recipe level (the 7 Nov seed
 study) rather than as three full CV passes, a compute trade-off recorded here.
+
+**Corrections recorded 8 Nov, after an independent recomputation pass.** (i) outputs/promised
+"point" fields were the bootstrap-replicate means; corrected to the full-sample paired AUROC
+differences and regenerated once with the same seeded bootstrap (intervals identical): R1 +0.016,
+R2 +0.006, R4 +0.002, no verdict changes. (ii) The SHAP sum check could not be reproduced without
+the local dataset; `just figures` now also commits the standardised feature matrix
+(outputs/figures/shap_features_z.csv) and the fusion coefficients in figures.json, so a grader can
+redo the check from the repo alone. (iii) Report wording aligned with the code as it ships: the
+last stage trains at a constant 1e-4 and minibatch 32 (the warm-up-plus-cosine schedule and batch
+64 are the heads and SensorCNN); horizontal flips; Huber on log(1+grams).

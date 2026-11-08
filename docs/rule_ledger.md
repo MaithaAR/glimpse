@@ -112,3 +112,19 @@ and GIF-renamed-to-.jpg photos are all read or refused in plain words; a truncat
 tests/test_stress.py enforces the invariant (one structured answer per meal folder, never an error
 row) on every `just check` from here to submission. The suite is re-run against the frozen final
 artifacts at S16 before the app freeze.
+
+## R11 - serving hardening round 2 (8 Nov, internal red-team before the freeze)
+
+A reading-level fuzz of the serve code against the locked pandas (3.x) found ten escapes; each became
+a fix and a test in tests/test_hardening.py the same day. No model, threshold or decision logic
+changed. Slash dates parsed inconsistently per row (06/01 as June but 13/01 as January) -> refused as
+ambiguous, ISO asked for. Epoch-second timestamps parsed as 1970 nanoseconds -> refused, named. Mixed
+UTC offsets now raise inside pandas itself before the old object-dtype check, so the same plain
+sentence is produced from the new message. A header written "timestamp " (trailing space) read as a
+missing column -> headers stripped. Heart rate outside 25-250 bpm flowed into the features -> dropped
+and flagged hr_out_of_range_dropped. prior_spike_rate had no plausibility range -> (0, 1). PHOTO.JPG
+missed on case-sensitive filesystems -> matched case-insensitively. An unreadable profile.json slipped
+past the R9 catch as a raw error row -> structured refusal. An output folder nested inside the input
+folder became a bogus meal on the second run -> excluded from case collection. Borderline reasons
+printed the risk at whole percent, colliding with the cut ("the risk (16%) is borderline, between 15%
+and 16%") -> one decimal.
