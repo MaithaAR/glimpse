@@ -13,8 +13,8 @@ calibration gaps the intermediate diagnosed. The photo went through a pre-regist
 AUROC, interval −0.010 to +0.061), so, per the paragraph committed before the run, the shipped
 product is sensor + confirmed carbs, with the photo head as a carb-entry assist. Safety behaves by design: 8 of 109
 cleared meals spiked (7.3%, interval 2.9–14.2% against a pre-registered 10% cap), degraded input
-triggers refusal, with dangerous flips at most 1.5%, and a 23-case adversarial input suite produces zero
-crashes and zero raw error rows. [S16: one sentence with the locked-8 result, scored once on 22 Nov, whatever it shows.]
+triggers refusal, with dangerous flips at most 1.5%, and a 23-case adversarial suite produces zero crashes
+and zero error rows. [S16: one sentence with the locked-8 result, scored once on 22 Nov, whatever it shows.]
 <!-- S16 bottom-line template (fill from the one scoring run, as measured): "On the 8 locked people
 (N meals, XX% spike rate), scored exactly once: personal AUROC 0.XXX (0.XXX-0.XXX), raw 0.XXX;
 XX cleared / XX caution / XX can't judge; missed-among-cleared X of XX." -->
@@ -54,7 +54,8 @@ bin F1 .61 vs ridge-on-true-macros F1 .38); then the gate. -->
 Three parts. A pinned, SHA-verified ConvNeXt-Tiny backbone (ImageNet-22k) feeds two small heads, grams
 regression and a 4-bin carb classifier, with only the last backbone stage fine-tuned; on
 held-out people the photo head reaches 22.6 g MAE, Spearman 0.53 and bin F1 0.61 (a ridge on true
-macros gets a better MAE, 20.4 g, but F1 0.38; the heads earn their 3,845 parameters on the bins;
+macros gets a better MAE, 20.4 g, but F1 0.38; the heads earn their 3,845 parameters on the bins, though the heads agree on only 51% of bins, not the
+old 90% aim;
 patients' own carb counts err by ~15–20% of meal content: Brazeau 2013, Vasiloglou 2018).
 The profile comprises eight inputs: age, BMI, HbA1c, fasting glucose, meal hour (as sine and
 cosine) and two onboarding priors (spike rate and mean rise); it is the channel whose removal costs
@@ -66,9 +67,9 @@ stayed.
 Fusion is a 20-parameter logistic regression. With 23 development people and four inner folds behind
 every choice, that is the capacity the data supports; it is also the course's own prescription for
 this data size (frozen pretrained features plus a simple classifier). Gradient boosting, the usual
-tabular default, was tried at the intermediate stage and earned no extra capacity: it tied the
-logistic regression on pooled CV (0.689 vs 0.686) and fell behind on the five test people (0.632
-vs 0.695). An attention or transformer head on the CGM sequence fails the
+tabular default, earns no extra capacity: on the same 19 fusion inputs and folds, the shipped
+regression is non-inferior under the pre-registered bar (paired +0.015, −0.024 to +0.062,
+outputs/promised). An attention or transformer head on the CGM sequence fails the
 same test the SensorCNN tie already settles: with 481 meals from 23 people, no higher-capacity
 sequence model meets the "simplest option that meets the measured bar" rule. Recipe, from the committed config: AdamW; heads at
 1e-3, the last stage at 1e-4 (the taught differential-rate rule); warm-up plus cosine; weight decay
@@ -83,7 +84,7 @@ Whether the photo helps at all was decided by a gate, not by us. The pre-registe
 (docs/gate_s8.md records both pre-written outcome paragraphs; the losing one was removed on the
 verdict),
 the shipped product is sensor + confirmed carbs, with the photo head as a carb-entry assist, not an
-established risk signal. Three results corroborate the verdict. RQ1: even the participants' true logged carbs gain only
+established risk signal. Three results corroborate it. RQ1: even the participants' true logged carbs gain only
 +0.024 (−0.003, +0.056) over profile + trend, and the photo estimate lands within +0.002 of them
 (non-inferior): an information ceiling no photo encoder can break (the taught ceiling analysis). D8: excluding training meals that share an
 exact macro profile with a held person's meal kills the photo gain (−0.005) while a size-matched
@@ -98,8 +99,8 @@ fixed before the ablation); dropping the profile costs −0.122. The tabular cor
 people); the headline and per-fold tables; calibration method (Platt on inner-OOF + penalised personal
 intercept, 2-h label gate, replay); (m, lo, hi) by min expected cost on replayed inner risks; m basin. -->
 The 45 CGMacros participants are healthy, prediabetic and T2D adults (ages 18 to 69, 64% female),
-each wearing a CGM for about ten days; meals without a usable 2-hour pre-meal window are excluded
-by the same checks the app applies. 158 of the 481 development meals (32.8%) met the spike
+each wearing a CGM for about ten days; meals without a usable 2-hour pre-meal window are
+excluded by the app's own checks. 158 of the 481 development meals (32.8%) met the spike
 definition, with per-person rates from 0% to 68%: per-person calibration is the central problem. Partition v2: the 23 development target people form
 five outer folds; four inner folds inside each
 fold's training people are the validation split for every choice (fusion C, Platt, the shrinkage m,
@@ -112,7 +113,7 @@ estimate carries selection pressure the locked eight do not. The personalised mo
 folds; the pooled estimate excluding the previously-scored fold 1 is 0.757 (0.651–0.833) against
 0.762 overall, and the locked eight, scored once in §6, are the only fully clean measurement.
 
-Postprandial response is strongly person-specific (Zeevi et al. 2015; Berry et al. 2020). The
+Postprandial response is person-specific (Zeevi et al. 2015; Berry et al. 2020). The
 calibration fix: a per-fold Platt map on inner out-of-fold risks plus a penalised per-person
 intercept b_p(t), fitted only on the person's earlier meals and replayed in deployment order under
 a 2-hour label-availability gate; deployment gets those labels free from the CGM. Reading note: within every fold
@@ -238,10 +239,10 @@ overnight, and the reproducibility environment was deliberately not split.
 
 **AI-assisted development, verified.** The code was built with an LLM assistant, as the course
 expects; the defence is the verification trail. A probe write-up stated n=397 where the committed
-output says 460, caught by checking every number against its evidence file. A fold AUROC was
+output says 460, caught by the number-to-file check. A fold AUROC was
 rounded the wrong way (.787 for 0.786). The artifact-freeze procedure stopped its own first run
-over a 0.001 criterion near-miss, and the decision is recorded before the rerun. Each correction
-is a dated commit.
+over a 0.001 near-miss, the decision recorded before the rerun. Each correction
+is a dated commit, and every intermediate commitment is reconciled in docs/evaluation_protocol.md.
 
 ## 7. Limitations and conclusion
 <!-- 200 words -->

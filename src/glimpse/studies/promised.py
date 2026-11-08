@@ -67,7 +67,7 @@ def run_promised(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
             raise RuntimeError(f"fold {kk}: refit photo arm drifts from the committed OOF by {drift:.2e}")
         x_te = fx(ds, te)
         x_masked = x_te.copy()
-        x_masked[:, -len(PHOTO_COLS):] = np.nan  # R4: photo inputs at their imputation medians
+        x_masked[:, -len(PHOTO_COLS) :] = np.nan  # R4: photo inputs at their imputation medians
         d, _ = _tune_sklearn(lambda v: gbm(v, cfg.seed), cfg.baselines.gbm_depth_grid, fx, ds,
                              people, inner, y)  # fmt: skip
         gb = gbm(d, cfg.seed).fit(fx(ds, tr), y[tr])
@@ -152,8 +152,12 @@ def run_missing_inputs(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dic
             m = meal_input(cfg, ds, int(row))
             base.append(tab.answer(m, key=int(row)))
             no_hr.append(tab.answer(m.model_copy(update={"hr_times": [], "hr_bpm": []}), key=int(row)))
-            no_labs.append(tab.answer(m.model_copy(
-                update={"profile": m.profile | {"a1c_pct": nan, "fasting_glucose_mgdl": nan}}), key=int(row)))
+            no_labs.append(
+                tab.answer(
+                    m.model_copy(update={"profile": m.profile | {"a1c_pct": nan, "fasting_glucose_mgdl": nan}}),
+                    key=int(row),
+                )
+            )
             ys.append(int(y[int(row)]))
         log.info("R6 fold {} answered", kk)
     yv = np.array(ys)

@@ -100,3 +100,28 @@ Settings referred to here live in `configs/default.yaml` (`splits`, `cv`, `basel
 - The cross-validated predictions are also summarised **without the 5 test people** (outer fold 1, 18 people, 385
   meals), because the main CV includes them. Photo gain there: +0.033 (95% range −0.007 to +0.077). No model is
   refitted; this is a view of the same predictions.
+
+## Promised vs delivered: reconciliation (8 Nov 2026, written after the pre-registered runs)
+
+An external audit (8 Nov) diffed every commitment in the intermediate against the final repo. The
+open items were pre-registered the same day (docs/final_design.md) and run once each against the
+frozen artifacts (`just promised` -> outputs/promised/promised.json). Outcomes, as measured:
+
+| promised (intermediate line) | outcome |
+|---|---|
+| fusion vs GBM on the SAME inputs, non-inferior if paired LB > -0.03 (137) | RUN: LR - GBM +0.015 (-0.024, +0.062) -> non-inferior; the shipped regression stands |
+| class weighting, adopt if LB > 0 (137) | RUN: weighted - LR +0.005 (-0.001, +0.012) -> no gain established; nothing adopted (freeze) |
+| CNN+GBM ensemble (137) | CUT (final_design.md cut list): two models to guard for no established gain |
+| branch masking reproduces the no-photo arm (138) | RUN, translated to the shipped design (missing photo abstains by rule): masked photo arm vs no-meal arm +0.002 paired -> photo inputs at imputation medians carry no photo information |
+| robustness as dAUROC >= -0.03 and dECE (138) | METRIC CHANGED to decision-flip rates (S9; decisions are the product; recorded in final_design.md); RUN for the two uncovered arms: missing HR dAUROC +0.003, dECE -0.003, 96% answered; missing labs 100% refused (rule R-profile, the designed response) |
+| photo swaps >= 90% directional (138) | RUN earlier: 100% (probe A, outputs/probes) |
+| rising-vs-flat direction (138) | RUN earlier: failed as registered, kept (probe B) |
+| spike-label sensitivity 30/70 (136) | RUN: frozen risks score AUROC 0.738 / 0.762 / 0.794 against 30/50/70 labels -> not an artifact of the 50 mg/dL choice |
+| grams/bin head agreement >= 90% (limit 6) | RUN: 51% agreement -> the old aim is MISSED and reported; the bin head was kept for its fused AUROC gain (+0.020), not for agreement |
+| photo CV at 3 seeds (protocol above) | EXECUTED AT THE FINAL-RECIPE LEVEL instead (7 Nov seed study, 24.9 +/- 1.9 g); full 3-seed CV not run, compute trade-off recorded in final_design.md |
+| frozen/last/full freezing ablation (limit 4) | NOT RUN beyond the intermediate's ridge-vs-fine-tuned pair; cut for compute, recorded here |
+| meal-type/time-only arm (limit 3) | NOT RUN; hour-of-day is a fusion input, the isolated arm was dropped, recorded here |
+| conformal rise intervals (144) | CUT before the dietitian consult that was to decide them (final_design.md cut list); recorded here as out of order |
+| 3-5 person user test (140) | REPLACED by two structured dietitian reviews (in progress); no end-user test exists and the report says so |
+
+Nothing in this table changes a shipped artifact, threshold or verdict.
