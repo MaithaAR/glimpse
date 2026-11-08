@@ -1,0 +1,82 @@
+{
+  "what": "the intermediate's promised comparisons, run once against the frozen evidence (pre-registered 8 Nov in docs/final_design.md); descriptive only",
+  "r1_gbm_same_inputs": {
+    "point": 0.015231596623573259,
+    "ci95": [
+      -0.0236396118495664,
+      0.06208468273938195
+    ],
+    "auroc_lr": 0.719461535446957,
+    "auroc_gbm": 0.7034721950072502,
+    "bar": "shipped LR non-inferior to GBM if paired lower bound > -0.03 (intermediate line 137)",
+    "verdict": "non-inferior"
+  },
+  "r2_class_weighting": {
+    "point": 0.005229780958431983,
+    "ci95": [
+      -0.0011439212862545843,
+      0.012209327694041934
+    ],
+    "auroc_weighted": 0.7250656425128346,
+    "bar": "adopt only if lower bound > 0 (adoption impossible under the freeze; verdict descriptive)",
+    "verdict": "no gain established"
+  },
+  "r3_label_sensitivity": {
+    "spike_30": {
+      "auroc_personal": 0.7382884972170686,
+      "spike_rate": 0.5739130434782609
+    },
+    "spike_50": {
+      "auroc_personal": 0.7623395272080413,
+      "spike_rate": 0.3282608695652174
+    },
+    "spike_70": {
+      "auroc_personal": 0.7939577223851416,
+      "spike_rate": 0.19130434782608696
+    }
+  },
+  "r4_branch_masking": {
+    "point": 0.002002915033545039,
+    "ci95": [
+      -0.022587183251825904,
+      0.02544985075030713
+    ],
+    "auroc_masked": 0.6957322569267548,
+    "auroc_no_meal": 0.6940079162911001,
+    "note": "masked photo arm vs the no-meal arm; expected near zero (design doc, 8 Nov)"
+  },
+  "r5_head_agreement": {
+    "agreement": 0.5130434782608696,
+    "old_bar": 0.9
+  },
+  "r6_missing_inputs": {
+    "missing_hr": {
+      "answered_share": 0.9563409563409564,
+      "co_answered": 460,
+      "delta_auroc": 0.0027647399215584567,
+      "delta_ece": -0.0032228817260362766,
+      "bar": "delta AUROC >= -0.03 (intermediate line 138)",
+      "flips": {
+        "n": 481,
+        "unchanged": 0.9272349272349273,
+        "dangerous_flips": 0.037422037422037424,
+        "newly_cant_judge": 0.016632016632016633,
+        "recovered_answers": 0.018711018711018712
+      }
+    },
+    "missing_labs": {
+      "answered_share": 0.0,
+      "co_answered": 0,
+      "delta_auroc": null,
+      "delta_ece": null,
+      "bar": "delta AUROC >= -0.03 (intermediate line 138)",
+      "flips": {
+        "n": 481,
+        "unchanged": 0.11434511434511435,
+        "dangerous_flips": 0.0,
+        "newly_cant_judge": 0.8856548856548857,
+        "recovered_answers": 0.0
+      }
+    }
+  }
+}
