@@ -232,6 +232,18 @@ def _timing(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _robustness_levels(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Rubric 4d: the four perturbations at three magnitudes each (pre-registered 22 Nov)."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.robustness import run_levels
+
+    run_levels(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _evaluate_locked(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """S16: score the 8 locked people once against the frozen artifacts (refuses a second run)."""
     from pathlib import Path
@@ -414,6 +426,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("robustness", help="decision-flip rates under CGM dropout/gap and photo blur/dark (S9)")
     sub.add_parser("promised", help="the intermediate's promised comparisons, run once (pre-registered 8 Nov)")
     sub.add_parser("evaluate-locked", help="S16: score the 8 locked people ONCE against the frozen artifacts")
+    sub.add_parser("robustness-levels", help="the four perturbations at three magnitudes each (rubric 4d)")
     sub.add_parser("probes", help="photo-swap and flat-vs-rising CGM counterfactual probes (S13)")
     sub.add_parser("efficiency", help="parameters vs caps, serving latency, artifact sizes (S12)")
     sub.add_parser("monitoring", help="drift-baseline figure for the monitoring design (S11)")
@@ -461,6 +474,7 @@ def main(argv: list[str] | None = None) -> int:
         "robustness": _robustness,
         "promised": _promised,
         "evaluate-locked": _evaluate_locked,
+        "robustness-levels": _robustness_levels,
         "probes": _probes,
         "efficiency": _efficiency,
         "monitoring": _monitoring,

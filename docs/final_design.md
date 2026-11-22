@@ -343,3 +343,15 @@ the local dataset; `just figures` now also commits the standardised feature matr
 redo the check from the repo alone. (iii) Report wording aligned with the code as it ships: the
 last stage trains at a constant 1e-4 and minibatch 32 (the warm-up-plus-cosine schedule and batch
 64 are the heads and SensorCNN); horizontal flips; Huber on log(1+grams).
+
+**Final-rubric additions (22 Nov, pre-registered before either runs; both descriptive, frozen
+artifacts untouched).** (a) Stress LEVELS (rubric 4d asks for degradation across increasing stress,
+not a single point): the four S9 perturbations at three magnitudes each (dropout 10/30/50%, gap
+10/25/40 min, blur radius 2/6/10, brightness x0.5/x0.25/x0.1) through the same per-fold pipelines,
+decision-flip taxonomy per level (`just robustness-levels` -> outputs/robustness/levels.json),
+reported whatever the curves show. (b) Monitoring shift demonstration (rubric 4e): a simulated
+four-week stream - weeks one to three drawn seeded from the training leave-one-out distances, week
+four the six synthetic non-meal pictures already in the demo - with the committed weekly-median
+alert rule (median above the training q90, 0.445); the expectation, stated now, is that the alert
+fires on week four and only week four, and the result is reported as it comes out inside
+`just monitoring`.

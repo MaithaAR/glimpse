@@ -124,6 +124,10 @@ photo-seeds:
 recalibrate:
     uv run glimpse recalibrate
 
+# degradation across increasing stress (rubric 4d; pre-registered 22 Nov; ~20 min, live photo passes)
+robustness-levels:
+    uv run glimpse robustness-levels
+
 # S16: the 8 locked people, scored exactly ONCE against the frozen artifacts; the guard refuses a second run
 evaluate-locked:
     uv run glimpse evaluate-locked

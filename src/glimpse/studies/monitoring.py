@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import torch
 from loguru import logger
@@ -48,6 +49,33 @@ def run_monitoring(cfg: GlimpseConfig) -> dict:
            "training_loo_q90": float(pd.Series(loo).quantile(0.9)),
            "real_photos_median": float(real.score.median()),
            "real_photos_above_cut": int((real.score > cut).sum()), "real_photos_n": int(len(real))}  # fmt: skip
+    # Rubric 4e (pre-registered 22 Nov): a simulated four-week stream; weeks 1-3 are seeded draws from
+    # the training LOO distances, week 4 is the six synthetic non-meal pictures (camera fault / wrong
+    # app); the committed alert rule (weekly median above the training q90) should fire on week 4 only.
+    from glimpse.data.photos import eval_transform
+    from glimpse.demo_cases import synthetic_images
+    from glimpse.models.weights import weights_path
+    from glimpse.serve import knn_distance
+    from glimpse.training.photo import load_photo_bundle
+    from glimpse.training.final import _photo_checkpoint
+
+    model, _ = load_photo_bundle(cfg, _photo_checkpoint())
+    model.eval()
+    tf, norm = eval_transform(cfg.photo.arch, cfg.photo.crop_pct), torch.nn.functional.normalize
+    with torch.no_grad():
+        syn = [float(knn_distance(ref["emb"].float(), norm(model.embed(tf(im)[None]), dim=1),
+                                  int(ref["k"]))[0]) for im in synthetic_images().values()]  # fmt: skip
+    rng = np.random.default_rng(cfg.seed)
+    q90 = float(pd.Series(loo).quantile(0.9))
+    weeks = [sorted(rng.choice(loo, 20, replace=False).tolist()) for _ in range(3)] + [sorted(syn)]
+    stream = [{"week": i + 1, "n": len(w), "median": float(np.median(w)),
+               "alert": bool(np.median(w) > q90)} for i, w in enumerate(weeks)]  # fmt: skip
+    res["simulated_stream"] = {"rule": "alert when the weekly median distance exceeds the training "
+                                       "q90 (%.3f)" % q90, "weeks": stream,
+                               "fires_on_week_4_only": [w["alert"] for w in stream] == [False, False, False, True]}
+    for w in stream:
+        log.info("simulated week {}: median {:.3f} -> {}", w["week"], w["median"],
+                 "ALERT" if w["alert"] else "ok")  # fmt: skip
     (OUT / "monitoring.json").write_text(json.dumps(res, indent=2))
     log.info("drift baseline: training LOO median {:.3f} (q90 {:.3f}), cut {:.3f}; real photos median "
              "{:.3f}, {} of {} above the cut", res["training_loo_median"], res["training_loo_q90"], cut,

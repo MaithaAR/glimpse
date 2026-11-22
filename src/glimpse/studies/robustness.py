@@ -28,28 +28,30 @@ OUT = Path("outputs/robustness")
 DROP_SHARE, GAP_MIN, BLUR_RADIUS, DARKEN = 0.3, 25, 6, 0.25
 
 
-def perturb_cgm(m: MealInput, kind: str, rng: np.random.Generator) -> MealInput:
+def perturb_cgm(m: MealInput, kind: str, rng: np.random.Generator, level: float | None = None) -> MealInput:
     """Dropout: each reading lost with p=0.3. Gap: a contiguous 25-minute block removed, ending half an
-    hour before the meal."""
+    hour before the meal. `level` overrides the S9 magnitude (the levels study); defaults unchanged."""
     t, v = list(m.glucose_times), list(m.glucose_mgdl)
     if kind == "cgm_dropout":
-        keep = rng.uniform(size=len(t)) > DROP_SHARE
+        keep = rng.uniform(size=len(t)) > (DROP_SHARE if level is None else level)
         keep[-1] = True  # the sensor's latest reading is always there
         t, v = [x for x, k in zip(t, keep, strict=True) if k], [x for x, k in zip(v, keep, strict=True) if k]
     else:  # cgm_gap
         end = m.meal_time - pd.Timedelta(minutes=30)
-        start = end - pd.Timedelta(minutes=GAP_MIN)
+        start = end - pd.Timedelta(minutes=GAP_MIN if level is None else level)
         pairs = [(x, y) for x, y in zip(t, v, strict=True) if not (start <= x < end)]
         t, v = [p[0] for p in pairs], [p[1] for p in pairs]
     return m.model_copy(update={"glucose_times": t, "glucose_mgdl": v})
 
 
-def perturb_photo(m: MealInput, kind: str, tmp: Path) -> MealInput:
-    """Blur (radius 6) or darken (x0.25), written next to nothing the user owns."""
+def perturb_photo(m: MealInput, kind: str, tmp: Path, level: float | None = None) -> MealInput:
+    """Blur (radius 6) or darken (x0.25), written next to nothing the user owns. `level` overrides
+    the S9 magnitude (the levels study); defaults unchanged."""
     img = open_photo(m.photo)
-    img = img.filter(ImageFilter.GaussianBlur(BLUR_RADIUS)) if kind == "photo_blur" \
-        else ImageEnhance.Brightness(img).enhance(DARKEN)  # fmt: skip
-    out = tmp / f"{kind}_{Path(m.photo).name}"
+    img = img.filter(ImageFilter.GaussianBlur(BLUR_RADIUS if level is None else level)) \
+        if kind == "photo_blur" \
+        else ImageEnhance.Brightness(img).enhance(DARKEN if level is None else level)  # fmt: skip
+    out = tmp / f"{kind}_{level}_{Path(m.photo).name}"
     img.save(out, quality=90)
     return m.model_copy(update={"photo": out})
 
@@ -169,3 +171,71 @@ def run_timing(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
         log.info("{:<22} unchanged {:.0%} | dangerous {:.1%} | newly can't-judge {:.0%}",
                  k2, r["unchanged"], r["dangerous_flips"], r["newly_cant_judge"])  # fmt: skip
     return res
+
+
+LEVELS = {"cgm_dropout": (0.1, 0.3, 0.5), "cgm_gap": (10, 25, 40),
+          "photo_blur": (2, 6, 10), "photo_dark": (0.5, 0.25, 0.1)}  # fmt: skip
+
+
+def run_levels(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
+    """Rubric 4d (pre-registered 22 Nov): the four perturbations at three magnitudes each through the
+    same per-fold pipelines as S9; decision-flip taxonomy per level, reported whatever it shows."""
+    from glimpse.calibration import choose_m_and_cutoffs
+    from glimpse.demo_cases import meal_input
+    from glimpse.training.final import cost_dict
+
+    log, pcv, y = logger.bind(stage="robust"), Path(cfg.paths.outputs) / "photo_cv", ds.labels()
+    oof, nested = pd.read_csv(pcv / "photo_oof.csv"), pd.read_csv(pcv / "photo_nested.csv")
+    rng = np.random.default_rng(cfg.seed)
+    base_tab, base_live = [], []
+    pert: dict[tuple, list] = {(k, lv): [] for k, lvs in LEVELS.items() for lv in lvs}
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        for k, held in enumerate(sp.dev_folds):
+            kk = k + 1
+            of, nf = oof[oof.fold == kk], nested[nested.fold == kk]
+            pt = photo_table(nf) | photo_table(of)
+            lr, c = fold_fusion(ds, sp, cfg, k, pt)
+            rows_i, p_i = inner_oof(ds, sp, cfg, k, pt, c)
+            a_k, b_k = fit_platt(p_i, y[rows_i])
+            if a_k <= 0:
+                a_k, b_k = 1.0, 0.0
+            times_i = np.array([ds.samples[i].meal_time for i in rows_i], dtype="datetime64[s]")
+            person_i = np.array([ds.samples[i].person_id for i in rows_i])
+            sel = choose_m_and_cutoffs(apply_platt(p_i, a_k, b_k), y[rows_i], person_i, times_i, cost_dict(cfg))
+            cuts = (sel["low_risk_below"], sel["caution_from"])
+            tab = Pipeline(cfg, photo_table=fold_estimates(of), fusion=lr, calibration=(a_k, b_k), cutoffs=cuts)
+            live = Pipeline(cfg, fusion=lr, calibration=(a_k, b_k), cutoffs=cuts)
+            for row in meal_rows(ds, set(held), scored_only=True):
+                m = meal_input(cfg, ds, int(row))
+                base_tab.append(tab.answer(m, key=int(row)).decision)
+                for kind in ("cgm_dropout", "cgm_gap"):
+                    for lv in LEVELS[kind]:
+                        pert[(kind, lv)].append(tab.answer(perturb_cgm(m, kind, rng, lv), key=int(row)).decision)
+                if m.photo is None:
+                    base_live.append(None)
+                    for kind in ("photo_blur", "photo_dark"):
+                        for lv in LEVELS[kind]:
+                            pert[(kind, lv)].append(None)
+                    continue
+                base_live.append(live.answer(m).decision)
+                for kind in ("photo_blur", "photo_dark"):
+                    for lv in LEVELS[kind]:
+                        pert[(kind, lv)].append(live.answer(perturb_photo(m, kind, tmp, lv)).decision)
+            log.info("levels fold {} answered", kk)
+    res: dict = {"what": "the four S9 perturbations at three magnitudes each (pre-registered 22 Nov, "
+                         "rubric 4d); same per-fold pipelines, no history", "levels": LEVELS}  # fmt: skip
+    for kind, lvs in LEVELS.items():
+        base = base_tab if kind.startswith("cgm") else [b for b in base_live if b is not None]
+        res[kind] = {str(lv): _flips(base, [x for x in pert[(kind, lv)] if not (x is None)]
+                                     if kind.startswith("photo") else pert[(kind, lv)]) for lv in lvs}  # fmt: skip
+        for lv in lvs:
+            r = res[kind][str(lv)]
+            log.info("{:<12} level {:>5}: unchanged {:.0%} | dangerous {:.1%} | newly can't-judge {:.0%}",
+                     kind, lv, r["unchanged"], r["dangerous_flips"], r["newly_cant_judge"])  # fmt: skip
+    out = Path(cfg.paths.outputs) / "robustness"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "levels.json").write_text(json.dumps(res, indent=2))
+    log.info("levels -> {}", out / "levels.json")
+    return res
+
