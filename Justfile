@@ -114,6 +114,7 @@ amend-thresholds:
 # development evaluation on partition v2 (D2): every risk comes from Pipeline.answer, one Pipeline per fold
 evaluate:
     uv run glimpse evaluate
+    uv run glimpse figures
 
 # seed spread of the shipped 12+2 recipe: 3 fresh seeds scored on the validation people (~15 min; nothing deployed changes)
 photo-seeds:
@@ -122,6 +123,10 @@ photo-seeds:
 # recalibration: being rebuilt on partition v2 (S5, D3/D4); the command says so and exits
 recalibrate:
     uv run glimpse recalibrate
+
+# S16: the 8 locked people, scored exactly ONCE against the frozen artifacts; the guard refuses a second run
+evaluate-locked:
+    uv run glimpse evaluate-locked
 
 # the intermediate's promised comparisons, run once against the frozen evidence (pre-registered 8 Nov; ~20 min)
 promised:
@@ -163,4 +168,4 @@ clean:
     find . -name "__pycache__" -type d -prune -exec rm -rf {} +
 
 wordcount:
-    uv run python -c "import re; t=open('docs/final_report.md').read(); print(len(re.sub(r'<!--.*?-->','',t,flags=re.S).split()), 'words (budget 3,000)')"
+    uv run python -c "import re; t=re.sub(r'<!--.*?-->','',open('docs/final_report.md').read(),flags=re.S); ls=[l for l in t.splitlines() if not l.lstrip().startswith(('|','!['))]; print(len(' '.join(ls).split()), 'words (cap 3,000; tables, figures, captions excluded per the final rubric)')"

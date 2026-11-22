@@ -4,7 +4,8 @@ Before eating: a meal photo + the last 2 h of CGM glucose and heart rate + a sho
 Maitha Alhosani · MAAI7103 · November 2026 · `just install` → `just predict-folder <in> <out>`
 
 <!-- BUDGET 3,000 words: bottom line 180 · §1 350 · §2 525 · §3 650 · §4 550 · §5 475 · §6 300 · §7 200.
-     Check with `just wordcount`. TODO markers: [S16] filled 22 Nov, [DIET] 19 Nov, [REGEN] 12 Nov. -->
+     Check with `just wordcount` (tables, figures and captions excluded per the final rubric).
+     TODO marker: [S16] filled from the single locked-8 run. -->
 
 **Bottom line.** The central fix this phase was calibration, and it worked: a per-person intercept,
 fitted only on each person's earlier meals and replayed in deployment order, raises AUROC from 0.726
@@ -44,8 +45,13 @@ ordering in the dated design docs) in which every pre-registration precedes its 
 | largest model (ConvNeXt-Tiny + heads) | 27.8M | 200M |
 | pretrained total | 27.8M | 1B |
 | trained from scratch (heads 3,845 + SensorCNN 5,217 + fusion 20) | 9,082 | 50M |
+| fine-tuning items (CGMacros photos; the planned 800 Nutrition5k items were cut) | 1,221 | 10,000 |
 | cold first answer / warm median / p95 | 1.57 s / 265 ms / 271 ms | ≤300 ms p95 |
 | peak memory / checkpoint | 796 MB / 31 MB | – |
+
+*Quality vs cost: 20 fitted fusion parameters match the 5,217-parameter SensorCNN (0.691 vs 0.686,
+RQ2), and caching the backbone embeddings turns the 1.57 s cold answer into 265 ms warm; ledger
+outputs/data/finetune_ledger.csv, measurements outputs/efficiency/.*
 
 ## 2. Multimodal design and the photo gate
 <!-- 525 words: architecture (frozen backbone + two heads, SensorCNN as RQ2 baseline only, LR fusion
@@ -180,9 +186,10 @@ Abstaining instead of guessing is established practice for medical ML (Kompa et 
 Stress suite: 23 hostile inputs (timezone offsets, malformed JSON, binary CSVs, broken photos,
 empty folders) give zero crashes and zero raw error rows; rules R8-R10 were added only against
 observed failures of a recorded naive run, like R1-R6, and tests enforce this on every commit. Monitoring: four signals with alert rules
-(docs/monitoring.md); drift baseline committed. [DIET: two dietitians, three structured questions:
-cap acceptability, label wording, the rising-baseline case; responses folded in here, or the honest
-pending line.]
+(docs/monitoring.md); drift baseline committed. The planned dietitian consultation did not complete before submission: the three structured
+questions (cap acceptability, decision wording, the rising-baseline case) are committed as the
+instrument, no clinician response is folded in, and the cost matrix stays a declared assumption
+with the committed sensitivity sweep as its hedge.
 
 ## 5. Explainability and failure analysis
 <!-- 475 words: probes A+B; R7; D8 as failure insight; S14 taxonomy (false-cleared + abstention

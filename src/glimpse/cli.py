@@ -232,6 +232,18 @@ def _timing(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _evaluate_locked(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """S16: score the 8 locked people once against the frozen artifacts (refuses a second run)."""
+    from pathlib import Path
+
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.evaluation.locked import run_locked
+
+    run_locked(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _promised(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """The intermediate's promised comparisons, run once (pre-registered 8 Nov, docs/final_design.md)."""
     from pathlib import Path
@@ -401,6 +413,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("wandb-export", help="offline W&B runs from every history CSV and summary in outputs/")
     sub.add_parser("robustness", help="decision-flip rates under CGM dropout/gap and photo blur/dark (S9)")
     sub.add_parser("promised", help="the intermediate's promised comparisons, run once (pre-registered 8 Nov)")
+    sub.add_parser("evaluate-locked", help="S16: score the 8 locked people ONCE against the frozen artifacts")
     sub.add_parser("probes", help="photo-swap and flat-vs-rising CGM counterfactual probes (S13)")
     sub.add_parser("efficiency", help="parameters vs caps, serving latency, artifact sizes (S12)")
     sub.add_parser("monitoring", help="drift-baseline figure for the monitoring design (S11)")
@@ -447,6 +460,7 @@ def main(argv: list[str] | None = None) -> int:
         "ood": _ood,
         "robustness": _robustness,
         "promised": _promised,
+        "evaluate-locked": _evaluate_locked,
         "probes": _probes,
         "efficiency": _efficiency,
         "monitoring": _monitoring,
