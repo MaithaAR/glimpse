@@ -108,3 +108,16 @@ One more correction (26 Nov, third grading round): replay 2 is described above a
 would have given". It re-decides the evaluated, with-history risk at the deployed cut-offs; the app and the
 folder command answer without history (Platt only), whose usefulness is reported separately in the report §4
 (served column, outputs/report_metrics/report_metrics.json `served_operating_point`).
+
+### Replay 3: a sequential calibration monitor on the served risk (registered 26 Nov, before its run)
+
+Written after the fourth grading round, knowing that the served (Platt-only) risk under-predicts the locked
+cohort by 11 points overall; so this is a demonstration that a standard sequential rule computes on the
+logged stream, not a test. Stream and blocks as in replay 1 (dev answers in `row` order, then locked; blocks
+of 20). Per block, x = observed spike rate minus mean served risk (dev: `risk_platt`; locked: the frozen
+Platt map on `risk_raw`), over answers with a risk. Standardise with the mean and standard deviation of x over
+the dev blocks. One-sided CUSUM for under-prediction, textbook defaults fixed now: S_t = max(0, S_{t-1} +
+z_t − 0.5), alarm when S_t > 4, reset after an alarm. The same rule on the caution share (x = caution share)
+is reported alongside. Expected: few or no alarms on dev blocks (they define the reference, so a dev alarm
+would be a false alarm), and a calibration alarm within the locked blocks. Reported as measured in
+outputs/monitoring/replay.json (`cusum_served`).
