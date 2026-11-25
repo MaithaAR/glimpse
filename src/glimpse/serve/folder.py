@@ -19,10 +19,10 @@ if TYPE_CHECKING:
     from glimpse.serve.pipeline import Pipeline
 
 # profile.json keys (docs/final_design.md §6) -> the model's profile input names
+# rule R11: both spellings accepted, so a profile written with the model-side names is not "missing"
 PROFILE_KEYS = {"age": "age", "bmi": "bmi", "a1c": "a1c_pct", "fasting_glucose": "fasting_glucose_mgdl",
                 "prior_spike_rate": "prior_spike_rate", "prior_rise": "prior_rise",
-                "a1c_pct": "a1c_pct", "fasting_glucose_mgdl": "fasting_glucose_mgdl"}  # rule R11: both
-# spellings accepted, so a profile written with the model-side names is not reported as missing  # fmt: skip
+                "a1c_pct": "a1c_pct", "fasting_glucose_mgdl": "fasting_glucose_mgdl"}  # fmt: skip
 PHOTO_NAMES = ("photo.jpg", "photo.jpeg", "photo.png", "photo.heic")
 
 
