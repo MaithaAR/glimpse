@@ -1,0 +1,1657 @@
+{
+  "what": "Descriptive metrics re-derived from the committed answer files (`glimpse report-metrics`, 26 Nov).",
+  "cohorts": {
+    "dev": {
+      "risk_raw": {
+        "n": 460,
+        "base_rate": 0.3282608695652174,
+        "auroc": 0.7256477849932488,
+        "auprc": {
+          "point": 0.5544795703682526,
+          "ci95": [
+            0.43739363045019763,
+            0.6642437192666557
+          ]
+        },
+        "brier": {
+          "point": 0.1918208219388815,
+          "ci95": [
+            0.16385253009575945,
+            0.21743010609297497
+          ]
+        },
+        "brier_constant_base_rate": 0.2205056710775047,
+        "log_loss": 0.567039147212089,
+        "ece_equal_mass_15": 0.05903813811230171,
+        "ece_equal_mass_10": 0.04939413946446653,
+        "ece_equal_width_15": 0.0602000619224841,
+        "bins_equal_mass_15": [
+          {
+            "n": 31,
+            "mean_predicted": 0.06973703744967708,
+            "observed": 0.12903225806451613
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.13414205742363366,
+            "observed": 0.12903225806451613
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.17949846504103154,
+            "observed": 0.0
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.21304646172101818,
+            "observed": 0.16129032258064516
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.2477265452980442,
+            "observed": 0.25806451612903225
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.2824282217724336,
+            "observed": 0.1935483870967742
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.31679577559990996,
+            "observed": 0.3870967741935484
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.3450956902582246,
+            "observed": 0.3225806451612903
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.3872024580518918,
+            "observed": 0.3225806451612903
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.41794735997606725,
+            "observed": 0.45161290322580644
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.4547683375714854,
+            "observed": 0.4
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.5065613445190784,
+            "observed": 0.4
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.5564281999269948,
+            "observed": 0.4666666666666667
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.6290622859251243,
+            "observed": 0.6333333333333333
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.7443756644868391,
+            "observed": 0.7
+          }
+        ],
+        "bins_equal_width_15": [
+          {
+            "mean_predicted": 0.04983571777369839,
+            "observed": 0.07142857142857142,
+            "n": 14
+          },
+          {
+            "mean_predicted": 0.1024319424622183,
+            "observed": 0.18181818181818182,
+            "n": 33
+          },
+          {
+            "mean_predicted": 0.17237734260603454,
+            "observed": 0.0196078431372549,
+            "n": 51
+          },
+          {
+            "mean_predicted": 0.23443780069075512,
+            "observed": 0.23728813559322035,
+            "n": 59
+          },
+          {
+            "mean_predicted": 0.3025909630618463,
+            "observed": 0.28125,
+            "n": 64
+          },
+          {
+            "mean_predicted": 0.36611166694448405,
+            "observed": 0.3148148148148148,
+            "n": 54
+          },
+          {
+            "mean_predicted": 0.4300423239751636,
+            "observed": 0.4406779661016949,
+            "n": 59
+          },
+          {
+            "mean_predicted": 0.5017475057459198,
+            "observed": 0.40540540540540543,
+            "n": 37
+          },
+          {
+            "mean_predicted": 0.5635858902851645,
+            "observed": 0.42857142857142855,
+            "n": 35
+          },
+          {
+            "mean_predicted": 0.6284606770564338,
+            "observed": 0.7368421052631579,
+            "n": 19
+          },
+          {
+            "mean_predicted": 0.6985486435742154,
+            "observed": 0.6842105263157895,
+            "n": 19
+          },
+          {
+            "mean_predicted": 0.7631919152823318,
+            "observed": 0.6923076923076923,
+            "n": 13
+          },
+          {
+            "mean_predicted": 0.8346279102536199,
+            "observed": 0.6666666666666666,
+            "n": 3
+          }
+        ]
+      },
+      "risk_platt": {
+        "n": 460,
+        "base_rate": 0.3282608695652174,
+        "auroc": 0.7139672946269745,
+        "auprc": {
+          "point": 0.5408343993724283,
+          "ci95": [
+            0.4264458732634784,
+            0.6544029216240242
+          ]
+        },
+        "brier": {
+          "point": 0.19368110039081443,
+          "ci95": [
+            0.16200756345583375,
+            0.2227141797339006
+          ]
+        },
+        "brier_constant_base_rate": 0.2205056710775047,
+        "log_loss": 0.5717718179388036,
+        "ece_equal_mass_15": 0.05581711126507391,
+        "ece_equal_mass_10": 0.029902523132900073,
+        "ece_equal_width_15": 0.02345685723056684,
+        "bins_equal_mass_15": [
+          {
+            "n": 31,
+            "mean_predicted": 0.0706826765114402,
+            "observed": 0.16129032258064516
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.12176035796298806,
+            "observed": 0.03225806451612903
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.1553046785232515,
+            "observed": 0.16129032258064516
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.18920378616752906,
+            "observed": 0.0967741935483871
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.217756895575005,
+            "observed": 0.1935483870967742
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.24359964564309836,
+            "observed": 0.3870967741935484
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.27024987178815996,
+            "observed": 0.2903225806451613
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.3091344360068316,
+            "observed": 0.2903225806451613
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.3458274435073056,
+            "observed": 0.3548387096774194
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.3809636945505144,
+            "observed": 0.41935483870967744
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.4157209312788031,
+            "observed": 0.4666666666666667
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.4609966672002827,
+            "observed": 0.36666666666666664
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.5135091296678552,
+            "observed": 0.43333333333333335
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.5881907166749443,
+            "observed": 0.6333333333333333
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.7016665097885395,
+            "observed": 0.6666666666666666
+          }
+        ],
+        "bins_equal_width_15": [
+          {
+            "mean_predicted": 0.05173907551623149,
+            "observed": 0.14285714285714285,
+            "n": 14
+          },
+          {
+            "mean_predicted": 0.10541093234085866,
+            "observed": 0.09523809523809523,
+            "n": 42
+          },
+          {
+            "mean_predicted": 0.16515597538370153,
+            "observed": 0.13114754098360656,
+            "n": 61
+          },
+          {
+            "mean_predicted": 0.23415097306202184,
+            "observed": 0.2619047619047619,
+            "n": 84
+          },
+          {
+            "mean_predicted": 0.298806670508137,
+            "observed": 0.2916666666666667,
+            "n": 48
+          },
+          {
+            "mean_predicted": 0.3664969090234961,
+            "observed": 0.3787878787878788,
+            "n": 66
+          },
+          {
+            "mean_predicted": 0.43209449152271295,
+            "observed": 0.4186046511627907,
+            "n": 43
+          },
+          {
+            "mean_predicted": 0.4973802332257517,
+            "observed": 0.4722222222222222,
+            "n": 36
+          },
+          {
+            "mean_predicted": 0.560352598021543,
+            "observed": 0.56,
+            "n": 25
+          },
+          {
+            "mean_predicted": 0.635769522377672,
+            "observed": 0.6666666666666666,
+            "n": 18
+          },
+          {
+            "mean_predicted": 0.7042830168538766,
+            "observed": 0.631578947368421,
+            "n": 19
+          },
+          {
+            "mean_predicted": 0.7738482188420703,
+            "observed": 0.75,
+            "n": 4
+          }
+        ]
+      },
+      "risk": {
+        "n": 460,
+        "base_rate": 0.3282608695652174,
+        "auroc": 0.7623395272080413,
+        "auprc": {
+          "point": 0.5914288391600925,
+          "ci95": [
+            0.45085283649948055,
+            0.6936942742902431
+          ]
+        },
+        "brier": {
+          "point": 0.18028461459381273,
+          "ci95": [
+            0.1479896842543142,
+            0.2102937702515524
+          ]
+        },
+        "brier_constant_base_rate": 0.2205056710775047,
+        "log_loss": 0.5370799244338427,
+        "ece_equal_mass_15": 0.04904761090603793,
+        "ece_equal_mass_10": 0.03531406110033508,
+        "ece_equal_width_15": 0.05209542261502841,
+        "bins_equal_mass_15": [
+          {
+            "n": 31,
+            "mean_predicted": 0.0510366285303176,
+            "observed": 0.06451612903225806
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.0892855231816519,
+            "observed": 0.03225806451612903
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.12377445048221362,
+            "observed": 0.0967741935483871
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.1514184744216468,
+            "observed": 0.16129032258064516
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.1790793813516461,
+            "observed": 0.25806451612903225
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.20515793676199381,
+            "observed": 0.1935483870967742
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.2316098306811202,
+            "observed": 0.2903225806451613
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.2654875972734051,
+            "observed": 0.3225806451612903
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.30387833920234464,
+            "observed": 0.3225806451612903
+          },
+          {
+            "n": 31,
+            "mean_predicted": 0.35466884761379824,
+            "observed": 0.41935483870967744
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.40980056523759484,
+            "observed": 0.3333333333333333
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.4722996833545049,
+            "observed": 0.4666666666666667
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.535682339971935,
+            "observed": 0.7
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.61575950519361,
+            "observed": 0.6333333333333333
+          },
+          {
+            "n": 30,
+            "mean_predicted": 0.744331525402727,
+            "observed": 0.6666666666666666
+          }
+        ],
+        "bins_equal_width_15": [
+          {
+            "mean_predicted": 0.0481805405133012,
+            "observed": 0.07407407407407407,
+            "n": 27
+          },
+          {
+            "mean_predicted": 0.10186779320418175,
+            "observed": 0.04918032786885246,
+            "n": 61
+          },
+          {
+            "mean_predicted": 0.16691265595032545,
+            "observed": 0.2236842105263158,
+            "n": 76
+          },
+          {
+            "mean_predicted": 0.23076493972585216,
+            "observed": 0.23943661971830985,
+            "n": 71
+          },
+          {
+            "mean_predicted": 0.2993126767793339,
+            "observed": 0.3333333333333333,
+            "n": 48
+          },
+          {
+            "mean_predicted": 0.3675076015174458,
+            "observed": 0.39473684210526316,
+            "n": 38
+          },
+          {
+            "mean_predicted": 0.4348382496430425,
+            "observed": 0.34375,
+            "n": 32
+          },
+          {
+            "mean_predicted": 0.49972279165275096,
+            "observed": 0.6129032258064516,
+            "n": 31
+          },
+          {
+            "mean_predicted": 0.5621601934150408,
+            "observed": 0.6153846153846154,
+            "n": 26
+          },
+          {
+            "mean_predicted": 0.6342197326742255,
+            "observed": 0.75,
+            "n": 20
+          },
+          {
+            "mean_predicted": 0.6983214200353908,
+            "observed": 0.6923076923076923,
+            "n": 13
+          },
+          {
+            "mean_predicted": 0.7674204651353038,
+            "observed": 0.6153846153846154,
+            "n": 13
+          },
+          {
+            "mean_predicted": 0.8188253137156951,
+            "observed": 0.75,
+            "n": 4
+          }
+        ]
+      },
+      "decisions": {
+        "shipped": 0.5748440748440748,
+        "always low risk": 1.6424116424116424,
+        "always caution": 0.6715176715176715,
+        "always can't judge": 0.9927234927234927,
+        "best_constant": "always caution",
+        "cost_reduction_vs_best_constant": 0.14396284829721362,
+        "shares": {
+          "low risk": 0.22661122661122662,
+          "caution": 0.6361746361746362,
+          "can't judge": 0.13721413721413722
+        }
+      }
+    },
+    "dev_excluding_fold1": {
+      "risk_raw": {
+        "n": 370,
+        "base_rate": 0.33513513513513515,
+        "auroc": 0.7200367164961973,
+        "auprc": {
+          "point": 0.549331574633009,
+          "ci95": [
+            0.41538481520410186,
+            0.6855594214029725
+          ]
+        },
+        "brier": {
+          "point": 0.19558128487410617,
+          "ci95": [
+            0.16271332757181006,
+            0.22582204522596133
+          ]
+        },
+        "brier_constant_base_rate": 0.22281957633308985,
+        "log_loss": 0.5744763117700429,
+        "ece_equal_mass_15": 0.05461175158960576,
+        "ece_equal_mass_10": 0.06112833135990745,
+        "ece_equal_width_15": 0.059495429595955975,
+        "bins_equal_mass_15": [
+          {
+            "n": 25,
+            "mean_predicted": 0.07227003644000145,
+            "observed": 0.08
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.14614949024244622,
+            "observed": 0.12
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.1875973188918627,
+            "observed": 0.0
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.22346231062083294,
+            "observed": 0.24
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.2585121391482451,
+            "observed": 0.24
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.2893679734755594,
+            "observed": 0.28
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.31923150751542084,
+            "observed": 0.36
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.346062824733367,
+            "observed": 0.44
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.38797434954064414,
+            "observed": 0.28
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.4184126675318696,
+            "observed": 0.36
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.45780695986624215,
+            "observed": 0.4583333333333333
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.5141423208395746,
+            "observed": 0.4166666666666667
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.5647624834873833,
+            "observed": 0.5
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.6306261700111198,
+            "observed": 0.625
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.7495954272002064,
+            "observed": 0.6666666666666666
+          }
+        ],
+        "bins_equal_width_15": [
+          {
+            "mean_predicted": 0.05057148527264117,
+            "observed": 0.09090909090909091,
+            "n": 11
+          },
+          {
+            "mean_predicted": 0.1033282394306986,
+            "observed": 0.17391304347826086,
+            "n": 23
+          },
+          {
+            "mean_predicted": 0.174014942495215,
+            "observed": 0.0,
+            "n": 38
+          },
+          {
+            "mean_predicted": 0.23477041059821877,
+            "observed": 0.2553191489361702,
+            "n": 47
+          },
+          {
+            "mean_predicted": 0.3021515283404737,
+            "observed": 0.288135593220339,
+            "n": 59
+          },
+          {
+            "mean_predicted": 0.36712043670131694,
+            "observed": 0.3409090909090909,
+            "n": 44
+          },
+          {
+            "mean_predicted": 0.4308181608099649,
+            "observed": 0.43478260869565216,
+            "n": 46
+          },
+          {
+            "mean_predicted": 0.5010506997511971,
+            "observed": 0.38461538461538464,
+            "n": 26
+          },
+          {
+            "mean_predicted": 0.5643893964238808,
+            "observed": 0.45161290322580644,
+            "n": 31
+          },
+          {
+            "mean_predicted": 0.6291596137819886,
+            "observed": 0.7222222222222222,
+            "n": 18
+          },
+          {
+            "mean_predicted": 0.6933524065967994,
+            "observed": 0.6666666666666666,
+            "n": 12
+          },
+          {
+            "mean_predicted": 0.7652127703751122,
+            "observed": 0.6666666666666666,
+            "n": 12
+          },
+          {
+            "mean_predicted": 0.8346279102536199,
+            "observed": 0.6666666666666666,
+            "n": 3
+          }
+        ]
+      },
+      "risk_platt": {
+        "n": 370,
+        "base_rate": 0.33513513513513515,
+        "auroc": 0.7078743771308681,
+        "auprc": {
+          "point": 0.537841419760922,
+          "ci95": [
+            0.40857785677057984,
+            0.6762907697213378
+          ]
+        },
+        "brier": {
+          "point": 0.19782929488314008,
+          "ci95": [
+            0.1620973382628608,
+            0.2316518730565477
+          ]
+        },
+        "brier_constant_base_rate": 0.22281957633308985,
+        "log_loss": 0.5804572721819093,
+        "ece_equal_mass_15": 0.06418237586709717,
+        "ece_equal_mass_10": 0.034255771594777495,
+        "ece_equal_width_15": 0.03591811981151796,
+        "bins_equal_mass_15": [
+          {
+            "n": 25,
+            "mean_predicted": 0.06789075355067466,
+            "observed": 0.16
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.11966377282175288,
+            "observed": 0.0
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.1535116119873298,
+            "observed": 0.16
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.18853090186129087,
+            "observed": 0.12
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.2178766956335966,
+            "observed": 0.24
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.24342726879496435,
+            "observed": 0.4
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.26914338412013455,
+            "observed": 0.32
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.3036743313425928,
+            "observed": 0.28
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.3425281742258078,
+            "observed": 0.44
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.37929830444062007,
+            "observed": 0.36
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.418627915633623,
+            "observed": 0.5
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.4718754062995673,
+            "observed": 0.375
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.5239546968101558,
+            "observed": 0.4583333333333333
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.5973797440285654,
+            "observed": 0.5833333333333334
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.7140740483695941,
+            "observed": 0.6666666666666666
+          }
+        ],
+        "bins_equal_width_15": [
+          {
+            "mean_predicted": 0.05073384110723884,
+            "observed": 0.16666666666666666,
+            "n": 12
+          },
+          {
+            "mean_predicted": 0.1040327351901744,
+            "observed": 0.058823529411764705,
+            "n": 34
+          },
+          {
+            "mean_predicted": 0.16564708008209222,
+            "observed": 0.14,
+            "n": 50
+          },
+          {
+            "mean_predicted": 0.23538124741647176,
+            "observed": 0.29850746268656714,
+            "n": 67
+          },
+          {
+            "mean_predicted": 0.2961591982031256,
+            "observed": 0.3333333333333333,
+            "n": 39
+          },
+          {
+            "mean_predicted": 0.3636928334876653,
+            "observed": 0.36,
+            "n": 50
+          },
+          {
+            "mean_predicted": 0.4278677947601068,
+            "observed": 0.43333333333333335,
+            "n": 30
+          },
+          {
+            "mean_predicted": 0.49811125642023724,
+            "observed": 0.4838709677419355,
+            "n": 31
+          },
+          {
+            "mean_predicted": 0.5595570569733139,
+            "observed": 0.5652173913043478,
+            "n": 23
+          },
+          {
+            "mean_predicted": 0.6366164603627588,
+            "observed": 0.5454545454545454,
+            "n": 11
+          },
+          {
+            "mean_predicted": 0.7042830168538766,
+            "observed": 0.631578947368421,
+            "n": 19
+          },
+          {
+            "mean_predicted": 0.7738482188420703,
+            "observed": 0.75,
+            "n": 4
+          }
+        ]
+      },
+      "risk": {
+        "n": 370,
+        "base_rate": 0.33513513513513515,
+        "auroc": 0.757244951481773,
+        "auprc": {
+          "point": 0.5861328108257892,
+          "ci95": [
+            0.425067947365954,
+            0.7159964669117308
+          ]
+        },
+        "brier": {
+          "point": 0.1846507371588567,
+          "ci95": [
+            0.1461040165630522,
+            0.22393832217391027
+          ]
+        },
+        "brier_constant_base_rate": 0.22281957633308985,
+        "log_loss": 0.5470831758603024,
+        "ece_equal_mass_15": 0.057081238640684026,
+        "ece_equal_mass_10": 0.04961232778430756,
+        "ece_equal_width_15": 0.06994569180467887,
+        "bins_equal_mass_15": [
+          {
+            "n": 25,
+            "mean_predicted": 0.048405633662131145,
+            "observed": 0.08
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.09070217691588604,
+            "observed": 0.04
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.125829614783435,
+            "observed": 0.08
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.15364876088708423,
+            "observed": 0.24
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.18041928113083647,
+            "observed": 0.2
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.20658277830218755,
+            "observed": 0.2
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.23353511466340124,
+            "observed": 0.32
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.2665971392113008,
+            "observed": 0.28
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.31158705023262157,
+            "observed": 0.36
+          },
+          {
+            "n": 25,
+            "mean_predicted": 0.35776185920660064,
+            "observed": 0.44
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.4077321587816416,
+            "observed": 0.3333333333333333
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.46282273395464363,
+            "observed": 0.4583333333333333
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.5232433117593699,
+            "observed": 0.75
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.6052436909908302,
+            "observed": 0.625
+          },
+          {
+            "n": 24,
+            "mean_predicted": 0.7304764859249472,
+            "observed": 0.6666666666666666
+          }
+        ],
+        "bins_equal_width_15": [
+          {
+            "mean_predicted": 0.046465120283979304,
+            "observed": 0.08695652173913043,
+            "n": 23
+          },
+          {
+            "mean_predicted": 0.10388411018721964,
+            "observed": 0.0425531914893617,
+            "n": 47
+          },
+          {
+            "mean_predicted": 0.16724273397953426,
+            "observed": 0.2459016393442623,
+            "n": 61
+          },
+          {
+            "mean_predicted": 0.23172370297280484,
+            "observed": 0.23728813559322035,
+            "n": 59
+          },
+          {
+            "mean_predicted": 0.30391924208346277,
+            "observed": 0.3333333333333333,
+            "n": 36
+          },
+          {
+            "mean_predicted": 0.3675893612333878,
+            "observed": 0.42424242424242425,
+            "n": 33
+          },
+          {
+            "mean_predicted": 0.43430649974722624,
+            "observed": 0.3448275862068966,
+            "n": 29
+          },
+          {
+            "mean_predicted": 0.49650725754271696,
+            "observed": 0.64,
+            "n": 25
+          },
+          {
+            "mean_predicted": 0.5622165631588648,
+            "observed": 0.75,
+            "n": 20
+          },
+          {
+            "mean_predicted": 0.636651102562836,
+            "observed": 0.6875,
+            "n": 16
+          },
+          {
+            "mean_predicted": 0.6929212672212289,
+            "observed": 0.6666666666666666,
+            "n": 9
+          },
+          {
+            "mean_predicted": 0.7668808096786395,
+            "observed": 0.5,
+            "n": 10
+          },
+          {
+            "mean_predicted": 0.8227301061897526,
+            "observed": 1.0,
+            "n": 2
+          }
+        ]
+      },
+      "decisions": {
+        "shipped": 0.574025974025974,
+        "always low risk": 1.6883116883116882,
+        "always caution": 0.6623376623376623,
+        "always can't judge": 1.0064935064935066,
+        "best_constant": "always caution",
+        "cost_reduction_vs_best_constant": 0.13333333333333341,
+        "shares": {
+          "low risk": 0.18961038961038962,
+          "caution": 0.6545454545454545,
+          "can't judge": 0.15584415584415584
+        }
+      }
+    },
+    "locked": {
+      "risk_raw": {
+        "n": 150,
+        "base_rate": 0.42,
+        "auroc": 0.6112023353402664,
+        "auprc": {
+          "point": 0.5309175712972759,
+          "ci95": [
+            0.40918120369406125,
+            0.6593927296234802
+          ]
+        },
+        "brier": {
+          "point": 0.2514802266834498,
+          "ci95": [
+            0.20149667016828454,
+            0.3019948742026895
+          ]
+        },
+        "brier_constant_base_rate": 0.24360000000000004,
+        "log_loss": 0.707200723712447,
+        "ece_equal_mass_15": 0.1431663958405674,
+        "ece_equal_mass_10": 0.13105526517449712,
+        "ece_equal_width_15": 0.14985188780341802,
+        "bins_equal_mass_15": [
+          {
+            "n": 10,
+            "mean_predicted": 0.06593973573698789,
+            "observed": 0.2
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.1054785766540863,
+            "observed": 0.2
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.14512738107651296,
+            "observed": 0.3
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.18448958276791455,
+            "observed": 0.4
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.22125469422104888,
+            "observed": 0.6
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.2457204541586282,
+            "observed": 0.3
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.2710720591987481,
+            "observed": 0.3
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.3179790878719719,
+            "observed": 0.4
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.35001477495055827,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.38507739981784994,
+            "observed": 0.6
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.45645432747969766,
+            "observed": 0.3
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.5183303475036725,
+            "observed": 0.6
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.5513523033672788,
+            "observed": 0.6
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.5934935646022923,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.7593844428517789,
+            "observed": 0.5
+          }
+        ],
+        "bins_equal_width_15": [
+          {
+            "mean_predicted": 0.05091247937907389,
+            "observed": 0.0,
+            "n": 3
+          },
+          {
+            "mean_predicted": 0.09572816182753585,
+            "observed": 0.2631578947368421,
+            "n": 19
+          },
+          {
+            "mean_predicted": 0.16245513113851132,
+            "observed": 0.26666666666666666,
+            "n": 15
+          },
+          {
+            "mean_predicted": 0.2347994031103476,
+            "observed": 0.4642857142857143,
+            "n": 28
+          },
+          {
+            "mean_predicted": 0.30145240569379517,
+            "observed": 0.23076923076923078,
+            "n": 13
+          },
+          {
+            "mean_predicted": 0.36265928942143044,
+            "observed": 0.5714285714285714,
+            "n": 21
+          },
+          {
+            "mean_predicted": 0.42419840102243767,
+            "observed": 0.6,
+            "n": 5
+          },
+          {
+            "mean_predicted": 0.5053290417885351,
+            "observed": 0.5,
+            "n": 18
+          },
+          {
+            "mean_predicted": 0.5700046442790649,
+            "observed": 0.6,
+            "n": 15
+          },
+          {
+            "mean_predicted": 0.6111164512278356,
+            "observed": 0.0,
+            "n": 3
+          },
+          {
+            "mean_predicted": 0.6978506469698065,
+            "observed": 0.0,
+            "n": 2
+          },
+          {
+            "mean_predicted": 0.7747678918222719,
+            "observed": 0.625,
+            "n": 8
+          }
+        ]
+      },
+      "risk": {
+        "n": 150,
+        "base_rate": 0.42,
+        "auroc": 0.644590403211093,
+        "auprc": {
+          "point": 0.5472537117989813,
+          "ci95": [
+            0.4086740976603852,
+            0.6582193996573006
+          ]
+        },
+        "brier": {
+          "point": 0.23021175871194552,
+          "ci95": [
+            0.198552225794545,
+            0.2566000499225678
+          ]
+        },
+        "brier_constant_base_rate": 0.24360000000000004,
+        "log_loss": 0.6498506249306079,
+        "ece_equal_mass_15": 0.09766957337151291,
+        "ece_equal_mass_10": 0.06717801002127115,
+        "ece_equal_width_15": 0.06101402021750801,
+        "bins_equal_mass_15": [
+          {
+            "n": 10,
+            "mean_predicted": 0.10709072674201318,
+            "observed": 0.2
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.18528702823751292,
+            "observed": 0.0
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.2354991048949703,
+            "observed": 0.4
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.27315296330921335,
+            "observed": 0.3
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.30749439775502996,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.3388908327930696,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.3666591375574874,
+            "observed": 0.4
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.39876553757403965,
+            "observed": 0.3
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.44235997532506577,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.48052890961611194,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.5179174339794096,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.5510386486309496,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.5913877131627828,
+            "observed": 0.5
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.6415798839238749,
+            "observed": 0.7
+          },
+          {
+            "n": 10,
+            "mean_predicted": 0.7139031709048356,
+            "observed": 0.5
+          }
+        ],
+        "bins_equal_width_15": [
+          {
+            "mean_predicted": 0.05125641369000591,
+            "observed": 0.0,
+            "n": 1
+          },
+          {
+            "mean_predicted": 0.10312170826889552,
+            "observed": 0.14285714285714285,
+            "n": 7
+          },
+          {
+            "mean_predicted": 0.16794951161519803,
+            "observed": 0.1111111111111111,
+            "n": 9
+          },
+          {
+            "mean_predicted": 0.23376799678170104,
+            "observed": 0.26666666666666666,
+            "n": 15
+          },
+          {
+            "mean_predicted": 0.2977250624664919,
+            "observed": 0.45,
+            "n": 20
+          },
+          {
+            "mean_predicted": 0.364096426552222,
+            "observed": 0.4166666666666667,
+            "n": 24
+          },
+          {
+            "mean_predicted": 0.4356030556575702,
+            "observed": 0.4,
+            "n": 15
+          },
+          {
+            "mean_predicted": 0.5024187418478638,
+            "observed": 0.5,
+            "n": 20
+          },
+          {
+            "mean_predicted": 0.5674998472300781,
+            "observed": 0.5625,
+            "n": 16
+          },
+          {
+            "mean_predicted": 0.6302543249385303,
+            "observed": 0.5833333333333334,
+            "n": 12
+          },
+          {
+            "mean_predicted": 0.7045556693353703,
+            "observed": 0.5,
+            "n": 10
+          },
+          {
+            "mean_predicted": 0.7605384095277812,
+            "observed": 1.0,
+            "n": 1
+          }
+        ]
+      },
+      "decisions": {
+        "shipped": 0.6078431372549019,
+        "always low risk": 2.1241830065359477,
+        "always caution": 0.5751633986928104,
+        "always can't judge": 1.1372549019607843,
+        "best_constant": "always caution",
+        "cost_reduction_vs_best_constant": -0.05681818181818188,
+        "shares": {
+          "low risk": 0.06535947712418301,
+          "caution": 0.9084967320261438,
+          "can't judge": 0.026143790849673203
+        }
+      }
+    }
+  },
+  "ece_target": {
+    "registered": "ECE <= 0.05, equal-width (protocol), 15 bins (config)",
+    "dev_equal_width": 0.05209542261502841,
+    "dev_equal_mass": 0.04904761090603793,
+    "locked_equal_width": 0.06101402021750801,
+    "locked_equal_mass": 0.09766957337151291
+  },
+  "locked_reconciliation": {
+    "meals": 153,
+    "with_risk": 150,
+    "cant_judge": 4,
+    "cant_judge_with_risk": 1,
+    "cant_judge_reasons": {
+      "no meal photo was taken": 2,
+      "the photo looks unlike the meal photos the model learned from": 1,
+      "the risk (15.8%) is borderline, between 15% and 16%": 1
+    }
+  },
+  "baselines": {
+    "all_481": {
+      "prevalence": {
+        "auroc": 0.402555159305561,
+        "brier": 0.23112847812606985,
+        "auprc": 0.28493053974729066
+      },
+      "profile_lr": {
+        "auroc": 0.6720617627464044,
+        "brier": 0.20376158611515197,
+        "auprc": 0.4874766703258221
+      },
+      "trend_lr": {
+        "auroc": 0.6863855468903084,
+        "brier": 0.19938664604173165,
+        "auprc": 0.5472267629701146
+      },
+      "trend_gbm": {
+        "auroc": 0.6892169925931733,
+        "brier": 0.20422992918448127,
+        "auprc": 0.5313317477898852
+      },
+      "sensor_cnn_3seed_mean": {
+        "auroc": 0.6885409726848766,
+        "brier": 0.20061316495682602,
+        "auprc": 0.5512635133744257
+      }
+    },
+    "answered_460": {
+      "prevalence": {
+        "auroc": 0.41372511198268286,
+        "brier": 0.2308320780746086,
+        "auprc": 0.289498571315007
+      },
+      "profile_lr": {
+        "auroc": 0.6756359973424206,
+        "brier": 0.20329168321816546,
+        "auprc": 0.4902045760154028
+      },
+      "trend_lr": {
+        "auroc": 0.6953213742257656,
+        "brier": 0.19760339106941371,
+        "auprc": 0.5548108112355503
+      },
+      "trend_gbm": {
+        "auroc": 0.6998113975867464,
+        "brier": 0.20097932300608004,
+        "auprc": 0.5382578432745772
+      },
+      "sensor_cnn_3seed_mean": {
+        "auroc": 0.6955142630575023,
+        "brier": 0.19921864081078758,
+        "auprc": 0.5583704910869611
+      }
+    },
+    "rq2_partition_v2": {
+      "sensor_cnn_minus_trend_lr": 0.0021554257945681776,
+      "bootstrap_mean": 0.0020308359228101854,
+      "ci95": [
+        -0.016326062339829618,
+        0.02214770261704502
+      ],
+      "bar": "CNN beats the hand-made trends only if the lower bound > 0",
+      "verdict": "tie or loss"
+    }
+  },
+  "photo_recipe": {
+    "folds": [
+      {
+        "fold": 1,
+        "heads_epochs": 16,
+        "inner_mae_heads_only_g": 28.41047477722168,
+        "inner_mae_with_last_stage_g": 25.62865447998047,
+        "last_stage_epochs": 3,
+        "last_stage_kept": true,
+        "ridge_alpha": 1000.0
+      },
+      {
+        "fold": 2,
+        "heads_epochs": 12,
+        "inner_mae_heads_only_g": 29.80360460281372,
+        "inner_mae_with_last_stage_g": 26.087154865264893,
+        "last_stage_epochs": 3,
+        "last_stage_kept": true,
+        "ridge_alpha": 1000.0
+      },
+      {
+        "fold": 3,
+        "heads_epochs": 14,
+        "inner_mae_heads_only_g": 27.532670974731445,
+        "inner_mae_with_last_stage_g": 24.213492393493652,
+        "last_stage_epochs": 2,
+        "last_stage_kept": true,
+        "ridge_alpha": 1000.0
+      },
+      {
+        "fold": 4,
+        "heads_epochs": 12,
+        "inner_mae_heads_only_g": 28.113479137420654,
+        "inner_mae_with_last_stage_g": 24.70445728302002,
+        "last_stage_epochs": 2,
+        "last_stage_kept": true,
+        "ridge_alpha": 1000.0
+      },
+      {
+        "fold": 5,
+        "heads_epochs": 12,
+        "inner_mae_heads_only_g": 28.96981716156006,
+        "inner_mae_with_last_stage_g": 25.26779842376709,
+        "last_stage_epochs": 2,
+        "last_stage_kept": true,
+        "ridge_alpha": 1000.0
+      }
+    ],
+    "held_out": {
+      "photo model (fine-tuned)": {
+        "mae_g": 22.598190500801618,
+        "spearman": 0.5301401799227843,
+        "bin_f1": 0.6060035300212092
+      },
+      "frozen ConvNeXt + ridge": {
+        "mae_g": 20.407727266233493,
+        "spearman": 0.5607915856341867,
+        "bin_f1": 0.3796317122186903
+      },
+      "training median": {
+        "mae_g": 27.693478285882303,
+        "spearman": -0.07766160808501799,
+        "bin_f1": 0.08181818181818182
+      }
+    }
+  },
+  "false_clears_exploratory": {
+    "note": "Exploratory, chosen after the outcome: where the dev missed-among-cleared meals sit among all cleared",
+    "meals": [
+      {
+        "row": 699,
+        "person_id": 19,
+        "fold": 1,
+        "risk": 0.07192967164409418,
+        "below_cut_by": 0.13807032835590582,
+        "n_history": 10,
+        "class": "T5 confident",
+        "percentile_among_cleared": {
+          "prior spike rate": 0.7155963302752294,
+          "prior rise": 0.6972477064220184,
+          "log photo grams": 0.05504587155963303,
+          "window rise": 0.5779816513761468,
+          "last glucose": 0.6972477064220184
+        }
+      },
+      {
+        "row": 705,
+        "person_id": 19,
+        "fold": 1,
+        "risk": 0.2046872112357624,
+        "below_cut_by": 0.005312788764237603,
+        "n_history": 15,
+        "class": "T4 near-cut",
+        "percentile_among_cleared": {
+          "prior spike rate": 0.7155963302752294,
+          "prior rise": 0.6972477064220184,
+          "log photo grams": 0.8256880733944955,
+          "window rise": 0.7522935779816514,
+          "last glucose": 0.6513761467889908
+        }
+      },
+      {
+        "row": 988,
+        "person_id": 31,
+        "fold": 1,
+        "risk": 0.1909990311686652,
+        "below_cut_by": 0.019000968831334786,
+        "n_history": 14,
+        "class": "T4 near-cut",
+        "percentile_among_cleared": {
+          "prior spike rate": 0.44954128440366975,
+          "prior rise": 0.5412844036697247,
+          "log photo grams": 0.908256880733945,
+          "window rise": 0.5963302752293578,
+          "last glucose": 0.30275229357798167
+        }
+      },
+      {
+        "row": 1024,
+        "person_id": 33,
+        "fold": 1,
+        "risk": 0.16326291544733362,
+        "below_cut_by": 0.04673708455266637,
+        "n_history": 1,
+        "class": "T5 confident",
+        "percentile_among_cleared": {
+          "prior spike rate": 0.926605504587156,
+          "prior rise": 0.9908256880733946,
+          "log photo grams": 0.6422018348623854,
+          "window rise": 0.01834862385321101,
+          "last glucose": 0.926605504587156
+        }
+      },
+      {
+        "row": 335,
+        "person_id": 9,
+        "fold": 2,
+        "risk": 0.03370548006547933,
+        "below_cut_by": 0.09629451993452068,
+        "n_history": 20,
+        "class": "T5 confident",
+        "percentile_among_cleared": {
+          "prior spike rate": 0.5321100917431193,
+          "prior rise": 0.13761467889908258,
+          "log photo grams": 0.3944954128440367,
+          "window rise": 0.8532110091743119,
+          "last glucose": 0.8348623853211009
+        }
+      },
+      {
+        "row": 1010,
+        "person_id": 32,
+        "fold": 4,
+        "risk": 0.13058274434305123,
+        "below_cut_by": 0.019417255656948768,
+        "n_history": 10,
+        "class": "T4 near-cut",
+        "percentile_among_cleared": {
+          "prior spike rate": 0.42201834862385323,
+          "prior rise": 0.6238532110091743,
+          "log photo grams": 0.8715596330275229,
+          "window rise": 0.05504587155963303,
+          "last glucose": 0.01834862385321101
+        }
+      },
+      {
+        "row": 847,
+        "person_id": 27,
+        "fold": 5,
+        "risk": 0.06150377270793797,
+        "below_cut_by": 0.07849622729206204,
+        "n_history": 1,
+        "class": "T5 confident",
+        "percentile_among_cleared": {
+          "prior spike rate": 0.6513761467889908,
+          "prior rise": 0.6513761467889908,
+          "log photo grams": 0.48623853211009177,
+          "window rise": 0.009174311926605505,
+          "last glucose": 0.5504587155963303
+        }
+      },
+      {
+        "row": 864,
+        "person_id": 27,
+        "fold": 5,
+        "risk": 0.10986628648616735,
+        "below_cut_by": 0.030133713513832663,
+        "n_history": 16,
+        "class": "T4 near-cut",
+        "percentile_among_cleared": {
+          "prior spike rate": 0.6513761467889908,
+          "prior rise": 0.6513761467889908,
+          "log photo grams": 0.1834862385321101,
+          "window rise": 0.3853211009174312,
+          "last glucose": 0.5229357798165137
+        }
+      }
+    ]
+  }
+}

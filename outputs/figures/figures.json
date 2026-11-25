@@ -2,10 +2,14 @@
   "what": "report figures rendered from committed evidence only (pre-commitment in docs/final_design.md); ECE = equal-mass, 15 bins, answered dev meals",
   "ece_raw": 0.05903813811230171,
   "ece_personal": 0.04904761090603793,
+  "ece_equal_width_15": {
+    "raw": 0.0602000619224841,
+    "personal": 0.05209542261502841
+  },
   "shap": {
     "base_logit": -0.7146975218368059,
-    "local_logit": 0.053870186543246656,
-    "sum_check_abs_err": 6.106226635438361e-16,
+    "local_logit": 0.05387018654324677,
+    "sum_check_abs_err": 1.6653345369377348e-16,
     "coefs": {
       "last glucose": -0.15253784412603505,
       "slope 30 min": 0.10229185813352688,
