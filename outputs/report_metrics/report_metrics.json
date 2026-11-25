@@ -1908,6 +1908,81 @@
     },
     "photo_block_mean_abs": 0.32870889376856394
   },
+  "t5_photo_and_heart_rate": {
+    "false_clears": {
+      "699": {
+        "class": "T5 confident",
+        "fold": 1,
+        "n_history": 10,
+        "photo_block": -0.40407520601717895,
+        "heart_rate": -0.1665286513888696
+      },
+      "705": {
+        "class": "T4 near-cut",
+        "fold": 1,
+        "n_history": 15,
+        "photo_block": 0.48124110725916597,
+        "heart_rate": -0.06783576661692524
+      },
+      "988": {
+        "class": "T4 near-cut",
+        "fold": 1,
+        "n_history": 14,
+        "photo_block": 0.5413149070160292,
+        "heart_rate": 0.028743431990216044
+      },
+      "1024": {
+        "class": "T5 confident",
+        "fold": 1,
+        "n_history": 1,
+        "photo_block": -0.3420895498029661,
+        "heart_rate": -0.3889534724234986
+      },
+      "335": {
+        "class": "T5 confident",
+        "fold": 2,
+        "n_history": 20,
+        "photo_block": -0.5135993176133963,
+        "heart_rate": -0.15433430813039212
+      },
+      "1010": {
+        "class": "T4 near-cut",
+        "fold": 4,
+        "n_history": 10,
+        "photo_block": 0.48096959729974836,
+        "heart_rate": -0.005888502863860062
+      },
+      "847": {
+        "class": "T5 confident",
+        "fold": 5,
+        "n_history": 1,
+        "photo_block": -0.2801698329344557,
+        "heart_rate": -0.008164780272109061
+      },
+      "864": {
+        "class": "T4 near-cut",
+        "fold": 5,
+        "n_history": 16,
+        "photo_block": -0.4349815709477702,
+        "heart_rate": -0.4453726338993877
+      }
+    },
+    "cleared_without_spike": {
+      "n": 101,
+      "share_photo_block_negative": 0.8217821782178217,
+      "median_photo_block": -0.3072399039269335,
+      "share_heart_rate_negative": 0.6633663366336634
+    }
+  },
+  "usefulness_excluding_fold_1": {
+    "meals": 385,
+    "cleared_share": 0.18961038961038962,
+    "cleared": 73,
+    "missed": 4,
+    "cant_judge_share": 0.15584415584415584,
+    "cost_reduction": 0.13333333333333341,
+    "false_clears_in_fold_1": 4
+  },
   "fine_tuned_parameters": {
     "backbone": 27820128,
     "last_stage": 15472128,

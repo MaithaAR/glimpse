@@ -147,3 +147,14 @@ the regeneration is two commands on the author's Mac, listed in the hand-off).
 
 The overnight registrations (replay 3, probe C, the 26 Nov what-ifs) were written by the assistant under the
 author's standing instruction, not approved one by one.
+
+## 26 Nov 2026, eighth pass (after strict grades 76.25, 76.5, 73.0 and a holistic grade of 81)
+
+| Change | Why | Evidence |
+|---|---|---|
+| T5: the photo block is negative on all four confident false clears but on 82% of clean clears too; 4 of 8 false clears are in fold 1; a fold-1-excluded usefulness row (19.0%, 4 of 73, 13.3%) | the photo's combined term and the contaminated fold were not followed into the errors (1-2 of 3) | report_metrics.json `t5_photo_and_heart_rate`, `usefulness_excluding_fold_1` |
+| Probe C's direction result called guaranteed by linearity, like probe A; decision changes reported as the finding | a tautology presented as a pass (3 of 3) | report §5 |
+| Harm paragraph corrected: 7 of 8 development false clears fell on healthy people | the paragraph named the wrong group (1 of 3) | report §7; `subgroups` |
+| Promised comparisons table (class weighting, label threshold, masked photo); served-decision CUSUM row; "trend + profile LR" naming; dev verdict "1 met, 3 on track"; T1 count 7 of 13; "evaluated system (with history)"; 150 scored locked meals; locked path "at the tag" | omissions and inconsistencies (1-3 of 3) | report §3-§6 |
+| Test: today's decision function reproduces every committed locked decision at the frozen cut-offs (nothing rescored) | the post-tag serving changes needed a check against the locked answers (1 of 3) | tests/test_report_numbers.py |
+| R7 mitigation sentence no longer cites the unwired confirm-carbs tier; abstention next step says "a new photo" | the escalation named a surface that does not exist (2 of 3) | report §1, §5 |

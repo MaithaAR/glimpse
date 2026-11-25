@@ -215,6 +215,24 @@ def shap_terms(rows: list[int]) -> dict:
             "photo_block_mean_abs": float(np.abs(centred[names[-4:]].sum(axis=1)).mean())}  # fmt: skip
 
 
+def t5_photo_and_heart_rate(dev: pd.DataFrame, fc: list[dict]) -> dict:
+    """The photo block (sum of the four photo terms) and the heart-rate term for every dev false clear, set
+    against all cleared meals (26 Nov, exploratory, in-sample frozen-fusion SHAP as in shap_terms)."""
+    fig = json.loads(Path("outputs/figures/figures.json").read_text())["shap"]
+    z = pd.read_csv("outputs/figures/shap_features_z.csv").set_index("row")
+    names = list(fig["coefs"])
+    centred = (z[names] - z[names].mean()) * np.array([fig["coefs"][n] for n in names])
+    photo, hr = centred[names[-4:]].sum(axis=1), centred["heart rate"]
+    cl = dev[(dev.decision == "low risk") & dev.row.isin(z.index)]
+    ok = cl[cl.spike == 0].row
+    return {"false_clears": {str(m["row"]): {"class": m["class"], "fold": m["fold"], "n_history": m["n_history"],
+                                             "photo_block": float(photo[m["row"]]), "heart_rate": float(hr[m["row"]])}
+                             for m in fc},
+            "cleared_without_spike": {"n": int(len(ok)), "share_photo_block_negative": float((photo[ok] < 0).mean()),
+                                      "median_photo_block": float(photo[ok].median()),
+                                      "share_heart_rate_negative": float((hr[ok] < 0).mean())}}  # fmt: skip
+
+
 def fine_tuned_parameters(cfg) -> dict:
     """Trainable parameters of the shipped photo model: the last ConvNeXt stage plus the two heads. The
     architecture is built without weights (no download); the head count is the budget file's photo total
@@ -513,6 +531,16 @@ def subgroups(dev: pd.DataFrame) -> dict:
     return out
 
 
+def usefulness_excluding_fold_1(dev: pd.DataFrame, costs: dict) -> dict:
+    """The decision outcomes without fold 1, the fold under selection pressure (26 Nov, descriptive)."""
+    d = dev[dev.fold != 1]
+    cl = d[d.decision == "low risk"]
+    return {"meals": int(len(d)), "cleared_share": float(len(cl) / len(d)), "cleared": int(len(cl)),
+            "missed": int(cl.spike.sum()), "cant_judge_share": float((d.decision == "can't judge").mean()),
+            "cost_reduction": _cost_reduction(d.decision, d.spike, costs),
+            "false_clears_in_fold_1": int(dev[(dev.fold == 1) & (dev.decision == "low risk")].spike.sum())}  # fmt: skip
+
+
 def share_cis(df: pd.DataFrame) -> dict:
     """Person-bootstrap intervals for the cleared and can't-judge shares (the protocol asks a 95% range for
     every usefulness criterion)."""
@@ -593,6 +621,8 @@ def run_report_metrics(cfg) -> dict:
     res["d8_paired"] = d8_paired()
     t5 = [m["row"] for m in res["false_clears_exploratory"]["meals"] if m["class"].startswith("T5")]
     res["shap_terms_t5"] = shap_terms(t5)
+    res["t5_photo_and_heart_rate"] = t5_photo_and_heart_rate(dev, res["false_clears_exploratory"]["meals"])
+    res["usefulness_excluding_fold_1"] = usefulness_excluding_fold_1(dev, costs)
     res["fine_tuned_parameters"] = fine_tuned_parameters(cfg)
     res["served_operating_point"] = served_operating_point(cfg, dev, locked, costs)
     res["ece_noise_floor"] = {}

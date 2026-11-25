@@ -251,7 +251,7 @@ def test_fair_baseline_and_band_cells(text, rm):
     def d(x):
         return f"{x:+.3f}".replace("-", "−")
 
-    for label, key in (("profile only", "profile_lr"), ("trend LR", "trend_lr"),
+    for label, key in (("profile only", "profile_lr"), ("trend + profile LR", "trend_lr"),
                        ("gradient boosting on trend + profile", "trend_gbm"),
                        ("SensorCNN, 3 seeds averaged", "sensor_cnn_3seed_mean")):  # fmt: skip
         r = fb[key]
@@ -333,3 +333,44 @@ def test_subgroup_table(text, rm):
             f"{r['cleared_share'] * 100:.1f}% ({r['cleared']}), {r['missed']}, "
             f"{r['people_with_a_clear']} of {r['people']}",
         ], g
+
+
+def test_round8_rows(text, rm):
+    t = _tables(text)
+    ex = rm["usefulness_excluding_fold_1"]
+    row = t[f"dev excluding fold 1 ({ex['meals']} meals): cleared, missed among them, cost saved"]
+    assert (
+        row[1] == f"{ex['cleared_share'] * 100:.1f}%, {ex['missed']} of {ex['cleared']}, {_pct(ex['cost_reduction'])}"
+    )
+    cu = _load("outputs/monitoring/replay.json")["cusum_served"]["caution_share_served"]
+    assert cu["alarms"] == []
+    assert t["the same on the served (no-history) decisions (added after that result)"][1] == (
+        f"no alarm; peak {max(cu['cusum']):.1f} of 4"
+    )
+    pr = _load("outputs/promised/promised.json")
+    r3 = pr["r3_label_sensitivity"]
+    want = " / ".join(f"{r3[k]['auroc_personal']:.3f} ({r3[k]['spike_rate'] * 100:.0f}%)"
+                      for k in ("spike_30", "spike_50", "spike_70"))  # fmt: skip
+    assert t["label threshold 30 / 50 / 70 mg/dL: AUROC (spike rate)"] == [want]
+    t5 = rm["t5_photo_and_heart_rate"]
+    pb = [v["photo_block"] for v in t5["false_clears"].values() if v["class"].startswith("T5")]
+    assert max(pb) < 0 and f"(−{-max(pb):.2f} to −{-min(pb):.2f}" in text
+    ok = t5["cleared_without_spike"]
+    assert f"equally on {ok['share_photo_block_negative']:.0%} of the cleared meals" in text
+    assert f"(median −{-ok['median_photo_block']:.2f})" in text
+
+
+def test_locked_decisions_follow_the_current_cut_off_rule():
+    """The committed locked answers (scored once, 25 Nov) re-decided by today's decision function at the frozen
+    cut-offs: identical, so the post-tag serving changes (R12, reason wording) did not alter any locked decision
+    rule. Nothing is rescored; no metric is recomputed."""
+    import pandas as pd
+
+    from glimpse.serve.rules import decision
+    from glimpse.training.final import load_thresholds
+
+    th = load_thresholds()["main"]
+    la = pd.read_csv("outputs/locked_eval/locked_answers.csv")
+    has = la.risk.notna()
+    redecided = [decision(float(r), th["low_risk_below"], th["caution_from"]) for r in la.risk[has]]
+    assert redecided == la.decision[has].tolist()
