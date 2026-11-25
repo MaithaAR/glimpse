@@ -1,0 +1,60 @@
+{
+  "what": "the 8 locked people, scored once against the frozen artifacts (S16); every number as measured, per the pre-registration",
+  "people": 8,
+  "meals": 153,
+  "answered": 150,
+  "spike_rate": 0.42483660130718953,
+  "risk_personal": {
+    "auroc": {
+      "point": 0.644590403211093,
+      "ci95": [
+        0.5399241682576845,
+        0.7355473555158033
+      ]
+    },
+    "log_loss": 0.6498506249306079,
+    "ece_equal_mass": {
+      "bins15": 0.09766957337151291,
+      "bins10": 0.06717801002127115
+    }
+  },
+  "risk_raw": {
+    "auroc": {
+      "point": 0.6112023353402664,
+      "ci95": [
+        0.5104699129492706,
+        0.7428721555590657
+      ]
+    },
+    "log_loss": 0.707200723712447,
+    "ece_equal_mass": {
+      "bins15": 0.1431663958405674,
+      "bins10": 0.13105526517449712
+    }
+  },
+  "decisions": {
+    "caution": 139,
+    "low risk": 10,
+    "can't judge": 4
+  },
+  "missed_among_cleared": {
+    "point": 0.2,
+    "ci95_person_bootstrap": [
+      0.0,
+      1.0
+    ],
+    "misses": 2,
+    "cleared": 10
+  },
+  "usefulness": {
+    "share_low_risk": 0.06535947712418301,
+    "share_caution": 0.9084967320261438,
+    "share_abstain": 0.026143790849673203,
+    "cost": 0.6078431372549019,
+    "best_trivial_cost": 0.5751633986928104,
+    "cost_reduction": -0.05681818181818188,
+    "missed_among_cleared": 0.2,
+    "n_cleared": 10,
+    "useful": false
+  }
+}

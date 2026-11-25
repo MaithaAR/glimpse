@@ -1,0 +1,154 @@
+row,person_id,spike,risk,risk_raw,n_history,decision,carb_source,reason
+54,2,0,0.22986061737263097,0.2589074491645413,0,caution,photo,risk 23% is at or above the caution cut-off 16%
+57,2,1,0.30566661343996904,0.39101961864338053,1,caution,photo,risk 31% is at or above the caution cut-off 16%
+58,2,1,0.4564189661164814,0.4296402811456314,2,caution,photo,risk 46% is at or above the caution cut-off 16%
+59,2,1,0.6561996408323387,0.5598804975413542,3,caution,photo,risk 66% is at or above the caution cut-off 16%
+61,2,1,0.5541081899464202,0.4040283456458883,4,caution,photo,risk 55% is at or above the caution cut-off 16%
+62,2,1,0.7322088876908707,0.5542536669563144,5,caution,photo,risk 73% is at or above the caution cut-off 16%
+63,2,1,0.5866352380703875,0.3582136859912621,6,caution,photo,risk 59% is at or above the caution cut-off 16%
+66,2,0,0.46836180676381123,0.22282831422583482,7,caution,photo,risk 47% is at or above the caution cut-off 16%
+67,2,0,0.6903467349302317,0.4729604554735965,8,caution,photo,risk 69% is at or above the caution cut-off 16%
+68,2,0,0.5102994612055146,0.3397702647199645,9,caution,photo,risk 51% is at or above the caution cut-off 16%
+69,2,0,0.6391120034199106,0.5111457420813078,10,caution,photo,risk 64% is at or above the caution cut-off 16%
+70,2,1,0.6074071672106883,0.5219223693754393,11,caution,photo,risk 61% is at or above the caution cut-off 16%
+71,2,1,0.5078657710028579,0.3919847030602777,12,caution,photo,risk 51% is at or above the caution cut-off 16%
+73,2,1,0.4785606914240144,0.33492200756255214,13,caution,photo,risk 48% is at or above the caution cut-off 16%
+74,2,1,0.707896235432072,0.54914975035327,14,caution,photo,risk 71% is at or above the caution cut-off 16%
+75,2,1,,,15,can't judge,none,no meal photo was taken
+77,2,0,0.5914253776080619,0.39974729897956096,15,caution,photo,risk 59% is at or above the caution cut-off 16%
+264,7,0,0.4210942443611769,0.4686232774784827,0,caution,photo,risk 42% is at or above the caution cut-off 16%
+265,7,1,0.3275189933590868,0.45306967384103874,1,caution,photo,risk 33% is at or above the caution cut-off 16%
+266,7,0,0.33248346115610683,0.3453256411659562,2,caution,photo,risk 33% is at or above the caution cut-off 16%
+267,7,0,0.4069349053792731,0.4741662024661436,3,caution,photo,risk 41% is at or above the caution cut-off 16%
+268,7,1,0.27522957252568697,0.3786042106666525,4,caution,photo,risk 28% is at or above the caution cut-off 16%
+269,7,0,0.44368970134505165,0.4804149237197604,5,caution,photo,risk 44% is at or above the caution cut-off 16%
+270,7,0,0.2540395875749019,0.31637914960387886,6,caution,photo,risk 25% is at or above the caution cut-off 16%
+614,17,0,0.3165752584149505,0.3555434803660022,0,caution,photo,risk 32% is at or above the caution cut-off 16%
+615,17,0,0.07271516824361737,0.10266029538694366,1,low risk,photo,risk 7% is below the low-risk cut-off 15%
+617,17,0,0.10116177773863617,0.1502970432265851,2,low risk,photo,risk 10% is below the low-risk cut-off 15%
+618,17,1,0.22437377928961658,0.3380008785770586,3,caution,photo,risk 22% is at or above the caution cut-off 16%
+619,17,0,0.11588067674164539,0.11859349421816676,4,low risk,photo,risk 12% is below the low-risk cut-off 15%
+622,17,0,,,5,can't judge,none,the photo looks unlike the meal photos the model learned from
+623,17,0,0.14788804352196466,0.16178833148384617,5,low risk,photo,risk 15% is below the low-risk cut-off 15%
+624,17,0,0.21811800889428778,0.2557642918435476,6,caution,photo,risk 22% is at or above the caution cut-off 16%
+625,17,1,0.2413573431887291,0.3066585221536876,7,caution,photo,risk 24% is at or above the caution cut-off 16%
+627,17,0,0.13187950486898822,0.12578764817036678,8,low risk,photo,risk 13% is below the low-risk cut-off 15%
+629,17,0,0.10103233222920077,0.1001457283524691,9,low risk,photo,risk 10% is below the low-risk cut-off 15%
+630,17,1,0.33523774384462135,0.35597622742796664,10,caution,photo,risk 34% is at or above the caution cut-off 16%
+631,17,0,0.2707932489837002,0.23901598596796414,11,caution,photo,risk 27% is at or above the caution cut-off 16%
+632,17,0,0.19019769846611081,0.1762239766821051,12,caution,photo,risk 19% is at or above the caution cut-off 16%
+633,17,1,0.362847653381301,0.36391900781055087,13,caution,photo,risk 36% is at or above the caution cut-off 16%
+634,17,0,0.16984295910253494,0.14000330739436048,14,caution,photo,risk 17% is at or above the caution cut-off 16%
+636,17,0,0.21406803153259837,0.18702594721504506,15,caution,photo,risk 21% is at or above the caution cut-off 16%
+637,17,0,0.3005151996312277,0.2816112535500429,16,caution,photo,risk 30% is at or above the caution cut-off 16%
+639,17,0,0.08129548371057697,0.07597865851783392,17,low risk,photo,risk 8% is below the low-risk cut-off 15%
+640,17,0,0.15770570050935925,0.15479939693681555,18,can't judge,photo,"the risk (15.8%) is borderline, between 15% and 16%"
+641,17,0,0.29519920530943466,0.30593298963760795,19,caution,photo,risk 30% is at or above the caution cut-off 16%
+642,17,0,0.2892201768567015,0.31558707930508884,20,caution,photo,risk 29% is at or above the caution cut-off 16%
+644,17,1,0.14991085232589285,0.172050454971142,21,low risk,photo,risk 15% is below the low-risk cut-off 15%
+646,17,0,0.1613367842168349,0.1569667499492028,22,caution,photo,risk 16% is at or above the caution cut-off 16%
+648,18,1,0.11788701434960364,0.1316017407792943,0,low risk,photo,risk 12% is below the low-risk cut-off 15%
+649,18,1,0.44443553736262204,0.30310875734842535,1,caution,photo,risk 44% is at or above the caution cut-off 16%
+650,18,0,0.3527572799762756,0.1635466863402346,2,caution,photo,risk 35% is at or above the caution cut-off 16%
+651,18,1,0.2841526584962625,0.14904586379024212,3,caution,photo,risk 28% is at or above the caution cut-off 16%
+652,18,1,0.484949857751622,0.2251609739137071,4,caution,photo,risk 48% is at or above the caution cut-off 16%
+653,18,1,0.5575107671252764,0.23569228783535126,5,caution,photo,risk 56% is at or above the caution cut-off 16%
+654,18,0,0.40718123492270514,0.11976065094421653,6,caution,photo,risk 41% is at or above the caution cut-off 16%
+656,18,1,0.3476019014106317,0.10897357110883989,7,caution,photo,risk 35% is at or above the caution cut-off 16%
+657,18,0,0.7192631487122529,0.33157656816969655,8,caution,photo,risk 72% is at or above the caution cut-off 16%
+658,18,0,0.5131136638009294,0.20008453813599425,9,caution,photo,risk 51% is at or above the caution cut-off 16%
+659,18,1,0.495783754124632,0.21417302493917975,10,caution,photo,risk 50% is at or above the caution cut-off 16%
+660,18,1,0.5833618214195876,0.2540677603949163,11,caution,photo,risk 58% is at or above the caution cut-off 16%
+661,18,0,0.6057367273895701,0.2511796171240642,12,caution,photo,risk 61% is at or above the caution cut-off 16%
+663,18,0,0.387870562186958,0.13469816462770154,13,caution,photo,risk 39% is at or above the caution cut-off 16%
+664,18,0,0.5144900903671195,0.22567746948153644,14,caution,photo,risk 51% is at or above the caution cut-off 16%
+665,18,0,0.6014587968512747,0.32111429414733883,15,caution,photo,risk 60% is at or above the caution cut-off 16%
+666,18,0,0.46860207737899684,0.23569770582238822,16,caution,photo,risk 47% is at or above the caution cut-off 16%
+667,18,0,0.25783575454868485,0.11438021378588985,17,caution,photo,risk 26% is at or above the caution cut-off 16%
+669,18,0,0.47840869056647056,0.2718583453780177,18,caution,photo,risk 48% is at or above the caution cut-off 16%
+670,18,0,0.3852206000500011,0.21627521256878338,19,caution,photo,risk 39% is at or above the caution cut-off 16%
+671,18,0,0.22124318717611927,0.11543974630344388,20,caution,photo,risk 22% is at or above the caution cut-off 16%
+672,18,0,0.41964811788500006,0.26426801079879764,21,caution,photo,risk 42% is at or above the caution cut-off 16%
+673,18,0,0.561114040200352,0.4120849152524628,22,caution,photo,risk 56% is at or above the caution cut-off 16%
+674,18,1,0.34006079214579893,0.231435563659977,23,caution,photo,risk 34% is at or above the caution cut-off 16%
+771,22,1,0.4540175206988947,0.5033607729711386,0,caution,photo,risk 45% is at or above the caution cut-off 16%
+772,22,0,0.5748273429399855,0.5160546039510729,1,caution,photo,risk 57% is at or above the caution cut-off 16%
+773,22,0,0.34026477799937477,0.3685409144404605,2,caution,photo,risk 34% is at or above the caution cut-off 16%
+774,22,0,0.483359985991644,0.5713255575342682,3,caution,photo,risk 48% is at or above the caution cut-off 16%
+775,22,0,0.4547711559013746,0.6057125075351197,4,caution,photo,risk 45% is at or above the caution cut-off 16%
+776,22,1,0.3278077060219511,0.5239145430338842,5,caution,photo,risk 33% is at or above the caution cut-off 16%
+777,22,0,0.28245811259048115,0.395449986501792,6,caution,photo,risk 28% is at or above the caution cut-off 16%
+778,22,1,0.43833135704957404,0.5988759830120597,7,caution,photo,risk 44% is at or above the caution cut-off 16%
+779,22,0,0.2545695745409231,0.33993954507075885,8,caution,photo,risk 25% is at or above the caution cut-off 16%
+780,22,0,0.3845131266814091,0.5127208172533434,9,caution,photo,risk 38% is at or above the caution cut-off 16%
+781,22,0,0.17988791129728032,0.2862704849898196,10,caution,photo,risk 18% is at or above the caution cut-off 16%
+782,22,0,0.3752254504101468,0.547272934510204,11,caution,photo,risk 38% is at or above the caution cut-off 16%
+783,22,0,0.34990626252056173,0.5467112612761206,12,caution,photo,risk 35% is at or above the caution cut-off 16%
+912,29,1,0.5334431633229078,0.5852681011734554,0,caution,photo,risk 53% is at or above the caution cut-off 16%
+913,29,1,0.7605384095277812,0.734243775548902,1,caution,photo,risk 76% is at or above the caution cut-off 16%
+914,29,0,0.5672435515498827,0.4797326947932079,2,caution,photo,risk 57% is at or above the caution cut-off 16%
+915,29,0,0.5299496083993307,0.5290801838981403,3,caution,photo,risk 53% is at or above the caution cut-off 16%
+916,29,0,0.7159553785772333,0.7746544115263411,4,caution,photo,risk 72% is at or above the caution cut-off 16%
+917,29,1,0.6670633938331286,0.792219332961201,5,caution,photo,risk 67% is at or above the caution cut-off 16%
+918,29,0,0.46603820739726876,0.5817630732505437,6,caution,photo,risk 47% is at or above the caution cut-off 16%
+919,29,0,0.5485811740892363,0.702127334557079,7,caution,photo,risk 55% is at or above the caution cut-off 16%
+920,29,1,0.6071209296158999,0.7866595909518783,8,caution,photo,risk 61% is at or above the caution cut-off 16%
+921,29,1,0.3621821479517632,0.5332610075043415,9,caution,photo,risk 36% is at or above the caution cut-off 16%
+922,29,0,0.6335267754738328,0.748864971471368,10,caution,photo,risk 63% is at or above the caution cut-off 16%
+923,29,0,0.2724432541555188,0.4221687892271671,11,caution,photo,risk 27% is at or above the caution cut-off 16%
+924,29,0,0.42826625214317826,0.6181300629174695,12,caution,photo,risk 43% is at or above the caution cut-off 16%
+925,29,0,0.592486290450251,0.7827762981436261,13,caution,photo,risk 59% is at or above the caution cut-off 16%
+926,29,0,0.3276954715874518,0.5724966566403208,14,caution,photo,risk 33% is at or above the caution cut-off 16%
+927,29,0,0.42837871974757086,0.693573959382534,15,caution,photo,risk 43% is at or above the caution cut-off 16%
+928,29,1,0.5262044836122707,0.7897085866501651,16,caution,photo,risk 53% is at or above the caution cut-off 16%
+929,29,1,0.5496221189212074,0.7890161673246936,17,caution,photo,risk 55% is at or above the caution cut-off 16%
+930,29,1,0.29107173283005044,0.5238323459767457,18,caution,photo,risk 29% is at or above the caution cut-off 16%
+1345,44,1,0.3357952595421534,0.37663866033045934,0,caution,photo,risk 34% is at or above the caution cut-off 16%
+1347,44,0,0.3756140442974795,0.29304637359123104,1,caution,photo,risk 38% is at or above the caution cut-off 16%
+1348,44,0,0.335392318701081,0.3104818425421496,2,caution,photo,risk 34% is at or above the caution cut-off 16%
+1349,44,0,0.5768202217803072,0.6095067832309179,3,caution,photo,risk 58% is at or above the caution cut-off 16%
+1351,44,0,0.19270745456140942,0.2610740954668098,4,caution,photo,risk 19% is at or above the caution cut-off 16%
+1352,44,1,0.23239717257336245,0.3340296682492933,5,caution,photo,risk 23% is at or above the caution cut-off 16%
+1353,44,0,0.05125641369000591,0.05480714620847174,6,low risk,photo,risk 5% is below the low-risk cut-off 15%
+1354,44,1,0.5265956852031818,0.5792728548892041,7,caution,photo,risk 53% is at or above the caution cut-off 16%
+1355,44,1,0.5261355212712926,0.5317786543218888,8,caution,photo,risk 53% is at or above the caution cut-off 16%
+1356,44,1,,,9,can't judge,none,no meal photo was taken
+1357,44,1,0.41064361602864785,0.37112251178970335,9,caution,photo,risk 41% is at or above the caution cut-off 16%
+1358,44,1,0.6558929741075296,0.5807417961268342,10,caution,photo,risk 66% is at or above the caution cut-off 16%
+1359,44,1,0.5800880019443022,0.4716820613994847,11,caution,photo,risk 58% is at or above the caution cut-off 16%
+1360,44,1,0.3884080517607331,0.2610357287392532,12,caution,photo,risk 39% is at or above the caution cut-off 16%
+1361,44,0,0.3929296739674729,0.2341300849769235,13,caution,photo,risk 39% is at or above the caution cut-off 16%
+1362,44,1,0.6607674457409249,0.5149299955467339,14,caution,photo,risk 66% is at or above the caution cut-off 16%
+1363,44,0,0.3986759494734022,0.24193519089301121,15,caution,photo,risk 40% is at or above the caution cut-off 16%
+1365,44,0,0.35804639938643495,0.2260202917803368,16,caution,photo,risk 36% is at or above the caution cut-off 16%
+1366,44,0,0.6968453749665323,0.579005512607172,17,caution,photo,risk 70% is at or above the caution cut-off 16%
+1367,44,1,0.6196690621231586,0.5263421009489202,18,caution,photo,risk 62% is at or above the caution cut-off 16%
+1368,44,1,0.4541962985247335,0.33887170872787425,19,caution,photo,risk 45% is at or above the caution cut-off 16%
+1370,44,0,0.5154015975962001,0.37363774812032396,20,caution,photo,risk 52% is at or above the caution cut-off 16%
+1371,44,1,0.6574067045533302,0.5473930470347061,21,caution,photo,risk 66% is at or above the caution cut-off 16%
+1372,44,1,0.7115607464002328,0.5966589712801468,22,caution,photo,risk 71% is at or above the caution cut-off 16%
+1374,44,0,0.5096787342350112,0.36458730964818803,23,caution,photo,risk 51% is at or above the caution cut-off 16%
+1474,48,1,0.24439463357594865,0.2752556136023525,0,caution,photo,risk 24% is at or above the caution cut-off 16%
+1475,48,0,0.23301324645846083,0.1568963740381843,1,caution,photo,risk 23% is at or above the caution cut-off 16%
+1476,48,1,0.27209617690655913,0.2153500261774178,2,caution,photo,risk 27% is at or above the caution cut-off 16%
+1477,48,0,0.16206820053539514,0.08017100665957072,3,caution,photo,risk 16% is at or above the caution cut-off 16%
+1478,48,1,0.32794950662090544,0.2002342428771508,4,caution,photo,risk 33% is at or above the caution cut-off 16%
+1479,48,1,0.3901426640862027,0.19137879816913111,5,caution,photo,risk 39% is at or above the caution cut-off 16%
+1480,48,1,0.5077820696275973,0.22971062631753775,6,caution,photo,risk 51% is at or above the caution cut-off 16%
+1481,48,0,0.24840146956159878,0.07014081328869198,7,caution,photo,risk 25% is at or above the caution cut-off 16%
+1483,48,0,0.22591001217833465,0.0676368638808203,8,caution,photo,risk 23% is at or above the caution cut-off 16%
+1484,48,1,0.4734419551350615,0.20163450140379893,9,caution,photo,risk 47% is at or above the caution cut-off 16%
+1485,48,1,0.5887437264981853,0.2573932367066154,10,caution,photo,risk 59% is at or above the caution cut-off 16%
+1486,48,0,0.292202958944061,0.07780008848382207,11,caution,photo,risk 29% is at or above the caution cut-off 16%
+1487,48,1,0.5293893314997176,0.20591543914617816,12,caution,photo,risk 53% is at or above the caution cut-off 16%
+1488,48,0,0.20693753325931827,0.04784535911222693,13,caution,photo,risk 21% is at or above the caution cut-off 16%
+1489,48,1,0.35171760235063715,0.101717493384041,14,caution,photo,risk 35% is at or above the caution cut-off 16%
+1490,48,1,0.2906908380121168,0.06768968601864113,15,caution,photo,risk 29% is at or above the caution cut-off 16%
+1491,48,1,0.6802302782597857,0.25541153739602834,16,caution,photo,risk 68% is at or above the caution cut-off 16%
+1492,48,0,0.2727311034876151,0.05008493281652299,17,caution,photo,risk 27% is at or above the caution cut-off 16%
+1493,48,1,0.5339865298148969,0.15117752185237665,18,caution,photo,risk 53% is at or above the caution cut-off 16%
+1494,48,1,0.3608120148429626,0.07223212674534452,19,caution,photo,risk 36% is at or above the caution cut-off 16%
+1495,48,0,0.7241865145513625,0.2543100793320873,20,caution,photo,risk 72% is at or above the caution cut-off 16%
+1496,48,0,0.6187536719439053,0.1909283504006975,21,caution,photo,risk 62% is at or above the caution cut-off 16%
+1497,48,0,0.3442163039894611,0.07518168229750326,22,caution,photo,risk 34% is at or above the caution cut-off 16%
+1498,48,0,0.38287565629646453,0.09294356639728162,23,caution,photo,risk 38% is at or above the caution cut-off 16%
