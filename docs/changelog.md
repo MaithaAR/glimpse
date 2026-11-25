@@ -183,3 +183,6 @@ claims R13 changes no decision. Still open and needing the author's Mac (weights
 folder, stress and demo suites under the current code and commit them with a fresh-clone terminal log;
 int8 decision agreement; an image-level probe of the ConvNeXt; author sign-off on the overnight
 registrations and on R13.
+Added at the close: the within-person drop has a person-bootstrap interval, −0.078 (−0.110, −0.046), with
+19 of 22 people worse: the intercept is established to hurt the ranking of a person's own meals while it
+helps between people (report §3; report_metrics.json `within_person`).

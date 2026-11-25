@@ -389,7 +389,11 @@ def test_within_person_rows(text, rm):
     wp = rm["within_person"]
     mw = wp["mean_within_person_auroc"]
     key = f"mean within-person AUROC ({wp['people_with_both_outcomes']} people with both outcomes), raw → shipped"
-    assert t[key][0] == f"{mw['risk_raw']:.3f} → {mw['risk']:.3f}"
+    d = wp["shipped_minus_raw_within_person"]
+    assert t[key][0] == (
+        f"{mw['risk_raw']:.3f} → {mw['risk']:.3f}; −{-d['point']:.3f} (−{-d['ci95'][0]:.3f}, "
+        f"−{-d['ci95'][1]:.3f}), {d['people_worse']} of {wp['people_with_both_outcomes']} worse"
+    )
     assert f"AUROC falls from {mw['risk_raw']:.3f} to {mw['risk']:.3f}" in text
     h = wp["history_only_running_rate"]
     row = t["no model: each person's running spike rate, same gate, shrunk to the other folds' rate"]

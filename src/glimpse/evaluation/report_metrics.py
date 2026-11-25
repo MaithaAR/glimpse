@@ -437,8 +437,14 @@ def within_person(dev: pd.DataFrame) -> dict:
     r = pd.Series(rate).loc[a.row].to_numpy()
     y, sids, sh = a.spike.to_numpy().astype(int), a.person_id.to_numpy(), a.risk.to_numpy(float)
     pt, lo, hi = person_bootstrap_ci(sids, lambda i: float(roc_auc_score(y[i], sh[i]) - roc_auc_score(y[i], r[i])))
+    diffs = np.array(per["risk"]) - np.array(per["risk_raw"])
+    rng = np.random.default_rng(0)
+    boot = [float(rng.choice(diffs, len(diffs)).mean()) for _ in range(2000)]
     return {"people_with_both_outcomes": len(per["risk"]),
             "mean_within_person_auroc": {c: float(np.mean(v)) for c, v in per.items()},
+            "shipped_minus_raw_within_person": {"point": float(diffs.mean()),
+                                                "ci95": np.percentile(boot, [2.5, 97.5]).tolist(),
+                                                "people_worse": int((diffs < 0).sum())},
             "history_only_running_rate": {"auroc": float(roc_auc_score(y, r)), "shipped_minus_this": pt,
                                           "ci95": [lo, hi]}}  # fmt: skip
 

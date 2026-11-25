@@ -10,8 +10,7 @@ to 0.762) and log-loss falls, though the AUROC gain is not established and most 
 intercept's own. The photo failed its pre-registered gate and is not claimed as a risk signal, yet the
 frozen fusion still uses it (§2). On the 8 locked people, scored exactly once, AUROC is 0.645 and the
 usefulness targets are not met. Without history or onboarding priors, as in the samples, the system would
-clear 11% of development meals with 16% of those spiking, so rule R13 now withholds every such clear (§4).
-The numbers stand unadjusted.
+clear 11% of development meals with 16% of those spiking, so rule R13 now withholds every such clear (§4). Nothing was re-tuned.
 
 | Status at a glance | development (481 meals) | locked eight (153) | served, no history: dev / locked |
 |---|---|---|---|
@@ -170,7 +169,7 @@ Within every fold Platt AUROC equals raw; the pooled 0.714 mixes five fold maps.
 | log-loss | −0.030 (−0.060, −0.001) | −0.057 (−0.156, +0.009) |
 | Brier reliability (calibration part), raw → shipped | 0.006 → 0.004 | 0.037 → 0.007 |
 | Brier resolution (ranking part), raw → shipped | 0.035 → 0.043 | 0.029 → 0.021 |
-| mean within-person AUROC (22 people with both outcomes), raw → shipped | 0.680 → 0.602 | – |
+| mean within-person AUROC (22 people with both outcomes), raw → shipped | 0.680 → 0.602; −0.078 (−0.110, −0.046), 19 of 22 worse | – |
 
 *Paired person bootstrap, 2,000 draws; Brier parts over the 15 registered bins (Platt only, development: reliability 0.001, resolution 0.028). outputs/report_metrics/report_metrics.json.*
 
@@ -211,8 +210,8 @@ Within every fold Platt AUROC equals raw; the pooled 0.714 mixes five fold maps.
 
 The intercept's evidence is log-loss and every fold, not pooled AUROC, and most of the gain is its own:
 with the same intercept, the fused system's margin over gradient boosting is not established. It works
-between people, not within them: averaged per person, AUROC falls from 0.680 to 0.602 as the offset drifts
-with history. The gain is learning each person's base rate, which the system does 0.063 better than a
+between people, not within them: averaged per person, AUROC falls from 0.680 to 0.602 (19 of 22 people worse) as
+the offset drifts with history. The gain is learning each person's base rate, which the system does 0.063 better than a
 running spike rate alone. On
 development it trades calibration (Platt alone is better) for resolution; on the locked eight it repairs
 calibration, its offsets moving up toward the harder cohort, where the served Platt-only risk

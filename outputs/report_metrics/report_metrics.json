@@ -2347,6 +2347,14 @@
       "risk_platt": 0.679705870555413,
       "risk": 0.6016766715288836
     },
+    "shipped_minus_raw_within_person": {
+      "point": -0.0780291990265293,
+      "ci95": [
+        -0.10994399561614472,
+        -0.04558514988063043
+      ],
+      "people_worse": 19
+    },
     "history_only_running_rate": {
       "auroc": 0.698879101566686,
       "shipped_minus_this": 0.06346042564135534,
