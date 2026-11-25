@@ -146,3 +146,6 @@ that every reading is below 30. A zero or negative reading is a broken export, n
 reading at or below zero refuses first, with "a glucose reading is zero or negative; the export is broken".
 The decision (can't judge) is unchanged; only the advice changes. The committed stress run keeps the old text.
 Same day, wording only: an incomplete-window refusal now names only the criteria that failed.
+
+Provenance note (26 Nov): commit hashes cited above for R1-R7 (4c72a62, 5e01186, 71abb13) predate the 2 Nov squash
+and do not resolve in this repository; the dated ledger text is the record for those rules.

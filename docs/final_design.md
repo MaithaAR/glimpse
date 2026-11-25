@@ -376,6 +376,8 @@ and corrected documents. No artifact, threshold or locked number changed in it.
 | `just probe` -> outputs/probe/ | `just probes` -> outputs/probes/ |
 | `just failures` -> outputs/failures/taxonomy.csv | taxonomy table in the report §5, counts from the committed answer and suite files |
 | docs/user_test.md | not built: no user test ran; the dietitian consultation did not complete (report §4) |
+| `just recalibrate`, `checkpoints/thresholds_v2.json` | superseded by `just finalize` and `checkpoints/thresholds.json` (recipe removed 26 Nov) |
+| `experiments/`, `outputs/evaluation/results.md` | intermediate-stage locations; the final evaluation is outputs/evaluation_v2/ and outputs/report_metrics/ |
 
 **Two departures this design did not record (26 Nov, found by the third grading round).**
 (1) D7 says the primary endpoint, the photo arm's AUROC gain over profile + trend, is reported on the locked

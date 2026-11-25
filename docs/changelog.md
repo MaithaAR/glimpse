@@ -106,3 +106,17 @@ Still declined, with reasons unchanged: a history or carbs input for the folder 
 folder, stress and demo runs under the 26 Nov reason wording, an occlusion probe, an int8 or no-photo latency
 study, real photos in the five stress cases (all need the weights or dataset, which this machine did not have;
 the regeneration is two commands on the author's Mac, listed in the hand-off).
+
+## 26 Nov 2026, fifth pass (after strict grades 84.25, 80.0, 84.0 and a holistic instructor grade of 85.5)
+
+| Change | Why | Evidence |
+|---|---|---|
+| Opening rewritten as a short bottom line plus a status table (development, locked, served) | readability; the opening was hard to read (holistic grade) | report top |
+| Optional `history.csv` per meal folder feeds the personal intercept through the evaluation's two-hour gate; without it the call is unchanged; tested with a recording stub | the main contribution was unreachable from the grader's entry point (3 of 3) | src/glimpse/serve/folder.py, io.py; tests/test_folder_history.py |
+| Stage timing on a 2-CPU cloud machine: the backbone is 80% of the photo path; the no-photo path takes 0.35 ms; int8 timed as cost only | no real quality-vs-cost study (3 of 3) | `just stage-timing` -> outputs/efficiency/stage_timing.json |
+| Replay 3 registered, then run: CUSUM on the served risk's calibration does not fire; on the caution share it fires once, in the 7th locked week, with no dev false alarm | no rule caught the real cohort shift (3 of 3) | outputs/monitoring/replay.json `cusum_served` |
+| Exploratory "falling now" what-if: 10 of 109 clears flip, 3 of 8 misses avoided, 7 clean clears lost | taxonomy actions had no before/after (3 of 3) | report_metrics.json `falling_now_what_if` |
+| T5 prose corrected per meal (row 1024's priors pushed risk up); R6/R7 described as preventive and limitation; heart rate's two numbers reconciled; exact binomial interval for 2 of 10; the verdict cell says the intervals cross the targets; shares sum to 100 | contradictions and overstatements (2-3 of 3) | report §2, §4, §5 |
+| Fine-tuned count includes the final norm trained with the last stage (15,475,973) | off by 1,536 (1 of 3) | report_metrics.json |
+| Stale code comments fixed (app disclaimer 37 adults, Pipeline.answer, tier-2 docstring, heads comment, section references); Dockerfile copies samples/; figures log prints the registered ECE; Figure 3 hollow markers for bins under 5 meals | front-door accuracy (2 of 3) | src/, Dockerfile, outputs/figures/ |
+| Model card R11 dates and ECE floor row; README history.csv, skip note and squash note; rule ledger provenance note; design-doc map of leftover planned names; outputs/evaluation/ labelled as intermediate | stale or dangling references (2 of 3) | docs/, README.md, outputs/evaluation/README.md |

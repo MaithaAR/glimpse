@@ -30,7 +30,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 ## Quick start (macOS or Linux; needs [uv](https://docs.astral.sh/uv/) and [just](https://just.systems/), no pip)
 ```bash
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
-just check       # ruff + 163 tests (16 need the dataset)
+just check       # ruff + the test suite (some tests skip until the dataset and weights are downloaded)
 just demo        # worked cases (in-sample for the frozen model), two can't-judge cases, response time -> outputs/demo/
 just evaluate    # dev evaluation, then every report table and figure  -> outputs/evaluation_v2/, report_metrics/, figures/
 just report-numbers   # the same tables and figures from committed outputs only (no data, no weights, ~1 min)
@@ -65,10 +65,11 @@ instructor folder → stress → demo; about 3 h). It never reruns `just finaliz
 regenerated once under a pre-registered procedure) or `just evaluate-locked` (the locked eight, scored once).
 
 **What the grader's folder command does and does not do.** `just predict-folder` answers each meal folder on
-its own, at the population calibration: the personal intercept needs a person's earlier labelled meals, which
-the evaluation replays in deployment order and a deployed app would collect from the CGM; the folder format has
-no history field yet, and a profile.json without `prior_spike_rate` / `prior_rise` gets the training medians
-(0.455, 48 mg/dL). That served point fails two usefulness targets on development (report §4).
+its own, at the population calibration, unless the folder holds an optional `history.csv` (the person's earlier
+answers: `meal_time,fusion_logit,spiked`; see samples/README.md), which feeds the personal intercept through the
+evaluation's two-hour gate. None of the samples carries one. A profile.json without `prior_spike_rate` /
+`prior_rise` gets training medians from all 37 non-locked people, type 2 diabetes included (0.455, 48 mg/dL).
+That no-history served point fails two usefulness targets on development (report §4).
 
 ## Results (AUROC, 95% ranges clustered by person)
 The locked test is the primary, clean measurement (scored once); the development estimate carries disclosed
@@ -147,7 +148,9 @@ version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 
 `tests/test_report_numbers.py` checks the report's headline numbers against these files on every commit.
 
-Proposal-era pilot analyses (`pilot/`, `scripts/`, `results/`) were removed from the tree and live at the git tag
+History note: the repository's first commit (68b7f4e, 2 Nov) is a squash of the earlier history and carries a
+misleading title; dated design documents record what came before. Proposal-era pilot analyses (`pilot/`,
+`scripts/`, `results/`) were removed from the tree and live at the git tag
 `proposal-era` (on the author's machine; pushed with the submission tags); copies sit in the course proposal folder.
 
 ## Data and licence
