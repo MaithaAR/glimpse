@@ -32,6 +32,10 @@ jobs:
         run: uv run glimpse prepare
       - name: Same person split as the committed one
         run: git diff --exit-code splits/dev_splits.json
+      - name: Same partition v2 (the split every final number uses) as the committed one
+        run: |
+          uv run glimpse splits-v2
+          git diff --exit-code splits/dev_splits_v2.json
       - name: Train the from-scratch SensorCNN
         run: uv run glimpse train --model scratch
   container:

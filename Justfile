@@ -123,6 +123,31 @@ evaluate:
     uv run glimpse evaluate
     just report-numbers
 
+# every compute study behind the report in dependency order, ~3 h (not `finalize` or `evaluate-locked`)
+reproduce-all:
+    just prepare
+    just splits-v2
+    just params
+    just cv
+    just carbs-check
+    just photo-cv
+    just fusion
+    just ablate
+    just promised
+    just robustness
+    just robustness-levels
+    just timing
+    just probes
+    just ood
+    just monitoring
+    just efficiency
+    just photo-seeds
+    just evaluate
+    just selftest
+    just predict-folder samples/instructor outputs/folder_run
+    just stress
+    just demo
+
 # re-derive every report table and figure from committed outputs (no dataset or weights needed, ~1 min)
 report-numbers:
     uv run glimpse report-metrics
@@ -191,7 +216,8 @@ app:
 
 # remove generated files (keeps downloaded data, the locked environment, checkpoints and committed results)
 clean:
-    rm -rf logs .pytest_cache .ruff_cache outputs/feedback outputs/demo/examples outputs/demo/test_meals.csv outputs/demo/blank_photo.jpg
+    rm -rf logs .pytest_cache .ruff_cache outputs/feedback
+    git checkout -- outputs/demo  # the demo's committed example files are evidence: restore them, never delete them
     find . -name "__pycache__" -type d -prune -exec rm -rf {} +
 
 wordcount:
