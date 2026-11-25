@@ -39,7 +39,7 @@ def f1_system(plt) -> None:
     box(0.0, 3.0, 1.9, 0.9, "meal photo")
     box(0.0, 1.7, 1.9, 0.9, "CGM + heart rate\n(2 h before)")
     box(0.0, 0.4, 1.9, 0.9, "profile\n(4 fields, 8 inputs)")
-    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R11")
+    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12")
     box(4.9, 3.0, 2.5, 0.9, "ConvNeXt-Tiny, last stage\ntuned; grams + bin heads")
     box(4.9, 1.7, 2.5, 0.9, "trend features\n+ profile inputs")
     box(7.9, 3.2, 2.4, 0.9, "kNN unfamiliar-photo\ncheck (cut 0.614)")
@@ -47,9 +47,9 @@ def f1_system(plt) -> None:
     box(10.8, 1.7, 2.4, 1.2, "personal intercept\nfrom earlier labelled\nmeals (m = 1.0)")
     box(13.7, 1.7, 2.3, 1.2, "cut-offs 0.15 / 0.16\nlow risk | caution\n+ reason", fc="#e6f0fa")
     box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 confirm carbs\nor dietitian", fc="#fdf0e6")
-    box(10.8, 3.4, 2.4, 0.9, "CGM labels the meal\nat +2 h (cgm_auto)", fc="#eef7ee")
+    box(10.8, 3.4, 2.4, 0.9, "CGM label at +2 h\n(evaluation replay only)", fc="#eef7ee")
     ax.text(12.4, 0.75, "borderline risk", fontsize=6.8, color=ORANGE)
-    ax.text(4.6, 0.75, "failed input rule", fontsize=6.8, color=ORANGE)
+    ax.text(4.6, 0.75, "failed input rule, blank or\nunreadable photo", fontsize=6.8, color=ORANGE)
     ax.text(10.55, 1.45, "unfamiliar\nphoto", fontsize=6.8, color=ORANGE)
     for y0 in (3.45, 2.15, 0.85):
         arrow(1.9, y0, 2.4, 2.15)
@@ -57,6 +57,7 @@ def f1_system(plt) -> None:
     arrow(4.4, 2.5, 4.9, 3.45)
     arrow(7.4, 3.6, 7.9, 3.6)  # the photo embedding feeds the unfamiliar-photo check
     arrow(9.1, 3.2, 9.1, 2.9)  # familiar photo: its carb inputs reach the fusion
+    ax.text(9.2, 3.0, "familiar: 4 carb inputs", fontsize=6.4, color=GREY)
     arrow(7.4, 2.15, 7.9, 2.15)
     arrow(10.3, 2.3, 10.8, 2.3)
     arrow(13.2, 2.3, 13.7, 2.3)
@@ -218,6 +219,12 @@ def f7_coverage(plt) -> None:
         axes[0].plot(xs, [r["cleared_share"] for r in rows], "o-", color=c, ms=3.5, label=name)
         pts = [(r["abstain_share"], r["missed_among_cleared"]) for r in rows if r["missed_among_cleared"] is not None]
         axes[1].plot([q[0] for q in pts], [q[1] for q in pts], "o-", color=c, ms=3.5, label=name)
+        n_ans = 460 if name == "development" else 150
+        for r in rows:
+            if r["missed_among_cleared"] is not None:
+                n = round(r["cleared_share"] * n_ans)
+                axes[1].annotate(f"n={n}", (r["abstain_share"], r["missed_among_cleared"]), textcoords="offset points",
+                                 xytext=(0, 5), ha="center", fontsize=6, color=c)  # fmt: skip
     axes[1].axhline(0.10, color=RED, lw=0.8, ls="--")
     axes[1].text(0.31, 0.105, "10% cap", color=RED, fontsize=7.5)
     axes[0].set_ylabel("share of answered meals cleared")
@@ -299,7 +306,7 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
 
 def _answer_stats(da: pd.DataFrame) -> dict:
     """Committed provenance for three report numbers derived from the committed answers: ECE at a second
-    bin count (the 0.05 target is passed by 0.001, so the pass must not be a binning artifact), the
+    bin count (a check on binning sensitivity; the registered binning is in report_metrics.json), the
     person-clustered interval on missed-among-cleared, and the per-group breakdown. Descriptive only."""
     from sklearn.metrics import roc_auc_score
 
@@ -322,7 +329,7 @@ def _answer_stats(da: pd.DataFrame) -> dict:
 
 
 def run_figures(cfg=None) -> dict:
-    """Render F1-F5 from committed evidence; write the ECE numbers next to them."""
+    """Render F1-F7 from committed evidence; write the ECE numbers next to them."""
     import matplotlib
 
     matplotlib.use("Agg")

@@ -322,6 +322,111 @@ def heart_rate_r2() -> float:
     return float(LinearRegression().fit(x, y).score(x, y))
 
 
+def with_intercept(dev: pd.DataFrame, logits: pd.Series, platt: bool) -> pd.Series:
+    """Replay the shipped per-person intercept on any out-of-fold logit: per fold m, the same history
+    (each answer's first n_history earlier answered meals of that person, as the evaluation gated them),
+    with or without the fold's Platt map. Reproduces the shipped `risk` exactly from `risk_raw` (tested)."""
+    from glimpse.calibration import personal_offset
+
+    ev = json.loads(Path("outputs/evaluation_v2/dev_summary.json").read_text())
+    folds = {f["fold"]: f for f in ev["folds"]}
+    out = {}
+    for _, g in dev[dev.risk_raw.notna()].sort_values("row").groupby("person_id"):
+        fd = folds[int(g.fold.iloc[0])]
+        f = logits.loc[g.row].to_numpy(float)
+        if platt:
+            f = fd["platt_slope"] * f + fd["platt_intercept"]
+        y = g.spike.to_numpy(float)
+        for i, (row, k) in enumerate(zip(g.row, g.n_history.astype(int), strict=True)):
+            off = personal_offset(f[:k], y[:k], fd["m"]) if k else 0.0
+            out[int(row)] = float(1 / (1 + np.exp(-(f[i] + off))))
+    return pd.Series(out)
+
+
+def fair_baselines(dev: pd.DataFrame) -> dict:
+    """Each comparison model with the same per-person intercept as the shipped risk (no Platt: none was fitted
+    for them), paired against the shipped risk on the 460 answered meals. Descriptive, 26 Nov."""
+    oof = pd.read_csv("outputs/cv/oof_predictions.csv")
+    base = oof[oof.seed == 0].set_index("row")
+    base["sensor_cnn_3seed_mean"] = oof.groupby("row").sensor_cnn.mean()
+    a = dev[dev.risk.notna()].set_index("row")
+    y, sids = a.spike.to_numpy().astype(int), a.person_id.to_numpy()
+    check = with_intercept(dev, pd.Series(_logit(dev.risk_raw.to_numpy(float)), index=dev.row), platt=True)
+    res = {"reproduces_shipped_max_abs_diff": float(np.abs(check.loc[a.index] - a.risk).max())}
+    shipped = a.risk.to_numpy(float)
+    arms = {m: pd.Series(_logit(base[m].to_numpy(float)), index=base.index) for m in MODELS[1:]}
+    arms["shipped fusion without Platt"] = pd.Series(_logit(dev.risk_raw.to_numpy(float)), index=dev.row)
+    for name, lg in arms.items():
+        r = with_intercept(dev, lg, platt=False).loc[a.index].to_numpy(float)
+        d, lo, hi = paired_person_bootstrap(y, shipped, r, sids)
+        res[name] = {"auroc_with_intercept": float(roc_auc_score(y, r)),
+                     "shipped_minus_this": float(roc_auc_score(y, shipped) - roc_auc_score(y, r)),
+                     "ci95": [lo, hi]}  # fmt: skip
+    return res
+
+
+def cost_reduction_ci(df: pd.DataFrame, decisions: pd.Series, costs: dict) -> list[float]:
+    """Person-bootstrap interval on cost reduction vs the better of always low risk / always caution."""
+    y = df.spike.to_numpy().astype(int)
+    act = decisions.map(ACTION).to_numpy()
+
+    def fn(i):
+        best = min(expected_cost(np.zeros_like(y[i]), y[i], costs), expected_cost(np.ones_like(y[i]), y[i], costs))
+        return 1 - expected_cost(act[i], y[i], costs) / best
+
+    _, lo, hi = person_bootstrap_ci(df.person_id.to_numpy(), fn)
+    return [lo, hi]
+
+
+def band_and_served_calibration(cfg, dev: pd.DataFrame, locked: pd.DataFrame, costs: dict) -> dict:
+    """What the abstention band costs on development, calibration in the bins around the cut-offs, and the
+    calibration of the served (Platt-only) risk. Descriptive, from the committed answers (26 Nov)."""
+    import joblib
+
+    from glimpse.serve.rules import decision
+    from glimpse.training.final import FINAL, load_thresholds
+
+    ev = json.loads(Path("outputs/evaluation_v2/dev_summary.json").read_text())
+    folds = {f["fold"]: f for f in ev["folds"]}
+    a = dev[dev.risk.notna()].copy()
+    y = a.spike.to_numpy().astype(int)
+    shipped = a.decision.map(ACTION).to_numpy()
+    no_band = np.array([0 if r < folds[f]["low_risk_below"] else 1 for r, f in zip(a.risk, a.fold, strict=True)])
+    band = a[a.decision == "can't judge"]
+    near = {}
+    for lo_, hi_ in ((0.10, 0.15), (0.15, 0.20), (0.20, 0.25)):
+        m = (a.risk >= lo_) & (a.risk < hi_)
+        near[f"{lo_:.2f}-{hi_:.2f}"] = {"n": int(m.sum()), "mean_risk": float(a.risk[m].mean()),
+                                        "spike_rate": float(a.spike[m].mean())}  # fmt: skip
+    th = load_thresholds()["main"]
+    pa, pb = joblib.load(FINAL)["calibration"]
+    lk = locked[locked.risk_raw.notna()]
+    served = {"dev": (a.spike.to_numpy(float), a.risk_platt.to_numpy(float)),
+              "locked": (lk.spike.to_numpy(float),
+                         1 / (1 + np.exp(-(pa * _logit(lk.risk_raw.to_numpy(float)) + pb))))}  # fmt: skip
+    cal = {}
+    for k, (yy, pp) in served.items():
+        cal[k] = {"ece_equal_width_15": reliability(pp, yy, bins=15)[1], "ece_equal_mass_15": ece_equal_mass(pp, yy),
+                  "calibration_in_the_large": float(pp.mean() - yy.mean()), "log_loss": float(log_loss(yy, pp)),
+                  "brier": float(brier_score_loss(yy, pp))}  # fmt: skip
+    so = dev.copy()
+    has = so.risk_platt.notna()
+    so.loc[has, "decision"] = [decision(float(r), th["low_risk_below"], th["caution_from"]) for r in so.risk_platt[has]]
+    lks = locked.copy()
+    hl = lks.risk_raw.notna()
+    lk_served = 1 / (1 + np.exp(-(pa * _logit(lks.risk_raw[hl].to_numpy(float)) + pb)))
+    lks.loc[hl, "decision"] = [decision(float(r), th["low_risk_below"], th["caution_from"]) for r in lk_served]
+    return {"band": {"answered": len(a), "cost_shipped": expected_cost(shipped, y, costs),
+                     "cost_without_band": expected_cost(no_band, y, costs), "borderline_meals": len(band),
+                     "borderline_spike_rate": float(band.spike.mean()),
+                     "abstain_beats_caution_below_spike_rate": 0.2},
+            "bins_near_cutoffs_dev": near, "served_calibration": cal,
+            "cost_reduction_ci95": {"dev": cost_reduction_ci(dev, dev.decision, costs),
+                                    "locked": cost_reduction_ci(locked, locked.decision, costs),
+                                    "served_dev": cost_reduction_ci(so, so.decision, costs),
+                                    "served_locked": cost_reduction_ci(lks, lks.decision, costs)}}  # fmt: skip
+
+
 def run_report_metrics(cfg) -> dict:
     """Write outputs/report_metrics/report_metrics.json; log the headline additions."""
     from glimpse.training.final import cost_dict
@@ -354,8 +459,9 @@ def run_report_metrics(cfg) -> dict:
     res["paired_personal_minus_raw"] = paired_gains(views)
     res["brier_decomposition"] = {k: {c: brier_decomposition(v[v.risk.notna()].spike.to_numpy().astype(float),
                                                              v.loc[v.risk.notna(), c].to_numpy(float))
-                                      for c in ("risk_raw", "risk")}
-                                  for k, v in (("dev", dev), ("locked", locked))}  # fmt: skip
+                                      for c in cols}
+                                  for k, v, cols in (("dev", dev, ("risk_raw", "risk_platt", "risk")),
+                                                     ("locked", locked, ("risk_raw", "risk")))}  # fmt: skip
     res["errors"] = {"dev": errors(dev), "locked": errors(locked)}
     res["d8_paired"] = d8_paired()
     t5 = [m["row"] for m in res["false_clears_exploratory"]["meals"] if m["class"].startswith("T5")]
@@ -375,6 +481,13 @@ def run_report_metrics(cfg) -> dict:
                                                     costs)}  # fmt: skip
     res["person_offsets"] = person_offsets(dev, locked, tuple(res["served_operating_point"]["platt"]))
     res["heart_rate_r2_from_other_inputs"] = heart_rate_r2()
+    res["fair_baselines"] = fair_baselines(dev)
+    res["band_and_served_calibration"] = band_and_served_calibration(cfg, dev, locked, costs)
+    lk = locked[locked.risk_raw.notna()]
+    pa, pb = res["served_operating_point"]["platt"]
+    res["brier_decomposition"]["locked"]["served_platt_only"] = brier_decomposition(
+        lk.spike.to_numpy().astype(float), 1 / (1 + np.exp(-(pa * _logit(lk.risk_raw.to_numpy(float)) + pb)))
+    )
     res["calibration_in_the_large_pooled"] = {k: float(v.risk.mean() - v.loc[v.risk.notna(), "spike"].mean())
                                               for k, v in (("dev", dev), ("locked", locked))}  # fmt: skip
     OUT.mkdir(parents=True, exist_ok=True)
