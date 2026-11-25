@@ -6,7 +6,7 @@ default:
 
 # install Python 3.14 + locked libraries, download the data and the pinned photo weights, prepare the dataset
 install:
-    uv sync
+    uv sync --locked
     uv run glimpse download-data
     uv run glimpse download-weights
     uv run glimpse prepare
@@ -39,14 +39,14 @@ check: lint test
 params:
     uv run glimpse params
 
-# the three training runs in order (the deployed artifacts then come from `just finalize`)
+# the intermediate-stage training runs (old 28-person split); the shipped artifacts come only from `just finalize`
 train: train-scratch train-photo train-final
 
 # train the from-scratch SensorCNN: epochs chosen on inner folds, then the 28-person model + checkpoint
 train-scratch:
     uv run glimpse train --model scratch
 
-# train the photo model: frozen ConvNeXt-Tiny + heads; last stage kept only if the inner folds show a gain
+# train the photo model: ConvNeXt-Tiny heads, then the last stage if the inner folds show a gain (intermediate)
 train-photo:
     uv run glimpse train --model photo
 
@@ -110,13 +110,9 @@ timing:
 stress:
     uv run glimpse predict-folder samples/stress outputs/stress_run
 
-# final 28-person pipeline: fusion + thresholds chosen on the validation people and frozen (~8 min; test untouched)
+# intermediate-stage 28-person fusion + thresholds (superseded by `just finalize`; refuses to overwrite it)
 train-final:
     uv run glimpse final
-
-# cut-off amendment: being rebuilt on partition v2 (S5, D4); the command says so and exits
-amend-thresholds:
-    uv run glimpse amend-thresholds
 
 # dev evaluation on partition v2 (every risk from Pipeline.answer, one Pipeline per fold), then `report-numbers`
 evaluate:
@@ -148,6 +144,11 @@ reproduce-all:
     just stress
     just demo
 
+# regenerate the data-free outputs and fail if they differ from the committed ones (no dataset or weights needed)
+verify-outputs:
+    just report-numbers
+    git diff --exit-code outputs/report_metrics outputs/monitoring/replay.json outputs/figures/figures.json
+
 # re-derive every report table and figure from committed outputs (no dataset or weights needed, ~1 min)
 report-numbers:
     uv run glimpse report-metrics
@@ -166,10 +167,6 @@ report-metrics:
 # seed spread of the shipped 12+2 recipe: 3 fresh seeds scored on the validation people (~15 min; nothing deployed changes)
 photo-seeds:
     uv run glimpse photo-seeds
-
-# superseded by partition v2: the deployed calibration comes from `just finalize`; the command says so and exits
-recalibrate:
-    uv run glimpse recalibrate
 
 # degradation across increasing stress (rubric 4d; pre-registered 22 Nov; ~20 min, live photo passes)
 robustness-levels:
