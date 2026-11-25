@@ -458,12 +458,19 @@ def fair_baselines(dev: pd.DataFrame) -> dict:
     arms["shipped fusion without Platt"] = pd.Series(_logit(dev.risk_raw.to_numpy(float)), index=dev.row)
     fz = pd.read_csv("outputs/fusion/fusion_oof.csv").set_index("row")
     arms["no-photo fusion (the gate's no-meal arm)"] = pd.Series(_logit(fz.no_meal.to_numpy(float)), index=fz.index)
+    risks = {}
     for name, lg in arms.items():
         r = with_intercept(dev, lg, platt=False).loc[a.index].to_numpy(float)
+        risks[name] = r
         d, lo, hi = paired_person_bootstrap(y, shipped, r, sids)
         res[name] = {"auroc_with_intercept": float(roc_auc_score(y, r)),
                      "shipped_minus_this": float(roc_auc_score(y, shipped) - roc_auc_score(y, r)),
                      "ci95": [lo, hi]}  # fmt: skip
+    # CGM removal (26 Nov): the no-photo arm (trend + profile) against profile only, both with the intercept
+    nop, prof = risks["no-photo fusion (the gate's no-meal arm)"], risks["profile_lr"]
+    d, lo, hi = paired_person_bootstrap(y, nop, prof, sids)
+    res["cgm_removal"] = {"no_photo_minus_profile_only": float(roc_auc_score(y, nop) - roc_auc_score(y, prof)),
+                          "ci95": [lo, hi]}  # fmt: skip
     return res
 
 

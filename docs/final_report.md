@@ -44,7 +44,7 @@ which the evaluation replays in deployment order. An optional `history.csv` per 
 answers' fusion logits and CGM labels) now feeds it through the same two-hour gate; the samples carry
 none. A profile without onboarding priors (every instructor case) gets training medians drawn from all 37
 non-locked people, type 2 diabetes included (spike rate 0.455, rise 48 mg/dL). Tooling: uv
-+ Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for every number, 174 tests in CI (157 run without the dataset or weights; 16 skip, 1 expected failure),
++ Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for every number, 175 tests in CI (158 run without the dataset or weights; 16 skip, 1 expected failure),
 W&B offline runs replayed from the committed training histories, and a git history (from 2 Nov; earlier
 ordering in the dated design docs) in which every pre-registration precedes its run.
 
@@ -130,8 +130,8 @@ MAE and Spearman, where patients' own counts err by about 15–20% (Brazeau et a
 2018), plus the unfamiliar-photo refusal. Heart rate earns nothing either: retrained without it, AUROC changes by +0.007
 (imputed at serving, +0.003); it stays only because the feature set was fixed before the ablation. The
 backbone is 80% of the photo path's time; the gate's no-photo arm, given the same intercept, scores 0.741
-(shipped minus it +0.021, −0.003 to +0.053) in 0.35 ms of model time, the product a next version should ship. The profile carries the system:
-dropping it costs 0.122 (Figure 4).
+(shipped minus it +0.021, −0.003 to +0.053) in 0.35 ms of model time, the product a next version should ship. The profile carries the system
+(dropping it costs 0.122, Figure 4); the CGM adds an established +0.033 (§3).
 
 ## 3. Evaluation and ablations
 The 45 CGMacros participants are healthy, prediabetic and T2D adults (ages 18 to 69, 64% female), each
@@ -183,8 +183,9 @@ Within every fold Platt AUROC equals raw; the pooled 0.714 mixes five fold maps.
 | shipped fusion without its Platt map | 0.763 | −0.001 (−0.008, +0.005) |
 | fusion without the photo (the gate's no-meal arm) | 0.741 | +0.021 (−0.003, +0.053) |
 | no model: each person's running spike rate, same gate, shrunk to the other folds' rate | 0.699 | +0.063 (+0.030, +0.113) |
+| CGM removal: the no-photo arm minus profile only (both with the intercept) | – | +0.033 (+0.007, +0.065) |
 
-*The shipped replay applied to each model's out-of-fold logits: same folds, m and gated history; it reproduces the shipped risk exactly (largest difference 1e-16). No Platt map was fitted for the baselines. Profile only against the no-photo arm (0.708 against 0.741) is the CGM-removal contrast. report_metrics.json (fair_baselines).*
+*The shipped replay applied to each model's out-of-fold logits: same folds, m and gated history; it reproduces the shipped risk exactly (largest difference 1e-16). No Platt map was fitted for the baselines. report_metrics.json (fair_baselines).*
 
 | further pre-registered comparisons (development, outputs/promised/promised.json) | result |
 |---|---|
@@ -306,6 +307,15 @@ below 1.8% at every level; with heart rate missing, 3.7%, the worst case. All st
 no-history per-fold pipelines. The 23 hostile inputs (timezone offsets, malformed JSON, binary CSVs,
 broken photos, empty folders) give zero crashes; five refuse on a placeholder photo after parsing their CSV
 stressor. R1-R5 and R8-R12 answer observed failures, R13 a measured one; tests enforce them.
+
+| unfamiliar-photo check at the 0.614 cut | photos | median kNN distance | refused by it |
+|---|---|---|---|
+| training photos, leave-one-out (the budget) | 1,221 | 0.291 | 1.1% (budget 2%) |
+| real phone photos of local meals | 14 | 0.433 | 0 of 14 |
+| synthetic non-meal pictures (monitoring week 4) | 6 | 0.709 | the week's median is above the cut |
+| instructor screenshot / dark photo / local dish | 3 | 0.771 / 0.613 / 0.318 | screenshot only (the dark photo is refused by the contrast rule) |
+
+*No realistic labelled out-of-distribution set exists, so no detection AUROC is claimed; local meals are food the check should accept. outputs/ood/, outputs/monitoring/monitoring.json.*
 
 | monitoring signal (docs/monitoring.md) | demonstration | result |
 |---|---|---|

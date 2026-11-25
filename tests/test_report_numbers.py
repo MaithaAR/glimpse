@@ -395,3 +395,19 @@ def test_within_person_rows(text, rm):
     row = t["no model: each person's running spike rate, same gate, shrunk to the other folds' rate"]
     assert row == [f"{h['auroc']:.3f}", f"+{h['shipped_minus_this']:.3f} (+{h['ci95'][0]:.3f}, +{h['ci95'][1]:.3f})"]
     assert f"does {h['shipped_minus_this']:.3f} better than a" in text
+
+
+def test_cgm_removal_and_ood_rows(text, rm):
+    t = _tables(text)
+    c = rm["fair_baselines"]["cgm_removal"]
+    assert t["CGM removal: the no-photo arm minus profile only (both with the intercept)"][1] == (
+        f"+{c['no_photo_minus_profile_only']:.3f} (+{c['ci95'][0]:.3f}, +{c['ci95'][1]:.3f})"
+    )
+    mo = _load("outputs/monitoring/monitoring.json")
+    n, med, above = mo["real_photos_n"], mo["real_photos_median"], mo["real_photos_above_cut"]
+    assert t["real phone photos of local meals"] == [str(n), f"{med:.3f}", f"{above} of {n}"]
+    assert t["training photos, leave-one-out (the budget)"][1] == f"{mo['training_loo_median']:.3f}"
+    sc = {x["photo"]: x["score"] for x in _load("outputs/ood/ood_summary.json")["scores"] if x["set"] == "instructor"}
+    assert t["instructor screenshot / dark photo / local dish"][1] == " / ".join(
+        f"{sc[k]:.3f}" for k in ("09_screenshot", "08_dark_photo", "11_local_dish")
+    )
