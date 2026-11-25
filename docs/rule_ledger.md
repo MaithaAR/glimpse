@@ -130,3 +130,7 @@ printed the risk at whole percent, colliding with the cut ("the risk (16%) is bo
 and 16%") -> one decimal. Added 25 Nov, found when our own test tripped over it: a profile.json
 written with the model-side field names (a1c_pct, fasting_glucose_mgdl) was silently dropped and then
 reported missing -> both spellings accepted.
+Order check (26 Nov): that last addition (dbac561, 08:08 on 25 Nov) landed before the locked run (8682b01,
+09:56), so the locked eight went through the final serving code. The committed instructor and stress runs
+(25a118c, 08:01) predate it by seven minutes; the change only adds two accepted key spellings and no
+committed case uses them, so those answers are unchanged by construction.

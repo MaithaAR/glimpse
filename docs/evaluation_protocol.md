@@ -125,3 +125,22 @@ frozen artifacts (`just promised` -> outputs/promised/promised.json). Outcomes, 
 | 3-5 person user test (140) | REPLACED by two structured dietitian reviews (in progress); no end-user test exists and the report says so |
 
 Nothing in this table changes a shipped artifact, threshold or verdict.
+
+## Errata and disclosures (26 Nov 2026, after three cold grades; lines above are left as written)
+
+- Reconciliation table, GBM row: the point is **+0.016** (outputs/promised/promised.json `point`); +0.015
+  was the bootstrap mean, the estimator the 8 Nov correction retired. Class-weighting row: point **+0.006**
+  (+0.005 was the bootstrap mean). Verdicts unchanged.
+- Head-agreement row: "fused AUROC gain (+0.020)" has no source. The committed figure is **+0.015** pooled
+  (photo arm 0.719 vs grams-only arm 0.705, outputs/fusion/fusion_summary.json; +0.008 within-fold mean),
+  and the grams-only arm is post hoc.
+- User-test row: "(in progress)" is stale. The dietitian consultation did not complete before submission;
+  no clinician response is folded in (report §4).
+- **Calibration binning.** The metric above registers equal-width bins with counts (15 bins in
+  `targets.ece_bins`); the intermediate used them. The final report switched to 15 equal-mass bins without
+  a dated record. Under the registered binning the shipped development ECE is **0.052**, a narrow miss of
+  the 0.05 target (equal-mass: 0.049); locked 0.061 (equal-mass 0.098). Both are now reported, with counts
+  per bin (Figure 3, outputs/report_metrics/report_metrics.json).
+- **AUPRC and Brier**, registered above, were not in the report until 26 Nov. Now reported for development
+  and the locked run from the committed answer files (`just report-metrics`): AUPRC 0.591 (base rate
+  0.328) and 0.547 (0.420); Brier 0.180 and 0.230.

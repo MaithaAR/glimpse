@@ -355,3 +355,24 @@ four the six synthetic non-meal pictures already in the demo - with the committe
 alert rule (median above the training q90, 0.445); the expectation, stated now, is that the alert
 fires on week four and only week four, and the result is reported as it comes out inside
 `just monitoring`.
+
+## Correction note (26 Nov 2026, after three cold grades; nothing above is edited)
+
+**Freeze calendar as it happened.** §7 planned: app 17 Nov, repository 21 Nov, locked set 22 Nov. Actual:
+serving artifacts frozen 6 Nov (amendment above) and never changed; stress levels and the monitoring stream
+pre-registered and committed 22 Nov; serving hardening (R11), evidence regeneration and the R11 profile-key
+aliases on the morning of 25 Nov (25a118c, dbac561); the locked eight scored once at 09:56 on 25 Nov
+(8682b01), after every serving change. After the tag `submission-v1` (48693f5) an improvement round
+(docs/changelog.md) added descriptive metrics, a monitoring replay, figures redrawn from the same evidence
+and corrected documents. No artifact, threshold or locked number changed in it.
+
+**Evidence-table names as shipped.** §3 planned names that were renamed or never built:
+
+| planned (§3) | shipped |
+|---|---|
+| `just ablate` -> outputs/ablate/modality.csv | `just ablate` -> outputs/ablations/channels.json, d8_profile_excluded.json |
+| `just robust` -> outputs/robust/curves.csv | `just robustness` (S9) and `just robustness-levels` -> outputs/robustness/ |
+| `just monitor` -> outputs/monitor/ | `just monitoring` and `just monitoring-replay` -> outputs/monitoring/ |
+| `just probe` -> outputs/probe/ | `just probes` -> outputs/probes/ |
+| `just failures` -> outputs/failures/taxonomy.csv | taxonomy table in the report §5, counts from the committed answer and suite files |
+| docs/user_test.md | not built: no user test ran; the dietitian consultation did not complete (report §4) |

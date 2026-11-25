@@ -27,6 +27,11 @@ One meal: the **2 hours of glucose and heart rate before it** (24 five-minute sl
 Out-of-range glucose (outside 40–400 mg/dL): 0 readings.
 
 ## Splits (by person)
+**Current partition (final stage): partition v2.** The 23 development target people form 5 outer folds (last
+row, 481 scored meals, each scored once; `splits/dev_splits_v2.json`, asserted in `splits/reconciliation.md`);
+the 14 type 2 diabetes people train only; the 8 locked people were scored once on 25 Nov. The first three rows
+are the intermediate's fixed split, kept for the record (26 Nov note).
+
 | Group | People | Training meals | Scored meals | Spike rate (scored) |
 |---|---|---|---|---|
 | Train (14 target + 14 type 2 diabetes) | 28 | 633 | 547 | 0.48 (target 0.39, T2D 0.59) |
@@ -49,8 +54,8 @@ Out-of-range glucose (outside 40–400 mg/dL): 0 readings.
 |---|---|---|
 | CGMacros before-meal photos, fixed training people | intermediate | 865 |
 | CGMacros before-meal photos, all development people (worst case over CV folds) | intermediate | 1,221 |
-| Nutrition5k overhead plates (optional pre-training; estimate) | CUT at the final design stage; never used | 800 |
-| **Running total (worst case, incl. planned)** | | **2,021** |
+| Nutrition5k overhead plates (planned 800 for optional pre-training) | cut, never used | 0 |
+| **Running total (worst case)** | | **1,221** |
 `glimpse prepare` stops with an error if the total exceeds the cap.
 
 ## Modalities
