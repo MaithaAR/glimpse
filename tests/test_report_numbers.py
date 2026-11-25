@@ -54,7 +54,7 @@ def test_dev_and_locked_headlines(text):
     assert f"({lo:.3f}–{hi:.3f})" in text
     assert f"{lk['usefulness']['cost_reduction']:.1%}".replace("-", "−") in text
     d = lk["decisions"]
-    assert f"{d['low risk']} cleared, {d['caution']} caution, {d["can't judge"]} can't judge" in text
+    assert f"{d['low risk']} low risk,\n{d['caution']} caution, {d["can't judge"]} can't judge" in text
 
 
 def test_report_metrics_agree_with_the_earlier_evidence(rm):
@@ -263,3 +263,25 @@ def test_fair_baseline_and_band_cells(text, rm):
     sc = rm["band_and_served_calibration"]["served_calibration"]
     row = t["ECE, registered 15 equal-width bins (target ≤ 0.05)"]
     assert row[2] == f"{sc['dev']['ece_equal_width_15']:.3f} / {sc['locked']['ece_equal_width_15']:.3f}"
+
+
+def test_status_table_timing_cusum_and_what_if(text, rm):
+    t = _tables(text)
+    lk = _load("outputs/locked_eval/locked_summary.json")
+    assert t["AUROC, shipped (95% person-clustered)"][1].startswith(f"{lk['risk_personal']['auroc']['point']:.3f}")
+    gb = rm["fair_baselines"]["trend_gbm"]
+    assert t["same intercept on gradient boosting (sensors + profile)"][0].startswith(
+        f"{gb['auroc_with_intercept']:.3f}"
+    )
+    st = _load("outputs/efficiency/stage_timing.json")
+    row = t["whole photo path / no-photo path (sensors + profile only)"][0]
+    assert row == f"{st['photo_path_median_ms']:.1f} / {st['no_photo_path_median_ms']:.2f}"
+    assert f"{st['backbone_share_of_photo_path']:.0%} of serving time" in text
+    cu = _load("outputs/monitoring/replay.json")["cusum_served"]
+    assert cu["calibration"]["alarms"] == [] and cu["caution_share"]["dev_false_alarms"] == 0
+    week = cu["caution_share"]["first_locked_alarm_week"] - cu["caution_share"]["first_locked_week"] + 1
+    assert f"in the {week}th locked week" in text
+    wi = rm["falling_now_what_if"]
+    want = (f"would flip {wi['would_flip']} of {wi['cleared']} clears, avoiding {wi['misses_avoided']} of the "
+            f"{wi['misses_total']} misses at the cost\nof {wi['clears_lost_without_a_spike']} clears")  # fmt: skip
+    assert want in text

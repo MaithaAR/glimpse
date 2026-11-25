@@ -223,7 +223,8 @@ def fine_tuned_parameters(cfg) -> dict:
 
     m = timm.create_model(cfg.photo.arch, pretrained=False, num_classes=0)
     backbone = sum(p.numel() for p in m.parameters())
-    last = sum(p.numel() for p in m.stages[-1].parameters())
+    last = sum(p.numel() for p in m.stages[-1].parameters()) + sum(p.numel() for p in m.head.parameters())
+    # the last stage and the final norm (backbone.head) train together, as PhotoCarbModel.set_trainable does
     budget = pd.read_csv("outputs/param_budget.csv")
     photo = int(budget.loc[budget.model.str.startswith("PhotoCarbModel"), "parameters"].iloc[0])
     return {"backbone": backbone, "last_stage": last, "heads": photo - backbone,
@@ -427,6 +428,20 @@ def band_and_served_calibration(cfg, dev: pd.DataFrame, locked: pd.DataFrame, co
                                     "served_locked": cost_reduction_ci(lks, lks.decision, costs)}}  # fmt: skip
 
 
+def falling_now_what_if(dev: pd.DataFrame) -> dict:
+    """Exploratory, chosen after T5 was seen: would a 'glucose falling now' check (never clear a meal whose
+    pre-meal window rise is in the steepest-falling tenth of ALL answered dev meals) have avoided misses, and at
+    what cost in clears? The cut is the 10th percentile over all 460 meals, not tuned on the misses."""
+    z = pd.read_csv("outputs/figures/shap_features_z.csv").set_index("row")["window rise"]
+    cut = float(z.quantile(0.10))
+    cl = dev[dev.decision == "low risk"]
+    flagged = cl[z.loc[cl.row].to_numpy() < cut]
+    return {"rule": "window rise in the lowest decile of all answered dev meals -> caution instead of low risk",
+            "cleared": len(cl), "would_flip": len(flagged), "misses_avoided": int(flagged.spike.sum()),
+            "misses_total": int(cl.spike.sum()),
+            "clears_lost_without_a_spike": int((flagged.spike == 0).sum())}  # fmt: skip
+
+
 def run_report_metrics(cfg) -> dict:
     """Write outputs/report_metrics/report_metrics.json; log the headline additions."""
     from glimpse.training.final import cost_dict
@@ -482,6 +497,7 @@ def run_report_metrics(cfg) -> dict:
     res["person_offsets"] = person_offsets(dev, locked, tuple(res["served_operating_point"]["platt"]))
     res["heart_rate_r2_from_other_inputs"] = heart_rate_r2()
     res["fair_baselines"] = fair_baselines(dev)
+    res["falling_now_what_if"] = falling_now_what_if(dev)
     res["band_and_served_calibration"] = band_and_served_calibration(cfg, dev, locked, costs)
     lk = locked[locked.risk_raw.notna()]
     pa, pb = res["served_operating_point"]["platt"]

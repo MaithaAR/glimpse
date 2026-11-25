@@ -121,8 +121,10 @@ def f3_reliability(plt, da: pd.DataFrame) -> dict:
             ece = ece_equal_mass(p, y)
             if frame is da:
                 out[col], out[col + "_equal_width"] = ece, ece_w
-            ax.plot([r[0] for r in rows], [r[1] for r in rows], "o-", color=c, ms=4,
+            ax.plot([r[0] for r in rows], [r[1] for r in rows], "-", color=c,
                     label=f"{label}: ECE {ece_w:.3f} equal-width, {ece:.3f} equal-mass")  # fmt: skip
+            for m_, o_, n_ in rows:  # hollow marker: a bin with fewer than 5 meals
+                ax.plot([m_], [o_], "o", ms=4, color=c, mfc=c if n_ >= 5 else "white")
             if col == "risk":
                 for m, o, n in rows:
                     ax.annotate(str(n), (m, o), textcoords="offset points", xytext=(0, 6), ha="center",
@@ -360,7 +362,8 @@ def run_figures(cfg=None) -> dict:
               **_answer_stats(da),
               "files": sorted(p.name for p in OUT.glob("*.png"))}  # fmt: skip
     (OUT / "figures.json").write_text(json.dumps(report, indent=2))
-    logger.bind(stage="figures").info("figures -> {}; ECE raw {:.3f} -> personal {:.3f}; SHAP sum "
-                                      "check {:.1e}; top features {}", OUT, ece["risk_raw"], ece["risk"],
-                                      shap_report["sum_check_abs_err"], shap_report["top_global"])  # fmt: skip
+    logger.bind(stage="figures").info("figures -> {}; ECE (registered equal-width) raw {:.3f} -> shipped {:.3f}; "
+                                      "SHAP sum check {:.1e}; top features {}", OUT, ece["risk_raw_equal_width"],
+                                      ece["risk_equal_width"], shap_report["sum_check_abs_err"],
+                                      shap_report["top_global"])  # fmt: skip
     return report
