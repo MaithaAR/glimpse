@@ -8,12 +8,12 @@ Maitha Alhosani · MAAI7103 · November 2026 · `just install` → `just predict
 
 **Bottom line.** The central fix this phase was calibration, and it worked: a per-person intercept,
 fitted only on each person's earlier meals and replayed in deployment order, raises AUROC from 0.726
-to 0.762 and improves every one of the five folds individually, while halving the per-person
+to 0.762 and improves every one of the five folds individually, while shrinking the per-person
 calibration gaps the intermediate diagnosed. The photo went through a pre-registered gate and did not pass (+0.025
 AUROC, interval −0.010 to +0.061), so, per the paragraph committed before the run, the shipped
 product is sensor + confirmed carbs, with the photo head as a carb-entry assist. Safety behaves by design: 8 of 109
 cleared meals spiked (7.3%, interval 2.9–14.2% against a pre-registered 10% cap), degraded input
-triggers refusal, with dangerous flips at most 1.5%, and a 23-case adversarial suite produces zero crashes
+triggers refusal, with dangerous flips at most 1.7%, and a 23-case adversarial suite produces zero crashes
 and zero error rows. On the 8 locked people (153 meals, 42.5% spike rate), scored exactly once: personal AUROC 0.645
 (0.540-0.736), raw 0.611; 10 cleared, 139 caution, 4 can't judge; 2 of the 10 cleared spiked and
 the cost reduction was −5.7%, failing the pre-set usefulness targets. With 8 people the interval
@@ -35,8 +35,8 @@ medical device.
 One scoring path: every number here, the demo, the app and the grader's
 `just predict-folder <in> <out>` go through the same `Pipeline.answer`; plain-code input rules run
 first (§4). Tooling: uv + Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for
-every number, 130 tests in CI, W&B offline exports, and a git history (from 2 Nov; earlier
-ordering in the dated design docs) in which every pre-registration precedes its run. It trains and runs on one laptop; Figure 1 shows the single path.
+every number, 143 tests in CI, W&B offline exports, and a git history (from 2 Nov; earlier
+ordering in the dated design docs) in which every pre-registration precedes its run. It trains and runs on one laptop (Figure 1).
 
 ![Figure 1: the one scoring path](../outputs/figures/f1_system.png)
 
@@ -126,7 +126,7 @@ a 2-hour label-availability gate; deployment gets those labels free from the CGM
 the Platt AUROC equals the raw AUROC exactly, because a monotone per-fold map cannot reorder meals
 inside its fold; the pooled Platt figure (0.714) below raw (0.726) is an artefact of mixing five
 fold-specific maps, and the calibration evidence is the reliability diagram (Figure 3), the
-equal-mass ECE (0.059 raw to 0.049 shipped), the log-loss (0.537 personal vs 0.572/0.567) and the
+equal-mass ECE (15 bins; 0.059 raw to 0.049 shipped), the log-loss (0.537 personal vs 0.572/0.567) and the
 halved per-person gaps, not AUROC. For binary logits, Platt scaling is temperature scaling plus a
 bias term, a strict generalisation of the taught one-parameter fix, fitted here on inner
 out-of-fold risks only; the personal intercept extends the same post-hoc principle by one penalised
@@ -166,7 +166,8 @@ band; §4 reports that as a finding.
 sensitivity sweep; usefulness vs pre-registered targets; robustness table; stress suite; monitoring. -->
 Decisions are priced, not guessed: a missed spike costs 5× an unnecessary caution, abstention
 (2, 0.5), declared assumptions (the 5:1 ratio is a ~17% action threshold in decision-curve terms:
-Vickers & Elkin 2006), with a pre-registered cost sensitivity sweep committed alongside. All four usefulness targets were fixed before any result
+Vickers & Elkin 2006), with a pre-registered cost sensitivity sweep committed alongside; across its 16 settings the
+cleared share moves from 0.4% to 43%, so the operating point is cost-driven. All four usefulness targets were fixed before any result
 (docs/evaluation_protocol.md) and all four hold at the point estimate on development, the
 protocol's on-track label (the locked eight fail them, §6): cost reduction 14% (min 10%),
 cleared 23% (min 20%), abstain 14% (max 20%), missed-among-cleared 7.3% (max 10%). In plain terms: of
@@ -185,7 +186,7 @@ Abstaining instead of guessing is established practice for medical ML (Kompa et 
 
 | stress at three magnitudes | level 1 | level 2 | level 3 |
 |---|---|---|---|
-| CGM dropout 10/30/50% (unchanged / dangerous) | 100% / 0.0% | 100% / 0.0% | 100% / 0.2% |
+| CGM dropout 10/30/50% (unchanged / dangerous) | 100% / 0.0% | 100% / 0.0% | 99.6% / 0.2% |
 | pre-meal gap 10/25/40 min (unchanged / new refusals) | 100% / 0% | 11% / 89% | 11% / 89% |
 | photo blur r=2/6/10 (unchanged / dangerous) | 98% / 0.7% | 94% / 0.9% | 89% / 1.7% |
 | photo brightness x0.5/x0.25/x0.1 (unchanged / new refusals) | 98% / 1% | 96% / 2% | 10% / 90% |
@@ -208,8 +209,9 @@ with the committed sensitivity sweep as its hedge.
 <!-- 475 words: probes A+B; R7; D8 as failure insight; S14 taxonomy (false-cleared + abstention
 breakdown) TODO 10 Nov; label-definition discussion. -->
 Failure taxonomy (every class observed, none hypothetical). **T1 rule refusals:** malformed or
-degraded input never reaches a model; all 9 malformed instructor and all 23 stress cases end in a
-structured refusal naming the problem (§4); the 4 clean cases answer. **T2 missing-photo abstentions:** 21 of 481 meals, no photo, no
+degraded input never reaches a model; 8 of the 13 instructor cases and all 23 stress cases end in
+a structured refusal naming the problem (§4); the other 5 answer, two of them with repairs
+flagged. **T2 missing-photo abstentions:** 21 of 481 meals, no photo, no
 guess. **T3 borderline abstentions:** 45 meals, all in folds 2–4; folds 1 and 5 chose no band, so
 where the band exists is itself a product of per-fold cost optimisation. **T4 near-cut
 false-clears:** 4 of the 8 missed-among-cleared sat within 0.031 of their fold's cut: boundary

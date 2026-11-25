@@ -5,14 +5,14 @@ one of three answers: **low risk**, **caution**, or **can't judge** (always with
 about 0.3 s on a laptop CPU and runs offline on local weights. It is a research prototype for adults with
 prediabetes: a second look before eating, not a medical device. MAAI7103 course project (Maitha Alhosani).
 
-**Intermediate milestone:**
+**Final submission (report: [`docs/final_report.md`](docs/final_report.md)):**
 
 - the full data pipeline for all four inputs (photo, CGM, heart rate, profile);
 - both required models trained (a from-scratch 1-D CNN, and a fine-tuned ConvNeXt-Tiny);
 - a person-level evaluation with baselines, calibration and targets;
 - a working command-line demo, a local screen and a Linux container.
 
-The report is [`docs/intermediate_report.md`](docs/intermediate_report.md).
+The final report is [`docs/final_report.md`](docs/final_report.md); the intermediate milestone report is kept at [`docs/intermediate_report.md`](docs/intermediate_report.md).
 
 ## Architecture
 ```
@@ -22,7 +22,7 @@ profile ─────────────┘          │ yes
                                 ├─ 2-h window (24 × 5 min, same code as training) + profile ─┐
                                 └─ ConvNeXt-Tiny photo model → carb range (4 bins) + grams ──┴─> logistic-regression
                                                                                                 fusion → spike risk
-                    risk < 0.143 → LOW RISK · ≥ 0.20 → CAUTION · in between → CAN'T JUDGE (borderline)
+                    risk < 0.15 → LOW RISK · ≥ 0.16 → CAUTION · in between → CAN'T JUDGE (borderline)
 ```
 The from-scratch SensorCNN (5k parameters) is trained and evaluated as the required scratch model. It ties
 hand-made trend features, so the deployed fusion uses those features (see the report).
@@ -30,7 +30,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 ## Quick start (macOS or Linux; needs [uv](https://docs.astral.sh/uv/) and [just](https://just.systems/), no pip)
 ```bash
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
-just check       # ruff + 85 tests
+just check       # ruff + 143 tests
 just demo        # worked cases, two can't-judge cases, response time  -> outputs/demo/cases.md
 just evaluate    # all metrics, baselines, calibration, fixed test     -> outputs/evaluation/ (about 1 min)
 just app         # local screen at http://127.0.0.1:7860 (optional extra: Gradio)
@@ -58,19 +58,20 @@ just docker-demo                              # needs `just install` first, for 
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`.
 
-## Results (final; 5-fold person cross-validation, 23 people, 481 meals; 95% ranges by person)
-| Risk model | AUROC |
-|---|---|
-| raw fusion | 0.726 (0.659–0.797) |
-| **+ per-person calibration (shipped)** | **0.762 (0.682–0.829)** |
+## Results (95% ranges clustered by person)
+| Risk model | development (23 people, 481 meals) | locked test (8 people, 153 meals) |
+|---|---|---|
+| raw fusion | 0.726 (0.659–0.797) | 0.611 (0.510–0.743) |
+| **+ per-person calibration (shipped)** | **0.762 (0.682–0.829)** | **0.645 (0.540–0.736)** |
 
-**What the final results show (details and evidence in [`docs/final_report.md`](docs/final_report.md)):**
+**What the results show (details and evidence in [`docs/final_report.md`](docs/final_report.md)):**
 
-- Per-person calibration improves every fold (5/5) and halves the largest per-person gaps; ECE 0.059 raw → 0.049 shipped.
+- Per-person calibration improves every development fold (5/5) and the locked test; dev ECE 0.059 raw → 0.049 shipped.
 - The photo is NOT established as a risk signal: pre-registered gate +0.025 (−0.010, +0.061). It ships as a carb-entry assist.
-- Usefulness targets met: 23% of meals cleared, 14% cost saving, 7.3% missed-among-cleared against a 10% cap.
-- The 8 locked test people are scored exactly once, on 22 Nov, from the frozen artifacts.
-- Full tables: `outputs/evaluation_v2/` and `just evaluate`.
+- Usefulness targets hold at the point on development (23% cleared, 14% cost saving, 7.3% missed vs a 10% cap) and FAIL on
+  the locked test (10 of 153 cleared, 2 spiked, cost reduction −5.7%) — reported unadjusted, per the pre-registration.
+- The 8 locked people were scored exactly once, on 25 Nov, from the frozen artifacts (`just evaluate-locked` refuses a rerun).
+- Full tables: `outputs/evaluation_v2/`, `outputs/locked_eval/` and `just evaluate`.
 
 ## Repository
 ```
@@ -85,7 +86,7 @@ samples/               synthetic CGM CSV for `just predict`
 pilot/ scripts/ results/  proposal-pilot code and logs, frozen (GitHub only; left out of the submitted zip)
 ```
 
-## Promised in the proposal vs delivered (as of the intermediate; kept for the record)
+## Promised in the proposal vs delivered (as of the intermediate; kept for the record — the final reconciliation of every commitment is in docs/evaluation_protocol.md)
 | Proposal | Now | Why |
 |---|---|---|
 | EfficientNet-B0 photo model | ConvNeXt-Tiny + carb-bin head | instructor feedback |

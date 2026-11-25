@@ -14,8 +14,10 @@ PER_MODEL_LIMIT = 200_000_000
 PRETRAINED_TOTAL_LIMIT = 1_000_000_000
 SCRATCH_LIMIT = 50_000_000
 
-# models planned for later stages: (name, role, estimated parameters)
-PLANNED = [("photo out-of-distribution check (DINOv2-S), final stage", "pretrained, frozen; planned", 22_000_000)]
+# models once planned and since superseded: (name, role, estimated parameters). Kept so the budget
+# table records the decision: the shipped unfamiliar-photo check is kNN in the photo model's own
+# features, so no extra model was added (docs/final_design.md cut list).
+PLANNED = [("photo out-of-distribution check (DINOv2-S)", "superseded by the kNN check; never added", 22_000_000)]
 
 
 class BudgetRow(BaseModel):

@@ -67,3 +67,5 @@ Out-of-range glucose (outside 40–400 mg/dL): 0 readings.
 
 ## Known limitations
 45 people from one study; served macros assume proportional eating; no local dishes; small validation and test groups give wide confidence intervals.
+
+Participants: ages 18 to 69, 64% female (bio.csv, all 45 people).

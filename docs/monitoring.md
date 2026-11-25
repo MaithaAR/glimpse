@@ -31,3 +31,14 @@ alert), no dashboard service (the statistics are one `just monitoring` run over 
 leave-one-out kNN distances, the deployed cut, and the 14 real phone photos' distances —
 outputs/monitoring/drift_baseline.png + monitoring.json (the numbers behind the figure). This is the
 panel a deployed monitor would redraw weekly from live logs.
+
+## What a maintainer does on each alert
+
+Photo-drift alert (weekly median above the training q90): inspect the week's logged distances and a
+sample of refused photos; if the cause is a camera or app change, rebuild the reference under the
+current model on the new photos; if it is new cuisine, route those users to confirm-carbs and queue
+the photos for the next labelled fine-tune. Rolling-AUROC or missed-among-cleared drift (from
+cgm_auto): freeze clearing (serve caution-only) for the affected people until the per-person
+intercepts relearn, and review their recent labels for sensor gaps. Latency alert: profile the cold
+path first (model load dominates); nothing else in the pipeline is above 30 ms. Every alert and the
+action taken is a dated note in this file; none of this retunes a frozen artifact mid-cycle.
