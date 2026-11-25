@@ -4,8 +4,7 @@ Before eating: a meal photo + the last 2 h of CGM glucose and heart rate + a sho
 Maitha Alhosani · MAAI7103 · November 2026 · `just install` → `just predict-folder <in> <out>`
 
 <!-- BUDGET 3,000 words: bottom line 180 · §1 350 · §2 525 · §3 650 · §4 550 · §5 475 · §6 300 · §7 200.
-     Check with `just wordcount` (tables, figures and captions excluded per the final rubric).
-     TODO marker: [S16] filled from the single locked-8 run. -->
+     Check with `just wordcount` (tables, figures and captions excluded per the final rubric). -->
 
 **Bottom line.** The central fix this phase was calibration, and it worked: a per-person intercept,
 fitted only on each person's earlier meals and replayed in deployment order, raises AUROC from 0.726
@@ -15,17 +14,11 @@ AUROC, interval −0.010 to +0.061), so, per the paragraph committed before the 
 product is sensor + confirmed carbs, with the photo head as a carb-entry assist. Safety behaves by design: 8 of 109
 cleared meals spiked (7.3%, interval 2.9–14.2% against a pre-registered 10% cap), degraded input
 triggers refusal, with dangerous flips at most 1.5%, and a 23-case adversarial suite produces zero crashes
-and zero error rows. [S16: one sentence with the locked-8 result, scored once on 22 Nov, whatever it shows.]
-<!-- S16: BOTH outcome paragraphs pre-written 25 Nov, before the run; the losing one is deleted.
-A (holds up): "On the 8 locked people (N meals, XX% spike rate), scored exactly once: personal
-AUROC 0.XXX (0.XXX-0.XXX), raw 0.XXX; decisions XX/XX/XX; missed-among-cleared X of XX. The
-development estimate carries over."
-B (does not): "On the 8 locked people (N meals, XX% spike rate), scored exactly once: personal
-AUROC 0.XXX (0.XXX-0.XXX), raw 0.XXX; decisions XX/XX/XX; missed-among-cleared X of XX, failing
-the pre-set XX cap. With 8 people the interval is wide; per the pre-registration this number
-stands unadjusted and the development estimate does not replace it."
-Rules: threshold first where one exists, value second, verdict in the pre-registration's words,
-n named, no adjectives, no new slices. -->
+and zero error rows. On the 8 locked people (153 meals, 42.5% spike rate), scored exactly once: personal AUROC 0.645
+(0.540-0.736), raw 0.611; 10 cleared, 139 caution, 4 can't judge; 2 of the 10 cleared spiked and
+the cost reduction was −5.7%, failing the pre-set usefulness targets. With 8 people the interval
+is wide; per the pre-registration these numbers stand unadjusted and the development estimate does
+not replace them.
 
 ## 1. System and tooling
 <!-- 350 words: condensed user/workflow from the intermediate; ONE scoring path (D2); the instructor
@@ -174,8 +167,8 @@ sensitivity sweep; usefulness vs pre-registered targets; robustness table; stres
 Decisions are priced, not guessed: a missed spike costs 5× an unnecessary caution, abstention
 (2, 0.5), declared assumptions (the 5:1 ratio is a ~17% action threshold in decision-curve terms:
 Vickers & Elkin 2006), with a pre-registered cost sensitivity sweep committed alongside. All four usefulness targets were fixed before any result
-(docs/evaluation_protocol.md) and all four hold at the point estimate, the protocol's on-track
-label: cost reduction 14% (min 10%),
+(docs/evaluation_protocol.md) and all four hold at the point estimate on development, the
+protocol's on-track label (the locked eight fail them, §6): cost reduction 14% (min 10%),
 cleared 23% (min 20%), abstain 14% (max 20%), missed-among-cleared 7.3% (max 10%). In plain terms: of
 every 100 meals, the app clears about 23, flags 64 and declines 14; of the cleared, about 7 in 100
 still spike, which the programme's dietitian sees because the CGM reports every outcome at +2 h. Two folds, and
@@ -250,12 +243,19 @@ one of the three dietitian questions (§4).
 
 ## 6. Reproducibility
 <!-- 300 words: fresh-clone chain; one-Mac story + CSCC sentence; W&B; manifest; locked-8 protocol. -->
-The 8 locked subjects are scored once, on 22 Nov, from frozen artifacts verified by a fresh-clone
+The 8 locked subjects were scored once, on 25 Nov, from frozen artifacts verified by a fresh-clone
 run; every reported number comes from the same Pipeline.answer path the instructor command invokes.
-[S16: locked-8 tables here.]
-<!-- S16 section template: one table in the S3 format (raw / personal AUROC + log-loss, locked 8),
-one decisions line, one sentence comparing with dev (higher/lower/within CI), zero interpretation
-beyond the pre-committed paragraph. Budget ~55 words; headroom is reserved. --> We pre-commit, before that run: the result is reported as measured, in
+
+| risk (locked 8, 150 answered of 153 meals) | AUROC (95% person-clustered) | log-loss | ECE (15 bins) |
+|---|---|---|---|
+| raw fusion | 0.611 (0.510-0.743) | 0.707 | 0.143 |
+| + personal intercept (shipped) | **0.645 (0.540-0.736)** | **0.650** | **0.098** |
+
+Decisions on the locked 8: 10 low risk, 139 caution, 4 can't judge; missed-among-cleared 2 of 10;
+cost reduction −5.7% against the best constant policy. The development estimate (0.762) lies above
+the locked interval: the selection pressure §3 concedes is measured here, not hypothetical. The
+personal intercept still improves raw on the locked people, as it did in all five development
+folds. We pre-commit, before that run: the result is reported as measured, in
 the same form as §3, and no re-tuning follows. A fresh-clone dry-run (5 Nov) proved the chain:
 clone, `uv sync`, one documented weights step (pinned revision, SHA-256) reproduce the selftest and
 both input suites, and the dry run itself found and fixed two onboarding defects. The serving
