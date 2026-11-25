@@ -57,6 +57,15 @@ def decision(risk: float, lo: float, hi: float) -> str:
     return "low risk" if risk < lo else "caution" if risk >= hi else "can't judge"
 
 
+def decision_reason(dec: str, risk: float, lo: float, hi: float) -> str:
+    """Why an answered meal got its decision. The risk prints at one decimal so it never reads as equal to
+    the cut-off it was compared with ("risk 15% is below the low-risk cut-off 15%"; R11 addition, 26 Nov)."""
+    if dec == "low risk":
+        digits = next(d for d in (1, 2, 3, 4) if round(risk * 100, d) < lo * 100 or d == 4)
+        return f"risk {risk:.{digits}%} is below the low-risk cut-off {lo:.0%}"
+    return f"risk {risk:.1%} is at or above the caution cut-off {hi:.0%}"
+
+
 def sentence(dec: str, risk: float | None, reason: str) -> str:
     """Plain words for the user."""
     if dec == "low risk":

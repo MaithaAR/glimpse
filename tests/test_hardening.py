@@ -96,3 +96,16 @@ def test_output_dir_inside_input_dir_is_not_a_meal(tmp_path):
     predict_folder(app, tmp_path / "in", tmp_path / "in" / "out")
     lines = (tmp_path / "in" / "out" / "results.jsonl").read_text().splitlines()
     assert len(lines) == 1 and json.loads(lines[0])["meal_id"] == "01_only"
+
+
+def test_decision_reason_never_reads_as_equal_to_its_cut():
+    """R11 addition (26 Nov): the locked run printed "risk 15% is below the low-risk cut-off 15%" for a risk
+    of 0.148. One decimal keeps the reason consistent with the decision; the decision itself is unchanged."""
+    from glimpse.serve.rules import decision, decision_reason
+
+    lo, hi = 0.15, 0.16
+    for risk in (0.148, 0.1499, 0.03, 0.16, 0.1649, 0.9):
+        dec = decision(risk, lo, hi)
+        text = decision_reason(dec, risk, lo, hi)
+        shown = float(text.split()[1].rstrip("%")) / 100
+        assert (shown < lo) if dec == "low risk" else (shown >= hi - 1e-12), text

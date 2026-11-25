@@ -24,6 +24,7 @@ from glimpse.data.preprocess import resample_window
 from glimpse.serve.rules import (
     cant_judge,
     decision,
+    decision_reason,
     knn_distance,
     photo_problem,
     profile_vector,
@@ -207,7 +208,6 @@ class Pipeline:
                               risk=risk, checks_passed=passed, checks_failed=["borderline"],
                               escalate_to="human", **base, **carb)  # fmt: skip
         passed.append("borderline")
-        reason = (f"risk {risk:.0%} is below the low-risk cut-off {self.lo:.0%}" if dec == "low risk"
-                  else f"risk {risk:.0%} is at or above the caution cut-off {self.hi:.0%}")  # fmt: skip
+        reason = decision_reason(dec, risk, self.lo, self.hi)
         return Answer(decision=dec, sentence=sentence(dec, risk, reason), reason=reason, risk=risk,
                       checks_passed=passed, **base, **carb)  # fmt: skip
