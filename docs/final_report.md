@@ -421,7 +421,7 @@ pipeline, so the endpoint was never computed and cannot be now.
 
 After the locked run, a fresh clone on the Mac under the final serving code (install, data, pinned
 weights, prepare, selftest, evaluate, figures, both input suites) reproduced every number in the report
-of that day exactly (record: outputs/finalize/fresh_clone_2026-11-25.md; a data-free fresh clone of the final state is logged beside it). `just evaluate` reruns the development evaluation, then `just report-numbers`
+of that day exactly (record, plus a data-free rerun of the final state: outputs/finalize/). `just evaluate` reruns the development evaluation, then `just report-numbers`
 recomputes the descriptive metrics, replays and figures from committed outputs (no dataset or weights);
 `just reproduce-all` chains the compute studies (the README maps tables to recipes). Tests check the main
 tables' cells against those files on every commit.
