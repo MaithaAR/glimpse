@@ -362,6 +362,14 @@ def _splits_v2(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _stage_timing(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Serving time per stage on this machine (random-weight backbone; descriptive, 26 Nov)."""
+    from glimpse.studies.stage_timing import run_stage_timing
+
+    run_stage_timing(cfg)
+    return 0
+
+
 def _monitoring_replay(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Outcome and behaviour monitoring rules replayed on the committed answers (registered 26 Nov)."""
     from glimpse.studies.monitoring_replay import run_monitoring_replay
@@ -452,6 +460,7 @@ def main(argv: list[str] | None = None) -> int:
     od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
+    sub.add_parser("stage-timing", help="serving time per stage on this machine, incl. the no-photo path")
     sub.add_parser("monitoring-replay", help="outcome and behaviour monitoring rules replayed on the logged answers")
     sub.add_parser(
         "report-metrics", help="AUPRC, Brier, both ECE binnings, baselines, policy costs (committed answers)"
@@ -502,6 +511,7 @@ def main(argv: list[str] | None = None) -> int:
         "figures": _figures,
         "timing": _timing,
         "splits-v2": _splits_v2,
+        "stage-timing": _stage_timing,
         "monitoring-replay": _monitoring_replay,
         "report-metrics": _report_metrics,
         "selftest": _selftest,
