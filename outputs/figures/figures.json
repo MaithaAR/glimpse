@@ -73,6 +73,7 @@
     "f3_reliability.png",
     "f4_effects.png",
     "f5_robustness.png",
-    "f6_shap.png"
+    "f6_shap.png",
+    "f7_coverage.png"
   ]
 }
