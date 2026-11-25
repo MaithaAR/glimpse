@@ -43,7 +43,7 @@ which the evaluation replays in deployment order. An optional `history.csv` per 
 answers' fusion logits and CGM labels) now feeds it through the same two-hour gate; the samples carry
 none. A profile without onboarding priors (every instructor case) gets training medians drawn from all 37
 non-locked people, type 2 diabetes included (spike rate 0.455, rise 48 mg/dL). Tooling: uv
-+ Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for every number, 175 tests in CI (158 run without the dataset or weights; 16 skip, 1 expected failure),
++ Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for every number, 176 tests in CI (159 run without the dataset or weights; 16 skip, 1 expected failure),
 W&B offline runs replayed from the committed training histories, and a git history (from 2 Nov; earlier
 ordering in the dated design docs) in which every pre-registration precedes its run.
 
@@ -322,6 +322,7 @@ stressor. R1-R5 and R8-R12 answer observed failures, R13 a measured one; tests e
 | 1, on real photos | the 14 real phone photos | median 0.433: R7-style cuisine drift would not fire it |
 | 2a missed-among-cleared above 10%, 80-answer windows | replay 1: dev answers at each fold's cut-offs, then locked | 7 of 21 ordinary dev windows (2–5 misses among 10–25 clears; overlapping windows over two runs of misses); locked windows too few clears; 1 of 3 mixed windows fires |
 | 2a, deployed cut-offs on the evaluated (with-history) risk | replay 2 | 3 of 21 dev windows |
+| 2b rolling AUROC below 0.645, 80-answer windows | replay 1 | 1 of 21 dev windows, 4 of 4 locked; circular, since 0.645 is the locked value itself |
 | 3 behaviour: caution share above the highest dev week | both replays | cannot fire: one dev week is all caution |
 | calibration-in-the-large | both replays | pooled −0.015 dev, −0.010 locked; locked window median +0.038, against a registered expectation of negative |
 | 4 calibration drift (median abs. b_p over months) | not computable from ten days per person | – |

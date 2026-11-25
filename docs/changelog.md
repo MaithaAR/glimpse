@@ -186,3 +186,5 @@ registrations and on R13.
 Added at the close: the within-person drop has a person-bootstrap interval, −0.078 (−0.110, −0.046), with
 19 of 22 people worse: the intercept is established to hurt the ranking of a person's own meals while it
 helps between people (report §3; report_metrics.json `within_person`).
+Also at the close: signal 2b (rolling AUROC below the locked value) added to the monitoring table, labelled
+circular because its threshold is the locked AUROC itself (outputs/monitoring/replay.json `summary`).

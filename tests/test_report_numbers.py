@@ -415,3 +415,13 @@ def test_cgm_removal_and_ood_rows(text, rm):
     assert t["instructor screenshot / dark photo / local dish"][1] == " / ".join(
         f"{sc[k]:.3f}" for k in ("09_screenshot", "08_dark_photo", "11_local_dish")
     )
+
+
+def test_signal_2b_row(text):
+    sm = _load("outputs/monitoring/replay.json")["summary"]
+    row = _tables(text)["2b rolling AUROC below 0.645, 80-answer windows"]
+    want = (
+        f"{sm['dev']['auroc_below_locked_value']} of {sm['dev']['windows']} dev windows, "
+        f"{sm['locked']['auroc_below_locked_value']} of {sm['locked']['windows']} locked"
+    )
+    assert row[1].startswith(want)
