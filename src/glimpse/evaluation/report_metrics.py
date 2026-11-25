@@ -230,6 +230,98 @@ def fine_tuned_parameters(cfg) -> dict:
             "fine_tuned_total": last + photo - backbone}  # fmt: skip
 
 
+def _logit(p: np.ndarray) -> np.ndarray:
+    q = np.clip(p, 1e-6, 1 - 1e-6)
+    return np.log(q / (1 - q))
+
+
+def _served(df: pd.DataFrame, platt: np.ndarray, lo: float, hi: float, costs: dict, targets: dict) -> dict:
+    """Decisions at the deployed cut-offs on a no-history (Platt-only) risk; rows without a risk stay can't
+    judge. This is the operating point the folder command and the app serve."""
+    from glimpse.evaluation.metrics import usefulness_report
+    from glimpse.serve.rules import decision
+
+    dec = df.decision.copy()
+    has = ~np.isnan(platt)
+    dec[has] = [decision(float(r), lo, hi) for r in platt[has]]
+    rep = usefulness_report(dec.map(ACTION).to_numpy(), df.spike.to_numpy().astype(int), costs, targets)
+    rep["n_missed"] = int(df.spike[dec == "low risk"].sum())
+    return rep
+
+
+def served_operating_point(cfg, dev: pd.DataFrame, locked: pd.DataFrame, costs: dict) -> dict:
+    """The no-history operating point at the deployed cut-offs, descriptive (26 Nov): dev uses each fold's
+    Platt-only risk (per-fold models), locked applies the frozen Platt map to the frozen fusion's raw risk.
+    Nothing is refitted; the locked people are not rescored (arithmetic on the committed answers)."""
+    import joblib
+
+    from glimpse.training.final import FINAL, load_thresholds
+
+    th = load_thresholds()["main"]
+    lo, hi = th["low_risk_below"], th["caution_from"]
+    a, b = joblib.load(FINAL)["calibration"]
+    lk_platt = 1 / (1 + np.exp(-(a * _logit(locked.risk_raw.to_numpy(float)) + b)))
+    lk_platt[locked.risk_raw.isna().to_numpy()] = np.nan
+    targets = cfg.targets.model_dump()
+    return {"cutoffs": [lo, hi], "platt": [a, b],
+            "dev": _served(dev, dev.risk_platt.to_numpy(float), lo, hi, costs, targets),
+            "locked": _served(locked, lk_platt, lo, hi, costs, targets)}  # fmt: skip
+
+
+def ece_noise_floor(y: np.ndarray, p: np.ndarray, sids: np.ndarray, draws: int = 2000, seed: int = 0) -> dict:
+    """What ECE (15 equal-width bins) a perfectly calibrated model shows at this sample size: labels drawn as
+    Bernoulli(risk). Plus a person-bootstrap interval on the observed ECE."""
+    rng = np.random.default_rng(seed)
+    sims = [reliability(p, (rng.random(len(p)) < p).astype(float), bins=15)[1] for _ in range(draws)]
+    obs = person_bootstrap_ci(sids, lambda i: reliability(p[i], y[i], bins=15)[1])
+    return {"observed": obs[0], "observed_ci95": [obs[1], obs[2]],
+            "perfectly_calibrated_median": float(np.median(sims)),
+            "perfectly_calibrated_q95": float(np.quantile(sims, 0.95))}  # fmt: skip
+
+
+def coverage_risk(df: pd.DataFrame, cut: np.ndarray, costs: dict) -> list[dict]:
+    """Selective decisions, descriptive: abstain on the share of answered meals whose risk lies closest to the
+    low-risk cut, decide the rest at the cut, and report what the cleared meals and the cost do."""
+    a = df[df.risk.notna()].reset_index(drop=True)
+    y = a.spike.to_numpy().astype(int)
+    r = a.risk.to_numpy(float)
+    dist = np.abs(r - cut[a.index] if cut.ndim else r - cut)
+    order = np.argsort(dist)
+    rows = []
+    for share in (0.0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5):
+        act = np.where(r < (cut[a.index] if cut.ndim else cut), 0, 1)
+        act[order[: int(round(share * len(a)))]] = 2
+        cl = act == 0
+        rows.append({"abstain_share": share, "cleared_share": float(cl.mean()),
+                     "missed_among_cleared": float(y[cl].mean()) if cl.any() else None,
+                     "error_rate_answered": float(np.mean((act[act < 2] == 0) == (y[act < 2] == 1))),
+                     "cost": expected_cost(act, y, costs)})  # fmt: skip
+    return rows
+
+
+def person_offsets(dev: pd.DataFrame, locked: pd.DataFrame, platt: tuple[float, float]) -> dict:
+    """The shipped risk's per-person part, b = logit(risk) - logit(Platt-only risk), from the answer files."""
+    out = {}
+    lk_platt = 1 / (1 + np.exp(-(platt[0] * _logit(locked.risk_raw.to_numpy(float)) + platt[1])))
+    for name, risk, base in (("dev", dev.risk.to_numpy(float), dev.risk_platt.to_numpy(float)),
+                             ("locked", locked.risk.to_numpy(float), lk_platt)):  # fmt: skip
+        b = _logit(risk) - _logit(base)
+        b = b[~np.isnan(b)]
+        out[name] = {"median": float(np.median(b)), "q10": float(np.quantile(b, 0.1)),
+                     "q90": float(np.quantile(b, 0.9)),
+                     "share_abs_above_0_5": float(np.mean(np.abs(b) > 0.5))}  # fmt: skip
+    return out
+
+
+def heart_rate_r2() -> float:
+    """R^2 of heart rate (standardised fusion input) regressed on the other 18 inputs, development meals."""
+    from sklearn.linear_model import LinearRegression
+
+    z = pd.read_csv("outputs/figures/shap_features_z.csv").drop(columns="row")
+    x, y = z.drop(columns="heart rate"), z["heart rate"]
+    return float(LinearRegression().fit(x, y).score(x, y))
+
+
 def run_report_metrics(cfg) -> dict:
     """Write outputs/report_metrics/report_metrics.json; log the headline additions."""
     from glimpse.training.final import cost_dict
@@ -269,6 +361,22 @@ def run_report_metrics(cfg) -> dict:
     t5 = [m["row"] for m in res["false_clears_exploratory"]["meals"] if m["class"].startswith("T5")]
     res["shap_terms_t5"] = shap_terms(t5)
     res["fine_tuned_parameters"] = fine_tuned_parameters(cfg)
+    res["served_operating_point"] = served_operating_point(cfg, dev, locked, costs)
+    res["ece_noise_floor"] = {}
+    for k, v in (("dev", dev), ("locked", locked)):
+        a = v[v.risk.notna()]
+        res["ece_noise_floor"][k] = ece_noise_floor(a.spike.to_numpy().astype(float), a.risk.to_numpy(float),
+                                                    a.person_id.to_numpy())  # fmt: skip
+    ev = json.loads(Path("outputs/evaluation_v2/dev_summary.json").read_text())
+    lo_by_fold = {f["fold"]: f["low_risk_below"] for f in ev["folds"]}
+    dev_ans = dev[dev.risk.notna()].reset_index(drop=True)
+    res["coverage_risk"] = {"dev": coverage_risk(dev_ans, dev_ans.fold.map(lo_by_fold).to_numpy(float), costs),
+                            "locked": coverage_risk(locked, np.array(res["served_operating_point"]["cutoffs"][0]),
+                                                    costs)}  # fmt: skip
+    res["person_offsets"] = person_offsets(dev, locked, tuple(res["served_operating_point"]["platt"]))
+    res["heart_rate_r2_from_other_inputs"] = heart_rate_r2()
+    res["calibration_in_the_large_pooled"] = {k: float(v.risk.mean() - v.loc[v.risk.notna(), "spike"].mean())
+                                              for k, v in (("dev", dev), ("locked", locked))}  # fmt: skip
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "report_metrics.json").write_text(json.dumps(res, indent=2))
     c = res["cohorts"]

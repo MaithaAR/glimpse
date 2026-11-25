@@ -207,6 +207,31 @@ def f5_robustness(plt, lv: dict) -> None:
     plt.close(fig)
 
 
+def f7_coverage(plt) -> None:
+    """Coverage vs risk, descriptive (26 Nov): abstain on the meals whose risk is closest to the low-risk cut,
+    decide the rest; development at each fold's cut, locked at the deployed 0.15. From report_metrics.json."""
+    cr = json.loads(Path("outputs/report_metrics/report_metrics.json").read_text())["coverage_risk"]
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.2))
+    for name, c in (("development", BLUE), ("locked eight", ORANGE)):
+        rows = cr["dev" if name == "development" else "locked"]
+        xs = [r["abstain_share"] for r in rows]
+        axes[0].plot(xs, [r["cleared_share"] for r in rows], "o-", color=c, ms=3.5, label=name)
+        pts = [(r["abstain_share"], r["missed_among_cleared"]) for r in rows if r["missed_among_cleared"] is not None]
+        axes[1].plot([q[0] for q in pts], [q[1] for q in pts], "o-", color=c, ms=3.5, label=name)
+    axes[1].axhline(0.10, color=RED, lw=0.8, ls="--")
+    axes[1].text(0.31, 0.105, "10% cap", color=RED, fontsize=7.5)
+    axes[0].set_ylabel("share of answered meals cleared")
+    axes[1].set_ylabel("spikes among cleared meals")
+    for ax in axes:
+        ax.set_xlabel("share abstained (closest to the cut first)")
+        ax.legend(frameon=False, fontsize=7.5)
+    axes[0].set_title("Coverage: abstaining near the cut removes clears", fontsize=9)
+    axes[1].set_title("Spikes among the cleared meals", fontsize=9)
+    fig.tight_layout()
+    fig.savefig(OUT / "f7_coverage.png")
+    plt.close(fig)
+
+
 FEATURE_NAMES = ["last glucose", "slope 30 min", "slope 60 min", "window mean", "window sd",
                  "window rise", "heart rate", "age", "BMI", "HbA1c", "fasting glucose", "hour (sin)",
                  "hour (cos)", "prior spike rate", "prior rise", "log photo grams", "p(bin 30-60g)",
@@ -317,6 +342,8 @@ def run_figures(cfg=None) -> dict:
     f4_effects(plt, fu, ch, d8)
     f5_robustness(plt, lv)
     shap_report = f6_shap(plt, da)
+    if Path("outputs/report_metrics/report_metrics.json").exists():
+        f7_coverage(plt)
     report = {"what": "report figures rendered from committed evidence only (pre-commitment in "
                       "docs/final_design.md); ece_raw/ece_personal = equal-mass ECE, 15 bins, answered dev meals; "
                       "ece_equal_width_15 = the registered binning that Figure 3 draws",
@@ -326,7 +353,7 @@ def run_figures(cfg=None) -> dict:
               **_answer_stats(da),
               "files": sorted(p.name for p in OUT.glob("*.png"))}  # fmt: skip
     (OUT / "figures.json").write_text(json.dumps(report, indent=2))
-    logger.bind(stage="figures").info("6 figures -> {}; ECE raw {:.3f} -> personal {:.3f}; SHAP sum "
+    logger.bind(stage="figures").info("figures -> {}; ECE raw {:.3f} -> personal {:.3f}; SHAP sum "
                                       "check {:.1e}; top features {}", OUT, ece["risk_raw"], ece["risk"],
                                       shap_report["sum_check_abs_err"], shap_report["top_global"])  # fmt: skip
     return report
