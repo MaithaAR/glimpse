@@ -58,3 +58,17 @@ counterfactual holds everything else fixed and moves last reading, window rise a
 the conditional direction, which is negative. Report use: section 5 quotes B1 verbatim as the probe
 that caught the authors' wrong intuition while confirming the model respects the baseline-relative
 label; no retuning follows from it.
+
+## Probe C, profile and onboarding priors (registered 26 Nov 2026, before its run)
+
+Why: the profile carries the system (dropping it costs 0.122 AUROC) and prior rise ranks first in the
+in-sample SHAP, yet no counterfactual has tested the profile. Written after every other result was known,
+so it is descriptive. Method: the frozen fusion on the 460 answered development meals' standardised inputs
+(outputs/figures/shap_features_z.csv), Platt only, deployed cut-offs (0.15, 0.16). For each of HbA1c,
+fasting glucose, prior spike rate and prior rise, set that one input to its 10th and then its 90th
+percentile over the 460 meals, everything else unchanged. Report per input: the share of meals whose risk
+rises from 10th to 90th, the median risk change, and the share of meals whose decision differs between the
+two settings. A fifth case sets both priors to the serving imputer's medians (the instructor's path).
+Expected, from physiology: risk rises with each of the four inputs on at least 90% of meals. Because the
+fusion is linear the share is 0% or 100% per input; the direction is the test. Reported as measured in
+outputs/probes/probe_c.json (`glimpse probe-c`).

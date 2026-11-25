@@ -269,6 +269,42 @@ def served_operating_point(cfg, dev: pd.DataFrame, locked: pd.DataFrame, costs: 
             "locked": _served(locked, lk_platt, lo, hi, costs, targets)}  # fmt: skip
 
 
+def served_imputed_priors(cfg, dev: pd.DataFrame, costs: dict) -> dict:
+    """The instructor's path on development (26 Nov, descriptive, approximate): no history AND no onboarding
+    priors, so the two prior inputs take the serving imputer's medians. The fusion is linear, so each dev
+    meal's no-history logit moves by the frozen fusion's prior coefficients times the change in the two
+    standardised inputs, scaled by its fold's Platt slope. Approximation: the frozen coefficients and imputer
+    stand in for each fold model's own (the fold models are not committed). Locked people are not touched."""
+    import joblib
+
+    from glimpse.training.final import FINAL, load_thresholds
+
+    pipe = joblib.load(FINAL)["models"]["photo"]
+    imp, sc, lr = pipe.named_steps.values()
+    z = pd.read_csv("outputs/figures/shap_features_z.csv").set_index("row")
+    idx = [list(z.columns).index(c) for c in ("prior spike rate", "prior rise")]
+    zmed = (imp.statistics_[idx] - sc.mean_[idx]) / sc.scale_[idx]
+    ev = json.loads(Path("outputs/evaluation_v2/dev_summary.json").read_text())
+    slope = {f["fold"]: f["platt_slope"] for f in ev["folds"]}
+    th = load_thresholds()["main"]
+    lo, hi = th["low_risk_below"], th["caution_from"]
+    has = dev.risk_platt.notna().to_numpy()
+    zr = z.loc[dev.row[has]].to_numpy()[:, idx]
+    delta = (zmed - zr) @ lr.coef_[0][idx]
+    lg = _logit(dev.risk_platt.to_numpy(float)[has]) + dev.fold[has].map(slope).to_numpy() * delta
+    risk = np.full(len(dev), np.nan)
+    risk[has] = 1 / (1 + np.exp(-lg))
+    y = dev.spike.to_numpy().astype(int)
+    out = _served(dev, risk, lo, hi, costs, cfg.targets.model_dump())
+    out.update({"auroc": float(roc_auc_score(y[has], risk[has])),
+                "auroc_own_priors": float(roc_auc_score(y[has], dev.risk_platt.to_numpy(float)[has])),
+                "mean_risk": float(np.nanmean(risk)), "spike_rate_answered": float(y[has].mean()),
+                "ece_equal_width_15": float(reliability(risk[has], y[has], bins=15)[1]),
+                "imputed_medians": imp.statistics_[idx].tolist(),
+                "median_abs_logit_shift": float(np.median(np.abs(lg - _logit(dev.risk_platt.to_numpy(float)[has]))))})  # noqa: E501
+    return out
+
+
 def ece_noise_floor(y: np.ndarray, p: np.ndarray, sids: np.ndarray, draws: int = 2000, seed: int = 0) -> dict:
     """What ECE (15 equal-width bins) a perfectly calibrated model shows at this sample size: labels drawn as
     Bernoulli(risk). Plus a person-bootstrap interval on the observed ECE."""
@@ -543,6 +579,7 @@ def run_report_metrics(cfg) -> dict:
     res["fair_baselines"] = fair_baselines(dev)
     res["falling_now_what_if"] = falling_now_what_if(dev)
     res["share_cis"] = {"dev": share_cis(dev), "locked": share_cis(locked)}
+    res["served_imputed_priors"] = served_imputed_priors(cfg, dev, costs)
     res["cold_start_what_if"] = {"dev": cold_start_what_if(dev, costs), "locked": cold_start_what_if(locked, costs)}
     res["band_and_served_calibration"] = band_and_served_calibration(cfg, dev, locked, costs)
     res["intercept_by_history"] = intercept_by_history(dev, locked, tuple(res["served_operating_point"]["platt"]))
