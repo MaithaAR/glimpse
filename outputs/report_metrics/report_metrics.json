@@ -2283,6 +2283,13 @@
     "n_cleared": 55,
     "useful": false,
     "n_missed": 9,
+    "with_rule_r13": {
+      "share_low_risk": 0.0,
+      "share_caution": 0.8274428274428275,
+      "share_abstain": 0.17255717255717257,
+      "cost": 0.6735966735966736,
+      "cost_reduction": -0.003095975232198178
+    },
     "auroc": 0.6371118112261299,
     "auroc_own_priors": 0.7139672946269745,
     "mean_risk": 0.3352311561806183,

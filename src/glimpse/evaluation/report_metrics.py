@@ -314,6 +314,17 @@ def served_imputed_priors(cfg, dev: pd.DataFrame, costs: dict) -> dict:
     risk[has] = 1 / (1 + np.exp(-lg))
     y = dev.spike.to_numpy().astype(int)
     out = _served(dev, risk, lo, hi, costs, cfg.targets.model_dump())
+    # rule R13 (26 Nov): no history and no priors -> a low-risk answer becomes can't judge
+    from glimpse.evaluation.metrics import usefulness_report
+    from glimpse.serve.rules import decision
+
+    dec = dev.decision.copy()
+    dec[has] = [decision(float(r), lo, hi) for r in risk[has]]
+    dec[dec == "low risk"] = "can't judge"
+    r13 = usefulness_report(dec.map(ACTION).to_numpy(), dev.spike.to_numpy().astype(int), costs,
+                            cfg.targets.model_dump())  # fmt: skip
+    out["with_rule_r13"] = {k: r13[k] for k in ("share_low_risk", "share_caution", "share_abstain", "cost",
+                                                "cost_reduction")}  # fmt: skip
     out.update(
         {
             "auroc": float(roc_auc_score(y[has], risk[has])),

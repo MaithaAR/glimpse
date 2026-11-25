@@ -308,7 +308,8 @@ def test_status_table_timing_cusum_and_what_if(text, rm):
     sp = rm["served_imputed_priors"]
     row = t["no history and no onboarding priors (the samples' path; dev, approximate)"][2]
     assert row == (f"AUROC {sp['auroc']:.3f}; {sp['share_low_risk'] * 100:.1f}% cleared, {sp['n_missed']} of "
-                   f"{sp['n_cleared']} spike; cost {_pct(sp['cost_reduction'])} / –")  # fmt: skip
+                   f"{sp['n_cleared']} spike; cost {_pct(sp['cost_reduction'])} / –; with rule R13: 0 cleared, "
+                   f"{_pct(sp['with_rule_r13']['cost_reduction'])}")  # fmt: skip
     pc = _load("outputs/probes/probe_c.json")
     assert all(v["expected_direction_met"] for v in pc["inputs"].values())
     ip = pc["imputed_priors"]
@@ -374,3 +375,10 @@ def test_locked_decisions_follow_the_current_cut_off_rule():
     has = la.risk.notna()
     redecided = [decision(float(r), th["low_risk_below"], th["caution_from"]) for r in la.risk[has]]
     assert redecided == la.decision[has].tolist()
+
+
+def test_r13_cells(text, rm):
+    sp = rm["served_imputed_priors"]["with_rule_r13"]
+    assert sp["share_low_risk"] == 0
+    assert f"{sp['share_abstain'] * 100:.1f}% can't judge" in text
+    assert f"with rule R13: 0 cleared, {_pct(sp['cost_reduction'])}" in text

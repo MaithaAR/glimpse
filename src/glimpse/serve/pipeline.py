@@ -27,6 +27,7 @@ from glimpse.serve.rules import (
     decision,
     decision_reason,
     knn_distance,
+    no_basis_to_clear,
     photo_problem,
     profile_vector,
     sentence,
@@ -212,6 +213,10 @@ class Pipeline:
                               risk=risk, checks_passed=passed, checks_failed=["borderline"],
                               escalate_to="human", **base, **carb)  # fmt: skip
         passed.append("borderline")
+        hold = no_basis_to_clear(dec, history, m.profile)
+        if hold:  # rule R13: no low risk on the population calibration alone
+            return cant_judge(hold, risk=risk, checks_passed=passed, checks_failed=["personal_basis"],
+                              escalate_to="human", **base, **carb)  # fmt: skip
         reason = decision_reason(dec, risk, self.lo, self.hi)
         return Answer(decision=dec, sentence=sentence(dec, risk, reason), reason=reason, risk=risk,
                       checks_passed=passed, **base, **carb)  # fmt: skip

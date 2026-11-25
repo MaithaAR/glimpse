@@ -72,6 +72,24 @@ def decision_reason(dec: str, risk: float, lo: float, hi: float) -> str:
     return f"risk {risk:.1%} is at or above the caution cut-off {hi:.0%}"
 
 
+PRIORS = ("prior_spike_rate", "prior_rise")
+
+
+def no_basis_to_clear(dec: str, history, profile: dict[str, float]) -> str | None:
+    """Rule R13 (26 Nov): a low-risk answer needs a personal basis, either earlier labelled meals (history)
+    or onboarding priors. Without both the risk is the population calibration alone, which on development
+    cleared 11% of meals with 16% of them spiking; such a meal is not cleared but referred, with this reason.
+    Returns the reason, or None when the rule does not apply. Changes no risk, weight or cut-off."""
+    if dec != "low risk" or history:
+        return None
+    if all(math.isfinite(float(profile.get(k, float("nan")))) for k in PRIORS):
+        return None
+    return (
+        "not cleared: no earlier labelled meals and no onboarding priors, so the risk rests on the "
+        "population alone (rule R13); add a history.csv or the onboarding priors, or ask a dietitian"
+    )
+
+
 def sentence(dec: str, risk: float | None, reason: str) -> str:
     """Plain words for the user."""
     if dec == "low risk":

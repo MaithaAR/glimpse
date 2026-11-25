@@ -38,15 +38,22 @@ def f1_system(plt) -> None:
 
     box(0.0, 3.0, 1.9, 0.9, "meal photo")
     box(0.0, 1.7, 1.9, 0.9, "CGM + heart rate\n(2 h before)")
-    box(0.0, 0.4, 1.9, 0.9, "profile\n(4 fields, 8 inputs)")
+    box(0.0, 0.4, 1.9, 0.9, "profile: 4 fields +\n2 optional priors")
     box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12")
     box(4.9, 3.0, 2.5, 0.9, "ConvNeXt-Tiny, last stage\ntuned; grams + bin heads")
     box(4.9, 1.7, 2.5, 0.9, "trend features\n+ profile inputs")
     box(7.9, 3.2, 2.4, 0.9, "kNN unfamiliar-photo\ncheck (cut 0.614)")
     box(7.9, 1.7, 2.4, 1.2, "logistic fusion\n(20 parameters)\nPlatt (0.96, \u22120.20)")
     box(10.8, 1.7, 2.4, 1.2, "personal intercept\nfrom earlier labelled\nmeals (m = 1.0)")
-    box(13.7, 1.7, 2.3, 1.2, "cut-offs 0.15 / 0.16\nlow risk | caution\n+ reason", fc="#e6f0fa")
-    box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 confirm carbs\nor dietitian", fc="#fdf0e6")
+    box(
+        13.7,
+        1.7,
+        2.3,
+        1.2,
+        "cut-offs 0.15 / 0.16\nlow risk | caution\n+ reason (R13: no clear\nwithout history or priors)",
+        fc="#e6f0fa",
+    )
+    box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 new photo\nor dietitian", fc="#fdf0e6")
     box(10.8, 3.4, 2.4, 0.9, "CGM label at +2 h\n(replay; or history.csv)", fc="#eef7ee")
     ax.text(12.4, 0.75, "borderline risk", fontsize=6.8, color=ORANGE)
     ax.text(3.9, 0.45, "failed input rule, blank or\nunreadable photo", fontsize=6.8, color=ORANGE)

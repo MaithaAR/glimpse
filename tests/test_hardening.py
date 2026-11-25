@@ -126,3 +126,17 @@ def test_window_reason_names_only_the_failing_criteria():
     assert reason == "glucose data incomplete: a gap of 35 min (max 20)"
     w = SimpleNamespace(values=np.full(24, 110.0), readings_last_30min=1, coverage=0.04, max_gap_min=115.0)
     assert window_problem(w, cfg).count("need") == 2 and "max 20" in window_problem(w, cfg)
+
+
+def test_r13_no_low_risk_without_history_or_priors():
+    """Rule R13 (26 Nov): low risk needs history or both onboarding priors; otherwise the meal is referred."""
+    from glimpse.serve.rules import no_basis_to_clear
+
+    bare = {"age": 45.0, "bmi": 28.0}
+    with_priors = {**bare, "prior_spike_rate": 0.3, "prior_rise": 40.0}
+    assert "rule R13" in no_basis_to_clear("low risk", None, bare)
+    assert "rule R13" in no_basis_to_clear("low risk", [], {**bare, "prior_spike_rate": 0.3})
+    assert "rule R13" in no_basis_to_clear("low risk", None, {**with_priors, "prior_rise": float("nan")})
+    assert no_basis_to_clear("low risk", None, with_priors) is None
+    assert no_basis_to_clear("low risk", [(-0.5, 1)], bare) is None
+    assert no_basis_to_clear("caution", None, bare) is None

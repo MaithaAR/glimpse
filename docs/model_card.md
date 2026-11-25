@@ -12,7 +12,8 @@ device. Not for type 1 diabetes, insulin dosing or treatment decisions. No claim
 those participants were used for training only.
 
 **Parts.** The model artifacts were frozen 6 Nov under a pre-registered procedure; the input rules gained R11 (8 Nov, with additions on 25 and 26 Nov) and R12 (26 Nov), which change wording and refusals, not risks.
-- Input rules R1-R12 run first and refuse with a named reason (docs/rule_ledger.md).
+- Input rules R1-R12 run first and refuse with a named reason; output rule R13 withholds low risk without
+  history or priors (docs/rule_ledger.md).
 - Photo: ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned; pinned revision and SHA-256), last stage
   fine-tuned, two heads (grams, 4 carb bins); 27.8M parameters, 15.5M fine-tuned. It did not pass its
   pre-registered risk gate (+0.025 AUROC, −0.010 to +0.061), yet its estimate is 4 of the fusion's 19
@@ -25,8 +26,8 @@ those participants were used for training only.
   without it, and in the app, answers use the population calibration (Platt only). Without history,
   development clears 15.2% of meals with 9.6% of them spiking (cost reduction 8.7%), failing two targets. A
   profile without onboarding priors (every sample) gets the training medians (0.455, 48 mg/dL); with that
-  too, approximated on development, AUROC is 0.637 and 9 of 55 cleared meals spike (cost −1.5%): do not
-  clear meals without history and priors.
+  too, approximated on development, AUROC is 0.637 and 9 of 55 cleared meals spike (cost −1.5%), so rule
+  R13 (26 Nov) answers can't judge instead of low risk when there is neither history nor both priors.
 - SensorCNN (5,217 parameters, from scratch) is evaluated, not deployed: it ties the trend features.
 
 **Training data.** CGMacros v1.0.0 (PhysioNet, CC BY-NC-SA 4.0): 37 non-locked adults (23 healthy or

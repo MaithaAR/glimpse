@@ -272,7 +272,8 @@ def test_decision_parity_with_the_vectorised_rule():
     Pipeline.answer give the same decision meal by meal on clean inputs, across the whole risk range."""
     for risk in (0.05, 0.142, 0.143, 0.17, 0.2, 0.45, 0.95):
         p = bare_pipeline(risk=risk, table={0: _est()})
-        a = p.answer(MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm()), key=0)
+        priors = {**PROFILE, "prior_spike_rate": 0.3, "prior_rise": 40.0}  # R13 needs a personal basis to clear
+        a = p.answer(MealInput(meal_time=MEAL, profile=priors, **flat_cgm()), key=0)
         vec = "low risk" if a.risk < p.lo else "caution" if a.risk >= p.hi else "can't judge"
         assert a.decision == vec, (risk, a.decision, vec)
 
@@ -287,3 +288,18 @@ def test_serving_bundle_calibration_reaches_the_risk_path(tmp_path, monkeypatch)
     hist = [(0.3, 1), (0.1, 0)]
     a, b = injected.answer(m, key=7, history=hist), served.answer(m, key=7, history=hist)
     assert a.risk == b.risk and a.risk_platt == b.risk_platt and a.risk_raw == b.risk_raw
+
+
+def test_r13_withholds_low_risk_without_history_or_priors():
+    """Rule R13 end to end on the bare pipeline: the same low risk is cleared with priors or with history,
+    and referred (can't judge, named reason, risk kept) without either. Caution answers are untouched."""
+    p = bare_pipeline(risk=0.05, table={0: _est()})
+    bare = p.answer(MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm()), key=0)
+    assert bare.decision == "can't judge" and "rule R13" in bare.reason and bare.risk == 0.05
+    assert bare.checks_failed == ["personal_basis"] and bare.escalate_to == "human"
+    priors = {**PROFILE, "prior_spike_rate": 0.3, "prior_rise": 40.0}
+    assert p.answer(MealInput(meal_time=MEAL, profile=priors, **flat_cgm()), key=0).decision == "low risk"
+    hist = p.answer(MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm()), key=0, history=[(-2.0, 0)])
+    assert hist.decision == "low risk"
+    high = bare_pipeline(risk=0.45, table={0: _est()})
+    assert high.answer(MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm()), key=0).decision == "caution"

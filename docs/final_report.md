@@ -21,7 +21,7 @@ samples are, clears 11% of development meals and 16% of those spike (§4). The n
 | ECE, registered bins (target ≤ 0.05) | 0.052: not assessable, a perfectly calibrated model's median here | 0.061, below that median (0.094); the one-shot record gave 0.098 equal-mass | 0.023 / 0.162 |
 | usefulness targets (protocol labels) | 1 met (can't judge), 3 on track: intervals cross | not met (at risk): 3 of 4 miss | not met: 2 of 4 miss / 2 of 4 miss |
 | spikes among cleared meals (cap 10%) | 7.3% (2.9–14.2%) | 2 of 10 (exact 2.5–55.6%; person bootstrap 0–100%) | 9.6% / 21.9% |
-| no history and no onboarding priors (the samples' path; dev, approximate) | – | – | AUROC 0.637; 11.4% cleared, 9 of 55 spike; cost −1.5% / – |
+| no history and no onboarding priors (the samples' path; dev, approximate) | – | – | AUROC 0.637; 11.4% cleared, 9 of 55 spike; cost −1.5% / –; with rule R13: 0 cleared, −0.3% |
 | robustness | flips between low risk and caution ≤1.8% at every registered level; 3.7% without heart rate | – | – |
 | monitoring | photo drift fires only on a synthetic week; the outcome rule is too noisy | no rule cleanly catches the cohort shift | – |
 
@@ -43,7 +43,7 @@ which the evaluation replays in deployment order. An optional `history.csv` per 
 answers' fusion logits and CGM labels) now feeds it through the same two-hour gate; the samples carry
 none. A profile without onboarding priors (every instructor case) gets training medians drawn from all 37
 non-locked people, type 2 diabetes included (spike rate 0.455, rise 48 mg/dL). Tooling: uv
-+ Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for every number, 170 tests in CI (153 run without the dataset or weights; 16 skip, 1 expected failure),
++ Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for every number, 173 tests in CI (156 run without the dataset or weights; 16 skip, 1 expected failure),
 W&B offline runs replayed from the committed training histories, and a git history (from 2 Nov; earlier
 ordering in the dated design docs) in which every pre-registration precedes its run.
 
@@ -265,14 +265,15 @@ far over its cap; at twice it, savings fall to 3.1% and missed-among-cleared ris
 *Served = the deployed cut-offs on the Platt-only risk, recomputed from the committed answers (dev: per-fold models; locked: frozen Platt on the frozen fusion's raw risk); nothing refitted or rescored. outputs/report_metrics/report_metrics.json (decisions, errors, served_operating_point, served_imputed_priors, share_cis), outputs/figures/figures.json (the dev miss interval), outputs/locked_eval/locked_summary.json.*
 
 In plain terms: of every 100 development meals the evaluated system (with history) clears 22.7, flags 63.6 and declines 13.7; of the
-cleared, about 7 still spike, visible to a dietitian since the CGM reports every outcome. Only 17 people
+cleared, about 7 still spike. Only 17 people
 had cleared meals, so the miss interval's upper end exceeds the cap; the 8 misses spread across 6 people. The frozen band (0.15, 0.16) is one point wide. On the locked cohort, where
 risks ran higher, 139 of 153 meals landed above it: a dietitian would see nearly every meal flagged, and
 always flagging is then the cheaper policy.
 Without history the served point (last column) fails two targets on development and misses 7 of 32 clears
 on the locked eight. The samples also lack onboarding priors: filled with the serving medians (development,
 frozen coefficients standing in for the fold models'), AUROC drops to 0.637 and 9 of 55 cleared meals
-spike, costlier than always flagging. Without history and priors no meal should be cleared. Abstention
+spike, costlier than always flagging. Rule R13 (26 Nov, after the locked run) therefore refers such meals
+instead of clearing them: no misses, 17.3% can't judge, the cost of always flagging. Abstention
 does not pay here. Deciding the 45 borderline development meals would have cost less (0.539 against 0.555
 per answered meal): they spiked at 27%, above the 20% at which abstaining beats caution at the declared
 prices, because risks just above the low cut are under-predicted. Abstaining on the meals closest to the
@@ -300,7 +301,7 @@ and a misstated meal time are steps by design. Flips between low risk and cautio
 below 1.8% at every level; with heart rate missing, 3.7%, the worst case. All stress runs use the
 no-history per-fold pipelines. The 23 hostile inputs (timezone offsets, malformed JSON, binary CSVs,
 broken photos, empty folders) give zero crashes; five refuse on a placeholder photo after parsing their CSV
-stressor. R1-R5 and R8-R12 were each added against an observed failure; tests enforce them.
+stressor. R1-R5 and R8-R13 were each added against an observed failure; tests enforce them.
 
 | monitoring signal (docs/monitoring.md) | demonstration | result |
 |---|---|---|
@@ -390,7 +391,7 @@ in-sample clears from 68 to 46 (outputs/probes/probe_c.json).
 Probe A: risk moves in the photo's direction on 100% of meals, which a linear fusion guarantees (a
 wiring check, not learning), yet the extreme bottom↔top-decile plate swap leaves 68.5% of decisions unchanged (median swing 0.102), as pre-committed: the gate's verdict seen
 mechanistically. R7 (rule ledger): the kNN check measures visual, not nutritional, familiarity. A local
-lamb-and-rice dish (instructor case 11) scores 0.318 against the 0.614 cut (more familiar than the clean tuna bowl at 0.406)
+lamb-and-rice dish (instructor case 11) scores 0.318 against the 0.614 cut
 and gets a confident wrong carb bin; the sweep under a ≤2% false-flag budget shows no threshold fixes it.
 The confirm-carbs tier is unwired, so the fix is a nutrition-aware embedding (future work).
 
@@ -447,7 +448,7 @@ regulatory review, built so that a clinical study could evaluate it.
 |---|---|
 | RQ1, RQ2 | the proposal's questions: does the photo match true logged carbs (RQ1); does a from-scratch CNN beat hand-made trend features (RQ2) |
 | D1-D8 | dated design decisions in docs/final_design.md (D7: the gate's endpoints; D8: the exact-macro exclusion test) |
-| R1-R12 | input rules in docs/rule_ledger.md: R1-R5 and R8-R12 added after observed failures, R6 a preventive check, R7 a recorded limitation |
+| R1-R13 | rules in docs/rule_ledger.md (R13 acts on the output: no low risk without history or priors): R1-R5 and R8-R13 added after observed failures, R6 a preventive check, R7 a recorded limitation |
 | T1-T8 | failure classes (§5) |
 | partition v2 | the final split: 23 development people in 5 outer folds, 14 T2D training-only, 8 locked |
 | cgm_auto | the CGM's own label at +2 h, the training spike rule |

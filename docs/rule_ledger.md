@@ -147,5 +147,18 @@ reading at or below zero refuses first, with "a glucose reading is zero or negat
 The decision (can't judge) is unchanged; only the advice changes. The committed stress run keeps the old text.
 Same day, wording only: an incomplete-window refusal now names only the criteria that failed.
 
+## R13 - no low risk without a personal basis (26 Nov, after the locked run; an output rule)
+Observed: the samples carry neither history nor onboarding priors. Recomputed on development (frozen
+fusion's prior coefficients standing in for the fold models; report_metrics.json `served_imputed_priors`),
+that path clears 11.4% of meals and 9 of the 55 spike (16.4%, over the 10% cap), costing more than always
+flagging. Rule: a low-risk answer with no earlier labelled meals and either onboarding prior missing becomes
+can't judge, with a reason naming what would allow a clear (a history.csv, the priors) and a referral.
+Before/after on the same approximation: clears 55 -> 0, misses 9 -> 0, can't judge 5.8% -> 17.3%, cost
+reduction -1.5% -> -0.3%. No risk, weight, Platt map or cut-off changes; the evaluated (with-history) and
+locked answers all carry priors, so no reported decision changes (a test re-decides the locked answers).
+Before (a no-prior, no-history meal at risk 0.12): "low risk". After: "can't judge: not cleared: no earlier
+labelled meals and no onboarding priors ... (rule R13)". Unit test: tests/test_hardening.py. Not run end
+to end with the weights on this machine; the committed folder, stress and demo runs predate it.
+
 Provenance note (26 Nov): commit hashes cited above for R1-R7 (4c72a62, 5e01186, 71abb13) predate the 2 Nov squash
 and do not resolve in this repository; the dated ledger text is the record for those rules.
