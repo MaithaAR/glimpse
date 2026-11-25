@@ -1,12 +1,15 @@
 """Batch entry point for a folder of meals, as the instructor will run it: one sub-folder per meal
 (photo.*, cgm.csv, profile.json) -> results.jsonl + summary.md. A bad meal becomes a per-item entry,
 never a crash, and the per-meal loop always finishes (a missing or empty input folder is still an
-error). Report: instructor-readiness in §6c."""
+error). An optional history.csv per meal feeds the personal intercept (report §1)."""
 
 from __future__ import annotations
 
+import csv
 import json
+import math
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -57,11 +60,34 @@ def _one_case(app: Pipeline, case: Path) -> dict:
         profile = {PROFILE_KEYS[k]: v for k, v in raw.items() if k in PROFILE_KEYS}
         photo = next((f for f in sorted(case.iterdir()) if f.name.lower() in PHOTO_NAMES), None)
         cgm = case / "cgm.csv"
-        a = answer_from_files(app, cgm if cgm.exists() else None, photo, meal_time, profile)
+        history = read_history(case / "history.csv")
+        a = answer_from_files(app, cgm if cgm.exists() else None, photo, meal_time, profile, history)
         return {"meal_id": case.name, **a.model_dump(mode="json")}
     except Exception as e:  # a malformed meal is reported in its own row; the run must finish
         logger.bind(stage="predict-folder").warning("{}: error ({})", case.name, e)
         return {"meal_id": case.name, "error": f"{type(e).__name__}: {e}"}
+
+
+def read_history(path: Path) -> list[tuple[datetime, float, int]] | None:
+    """Optional history.csv (26 Nov): the person's earlier answers as meal_time, fusion_logit (from an
+    earlier results.jsonl) and spiked (0/1, the CGM's label at +2 h). Rows that do not parse are skipped;
+    a missing file means no history, the population calibration the samples are scored at."""
+    if not path.exists():
+        return None
+    rows = []
+    try:
+        with open(path, newline="", encoding="utf-8-sig") as f:
+            for r in csv.DictReader(f):
+                try:
+                    t = datetime.fromisoformat(str(r["meal_time"]).strip()).replace(tzinfo=None)
+                    z, y = float(r["fusion_logit"]), int(float(r["spiked"]))
+                except KeyError, TypeError, ValueError:
+                    continue
+                if math.isfinite(z) and y in (0, 1):
+                    rows.append((t, z, y))
+    except OSError, UnicodeDecodeError, csv.Error:
+        return None
+    return rows
 
 
 def _summary(rows: list[dict]) -> str:

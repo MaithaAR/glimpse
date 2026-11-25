@@ -13,3 +13,7 @@
 - `local_photos/`: the real phone photos behind the unfamiliar-photo study (R7, `just ood`).
 - Real CGMacros meals (photos + sensor data) are downloaded by `just install` (PhysioNet, CC BY-NC-SA 4.0) and are
   not stored in this repository; `just demo` and `just app` use them, so those two need the download first.
+- Optional `history.csv` in a meal folder (26 Nov): the person's earlier answers as `meal_time,fusion_logit,spiked`
+  (`fusion_logit` from an earlier `results.jsonl`, `spiked` the CGM's 0/1 label at +2 h). Meals labelled at
+  least two hours before the current meal feed the personal intercept; without the file (every sample here)
+  the answer uses the population calibration.

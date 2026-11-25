@@ -1,15 +1,16 @@
 """Reads user-supplied files into a validated MealInput: the CGM export and the entry point that turns
-anything malformed into a structured 'can't judge' instead of a crash. Report: instructor-readiness in §2/6c."""
+anything malformed into a structured 'can't judge' instead of a crash. Report: §1 and §4 (the stress suite)."""
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from loguru import logger
 from pydantic import ValidationError
 
+from glimpse.calibration import LABEL_LAG_MIN
 from glimpse.serve.rules import cant_judge
 from glimpse.serve.schemas import Answer, MealInput
 
@@ -74,9 +75,12 @@ def _plain(e: Exception) -> str:
 
 
 def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path | None, meal_time: str | None,
-                      profile: dict[str, float | None]) -> Answer:  # fmt: skip
+                      profile: dict[str, float | None],
+                      history: list[tuple[datetime, float, int]] | None = None) -> Answer:  # fmt: skip
     """The app's entry point for user files: anything malformed, empty or unsupported becomes a structured
-    'can't judge' with the reason, never a crash."""
+    'can't judge' with the reason, never a crash. `history` (optional, 26 Nov): the person's earlier answers
+    as (meal time, fusion logit, CGM label); only meals whose label existed two hours before this meal are
+    used, the same gate as the evaluation replay. Without it the call is exactly the no-history one."""
     try:
         if cgm is None:
             raise ValueError("no CGM export was given")
@@ -99,4 +103,9 @@ def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path |
         a = cant_judge(f"unsupported input ({_plain(e)})")
         logger.bind(stage="predict").warning("can't judge: {}", a.reason)
         return a
-    return app.answer(m)
+    if not history:
+        return app.answer(m)
+    lag = timedelta(minutes=LABEL_LAG_MIN)
+    usable = [(z, y) for t, z, y in sorted(history) if t + lag <= when]
+    m = m.model_copy(update={"input_flags": [*m.input_flags, f"history_{len(usable)}_meals"]})
+    return app.answer(m, history=usable)
