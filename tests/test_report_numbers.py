@@ -294,21 +294,28 @@ def test_status_table_timing_cusum_and_what_if(text, rm):
             c = sh[coh][key]
             want = f"{c['point'] * 100:.1f}% ({c['ci95'][0] * 100:.1f}–{c['ci95'][1] * 100:.1f}%)"
             assert t[row][j] == want, (row, coh)
-    cs = rm["cold_start_what_if"]
+    cs, fw = rm["cold_start_what_if"], rm["falling_now_what_if"]
     d0, d3, l0, l3 = cs["dev"]["0"], cs["dev"]["3"], cs["locked"]["0"], cs["locked"]["3"]
-    assert abs(d0["cost_reduction"] - d3["cost_reduction"]) < 1e-9
-    want = (
-        f"drop {d0['cleared'] - d3['cleared']} clears and {d0['missed'] - d3['missed']} misses on development"
-        f" at unchanged cost, but {l0['cleared'] - l3['cleared']} clears and {l0['missed'] - l3['missed']} miss"
-    )
-    assert want in text.replace("\n", " ")
+
+    def cell(c: dict) -> str:
+        return f"{c['cleared']}, {c['missed']}, {_pct(c['cost_reduction'])}"
+
+    assert t["as shipped"] == [cell(d0), cell(l0)]
+    assert t["cold-start hold: no clear before the person's third labelled meal"] == [cell(d3), cell(l3)]
+    fl = {"cleared": fw["cleared"] - fw["would_flip"], "missed": fw["misses_total"] - fw["misses_avoided"],
+          "cost_reduction": fw["cost_reduction"]}  # fmt: skip
+    assert t['"falling now": never clear a meal in the steepest-falling tenth of all meals'] == [cell(fl), "–"]
+    sp = rm["served_imputed_priors"]
+    row = t["no history and no onboarding priors (the samples' path; dev, approximate)"][2]
+    assert row == (f"AUROC {sp['auroc']:.3f}; {sp['share_low_risk'] * 100:.1f}% cleared, {sp['n_missed']} of "
+                   f"{sp['n_cleared']} spike; cost {_pct(sp['cost_reduction'])} / –")  # fmt: skip
+    pc = _load("outputs/probes/probe_c.json")
+    assert all(v["expected_direction_met"] for v in pc["inputs"].values())
+    ip = pc["imputed_priors"]
+    assert f"in-sample clears from {ip['cleared_own_priors']} to {ip['cleared_imputed']}" in text.replace("\n", " ")
     ef = rm["ece_noise_floor"]
     assert t["share of perfectly calibrated draws scoring at or above the observed ECE"] == [
         f"{ef['dev']['share_of_perfectly_calibrated_draws_at_or_above_observed']:.0%}",
         f"{ef['locked']['share_of_perfectly_calibrated_draws_at_or_above_observed']:.0%}",
         "–",
     ]
-    wi = rm["falling_now_what_if"]
-    want = (f"would flip {wi['would_flip']} of {wi['cleared']} clears, avoiding {wi['misses_avoided']} of the "
-            f"{wi['misses_total']} misses at the cost\nof {wi['clears_lost_without_a_spike']} clears")  # fmt: skip
-    assert want in text

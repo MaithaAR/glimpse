@@ -131,3 +131,17 @@ the regeneration is two commands on the author's Mac, listed in the hand-off).
 | Exploratory cold-start what-if (no clear before three labelled meals) and the offset's size by labelled meals | T5 cold starts had no before/after; the intercept's growth with history was unshown | report_metrics.json `cold_start_what_if`, `intercept_by_history` |
 | History statements made consistent (the folder command accepts history.csv; the app does not); heads counted once; 27.82M | contradictions (2 of 3) | report §1, §2, §4, §7 |
 | `just stage-timing` recipe added and chained in `reproduce-all` | the file named a recipe that did not exist (1 of 3) | Justfile, README |
+
+## 26 Nov 2026, seventh pass (after strict grades 79.75, 78.4, 78.25 and a holistic grade of 82.5)
+
+| Change | Why | Evidence |
+|---|---|---|
+| The samples' real path evaluated: no history and no onboarding priors (serving medians), approximated on development with the frozen fusion's prior coefficients; AUROC 0.637, 11.4% cleared, 9 of 55 spike, cost −1.5%; status table, §4, model card | the served column used each person's real priors, which no sample has (2 of 3) | report_metrics.json `served_imputed_priors` |
+| Probe C registered (commit 32aec59) then run (91f737a): all four profile inputs raise risk on every meal; imputed priors change 11% of decisions | the profile carries the system but had no counterfactual (1 of 3) | docs/probes_s13.md; outputs/probes/probe_c.json; `just probe-c` |
+| CUSUM verdict reworded: the registered caution-share rule fired; part of the step is the cut-off change; at deployed cut-offs the statistic reaches 2.6 of 4; the calibration expectation failed | the sixth pass called the alarm an artifact on post-hoc rows (1 of 3) | report §4; docs/monitoring.md |
+| Exploratory what-if table (falling now, cold-start hold) with cost; post-hoc labelled | before/after for the taxonomy actions (3 of 3) | report §5; report_metrics.json |
+| Figures: F1 shows the history.csv path; F2 title neutral with the pooled interval; F3 counts unhidden, lines only through bins with 5+ meals; F6 says "window spread" | stale or misleading figure text (3 of 3) | outputs/figures/ |
+| Text: "the change that worked" softened; "not met" next to the protocol labels; dev ECE "not assessable"; locked one-shot 0.098 shown; person-bootstrap 0–100% beside the exact interval; scoring-path sentence scoped; harm paragraph; ownership sentence separates the overnight registrations; stale monitoring lines corrected | overstatement and inconsistencies (2-3 of 3) | report, docs/monitoring.md, docs/model_card.md |
+
+The overnight registrations (replay 3, probe C, the 26 Nov what-ifs) were written by the assistant under the
+author's standing instruction, not approved one by one.

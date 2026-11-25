@@ -127,4 +127,12 @@ caution-share CUSUM alarmed once, in the 7th locked week, with no dev false alar
 each fold's own cut-offs and its locked blocks the deployed ones, so a shift at the seam can come from the
 cut-off change alone. Two rows added after that result put both streams at the deployed cut-offs, on the
 shipped risk (`caution_share_deployed_cutoffs`) and on the served risk (`caution_share_served`): neither
-alarms. The alarm is an artifact of the replay, and no registered rule caught the real cohort shift.
+alarms. Seventh-round correction (26 Nov): "artifact" overstated it. At the deployed cut-offs the shipped
+risk's statistic still climbs to 2.6 of 4 by the last locked week, so the step mixes the cut-off change with
+a real rise in the caution share; the registered calibration expectation (a locked alarm) failed, its
+statistic peaking at 2.4. No rule caught the real shift cleanly.
+
+Two older lines are stale (26 Nov): "nothing else in the pipeline is above 30 ms" (alert actions above) is
+contradicted by outputs/efficiency/stage_timing.json, where the ConvNeXt pass alone takes 47 ms on a 2-CPU
+machine; and the folder command now accepts an optional history.csv, so "answer without history" in the
+replay-2 correction holds only when that file is absent.

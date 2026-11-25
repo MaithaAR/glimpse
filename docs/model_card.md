@@ -22,9 +22,11 @@ those participants were used for training only.
 - Fusion: 20-parameter logistic regression over 8 profile inputs, 7 CGM/heart-rate trend features and 4
   photo inputs; Platt map (0.96, −0.20); per-person intercept fitted on the person's earlier labelled
   meals (shrinkage m = 1.0). The folder command accepts an optional history.csv (earlier answers' fusion logits and CGM labels);
-  without it, and in the app, answers use the population calibration (Platt only). A profile
-  without onboarding priors gets the training medians (0.455, 48 mg/dL). At that served point development
-  clears 15.2% of meals with 9.6% of them spiking (cost reduction 8.7%), failing two targets.
+  without it, and in the app, answers use the population calibration (Platt only). Without history,
+  development clears 15.2% of meals with 9.6% of them spiking (cost reduction 8.7%), failing two targets. A
+  profile without onboarding priors (every sample) gets the training medians (0.455, 48 mg/dL); with that
+  too, approximated on development, AUROC is 0.637 and 9 of 55 cleared meals spike (cost −1.5%): do not
+  clear meals without history and priors.
 - SensorCNN (5,217 parameters, from scratch) is evaluated, not deployed: it ties the trend features.
 
 **Training data.** CGMacros v1.0.0 (PhysioNet, CC BY-NC-SA 4.0): 37 non-locked adults (23 healthy or

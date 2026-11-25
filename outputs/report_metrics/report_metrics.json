@@ -2160,7 +2160,8 @@
     "would_flip": 10,
     "misses_avoided": 3,
     "misses_total": 8,
-    "clears_lost_without_a_spike": 7
+    "clears_lost_without_a_spike": 7,
+    "cost_reduction": 0.1687306501547987
   },
   "share_cis": {
     "dev": {

@@ -472,7 +472,7 @@ def band_and_served_calibration(cfg, dev: pd.DataFrame, locked: pd.DataFrame, co
                                     "served_locked": cost_reduction_ci(lks, lks.decision, costs)}}  # fmt: skip
 
 
-def falling_now_what_if(dev: pd.DataFrame) -> dict:
+def falling_now_what_if(dev: pd.DataFrame, costs: dict | None = None) -> dict:
     """Exploratory, chosen after T5 was seen: would a 'glucose falling now' check (never clear a meal whose
     pre-meal window rise is in the steepest-falling tenth of ALL answered dev meals) have avoided misses, and at
     what cost in clears? The cut is the 10th percentile over all 460 meals, not tuned on the misses."""
@@ -483,7 +483,15 @@ def falling_now_what_if(dev: pd.DataFrame) -> dict:
     return {"rule": "window rise in the lowest decile of all answered dev meals -> caution instead of low risk",
             "cleared": len(cl), "would_flip": len(flagged), "misses_avoided": int(flagged.spike.sum()),
             "misses_total": int(cl.spike.sum()),
-            "clears_lost_without_a_spike": int((flagged.spike == 0).sum())}  # fmt: skip
+            "clears_lost_without_a_spike": int((flagged.spike == 0).sum()),
+            **({} if costs is None else {"cost_reduction": _cost_reduction(
+                dev.decision.where(~dev.row.isin(flagged.row), "caution"), dev.spike, costs)})}  # fmt: skip
+
+
+def _cost_reduction(dec: pd.Series, spike: pd.Series, costs: dict) -> float:
+    y = spike.to_numpy().astype(int)
+    best = min(expected_cost(np.zeros_like(y), y, costs), expected_cost(np.ones_like(y), y, costs))
+    return 1 - expected_cost(dec.map(ACTION).to_numpy(), y, costs) / best
 
 
 def share_cis(df: pd.DataFrame) -> dict:
@@ -582,7 +590,7 @@ def run_report_metrics(cfg) -> dict:
     res["person_offsets"] = person_offsets(dev, locked, tuple(res["served_operating_point"]["platt"]))
     res["heart_rate_r2_from_other_inputs"] = heart_rate_r2()
     res["fair_baselines"] = fair_baselines(dev)
-    res["falling_now_what_if"] = falling_now_what_if(dev)
+    res["falling_now_what_if"] = falling_now_what_if(dev, costs)
     res["share_cis"] = {"dev": share_cis(dev), "locked": share_cis(locked)}
     res["served_imputed_priors"] = served_imputed_priors(cfg, dev, costs)
     res["cold_start_what_if"] = {"dev": cold_start_what_if(dev, costs), "locked": cold_start_what_if(locked, costs)}
