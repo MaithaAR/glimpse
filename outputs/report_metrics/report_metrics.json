@@ -1910,9 +1910,9 @@
   },
   "fine_tuned_parameters": {
     "backbone": 27820128,
-    "last_stage": 15470592,
+    "last_stage": 15472128,
     "heads": 3845,
-    "fine_tuned_total": 15474437
+    "fine_tuned_total": 15475973
   },
   "served_operating_point": {
     "cutoffs": [
@@ -2143,6 +2143,14 @@
         0.004924371810841523
       ]
     }
+  },
+  "falling_now_what_if": {
+    "rule": "window rise in the lowest decile of all answered dev meals -> caution instead of low risk",
+    "cleared": 109,
+    "would_flip": 10,
+    "misses_avoided": 3,
+    "misses_total": 8,
+    "clears_lost_without_a_spike": 7
   },
   "band_and_served_calibration": {
     "band": {

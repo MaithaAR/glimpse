@@ -1,0 +1,39 @@
+{
+  "what": "Where serving time goes, stage by stage (`glimpse stage-timing`, 26 Nov, descriptive).",
+  "machine": "x86_64, 2 CPUs, 2 threads (this run, not the author's Mac)",
+  "stages": {
+    "photo decode + transform": {
+      "median_ms": 11.248364999573823,
+      "p95_ms": 12.074376149894304,
+      "reps": 50
+    },
+    "ConvNeXt-Tiny pass (fp32)": {
+      "median_ms": 47.382661499796086,
+      "p95_ms": 51.78827455001738,
+      "reps": 50
+    },
+    "ConvNeXt-Tiny pass (int8 dynamic, cost only)": {
+      "median_ms": 29.678363000130048,
+      "p95_ms": 35.97093634984957,
+      "reps": 50
+    },
+    "kNN check (1,221 reference photos)": {
+      "median_ms": 0.07453650005118106,
+      "p95_ms": 0.1181209999231214,
+      "reps": 50
+    },
+    "grams + bin heads": {
+      "median_ms": 0.0046225000005506445,
+      "p95_ms": 0.004887450404567062,
+      "reps": 50
+    },
+    "fusion + cut-offs (20 parameters)": {
+      "median_ms": 0.35020450013689697,
+      "p95_ms": 0.5037656004333256,
+      "reps": 50
+    }
+  },
+  "photo_path_median_ms": 59.06038999955854,
+  "no_photo_path_median_ms": 0.35020450013689697,
+  "backbone_share_of_photo_path": 0.8022747817979234
+}
