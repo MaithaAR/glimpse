@@ -25,11 +25,45 @@ def _blocks(df: pd.DataFrame, stream: str) -> list[pd.DataFrame]:
     return [df.iloc[i : i + BLOCK].assign(stream=stream) for i in range(0, len(df) - BLOCK + 1, BLOCK)]
 
 
+def at_deployed_cutoffs(dev: pd.DataFrame, lo: float, hi: float) -> pd.DataFrame:
+    """Replay 2: each dev answer with a risk re-decided at the deployed cut-offs (no refit); answers without
+    a risk stay can't judge."""
+    from glimpse.serve.rules import decision
+
+    out = dev.copy()
+    has = out.risk.notna()
+    out.loc[has, "decision"] = [decision(float(r), lo, hi) for r in out.loc[has, "risk"]]
+    return out
+
+
 def run_monitoring_replay(cfg) -> dict:
-    """Weekly behaviour shares and rolling outcome signals over dev then locked answers."""
+    """Replay 1 (dev at each fold's cut-offs) and replay 2 (dev at the deployed cut-offs), each followed by
+    the locked answers; both are written to outputs/monitoring/replay.json."""
+    from glimpse.training.final import load_thresholds
+
     cap = cfg.targets.usefulness.max_missed_among_cleared
     dev = pd.read_csv("outputs/evaluation_v2/dev_answers.csv")
     locked = pd.read_csv("outputs/locked_eval/locked_answers.csv")
+    th = load_thresholds()["main"]
+    res = replay(dev, locked, cap)
+    res["deployed_operating_point"] = replay(at_deployed_cutoffs(dev, th["low_risk_below"], th["caution_from"]),
+                                             locked, cap)  # fmt: skip
+    res["deployed_operating_point"]["cutoffs"] = [th["low_risk_below"], th["caution_from"]]
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "replay.json").write_text(json.dumps(res, indent=2))
+    for name, r in (("replay 1", res), ("replay 2 (deployed cut-offs)", res["deployed_operating_point"])):
+        d, lk = r["summary"]["dev"], r["summary"]["locked"]
+        logger.bind(stage="monitoring").info(
+            "{}: dev {} windows, {} outcome alerts, {} behaviour alerts in {} weeks; locked {} windows, {} outcome "
+            "alerts, {} too few cleared, {} behaviour alerts in {} weeks (threshold {:.0%})", name, d["windows"],
+            d["outcome_alerts"], d["behaviour_alerts"], d["weeks"], lk["windows"], lk["outcome_alerts"],
+            lk["outcome_too_few_cleared"], lk["behaviour_alerts"], lk["weeks"],
+            r["behaviour_threshold_dev_max_caution"])  # fmt: skip
+    return res
+
+
+def replay(dev: pd.DataFrame, locked: pd.DataFrame, cap: float) -> dict:
+    """Weekly behaviour shares and rolling outcome signals over dev then locked answers."""
     blocks = _blocks(dev, "dev") + _blocks(locked, "locked")
     weeks = []
     for i, b in enumerate(blocks):
@@ -68,16 +102,7 @@ def run_monitoring_replay(cfg) -> dict:
                       if ws else None,
                       "weeks": len(wk), "behaviour_alerts": sum(w["behaviour_alert"] for w in wk),
                       "caution_share_median": float(np.median([w["caution"] for w in wk])) if wk else None}  # fmt: skip
-    res = {"what": __doc__.splitlines()[0], "rules": "docs/monitoring.md, replay section (registered 26 Nov)",
-           "block": BLOCK, "window_blocks": WINDOW, "min_cleared": MIN_CLEARED, "cap": cap,
-           "behaviour_threshold_dev_max_caution": dev_max_caution,
-           "summary": summary, "weeks": weeks, "windows": windows}  # fmt: skip
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "replay.json").write_text(json.dumps(res, indent=2))
-    d, lk = summary["dev"], summary["locked"]
-    logger.bind(stage="monitoring").info(
-        "replay: dev {} windows, {} outcome alerts, {} behaviour alerts in {} weeks; locked {} windows, {} outcome "
-        "alerts, {} too few cleared, {} behaviour alerts in {} weeks (threshold {:.0%})", d["windows"],
-        d["outcome_alerts"], d["behaviour_alerts"], d["weeks"], lk["windows"], lk["outcome_alerts"],
-        lk["outcome_too_few_cleared"], lk["behaviour_alerts"], lk["weeks"], dev_max_caution)  # fmt: skip
-    return res
+    return {"what": __doc__.splitlines()[0], "rules": "docs/monitoring.md, replay sections (registered 26 Nov)",
+            "block": BLOCK, "window_blocks": WINDOW, "min_cleared": MIN_CLEARED, "cap": cap,
+            "behaviour_threshold_dev_max_caution": dev_max_caution,
+            "summary": summary, "weeks": weeks, "windows": windows}  # fmt: skip

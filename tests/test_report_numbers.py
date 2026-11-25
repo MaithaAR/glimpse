@@ -112,3 +112,86 @@ def test_stress_table_and_figure_share_one_run(text):
 def test_every_cited_output_path_exists(text):
     for p in set(re.findall(r"outputs/[\w./-]+[\w/]", text)):
         assert Path(p.rstrip("/")).exists(), p
+
+
+def _tables(text: str) -> dict[str, list[str]]:
+    """Every markdown table row in the report, keyed by its first cell (bold stripped)."""
+    rows = {}
+    for ln in text.splitlines():
+        if ln.startswith("|") and not ln.startswith("|---"):
+            cells = [c.strip().replace("**", "") for c in ln.strip().strip("|").split("|")]
+            rows[cells[0]] = cells[1:]
+    return rows
+
+
+def _pct(x: float) -> str:
+    return f"{x * 100:.1f}%".replace("-", "−")
+
+
+def test_results_table_cells(text, rm):
+    t = _tables(text)
+    dev, lk = rm["cohorts"]["dev"]["risk"], rm["cohorts"]["locked"]["risk"]
+    row = t["dev + personal intercept (shipped)"]
+    a, b = dev["auprc"], dev["brier"]
+    assert row[1] == f"{a['point']:.3f} ({a['ci95'][0]:.3f}–{a['ci95'][1]:.3f})"
+    assert row[2] == f"{b['point']:.3f} ({b['ci95'][0]:.3f}–{b['ci95'][1]:.3f})"
+    assert row[4] == f"{dev['ece_equal_width_15']:.3f} / {dev['ece_equal_mass_15']:.3f}"
+    row = t["locked shipped (150 of 153)"]
+    assert row[0].startswith(f"{lk['auroc']:.3f}")
+    assert row[4] == f"{lk['ece_equal_width_15']:.3f} / {lk['ece_equal_mass_15']:.3f}"
+    pg = rm["paired_personal_minus_raw"]
+    d = pg["dev"]["auroc"]
+    assert t["AUROC"][0].startswith(f"+{d['point']:.3f} ({d['ci95'][0]:.3f}, +{d['ci95'][1]:.3f})".replace("-", "−"))
+    assert f"{pg['dev']['folds_improved']} of 5 folds" in t["AUROC"][0]
+    ll = pg["dev"]["log_loss"]
+    assert t["log-loss"][0] == f"{ll['point']:.3f} ({ll['ci95'][0]:.3f}, {ll['ci95'][1]:.3f})".replace("-", "−")
+
+
+def test_cost_grid_and_usefulness_cells(text, rm):
+    t = _tables(text)
+    sweep = {
+        (r["missed_spike"], r["abstain_multiplier"]): r
+        for r in _load("outputs/evaluation_v2/dev_summary.json")["cost_sweep"]
+    }
+    for label, ms in (("3×", 3.0), ("5× (declared)", 5.0), ("7×", 7.0), ("10×", 10.0)):
+        for cell, am in zip(t[label], (0.5, 1.0, 2.0, 4.0), strict=True):
+            r = sweep[(ms, am)]
+            assert (
+                cell == f"{_pct(r['cost_reduction'])} · {_pct(r['share_low_risk'])} · {_pct(r['missed_among_cleared'])}"
+            )
+    dec = {k: rm["cohorts"][k]["decisions"] for k in ("dev", "locked")}
+    row = t["cost reduction vs the best constant policy (always caution, both cohorts)"]
+    assert row[1:] == [
+        _pct(dec["dev"]["cost_reduction_vs_best_constant"]),
+        _pct(dec["locked"]["cost_reduction_vs_best_constant"]),
+    ]
+    row = t["mean cost per meal: shipped / always caution / always low risk"]
+    for cell, k in zip(row[1:], ("dev", "locked"), strict=True):
+        assert cell == " / ".join(f"{dec[k][p]:.3f}" for p in ("shipped", "always caution", "always low risk"))
+    er = rm["errors"]
+    assert t["people with a cleared meal"][1] == f"{er['dev']['people_with_a_clear']} of {er['dev']['people']}"
+    d, lk = er["dev"], er["locked"]
+    want = f"{d['false_cautions']} of {d['cautions']}; {lk['false_cautions']} of {lk['cautions']}"
+    assert t["false caution (caution, no spike)"][0] == want
+
+
+def test_stress_table_cells(text):
+    t = _tables(text)
+    lv = _load("outputs/robustness/levels.json")
+
+    def u(x):
+        return f"{x * 100:.1f}%" if 0.99 < x < 1 else f"{x * 100:.0f}%"
+
+    for label, kind, second in (
+        ("CGM dropout 10/30/50% (unchanged / low risk↔caution)", "cgm_dropout", "dangerous_flips"),
+        ("photo blur r=2/6/10 (unchanged / low risk↔caution)", "photo_blur", "dangerous_flips"),
+    ):
+        for cell, level in zip(t[label], lv["levels"][kind], strict=True):
+            c = lv[kind][f"{level:g}"]
+            assert cell == f"{u(c['unchanged'])} / {c[second] * 100:.1f}%", (label, cell)
+
+
+def test_parameter_table_cells(text, rm):
+    t = _tables(text)
+    ft = rm["fine_tuned_parameters"]["fine_tuned_total"]
+    assert t["fine-tuned, deployed (last ConvNeXt stage + heads)"][0] == f"{ft / 1e6:.1f}M"

@@ -138,6 +138,98 @@ def false_clears(dev: pd.DataFrame) -> dict:
     return {"note": false_clears.__doc__.split("\n")[0], "meals": rows}
 
 
+def paired_gains(views: dict) -> dict:
+    """Shipped (personal) minus raw, paired by meal, intervals resampling people: the same standard of
+    evidence the photo gate is held to (added 26 Nov after the second grading round)."""
+    out = {}
+    for name in ("dev", "locked"):
+        a = views[name][views[name].risk.notna()]
+        y, sids = a.spike.to_numpy().astype(int), a.person_id.to_numpy()
+        p, r = a.risk.to_numpy(float), a.risk_raw.to_numpy(float)
+        d, lo, hi = paired_person_bootstrap(y, p, r, sids)
+        point = float(roc_auc_score(y, p) - roc_auc_score(y, r))
+        brier = person_bootstrap_ci(sids, _diff(brier_score_loss, y, p, r))
+        ll = person_bootstrap_ci(sids, _diff(log_loss, y, p, r))
+        out[name] = {"auroc": {"point": point, "bootstrap_mean": d, "ci95": [lo, hi]},
+                     "brier": {"point": brier[0], "ci95": [brier[1], brier[2]]},
+                     "log_loss": {"point": ll[0], "ci95": [ll[1], ll[2]]}}  # fmt: skip
+    folds = views["dev"].dropna(subset=["risk"]).groupby("fold")
+    out["dev"]["folds_improved"] = int(sum(roc_auc_score(g.spike, g.risk) > roc_auc_score(g.spike, g.risk_raw)
+                                           for _, g in folds))  # fmt: skip
+    return out
+
+
+def _diff(fn, y, p, r):
+    """fn(shipped) - fn(raw) on resampled meal indices (a closure per cohort, so nothing leaks across loops)."""
+    kw = {"labels": [0, 1]} if fn is log_loss else {}
+    return lambda i: float(fn(y[i], p[i], **kw) - fn(y[i], r[i], **kw))
+
+
+def brier_decomposition(y: np.ndarray, p: np.ndarray, bins: int = 15) -> dict:
+    """Murphy: Brier ~ reliability - resolution + uncertainty, over the registered equal-width bins."""
+    edges = np.linspace(0, 1, bins + 1)
+    b = np.clip(np.digitize(p, edges[1:-1]), 0, bins - 1)
+    base = y.mean()
+    rel = sum((b == k).sum() * (p[b == k].mean() - y[b == k].mean()) ** 2 for k in range(bins) if (b == k).any())
+    res = sum((b == k).sum() * (y[b == k].mean() - base) ** 2 for k in range(bins) if (b == k).any())
+    return {"reliability": float(rel / len(y)), "resolution": float(res / len(y)),
+            "uncertainty": float(base * (1 - base))}  # fmt: skip
+
+
+def errors(df: pd.DataFrame) -> dict:
+    """Every error class with counts: false clears, false cautions, spikes among can't-judge; who was cleared."""
+    cleared = df[df.decision == "low risk"]
+    caution = df[df.decision == "caution"]
+    cj = df[df.decision == "can't judge"]
+    return {"false_clears": int(cleared.spike.sum()), "cleared": len(cleared),
+            "false_cautions": int((caution.spike == 0).sum()), "cautions": len(caution),
+            "cant_judge_spiked": int(cj.spike.sum()), "cant_judge": len(cj),
+            "people": int(df.person_id.nunique()), "people_with_a_clear": int(cleared.person_id.nunique()),
+            "people_with_a_missed_spike": int(cleared[cleared.spike == 1].person_id.nunique()),
+            "clears_by_person": {str(k): int(v) for k, v in cleared.person_id.value_counts().items()}}  # fmt: skip
+
+
+def d8_paired() -> dict:
+    """D8 against its control, paired: the photo arm trained without exact-macro matches vs the photo arm
+    trained after a size-matched random drop, on the same photo meals (the no-meal arm cancels)."""
+    d = pd.read_csv("outputs/ablations/d8_profile_excluded_oof.csv")
+    d = d[d.has_photo]
+    y, sids = d.spike.to_numpy().astype(int), d.person_id.to_numpy()
+    m, lo, hi = paired_person_bootstrap(y, d.photo.to_numpy(), d.photo_random_drop.to_numpy(), sids)
+    point = float(roc_auc_score(y, d.photo) - roc_auc_score(y, d.photo_random_drop))
+    return {"matched_removed_minus_random_drop": point, "bootstrap_mean": m, "ci95": [lo, hi], "meals": len(d)}
+
+
+def shap_terms(rows: list[int]) -> dict:
+    """Centred linear SHAP terms of the frozen fusion (figures.json coefficients x committed standardised
+    features) for chosen meals; the base value is the mean logit. Same arithmetic as Figure 6."""
+    fig = json.loads(Path("outputs/figures/figures.json").read_text())["shap"]
+    z = pd.read_csv("outputs/figures/shap_features_z.csv").set_index("row")
+    names = list(fig["coefs"])
+    coef = np.array([fig["coefs"][n] for n in names])
+    centred = (z[names] - z[names].mean()) * coef
+    corr = z[names].corr()
+    return {"base_logit": fig["base_logit"],
+            "meals": {str(r): {n: float(v) for n, v in centred.loc[r].items()} for r in rows},
+            "heart_rate_correlations": {n: float(corr.loc["heart rate", n]) for n in names if n != "heart rate"},
+            "photo_block_mean_abs": float(np.abs(centred[names[-4:]].sum(axis=1)).mean())}  # fmt: skip
+
+
+def fine_tuned_parameters(cfg) -> dict:
+    """Trainable parameters of the shipped photo model: the last ConvNeXt stage plus the two heads. The
+    architecture is built without weights (no download); the head count is the budget file's photo total
+    minus the backbone."""
+    import timm
+
+    m = timm.create_model(cfg.photo.arch, pretrained=False, num_classes=0)
+    backbone = sum(p.numel() for p in m.parameters())
+    last = sum(p.numel() for p in m.stages[-1].parameters())
+    budget = pd.read_csv("outputs/param_budget.csv")
+    photo = int(budget.loc[budget.model.str.startswith("PhotoCarbModel"), "parameters"].iloc[0])
+    return {"backbone": backbone, "last_stage": last, "heads": photo - backbone,
+            "fine_tuned_total": last + photo - backbone}  # fmt: skip
+
+
 def run_report_metrics(cfg) -> dict:
     """Write outputs/report_metrics/report_metrics.json; log the headline additions."""
     from glimpse.training.final import cost_dict
@@ -167,6 +259,16 @@ def run_report_metrics(cfg) -> dict:
     res["baselines"] = baselines(dev)
     res["photo_recipe"] = photo_recipe()
     res["false_clears_exploratory"] = false_clears(dev)
+    res["paired_personal_minus_raw"] = paired_gains(views)
+    res["brier_decomposition"] = {k: {c: brier_decomposition(v[v.risk.notna()].spike.to_numpy().astype(float),
+                                                             v.loc[v.risk.notna(), c].to_numpy(float))
+                                      for c in ("risk_raw", "risk")}
+                                  for k, v in (("dev", dev), ("locked", locked))}  # fmt: skip
+    res["errors"] = {"dev": errors(dev), "locked": errors(locked)}
+    res["d8_paired"] = d8_paired()
+    t5 = [m["row"] for m in res["false_clears_exploratory"]["meals"] if m["class"].startswith("T5")]
+    res["shap_terms_t5"] = shap_terms(t5)
+    res["fine_tuned_parameters"] = fine_tuned_parameters(cfg)
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "report_metrics.json").write_text(json.dumps(res, indent=2))
     c = res["cohorts"]

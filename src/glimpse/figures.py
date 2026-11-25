@@ -23,40 +23,53 @@ def _style(plt):
 
 
 def f1_system(plt) -> None:
-    """The one scoring path: inputs -> rules -> arms -> fusion -> calibration -> decision."""
-    fig, ax = plt.subplots(figsize=(11.2, 3.9))
+    """The one scoring path: inputs -> rules -> photo branch (with its refusal gate) and trend features ->
+    fusion -> calibration with the person's labelled history -> cut-offs -> decision or escalation."""
+    fig, ax = plt.subplots(figsize=(12.0, 4.6))
     ax.axis("off")
 
     def box(x, y, w, h, text, fc="#edf2f7"):
         ax.add_patch(plt.Rectangle((x, y), w, h, facecolor=fc, edgecolor=GREY, lw=1.0, zorder=2))
-        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=7.6, zorder=3)
+        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=7.2, zorder=3)
 
-    def arrow(x0, y0, x1, y1):
+    def arrow(x0, y0, x1, y1, c=GREY, ls="-"):
         ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
-                    arrowprops={"arrowstyle": "->", "color": GREY, "lw": 1.1})  # fmt: skip
+                    arrowprops={"arrowstyle": "->", "color": c, "lw": 1.1, "linestyle": ls})  # fmt: skip
 
-    box(0.0, 2.6, 1.9, 1.0, "meal photo")
-    box(0.0, 1.3, 1.9, 1.0, "CGM + HR\n(2 h window)")
-    box(0.0, 0.0, 1.9, 1.0, "profile (4 fields → 8 inputs)")
-    box(2.5, 1.3, 2.4, 1.0, "input rules R1\u2013R11:\nrefuse + name\nthe problem")
-    box(5.5, 2.6, 2.8, 1.0, "ConvNeXt-Tiny (pinned;\nlast stage tuned) + 2 heads")
-    box(5.5, 1.3, 2.8, 1.0, "engineered trend features")
-    box(5.5, 0.0, 2.8, 1.0, "kNN unfamiliar-photo\ncheck (cut 0.614)")
-    box(8.9, 1.3, 2.6, 1.0, "logistic fusion (20 par.)\nPlatt (0.96, \u22120.20)\npersonal intercept, m = 1.0")
-    box(12.1, 1.3, 2.6, 1.0, "cut-offs (0.15, 0.16)\nlow risk / caution /\ncan't judge + reason")
-    for y0 in (3.1, 1.8, 0.5):
-        arrow(1.9, y0, 2.5, 1.8)
-    arrow(4.9, 1.8, 5.5, 1.8)
-    arrow(4.9, 2.05, 5.5, 3.1)
-    arrow(4.9, 1.55, 5.5, 0.5)
-    arrow(8.3, 3.1, 8.9, 2.05)
-    arrow(8.3, 1.8, 8.9, 1.8)
-    arrow(8.3, 0.5, 8.9, 1.55)
-    arrow(11.5, 1.8, 12.1, 1.8)
-    ax.text(7.35, 3.95, "one scoring path: report numbers = demo = app = the grader's folder command",
-            ha="center", fontsize=8.8, style="italic", color=GREY)  # fmt: skip
-    ax.set_xlim(-0.2, 15.0)
-    ax.set_ylim(-0.2, 4.2)
+    box(0.0, 3.0, 1.9, 0.9, "meal photo")
+    box(0.0, 1.7, 1.9, 0.9, "CGM + heart rate\n(2 h before)")
+    box(0.0, 0.4, 1.9, 0.9, "profile\n(4 fields, 8 inputs)")
+    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R11")
+    box(4.9, 3.0, 2.5, 0.9, "ConvNeXt-Tiny, last stage\ntuned; grams + bin heads")
+    box(4.9, 1.7, 2.5, 0.9, "trend features\n+ profile inputs")
+    box(7.9, 3.2, 2.4, 0.9, "kNN unfamiliar-photo\ncheck (cut 0.614)")
+    box(7.9, 1.7, 2.4, 1.2, "logistic fusion\n(20 parameters)\nPlatt (0.96, \u22120.20)")
+    box(10.8, 1.7, 2.4, 1.2, "personal intercept\nfrom earlier labelled\nmeals (m = 1.0)")
+    box(13.7, 1.7, 2.3, 1.2, "cut-offs 0.15 / 0.16\nlow risk | caution\n+ reason", fc="#e6f0fa")
+    box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 confirm carbs\nor dietitian", fc="#fdf0e6")
+    box(10.8, 3.4, 2.4, 0.9, "CGM labels the meal\nat +2 h (cgm_auto)", fc="#eef7ee")
+    ax.text(12.4, 0.75, "borderline risk", fontsize=6.8, color=ORANGE)
+    ax.text(4.6, 0.75, "failed input rule", fontsize=6.8, color=ORANGE)
+    ax.text(10.55, 1.45, "unfamiliar\nphoto", fontsize=6.8, color=ORANGE)
+    for y0 in (3.45, 2.15, 0.85):
+        arrow(1.9, y0, 2.4, 2.15)
+    arrow(4.4, 2.15, 4.9, 2.15)
+    arrow(4.4, 2.5, 4.9, 3.45)
+    arrow(7.4, 3.6, 7.9, 3.6)  # the photo embedding feeds the unfamiliar-photo check
+    arrow(9.1, 3.2, 9.1, 2.9)  # familiar photo: its carb inputs reach the fusion
+    arrow(7.4, 2.15, 7.9, 2.15)
+    arrow(10.3, 2.3, 10.8, 2.3)
+    arrow(13.2, 2.3, 13.7, 2.3)
+    arrow(10.3, 3.3, 10.45, 1.0, c=ORANGE)  # unfamiliar photo: no carb guess, refusal
+    arrow(14.85, 1.7, 10.55, 0.6, c=ORANGE)  # borderline risk between the cut-offs
+    arrow(3.4, 1.6, 8.2, 0.45, c=ORANGE)  # failed input rule: refusal
+    arrow(14.85, 2.9, 13.2, 3.85, c=GREEN, ls="--")  # the answered meal is labelled later
+    arrow(12.0, 3.4, 12.0, 2.9, c=GREEN, ls="--")  # ... and joins the person's history
+    ax.text(7.2, 4.45, "one scoring path: report numbers = demo = app = the grader's folder command "
+            "(the folder command and app answer without history: population calibration only)",
+            ha="center", fontsize=8.2, style="italic", color=GREY)  # fmt: skip
+    ax.set_xlim(-0.2, 16.2)
+    ax.set_ylim(-0.2, 4.7)
     fig.savefig(OUT / "f1_system.png")
     plt.close(fig)
 
@@ -90,32 +103,36 @@ def f2_per_fold(plt, ev: dict) -> None:
 
 def f3_reliability(plt, da: pd.DataFrame) -> dict:
     """Reliability in the protocol's registered binning (15 equal-width bins, meals per bin printed) for raw
-    vs shipped risks over the answered development meals; the legend gives ECE in both binnings (26 Nov)."""
+    vs shipped risks: development (out-of-fold) and the locked run (26 Nov); legends give ECE both ways."""
     from glimpse.evaluation.metrics import reliability
 
-    d = da.dropna(subset=["risk"])
-    y = d.spike.to_numpy().astype(float)
+    lk = pd.read_csv("outputs/locked_eval/locked_answers.csv")
     out = {}
-    fig, ax = plt.subplots(figsize=(4.8, 4.2))
-    ax.plot([0, 1], [0, 1], color=GREY, lw=0.8, ls="--")
-    for col, label, c in (("risk_raw", "raw fusion", GREY), ("risk", "shipped", BLUE)):
-        p = d[col].to_numpy().astype(float)
-        rows, ece_w = reliability(p, y, bins=15)
-        ece = ece_equal_mass(p, y)
-        out[col] = ece
-        out[col + "_equal_width"] = ece_w
-        ax.plot([r[0] for r in rows], [r[1] for r in rows], "o-", color=c, ms=4,
-                label=f"{label}: ECE {ece_w:.3f} equal-width, {ece:.3f} equal-mass")  # fmt: skip
-        if col == "risk":
-            for m, o, n in rows:
-                ax.annotate(str(n), (m, o), textcoords="offset points", xytext=(0, 6), ha="center", fontsize=6.5,
-                            color=BLUE)  # fmt: skip
-    ax.set_xlabel("predicted spike probability (15 equal-width bins; blue numbers = meals per bin)")
-    ax.set_ylabel("observed spike rate")
-    ax.set_xlim(0, 0.9)
-    ax.set_ylim(0, 0.9)
-    ax.legend(frameon=False, fontsize=8, loc="upper left")
-    ax.set_title("Reliability on out-of-fold development meals", fontsize=9)
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.2), sharey=True)
+    for ax, (name, frame) in zip(axes, (("development, 460 meals", da), ("locked eight, 150 meals", lk)),
+                                 strict=True):  # fmt: skip
+        d = frame.dropna(subset=["risk"])
+        y = d.spike.to_numpy().astype(float)
+        ax.plot([0, 1], [0, 1], color=GREY, lw=0.8, ls="--")
+        for col, label, c in (("risk_raw", "raw fusion", GREY), ("risk", "shipped", BLUE)):
+            p = d[col].to_numpy().astype(float)
+            rows, ece_w = reliability(p, y, bins=15)
+            ece = ece_equal_mass(p, y)
+            if frame is da:
+                out[col], out[col + "_equal_width"] = ece, ece_w
+            ax.plot([r[0] for r in rows], [r[1] for r in rows], "o-", color=c, ms=4,
+                    label=f"{label}: ECE {ece_w:.3f} equal-width, {ece:.3f} equal-mass")  # fmt: skip
+            if col == "risk":
+                for m, o, n in rows:
+                    ax.annotate(str(n), (m, o), textcoords="offset points", xytext=(0, 6), ha="center",
+                                fontsize=6.5, color=BLUE)  # fmt: skip
+        ax.set_xlabel("predicted spike probability (15 equal-width bins)")
+        ax.set_xlim(0, 0.9)
+        ax.set_ylim(0, 1.0)
+        ax.legend(frameon=False, fontsize=7.2, loc="upper left")
+        ax.set_title(f"Reliability, {name}", fontsize=9)
+    axes[0].set_ylabel("observed spike rate (blue numbers = meals per bin)")
+    fig.tight_layout()
     fig.savefig(OUT / "f3_reliability.png")
     plt.close(fig)
     return out
@@ -125,19 +142,20 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
     """Every headline effect with its 95% interval on one axis; the zero line tells the story."""
     g = fu["gains_vs_no_meal"]
     rows = [
-        ("photo gain (gate, photo meals)", fu["primary_photo_meals_only"]["point"],
+        ("photo gain over no meal (the gate)", fu["primary_photo_meals_only"]["point"],
          fu["primary_photo_meals_only"]["ci95"], BLUE),
-        ("shuffled-photo control", g["photo_shuffled"]["point"], g["photo_shuffled"]["ci95"], GREY),
-        ("photo − true carbs (RQ1, other bars are vs no-meal)", fu["rq1_photo_vs_logged"]["point"],
+        ("shuffled-photo gain (control)", g["photo_shuffled"]["point"], g["photo_shuffled"]["ci95"], GREY),
+        ("true logged carbs gain (RQ1 ceiling)", g["logged_carbs"]["point"], g["logged_carbs"]["ci95"], GREY),
+        ("photo minus true carbs (non-inferiority)", fu["rq1_photo_vs_logged"]["point"],
          fu["rq1_photo_vs_logged"]["ci95"], GREY),
-        ("D8: profile-matched meals removed", d8["gain_photo_meals_only"]["point"],
-         d8["gain_photo_meals_only"]["ci95"], RED),
-        ("D8 control: random drop", d8["control_random_drop_gain"]["point"],
-         d8["control_random_drop_gain"]["ci95"], GREEN),
-        ("drop heart rate", ch["delta_vs_full"]["no_heart_rate"]["point"],
-         ch["delta_vs_full"]["no_heart_rate"]["ci95"], GREY),
-        ("drop profile", ch["delta_vs_full"]["no_profile"]["point"],
-         ch["delta_vs_full"]["no_profile"]["ci95"], RED),
+        ("D8 photo gain, exact-macro meals removed", d8["gain_photo_meals_only"]["point"],
+         d8["gain_photo_meals_only"]["ci95"], ORANGE),
+        ("D8 control: photo gain, random drop", d8["control_random_drop_gain"]["point"],
+         d8["control_random_drop_gain"]["ci95"], GREY),
+        ("change when heart rate is dropped", ch["delta_vs_full"]["no_heart_rate"]["point"],
+         ch["delta_vs_full"]["no_heart_rate"]["ci95"], ORANGE),
+        ("change when the profile is dropped", ch["delta_vs_full"]["no_profile"]["point"],
+         ch["delta_vs_full"]["no_profile"]["ci95"], ORANGE),
     ]  # fmt: skip
     fig, ax = plt.subplots(figsize=(5.8, 3.4))
     ys = np.arange(len(rows))[::-1]
@@ -147,7 +165,7 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
     ax.axvline(0, color=GREY, lw=0.8, ls="--")
     ax.set_yticks(ys, [r[0] for r in rows], fontsize=8)
     ax.set_xlabel("AUROC change (95% person-clustered interval)")
-    ax.set_title("Effect sizes: the profile carries the system; the photo is not established", fontsize=9)
+    ax.set_title("Effect sizes (blue: the gate; orange: removals; grey: controls and references)", fontsize=9)
     fig.savefig(OUT / "f4_effects.png")
     plt.close(fig)
 
@@ -174,7 +192,7 @@ def f5_robustness(plt, lv: dict) -> None:
     other = [max(0.0, 1 - u - n - d) for u, n, d in zip(unchanged, newcj, danger, strict=True)]
     bottom = np.zeros(len(conds))
     for vals, label, c in ((unchanged, "unchanged", "#a0c4e8"), (newcj, "newly can't judge (refusal)", BLUE),
-                           (other, "other benign flips", GREY), (danger, "dangerous flips", RED)):  # fmt: skip
+                           (other, "other changes", GREY), (danger, "low risk \u2194 caution", RED)):  # fmt: skip
         ax.bar(xs, vals, bottom=bottom, label=label, color=c, width=0.62)
         bottom += np.array(vals)
     for i, d in enumerate(danger):  # the word is in the legend; the bars leave room for the number only
@@ -183,7 +201,7 @@ def f5_robustness(plt, lv: dict) -> None:
     ax.set_ylim(0, 1.12)
     ax.set_ylabel("share of meals")
     ax.legend(frameon=False, fontsize=7.5, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.14))
-    ax.set_title("Graded change while input stays usable, refusal at the designed thresholds; red = dangerous flips",
+    ax.set_title("Graded change while input stays usable, refusal at the designed thresholds (no history)",
                  fontsize=9)  # fmt: skip
     fig.savefig(OUT / "f5_robustness.png")
     plt.close(fig)
@@ -243,8 +261,8 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     axes[1].set_yticks(np.arange(len(top))[::-1], [FEATURE_NAMES[j] for j in top], fontsize=6.8)
     axes[1].axvline(0, color=GREY, lw=0.8)
     axes[1].set_xlabel("SHAP contribution (logit units)")
-    axes[1].set_title(f"One meal (frozen-fusion risk {1 / (1 + np.exp(-logit_i)):.2f}): terms sum to its logit",
-                      fontsize=9)  # fmt: skip
+    axes[1].set_title(f"One meal: base {base_logit:+.2f} + terms = logit {logit_i:+.2f} (risk "
+                      f"{1 / (1 + np.exp(-logit_i)):.2f}); top 8 of 19 terms", fontsize=8.5)  # fmt: skip
     fig.tight_layout()
     fig.savefig(OUT / "f6_shap.png")
     plt.close(fig)
@@ -300,7 +318,8 @@ def run_figures(cfg=None) -> dict:
     f5_robustness(plt, lv)
     shap_report = f6_shap(plt, da)
     report = {"what": "report figures rendered from committed evidence only (pre-commitment in "
-                      "docs/final_design.md); ECE = equal-mass, 15 bins, answered dev meals",
+                      "docs/final_design.md); ece_raw/ece_personal = equal-mass ECE, 15 bins, answered dev meals; "
+                      "ece_equal_width_15 = the registered binning that Figure 3 draws",
               "ece_raw": ece["risk_raw"], "ece_personal": ece["risk"],
               "ece_equal_width_15": {"raw": ece["risk_raw_equal_width"], "personal": ece["risk_equal_width"]},
               "shap": shap_report,
