@@ -49,6 +49,11 @@ def run_monitoring_replay(cfg) -> dict:
     res["deployed_operating_point"] = replay(at_deployed_cutoffs(dev, th["low_risk_below"], th["caution_from"]),
                                              locked, cap)  # fmt: skip
     res["deployed_operating_point"]["cutoffs"] = [th["low_risk_below"], th["caution_from"]]
+    import joblib
+
+    from glimpse.training.final import FINAL
+
+    res["cusum_served"] = cusum_served(dev, locked, tuple(joblib.load(FINAL)["calibration"]))
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "replay.json").write_text(json.dumps(res, indent=2))
     for name, r in (("replay 1", res), ("replay 2 (deployed cut-offs)", res["deployed_operating_point"])):
@@ -60,6 +65,37 @@ def run_monitoring_replay(cfg) -> dict:
             lk["outcome_too_few_cleared"], lk["behaviour_alerts"], lk["weeks"],
             r["behaviour_threshold_dev_max_caution"])  # fmt: skip
     return res
+
+
+def cusum_served(dev: pd.DataFrame, locked: pd.DataFrame, platt: tuple[float, float], k: float = 0.5,
+                 h: float = 4.0) -> dict:  # fmt: skip
+    """Replay 3 (registered 26 Nov): one-sided CUSUM on the served (Platt-only) risk's per-block
+    calibration (spike rate minus mean risk) and on the caution share, standardised on the dev blocks."""
+    lk = locked.copy()
+    q = np.clip(lk.risk_raw.to_numpy(float), 1e-6, 1 - 1e-6)
+    lk["served"] = 1 / (1 + np.exp(-(platt[0] * np.log(q / (1 - q)) + platt[1])))
+    lk.loc[lk.risk_raw.isna(), "served"] = np.nan
+    dv = dev.assign(served=dev.risk_platt)
+    blocks = _blocks(dv, "dev") + _blocks(lk, "locked")
+    first_locked = next(i + 1 for i, b in enumerate(blocks) if b.stream.iloc[0] == "locked")
+    out = {}
+    for name, fn in (("calibration", lambda b: float(b.spike[b.served.notna()].mean() - b.served.mean())),
+                     ("caution_share", lambda b: float((b.decision == "caution").mean()))):  # fmt: skip
+        x = np.array([fn(b) for b in blocks])
+        ref = x[[b.stream.iloc[0] == "dev" for b in blocks]]
+        z = (x - ref.mean()) / ref.std(ddof=1)
+        s, alarms, path = 0.0, [], []
+        for i, zi in enumerate(z):
+            s = max(0.0, s + zi - k)
+            path.append(s)
+            if s > h:
+                alarms.append({"week": i + 1, "stream": blocks[i].stream.iloc[0]})
+                s = 0.0
+        out[name] = {"x": x.tolist(), "cusum": path, "alarms": alarms,
+                     "dev_false_alarms": sum(a["stream"] == "dev" for a in alarms),
+                     "first_locked_alarm_week": next((a["week"] for a in alarms if a["stream"] == "locked"), None),
+                     "first_locked_week": first_locked}  # fmt: skip
+    return {"k": k, "h": h, **out}
 
 
 def replay(dev: pd.DataFrame, locked: pd.DataFrame, cap: float) -> dict:
