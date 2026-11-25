@@ -147,7 +147,7 @@ reproduce-all:
     just selftest
     just predict-folder samples/instructor outputs/folder_run
     just stress
-    just demo
+    just demo-cli
 
 # regenerate the data-free outputs and fail if they differ from the committed ones (no dataset or weights needed)
 verify-outputs:
@@ -186,10 +186,15 @@ evaluate-locked:
 promised:
     uv run glimpse promised
 
-# demo with the frozen pipeline: worked cases from the test people, two can't-judge cases, response time
+# demo: worked cases (in-sample for the frozen model), two can't-judge cases, response time, then the interface
 demo:
     uv run glimpse demo
-    @echo "UI: just app -> http://127.0.0.1:7860 (optional Gradio extra)"
+    @echo "starting the demo interface at http://127.0.0.1:7860 (Ctrl-C to stop; CLI only: just demo-cli)"
+    uv run --extra app python -m glimpse.app
+
+# the CLI half of the demo only (no interface; used by reproduce-all)
+demo-cli:
+    uv run glimpse demo
 
 # answer one meal from your own files, e.g. just predict --cgm my_cgm.csv --photo lunch.jpg --age 45 --bmi 28 --a1c 5.9 --fasting 100
 predict *ARGS:
@@ -220,7 +225,7 @@ app:
 # remove generated files (keeps downloaded data, the locked environment, checkpoints and committed results)
 clean:
     rm -rf logs .pytest_cache .ruff_cache outputs/feedback
-    git checkout -- outputs/demo  # the demo's committed example files are evidence: restore them, never delete them
+    git checkout -- outputs/demo 2>/dev/null || true  # committed demo files are evidence: restore, never delete
     find . -name "__pycache__" -type d -prune -exec rm -rf {} +
 
 # prose words in the report, tables, figures and their captions excluded (the final rubric's rule)

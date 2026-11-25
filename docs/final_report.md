@@ -283,7 +283,7 @@ it buys little.
 | photo blur r=2/6/10 (same decision / low risk↔caution) | 98% / 0.7% | 94% / 0.9% | 89% / 1.7% |
 | photo brightness ×0.5/×0.25/×0.1 (same decision / new refusals) | 98% / 1% | 96% / 2% | 10% / 90% |
 
-*"Same decision" includes meals already refused before the perturbation. Pre-registered 22 Nov; outputs/robustness/levels.json, the run Figure 5 draws with timing.json and promised.json (outputs/robustness/robustness.json is the earlier 2 Nov single-level run under pre-freeze pipelines, kept for the record).*
+*"Same decision" includes meals already refused before the perturbation; low risk↔caution flips are `dangerous_flips` in the evidence files. Pre-registered 22 Nov; outputs/robustness/levels.json, the run Figure 5 draws with timing.json and promised.json (outputs/robustness/robustness.json is the earlier 2 Nov single-level run under pre-freeze pipelines, kept for the record).*
 
 ![Figure 7: coverage vs risk, abstaining on the meals closest to the low-risk cut (development at each fold's cut, locked at 0.15; n of cleared meals printed), descriptive](../outputs/figures/f7_coverage.png)
 

@@ -31,7 +31,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 ```bash
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
 just check       # ruff + the test suite (some tests skip until the dataset and weights are downloaded)
-just demo        # worked cases (in-sample for the frozen model), two can't-judge cases, response time -> outputs/demo/
+just demo        # worked cases (in-sample), two can't-judge cases, timing -> outputs/demo/, then the UI at :7860
 just evaluate    # dev evaluation, then every report table and figure  -> outputs/evaluation_v2/, report_metrics/, figures/
 just report-numbers   # the same tables and figures from committed outputs only (no data, no weights, ~1 min)
 just predict-folder samples/instructor outputs/folder_run   # the grader's entry point: a folder of meals in, structured answers out
