@@ -286,7 +286,7 @@ cut (Figure 7) keeps the miss rate among cleared meals at 5.6–8.4% from 0 to 3
 fall from 24% to 10% of answered meals. Abstention is established practice (Kompa et al. 2021), but here
 it buys little.
 
-![Figure 4: effect sizes with 95% person-clustered intervals; removals are measured against the fusion study's photo arm (pooled 0.719), not the evaluation's 0.726](../outputs/figures/f4_effects.png)
+![Figure 4: effect sizes with 95% person-clustered intervals; removals are measured against the fusion study's photo arm (pooled 0.719), not the evaluation's 0.726; the green rows come from the evaluation (intercept) and the fair-baseline replay (CGM)](../outputs/figures/f4_effects.png)
 ![Figure 5: every registered perturbation, one run per condition (the table's levels, the meal-time shifts, missing heart rate), per-fold pipelines without history](../outputs/figures/f5_robustness.png)
 
 | stress at three magnitudes | level 1 | level 2 | level 3 |

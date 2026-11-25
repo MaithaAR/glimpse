@@ -184,15 +184,20 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
         ("change when the profile is dropped", ch["delta_vs_full"]["no_profile"]["point"],
          ch["delta_vs_full"]["no_profile"]["ci95"], ORANGE),
     ]  # fmt: skip
-    fig, ax = plt.subplots(figsize=(5.8, 3.4))
+    rm = json.loads(Path("outputs/report_metrics/report_metrics.json").read_text())
+    pg, cg = rm["paired_personal_minus_raw"]["dev"]["auroc"], rm["fair_baselines"]["cgm_removal"]
+    rows += [("personal intercept: shipped minus raw (evaluation, 0.726 base)", pg["point"], pg["ci95"], GREEN),
+             ("CGM trend: no-photo arm minus profile only (with intercept)", cg["no_photo_minus_profile_only"],
+              cg["ci95"], GREEN)]  # fmt: skip
+    fig, ax = plt.subplots(figsize=(5.8, 3.9))
     ys = np.arange(len(rows))[::-1]
     for yv, (_label, pt, ci, c) in zip(ys, rows, strict=True):
         ax.plot(ci, [yv, yv], color=c, lw=1.4)
         ax.plot([pt], [yv], "o", color=c, ms=5)
     ax.axvline(0, color=GREY, lw=0.8, ls="--")
     ax.set_yticks(ys, [r[0] for r in rows], fontsize=8)
-    ax.set_xlabel("AUROC change (95% person-clustered interval)")
-    ax.set_title("Effect sizes (blue: the gate; orange: removals; grey: controls and references)", fontsize=9)
+    ax.set_xlabel("AUROC change (95% person-clustered); removals: negative = the input helped")
+    ax.set_title("Effect sizes (blue: gate; orange: removals; green: contributions; grey: controls)", fontsize=9)
     fig.savefig(OUT / "f4_effects.png")
     plt.close(fig)
 
