@@ -83,7 +83,7 @@ Whether the photo helps at all was decided by a gate, not by us. The pre-registe
 (docs/gate_s8.md committed both outcome paragraphs before the run; the losing one was deleted on
 the verdict, per its own rule),
 the shipped product is sensor + confirmed carbs, with the photo head as a carb-entry assist, not an
-established risk signal. Three results corroborate it. RQ1: even the participants' true logged carbs gain only
+established risk signal. Three results agree. RQ1: even the participants' true logged carbs gain only
 +0.024 (−0.003, +0.056) over profile + trend, and the photo estimate lands within +0.002 of them
 (non-inferior): an information ceiling no photo encoder can break. The pre-registered D8 split: excluding training meals that share an
 exact macro profile with a held person's meal kills the photo gain (−0.005) while a size-matched
@@ -106,7 +106,7 @@ fold 1 contains the five people the intermediate evaluation already scored (the 
 and the calibration fix was chosen after a diagnosis made on those people, so the development
 estimate carries selection pressure the locked eight do not. The personalised model beats raw in all five outer
 folds (Figure 2); the pooled estimate excluding the previously-scored fold 1 is 0.757 (0.651–0.833) against
-0.762 overall, and the locked eight, scored once in §6, are the only fully clean measurement.
+0.762 overall, and the locked eight, scored once in §6, are the only clean measurement.
 
 Postprandial response is person-specific (Zeevi et al. 2015; Berry et al. 2020). The
 calibration fix: a per-fold Platt map on inner out-of-fold risks plus a penalised per-person
