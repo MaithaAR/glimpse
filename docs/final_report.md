@@ -16,9 +16,16 @@ product is sensor + confirmed carbs, with the photo head as a carb-entry assist.
 cleared meals spiked (7.3%, interval 2.9–14.2% against a pre-registered 10% cap), degraded input
 triggers refusal, with dangerous flips at most 1.5%, and a 23-case adversarial suite produces zero crashes
 and zero error rows. [S16: one sentence with the locked-8 result, scored once on 22 Nov, whatever it shows.]
-<!-- S16 bottom-line template (fill from the one scoring run, as measured): "On the 8 locked people
-(N meals, XX% spike rate), scored exactly once: personal AUROC 0.XXX (0.XXX-0.XXX), raw 0.XXX;
-XX cleared / XX caution / XX can't judge; missed-among-cleared X of XX." -->
+<!-- S16: BOTH outcome paragraphs pre-written 25 Nov, before the run; the losing one is deleted.
+A (holds up): "On the 8 locked people (N meals, XX% spike rate), scored exactly once: personal
+AUROC 0.XXX (0.XXX-0.XXX), raw 0.XXX; decisions XX/XX/XX; missed-among-cleared X of XX. The
+development estimate carries over."
+B (does not): "On the 8 locked people (N meals, XX% spike rate), scored exactly once: personal
+AUROC 0.XXX (0.XXX-0.XXX), raw 0.XXX; decisions XX/XX/XX; missed-among-cleared X of XX, failing
+the pre-set XX cap. With 8 people the interval is wide; per the pre-registration this number
+stands unadjusted and the development estimate does not replace it."
+Rules: threshold first where one exists, value second, verdict in the pre-registration's words,
+n named, no adjectives, no new slices. -->
 
 ## 1. System and tooling
 <!-- 350 words: condensed user/workflow from the intermediate; ONE scoring path (D2); the instructor
@@ -183,10 +190,23 @@ Abstaining instead of guessing is established practice for medical ML (Kompa et 
 ![Figure 4: effect sizes](../outputs/figures/f4_effects.png)
 ![Figure 5: six perturbations, same per-fold pipelines, no history](../outputs/figures/f5_robustness.png)
 
+| stress at three magnitudes | level 1 | level 2 | level 3 |
+|---|---|---|---|
+| CGM dropout 10/30/50% (unchanged / dangerous) | 100% / 0.0% | 100% / 0.0% | 100% / 0.2% |
+| pre-meal gap 10/25/40 min (unchanged / new refusals) | 100% / 0% | 11% / 89% | 11% / 89% |
+| photo blur r=2/6/10 (unchanged / dangerous) | 98% / 0.7% | 94% / 0.9% | 89% / 1.7% |
+| photo brightness x0.5/x0.25/x0.1 (unchanged / new refusals) | 98% / 1% | 96% / 2% | 10% / 90% |
+
+*Degradation is graded where inputs stay usable (blur) and collapses to refusal at the designed
+thresholds (the 20-minute gap rule, the contrast rule in near-darkness); dangerous flips stay at or
+below 1.7% at every level (pre-registered 22 Nov; outputs/robustness/levels.json).*
+
 Stress suite: 23 hostile inputs (timezone offsets, malformed JSON, binary CSVs, broken photos,
 empty folders) give zero crashes and zero raw error rows; rules R8-R10 were added only against
 observed failures of a recorded naive run, like R1-R6, and tests enforce this on every commit. Monitoring: four signals with alert rules
-(docs/monitoring.md); drift baseline committed. The planned dietitian consultation did not complete before submission: the three structured
+(docs/monitoring.md); drift baseline committed, and on a simulated four-week stream the
+weekly-median alert fires on the drifted week only (0.709 against the 0.445 rule; weeks one to
+three 0.25-0.37). The planned dietitian consultation did not complete before submission: the three structured
 questions (cap acceptability, decision wording, the rising-baseline case) are committed as the
 instrument, no clinician response is folded in, and the cost matrix stays a declared assumption
 with the committed sensitivity sweep as its hedge.
