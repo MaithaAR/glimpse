@@ -1,5 +1,5 @@
 {
-  "what": "report figures rendered from committed evidence only (pre-commitment in docs/final_design.md); ECE = equal-mass, 15 bins, answered dev meals",
+  "what": "report figures rendered from committed evidence only (pre-commitment in docs/final_design.md); ece_raw/ece_personal = equal-mass ECE, 15 bins, answered dev meals; ece_equal_width_15 = the registered binning that Figure 3 draws",
   "ece_raw": 0.05903813811230171,
   "ece_personal": 0.04904761090603793,
   "ece_equal_width_15": {

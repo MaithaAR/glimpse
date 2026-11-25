@@ -1,6 +1,6 @@
 {
   "what": "Replay of the outcome and behaviour monitoring rules on the logged answers (`glimpse monitoring-replay`).",
-  "rules": "docs/monitoring.md, replay section (registered 26 Nov)",
+  "rules": "docs/monitoring.md, replay sections (registered 26 Nov)",
   "block": 20,
   "window_blocks": 4,
   "min_cleared": 10,
@@ -597,5 +597,610 @@
       "auroc_below_locked_value": true,
       "calibration_in_the_large": 0.03526973630618824
     }
-  ]
+  ],
+  "deployed_operating_point": {
+    "what": "Replay of the outcome and behaviour monitoring rules on the logged answers (`glimpse monitoring-replay`).",
+    "rules": "docs/monitoring.md, replay sections (registered 26 Nov)",
+    "block": 20,
+    "window_blocks": 4,
+    "min_cleared": 10,
+    "cap": 0.1,
+    "behaviour_threshold_dev_max_caution": 1.0,
+    "summary": {
+      "dev": {
+        "windows": 21,
+        "outcome_alerts": 3,
+        "outcome_too_few_cleared": 2,
+        "auroc_below_locked_value": 1,
+        "calibration_in_the_large_median": -0.02963208665584116,
+        "weeks": 24,
+        "behaviour_alerts": 0,
+        "caution_share_median": 0.75
+      },
+      "mixed": {
+        "windows": 3,
+        "outcome_alerts": 1,
+        "outcome_too_few_cleared": 1,
+        "auroc_below_locked_value": 0,
+        "calibration_in_the_large_median": -0.046665338152272806,
+        "weeks": 0,
+        "behaviour_alerts": 0,
+        "caution_share_median": null
+      },
+      "locked": {
+        "windows": 4,
+        "outcome_alerts": 0,
+        "outcome_too_few_cleared": 4,
+        "auroc_below_locked_value": 4,
+        "calibration_in_the_large_median": 0.03755977140176889,
+        "weeks": 7,
+        "behaviour_alerts": 0,
+        "caution_share_median": 0.95
+      }
+    },
+    "weeks": [
+      {
+        "week": 1,
+        "stream": "dev",
+        "low risk": 0.85,
+        "caution": 0.15,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 2,
+        "stream": "dev",
+        "low risk": 0.3,
+        "caution": 0.7,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 3,
+        "stream": "dev",
+        "low risk": 0.25,
+        "caution": 0.75,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 4,
+        "stream": "dev",
+        "low risk": 0.05,
+        "caution": 0.95,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 5,
+        "stream": "dev",
+        "low risk": 0.1,
+        "caution": 0.9,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 6,
+        "stream": "dev",
+        "low risk": 0.6,
+        "caution": 0.3,
+        "can't judge": 0.1,
+        "behaviour_alert": false
+      },
+      {
+        "week": 7,
+        "stream": "dev",
+        "low risk": 0.2,
+        "caution": 0.8,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 8,
+        "stream": "dev",
+        "low risk": 0.2,
+        "caution": 0.7,
+        "can't judge": 0.1,
+        "behaviour_alert": false
+      },
+      {
+        "week": 9,
+        "stream": "dev",
+        "low risk": 0.05,
+        "caution": 0.95,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 10,
+        "stream": "dev",
+        "low risk": 0.1,
+        "caution": 0.8,
+        "can't judge": 0.1,
+        "behaviour_alert": false
+      },
+      {
+        "week": 11,
+        "stream": "dev",
+        "low risk": 0.2,
+        "caution": 0.6,
+        "can't judge": 0.2,
+        "behaviour_alert": false
+      },
+      {
+        "week": 12,
+        "stream": "dev",
+        "low risk": 0.35,
+        "caution": 0.45,
+        "can't judge": 0.2,
+        "behaviour_alert": false
+      },
+      {
+        "week": 13,
+        "stream": "dev",
+        "low risk": 0.1,
+        "caution": 0.9,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 14,
+        "stream": "dev",
+        "low risk": 0.0,
+        "caution": 1.0,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 15,
+        "stream": "dev",
+        "low risk": 0.05,
+        "caution": 0.95,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 16,
+        "stream": "dev",
+        "low risk": 0.1,
+        "caution": 0.75,
+        "can't judge": 0.15,
+        "behaviour_alert": false
+      },
+      {
+        "week": 17,
+        "stream": "dev",
+        "low risk": 0.3,
+        "caution": 0.7,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 18,
+        "stream": "dev",
+        "low risk": 0.3,
+        "caution": 0.45,
+        "can't judge": 0.25,
+        "behaviour_alert": false
+      },
+      {
+        "week": 19,
+        "stream": "dev",
+        "low risk": 0.1,
+        "caution": 0.85,
+        "can't judge": 0.05,
+        "behaviour_alert": false
+      },
+      {
+        "week": 20,
+        "stream": "dev",
+        "low risk": 0.55,
+        "caution": 0.45,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 21,
+        "stream": "dev",
+        "low risk": 0.3,
+        "caution": 0.7,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 22,
+        "stream": "dev",
+        "low risk": 0.05,
+        "caution": 0.95,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 23,
+        "stream": "dev",
+        "low risk": 0.2,
+        "caution": 0.75,
+        "can't judge": 0.05,
+        "behaviour_alert": false
+      },
+      {
+        "week": 24,
+        "stream": "dev",
+        "low risk": 0.05,
+        "caution": 0.8,
+        "can't judge": 0.15,
+        "behaviour_alert": false
+      },
+      {
+        "week": 25,
+        "stream": "locked",
+        "low risk": 0.0,
+        "caution": 0.95,
+        "can't judge": 0.05,
+        "behaviour_alert": false
+      },
+      {
+        "week": 26,
+        "stream": "locked",
+        "low risk": 0.3,
+        "caution": 0.65,
+        "can't judge": 0.05,
+        "behaviour_alert": false
+      },
+      {
+        "week": 27,
+        "stream": "locked",
+        "low risk": 0.15,
+        "caution": 0.8,
+        "can't judge": 0.05,
+        "behaviour_alert": false
+      },
+      {
+        "week": 28,
+        "stream": "locked",
+        "low risk": 0.0,
+        "caution": 1.0,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 29,
+        "stream": "locked",
+        "low risk": 0.0,
+        "caution": 1.0,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      },
+      {
+        "week": 30,
+        "stream": "locked",
+        "low risk": 0.05,
+        "caution": 0.9,
+        "can't judge": 0.05,
+        "behaviour_alert": false
+      },
+      {
+        "week": 31,
+        "stream": "locked",
+        "low risk": 0.0,
+        "caution": 1.0,
+        "can't judge": 0.0,
+        "behaviour_alert": false
+      }
+    ],
+    "windows": [
+      {
+        "weeks": "1-4",
+        "stream": "dev",
+        "cleared": 29,
+        "missed": 0,
+        "missed_among_cleared": 0.0,
+        "outcome_alert": false,
+        "auroc": 0.762987012987013,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": 0.057530416375087434
+      },
+      {
+        "weeks": "2-5",
+        "stream": "dev",
+        "cleared": 14,
+        "missed": 0,
+        "missed_among_cleared": 0.0,
+        "outcome_alert": false,
+        "auroc": 0.7795575896262394,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": 0.027965410739629826
+      },
+      {
+        "weeks": "3-6",
+        "stream": "dev",
+        "cleared": 20,
+        "missed": 2,
+        "missed_among_cleared": 0.1,
+        "outcome_alert": false,
+        "auroc": 0.7604881769641495,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": 0.010483052675535065
+      },
+      {
+        "weeks": "4-7",
+        "stream": "dev",
+        "cleared": 19,
+        "missed": 2,
+        "missed_among_cleared": 0.10526315789473684,
+        "outcome_alert": true,
+        "auroc": 0.7597254004576659,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": 0.025527974285609822
+      },
+      {
+        "weeks": "5-8",
+        "stream": "dev",
+        "cleared": 22,
+        "missed": 2,
+        "missed_among_cleared": 0.09090909090909091,
+        "outcome_alert": false,
+        "auroc": 0.7794486215538847,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": 0.008670511111479762
+      },
+      {
+        "weeks": "6-9",
+        "stream": "dev",
+        "cleared": 21,
+        "missed": 2,
+        "missed_among_cleared": 0.09523809523809523,
+        "outcome_alert": false,
+        "auroc": 0.6624895572263994,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.019038120045994367
+      },
+      {
+        "weeks": "7-10",
+        "stream": "dev",
+        "cleared": 11,
+        "missed": 0,
+        "missed_among_cleared": 0.0,
+        "outcome_alert": false,
+        "auroc": 0.6831761006289307,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.02963208665584116
+      },
+      {
+        "weeks": "8-11",
+        "stream": "dev",
+        "cleared": 11,
+        "missed": 0,
+        "missed_among_cleared": 0.0,
+        "outcome_alert": false,
+        "auroc": 0.6941666666666666,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.046184854936827724
+      },
+      {
+        "weeks": "9-12",
+        "stream": "dev",
+        "cleared": 14,
+        "missed": 1,
+        "missed_among_cleared": 0.07142857142857142,
+        "outcome_alert": false,
+        "auroc": 0.7083333333333334,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.05098205378591647
+      },
+      {
+        "weeks": "10-13",
+        "stream": "dev",
+        "cleared": 15,
+        "missed": 1,
+        "missed_among_cleared": 0.06666666666666667,
+        "outcome_alert": false,
+        "auroc": 0.7261904761904762,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.03664777125069124
+      },
+      {
+        "weeks": "11-14",
+        "stream": "dev",
+        "cleared": 13,
+        "missed": 1,
+        "missed_among_cleared": 0.07692307692307693,
+        "outcome_alert": false,
+        "auroc": 0.6875,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": 0.0071868333266104645
+      },
+      {
+        "weeks": "12-15",
+        "stream": "dev",
+        "cleared": 10,
+        "missed": 1,
+        "missed_among_cleared": 0.1,
+        "outcome_alert": false,
+        "auroc": 0.6782312925170069,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.06759106809325782
+      },
+      {
+        "weeks": "13-16",
+        "stream": "dev",
+        "cleared": 5,
+        "missed": 1,
+        "missed_among_cleared": null,
+        "outcome_alert": "too few cleared to judge",
+        "auroc": 0.6241565452091768,
+        "auroc_below_locked_value": true,
+        "calibration_in_the_large": -0.07150398968127397
+      },
+      {
+        "weeks": "14-17",
+        "stream": "dev",
+        "cleared": 9,
+        "missed": 2,
+        "missed_among_cleared": null,
+        "outcome_alert": "too few cleared to judge",
+        "auroc": 0.6618457300275482,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.04475776100795231
+      },
+      {
+        "weeks": "15-18",
+        "stream": "dev",
+        "cleared": 15,
+        "missed": 2,
+        "missed_among_cleared": 0.13333333333333333,
+        "outcome_alert": true,
+        "auroc": 0.718676122931442,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.07063970001456227
+      },
+      {
+        "weeks": "16-19",
+        "stream": "dev",
+        "cleared": 16,
+        "missed": 3,
+        "missed_among_cleared": 0.1875,
+        "outcome_alert": true,
+        "auroc": 0.7021276595744681,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.040124837539997016
+      },
+      {
+        "weeks": "17-20",
+        "stream": "dev",
+        "cleared": 25,
+        "missed": 2,
+        "missed_among_cleared": 0.08,
+        "outcome_alert": false,
+        "auroc": 0.7598214285714286,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": 0.00922597956686122
+      },
+      {
+        "weeks": "18-21",
+        "stream": "dev",
+        "cleared": 25,
+        "missed": 1,
+        "missed_among_cleared": 0.04,
+        "outcome_alert": false,
+        "auroc": 0.84375,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.0166980085624836
+      },
+      {
+        "weeks": "19-22",
+        "stream": "dev",
+        "cleared": 20,
+        "missed": 1,
+        "missed_among_cleared": 0.05,
+        "outcome_alert": false,
+        "auroc": 0.8544137022397893,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.03848404628100316
+      },
+      {
+        "weeks": "20-23",
+        "stream": "dev",
+        "cleared": 22,
+        "missed": 1,
+        "missed_among_cleared": 0.045454545454545456,
+        "outcome_alert": false,
+        "auroc": 0.8388969521044993,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": 0.005250234594944114
+      },
+      {
+        "weeks": "21-24",
+        "stream": "dev",
+        "cleared": 12,
+        "missed": 1,
+        "missed_among_cleared": 0.08333333333333333,
+        "outcome_alert": false,
+        "auroc": 0.7878151260504201,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.0499854555610319
+      },
+      {
+        "weeks": "22-25",
+        "stream": "mixed",
+        "cleared": 6,
+        "missed": 1,
+        "missed_among_cleared": null,
+        "outcome_alert": "too few cleared to judge",
+        "auroc": 0.7219061166429588,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.046665338152272806
+      },
+      {
+        "weeks": "23-26",
+        "stream": "mixed",
+        "cleared": 11,
+        "missed": 1,
+        "missed_among_cleared": 0.09090909090909091,
+        "outcome_alert": false,
+        "auroc": 0.7066766691672918,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.046169070964956815
+      },
+      {
+        "weeks": "24-27",
+        "stream": "mixed",
+        "cleared": 10,
+        "missed": 2,
+        "missed_among_cleared": 0.2,
+        "outcome_alert": true,
+        "auroc": 0.7014285714285714,
+        "auroc_below_locked_value": false,
+        "calibration_in_the_large": -0.0812733281127283
+      },
+      {
+        "weeks": "25-28",
+        "stream": "locked",
+        "cleared": 9,
+        "missed": 2,
+        "missed_among_cleared": null,
+        "outcome_alert": "too few cleared to judge",
+        "auroc": 0.6235045742434905,
+        "auroc_below_locked_value": true,
+        "calibration_in_the_large": 0.009462083776437258
+      },
+      {
+        "weeks": "26-29",
+        "stream": "locked",
+        "cleared": 9,
+        "missed": 2,
+        "missed_among_cleared": null,
+        "outcome_alert": "too few cleared to judge",
+        "auroc": 0.5830745341614907,
+        "auroc_below_locked_value": true,
+        "calibration_in_the_large": 0.08216719957904373
+      },
+      {
+        "weeks": "27-30",
+        "stream": "locked",
+        "cleared": 4,
+        "missed": 2,
+        "missed_among_cleared": null,
+        "outcome_alert": "too few cleared to judge",
+        "auroc": 0.6027210884353742,
+        "auroc_below_locked_value": true,
+        "calibration_in_the_large": 0.03984980649734954
+      },
+      {
+        "weeks": "28-31",
+        "stream": "locked",
+        "cleared": 1,
+        "missed": 0,
+        "missed_among_cleared": null,
+        "outcome_alert": "too few cleared to judge",
+        "auroc": 0.6236702127659575,
+        "auroc_below_locked_value": true,
+        "calibration_in_the_large": 0.03526973630618824
+      }
+    ],
+    "cutoffs": [
+      0.15,
+      0.16
+    ]
+  }
 }
