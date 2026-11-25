@@ -227,7 +227,7 @@ def run_levels(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
                          "rubric 4d); same per-fold pipelines, no history", "levels": LEVELS}  # fmt: skip
     for kind, lvs in LEVELS.items():
         base = base_tab if kind.startswith("cgm") else [b for b in base_live if b is not None]
-        res[kind] = {str(lv): _flips(base, [x for x in pert[(kind, lv)] if not (x is None)]
+        res[kind] = {str(lv): _flips(base, [x for x in pert[(kind, lv)] if x is not None]
                                      if kind.startswith("photo") else pert[(kind, lv)]) for lv in lvs}  # fmt: skip
         for lv in lvs:
             r = res[kind][str(lv)]

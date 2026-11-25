@@ -1,6 +1,7 @@
 """Batch entry point for a folder of meals, as the instructor will run it: one sub-folder per meal
 (photo.*, cgm.csv, profile.json) -> results.jsonl + summary.md. A bad meal becomes a per-item entry,
-never a crash, and the per-meal loop always finishes (a missing or empty input folder is still an error). Report: instructor-readiness in §6c."""
+never a crash, and the per-meal loop always finishes (a missing or empty input folder is still an
+error). Report: instructor-readiness in §6c."""
 
 from __future__ import annotations
 

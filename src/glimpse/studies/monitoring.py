@@ -54,10 +54,9 @@ def run_monitoring(cfg: GlimpseConfig) -> dict:
     # app); the committed alert rule (weekly median above the training q90) should fire on week 4 only.
     from glimpse.data.photos import eval_transform
     from glimpse.demo_cases import synthetic_images
-    from glimpse.models.weights import weights_path
     from glimpse.serve import knn_distance
-    from glimpse.training.photo import load_photo_bundle
     from glimpse.training.final import _photo_checkpoint
+    from glimpse.training.photo import load_photo_bundle
 
     model, _ = load_photo_bundle(cfg, _photo_checkpoint())
     model.eval()
@@ -71,7 +70,7 @@ def run_monitoring(cfg: GlimpseConfig) -> dict:
     stream = [{"week": i + 1, "n": len(w), "median": float(np.median(w)),
                "alert": bool(np.median(w) > q90)} for i, w in enumerate(weeks)]  # fmt: skip
     res["simulated_stream"] = {"rule": "alert when the weekly median distance exceeds the training "
-                                       "q90 (%.3f)" % q90, "weeks": stream,
+                                       f"q90 ({q90:.3f})", "weeks": stream,
                                "fires_on_week_4_only": [w["alert"] for w in stream] == [False, False, False, True]}
     for w in stream:
         log.info("simulated week {}: median {:.3f} -> {}", w["week"], w["median"],

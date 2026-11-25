@@ -3,10 +3,10 @@
 import json
 
 import pytest
-from test_serve import bare_pipeline
 
 from glimpse.serve.folder import predict_folder
 from glimpse.serve.io import _plain, answer_from_files, read_cgm_csv
+from test_serve import bare_pipeline
 
 GOOD = {"age": 42.0, "bmi": 27.5, "a1c_pct": 5.8, "fasting_glucose_mgdl": 102.0}
 
