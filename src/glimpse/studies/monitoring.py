@@ -69,9 +69,11 @@ def run_monitoring(cfg: GlimpseConfig) -> dict:
     weeks = [sorted(rng.choice(loo, 20, replace=False).tolist()) for _ in range(3)] + [sorted(syn)]
     stream = [{"week": i + 1, "n": len(w), "median": float(np.median(w)),
                "alert": bool(np.median(w) > q90)} for i, w in enumerate(weeks)]  # fmt: skip
-    res["simulated_stream"] = {"rule": "alert when the weekly median distance exceeds the training "
-                                       f"q90 ({q90:.3f})", "weeks": stream,
-                               "fires_on_week_4_only": [w["alert"] for w in stream] == [False, False, False, True]}
+    res["simulated_stream"] = {
+        "rule": f"alert when the weekly median distance exceeds the training q90 ({q90:.3f})",
+        "weeks": stream,
+        "fires_on_week_4_only": [w["alert"] for w in stream] == [False, False, False, True],
+    }
     for w in stream:
         log.info("simulated week {}: median {:.3f} -> {}", w["week"], w["median"],
                  "ALERT" if w["alert"] else "ok")  # fmt: skip

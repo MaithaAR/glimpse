@@ -238,4 +238,3 @@ def run_levels(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
     (out / "levels.json").write_text(json.dumps(res, indent=2))
     log.info("levels -> {}", out / "levels.json")
     return res
-

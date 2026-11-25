@@ -67,8 +67,10 @@ def test_uppercase_photo_name_is_found_and_unreadable_profile_is_structured(tmp_
         predict_folder(bare_pipeline(risk=0.4, table={}), tmp_path / "in", tmp_path / "out")
     finally:
         (locked / "profile.json").chmod(0o644)
-    rows = {json.loads(ln)["meal_id"]: json.loads(ln)
-            for ln in (tmp_path / "out" / "results.jsonl").read_text().splitlines()}
+    rows = {
+        json.loads(ln)["meal_id"]: json.loads(ln)
+        for ln in (tmp_path / "out" / "results.jsonl").read_text().splitlines()
+    }
     assert "error" not in rows["01_upper"]
     assert "photo" in rows["01_upper"]["reason"]  # the photo WAS found (and then rejected as unreadable)
     locked_row = rows["02_locked_profile"]
