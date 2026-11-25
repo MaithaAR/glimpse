@@ -9,7 +9,7 @@ deployment order, is the change that worked: it lifts AUROC in all five developm
 and lowers log-loss, though most of the system's edge is the intercept's own. The photo failed its
 pre-registered gate and is not claimed as a risk signal, yet the frozen fusion still uses it (§2). On the
 8 locked people, scored exactly once, AUROC is 0.645 and the usefulness targets fail; the grader's folder
-command, which has no history, fails two targets on development too. Per the pre-registration these
+command, run without history as the samples are, fails two targets on development too. Per the pre-registration these
 numbers stand unadjusted.
 
 | Status at a glance | development (481 meals) | locked eight (153) | served, no history: dev / locked |
@@ -36,7 +36,8 @@ person without logging; abstentions name a next step (confirm carbs, a dietitian
 
 One scoring path: every decision and risk here, the demo, the app and the grader's
 `just predict-folder <in> <out>` go through the same `Pipeline.answer`; plain-code input rules run first
-(§4). The folder command and the app answer each meal without history, at the population calibration:
+(§4). By default the folder command and the app answer each meal without history, at the population
+calibration:
 the personal intercept needs a person's labelled meals, which the evaluation replays in deployment order
 and a deployed app would collect from `cgm_auto`. An optional `history.csv` per meal folder (earlier
 answers' fusion logits and CGM labels) now feeds it through the same two-hour gate; the samples carry
