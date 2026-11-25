@@ -64,3 +64,26 @@ Declined in this pass: a history input for the folder command (new serving code 
 end-to-end on the machine doing this round; the grader's entry point is not changed blind); a stress run
 through the personalised path, a direction split of the flips and a 15-minute gap level (all need the
 dataset); an occlusion probe (needs the weights).
+
+## 26 Nov 2026, third pass (after a third set of cold grades: 83.5, 77.5, 85.1)
+
+| Change | Why | Evidence |
+|---|---|---|
+| The product claim corrected everywhere: the gate's Paragraph B described a sensor-first product that was not built; the frozen fusion takes the photo estimate as 4 of 19 inputs; the typed-carbs tier has no input surface | the report described a product the code does not ship (3 of 3) | src/glimpse/serve/pipeline.py; docs/final_design.md note |
+| Typed-carbs risk shown not monotone; recorded as a strict known-failure test (T8) | unevaluated tier with a defect (1 of 3) | tests/test_known_failures.py |
+| The served operating point (no history, deployed cut-offs) recomputed from the committed answers: fails two targets on dev, misses 7 of 32 clears locked; prior imputation for profiles without priors disclosed and tested | the point the grader runs was never evaluated (3 of 3) | report_metrics.json `served_operating_point` |
+| ECE against its noise floor (a perfectly calibrated model scores 0.052 at n = 460) and a person-bootstrap interval; the "narrow miss" reading withdrawn; per-person offsets reported | ECE read as signal (1 of 3) | `ece_noise_floor`, `person_offsets` |
+| Coverage-vs-risk figure (Figure 7) | rubric 4c asks for it by name (3 of 3) | `coverage_risk`, outputs/figures/f7_coverage.png |
+| D7's locked primary endpoint disclosed as never computed; secondary endpoint reported | unreported pre-registered endpoint (1 of 3) | docs/final_design.md, docs/evaluation_protocol.md |
+| Cost grid: abstention at half the abstain price disclosed (62–76%); constant-policy set stated | hidden failing target (1 of 3) | dev_summary.json `cost_sweep` |
+| Monitoring results as a table; pooled calibration-in-the-large (−0.010 locked); overlapping windows and the mixed window stated; signal 4 marked not computable; monitoring.md 30 ms and latency lines corrected | overstated or missing (3 of 3) | outputs/monitoring/ |
+| Probe A's 100% stated as guaranteed by linearity; the heart-rate redundancy claim withdrawn (R² 0.19); T5 top-four terms tabled; taxonomy gains root cause, action and T8; T6 corpus fixed (instructor case 11) | overclaims (2 of 3) | report_metrics.json |
+| Baselines labelled by meal set and estimator; recipe table says which settings live in code; seed study labelled as the intermediate split; glossary added | ambiguous numbers (3 of 3) | report §1-§3 |
+| R12: zero or negative glucose refuses as a broken export, not as mmol/L; incomplete-window reasons name only the failing criteria | wrong advice to the user (1 of 3) | src/glimpse/serve/pipeline.py, rules.py; tests |
+| Justfile: dead recipes removed, stale comments fixed, `uv sync --locked`, `just verify-outputs` | front-door hygiene (2 of 3) | Justfile |
+| Docs: design-doc note's R11 date corrected (8 Nov); data card's spike-rate ranges labelled by cohort; pipeline docstring (37 people) | stale or wrong (2 of 3) | docs/, src/ |
+
+Declined in this pass: wiring a carbs or history input into the folder command (new serving code on the
+grader's entry point that could not be run end-to-end here); a stress run through the personalised path;
+real photos in the five stress cases and real-photo format cases; an int8 or no-photo latency study; an
+occlusion probe (all need the dataset or the weights).

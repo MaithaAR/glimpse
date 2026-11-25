@@ -144,3 +144,5 @@ Nothing in this table changes a shipped artifact, threshold or verdict.
 - **AUPRC and Brier**, registered above, were not in the report until 26 Nov. Now reported for development
   and the locked run from the committed answer files (`just report-metrics`): AUPRC 0.591 (base rate
   0.328) and 0.547 (0.420); Brier 0.180 and 0.230.
+- **D7's locked primary endpoint** (photo arm vs profile + trend on the locked eight) was not computed: the
+  single locked run scored only the shipped pipeline and cannot be repeated. See docs/final_design.md, 26 Nov.

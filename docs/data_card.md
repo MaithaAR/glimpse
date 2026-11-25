@@ -41,7 +41,7 @@ are the intermediate's fixed split, kept for the record (26 Nov note).
 | 5 outer CV folds (23 development target people) | 23 | | **481** | 0.24–0.51 per fold |
 
 - **Main estimate:** person-level 5-fold cross-validation over the 23 development target people. Every one of them is tested once (481 scored meals). The held-out test of the final stage is the locked eight, scored once; the intermediate's fixed split (rows 1-3) remains the demo's split.
-- **Rates differ** between groups because people differ (per-person spike rate 0 to 0.84) and type 2 diabetes people, who spike more, train only. Results are therefore reported for the target cohort, with base-rate-aware measures and calibration. Every setting is chosen on four inner folds inside each outer fold (partition v2); the intermediate chose on 4 validation people (99 meals), a noisy basis it replaced.
+- **Rates differ** between groups because people differ (per-person spike rate 0 to 0.84 across all scored people including type 2 diabetes; 0 to 0.68 among the 23 development target people) and type 2 diabetes people, who spike more, train only. Results are therefore reported for the target cohort, with base-rate-aware measures and calibration. Every setting is chosen on four inner folds inside each outer fold (partition v2); the intermediate chose on 4 validation people (99 meals), a noisy basis it replaced.
 
 ## Leakage controls
 - People never cross groups (checked in code). The 8 locked people are verified by SHA-256, never touched by `glimpse prepare` or training, and were scored exactly once on 25 Nov (`just evaluate-locked`; the guard refuses a rerun).

@@ -30,7 +30,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 ## Quick start (macOS or Linux; needs [uv](https://docs.astral.sh/uv/) and [just](https://just.systems/), no pip)
 ```bash
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
-just check       # ruff + 157 tests
+just check       # ruff + 162 tests
 just demo        # worked cases, two can't-judge cases, response time  -> outputs/demo/cases.md
 just evaluate    # dev evaluation, then every report table and figure  -> outputs/evaluation_v2/, report_metrics/, figures/
 just report-numbers   # the same tables and figures from committed outputs only (no data, no weights, ~1 min)
@@ -56,7 +56,6 @@ just docker-demo                              # needs `just install` first, for 
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
 | `just evaluate` | the dev evaluation, then `just report-numbers` (every report table and figure re-derived from committed outputs); the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun); compute studies have their own recipes (table below) | 2 min |
 | `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10 min |
-| `just recalibrate` | superseded by partition v2: the deployed calibration comes from `just finalize`; the recipe says so and exits | – |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`,
 and `just report-numbers` works on a bare clone. `just reproduce-all` reruns every compute study in dependency
@@ -68,7 +67,8 @@ regenerated once under a pre-registered procedure) or `just evaluate-locked` (th
 **What the grader's folder command does and does not do.** `just predict-folder` answers each meal folder on
 its own, at the population calibration: the personal intercept needs a person's earlier labelled meals, which
 the evaluation replays in deployment order and a deployed app would collect from the CGM; the folder format has
-no history field yet (report §1, §7).
+no history field yet, and a profile.json without `prior_spike_rate` / `prior_rise` gets the training medians
+(0.455, 48 mg/dL). That served point fails two usefulness targets on development (report §4).
 
 ## Results (AUROC, 95% ranges clustered by person)
 The locked test is the primary, clean measurement (scored once); the development estimate carries disclosed
@@ -87,7 +87,8 @@ selection pressure (fold 1 was scored at the intermediate stage).
   AUROC gain, +0.037 (−0.004, +0.071), is not established, and the registered ECE target is narrowly missed on
   development (0.052; 0.049 in the equal-mass binning used until 26 Nov). On the locked test it improves AUROC,
   Brier and log-loss at the point estimate, with intervals that include zero.
-- The photo is NOT established as a risk signal: pre-registered gate +0.025 (−0.010, +0.061). It ships as a carb-entry assist.
+- The photo is NOT established as a risk signal: pre-registered gate +0.025 (−0.010, +0.061). The frozen fusion still takes
+  the photo estimate as 4 of its 19 inputs: the sensor-first product the gate's verdict described was not built.
 - Usefulness targets hold at the point on development (23% cleared, 14% cost saving, 7.3% missed vs a 10% cap) and FAIL on
   the locked test (10 of 153 cleared, 2 spiked, cost reduction −5.7%), reported unadjusted, per the pre-registration.
 - The 8 locked people were scored exactly once, on 25 Nov, from the frozen artifacts (`just evaluate-locked` refuses a rerun).

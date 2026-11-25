@@ -139,3 +139,10 @@ final serving code and reproduced them. And one more R11 addition, found when a 
 answers: an answered meal's reason printed the risk at whole percent, so a risk of 0.148 read "risk 15% is
 below the low-risk cut-off 15%". The reason now prints one decimal (more only when rounding would reach
 the cut); decisions are unchanged, and the committed answer files keep the wording they were made with.
+
+## R12 - zero or negative glucose (26 Nov, found by a grader reading the stress run)
+Observed: stress case 05_negative_glucose got the mmol/L advice ("multiply by 18") because rule R1 only checks
+that every reading is below 30. A zero or negative reading is a broken export, not a unit problem. Rule: any
+reading at or below zero refuses first, with "a glucose reading is zero or negative; the export is broken".
+The decision (can't judge) is unchanged; only the advice changes. The committed stress run keeps the old text.
+Same day, wording only: an incomplete-window refusal now names only the criteria that failed.

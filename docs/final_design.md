@@ -360,8 +360,8 @@ fires on week four and only week four, and the result is reported as it comes ou
 
 **Freeze calendar as it happened.** §7 planned: app 17 Nov, repository 21 Nov, locked set 22 Nov. Actual:
 serving artifacts frozen 6 Nov (amendment above) and never changed; stress levels and the monitoring stream
-pre-registered and committed 22 Nov; serving hardening (R11), evidence regeneration and the R11 profile-key
-aliases on the morning of 25 Nov (25a118c, dbac561); the locked eight scored once at 09:56 on 25 Nov
+pre-registered and committed 22 Nov; serving hardening R11 on 8 Nov (0ec262b); evidence regeneration and the
+R11 profile-key aliases on the morning of 25 Nov (25a118c, dbac561); the locked eight scored once at 09:56 on 25 Nov
 (8682b01), after every serving change. After the tag `submission-v1` (48693f5) an improvement round
 (docs/changelog.md) added descriptive metrics, a monitoring replay, figures redrawn from the same evidence
 and corrected documents. No artifact, threshold or locked number changed in it.
@@ -376,3 +376,15 @@ and corrected documents. No artifact, threshold or locked number changed in it.
 | `just probe` -> outputs/probe/ | `just probes` -> outputs/probes/ |
 | `just failures` -> outputs/failures/taxonomy.csv | taxonomy table in the report §5, counts from the committed answer and suite files |
 | docs/user_test.md | not built: no user test ran; the dietitian consultation did not complete (report §4) |
+
+**Two departures this design did not record (26 Nov, found by the third grading round).**
+(1) D7 says the primary endpoint, the photo arm's AUROC gain over profile + trend, is reported on the locked
+eight as the test. The 25 Nov run scored only the shipped pipeline, so that gain was never computed on the
+locked eight, and the score-once rule forbids a second pass; it stays unreported, and the development value
+(+0.025, −0.010 to +0.061) is the only one. The D7 secondary endpoint (log-loss, +0.016, one-sided p = 0.094)
+is in docs/gate_s8.md and now in the report. (2) docs/gate_s8.md Paragraph B said the pre-meal answer would
+rest on the glucose trend and profile, with the photo head as a carb-entry assist inside the confirm-carbs
+tier. The 5 Nov amendment regenerated the existing photo-arm design, so the frozen fusion takes the photo
+estimate as 4 of its 19 inputs and a meal without a usable photo is refused; the confirm-carbs tier exists in
+code (`user_carbs_g`) but no input surface sets it. The gate changed what the report claims, not the shipped
+model, and nothing is reshipped now.

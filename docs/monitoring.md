@@ -93,3 +93,14 @@ cut-offs), 2a still noisy on dev windows, locked windows still too few cleared t
 behaviour rule able to fire only if some locked block exceeds every dev block. Reported as measured in
 outputs/monitoring/replay.json (`deployed_operating_point`). Replay 1's calibration-in-the-large
 expectation for the locked stream (negative) was wrong: it measured +0.038.
+
+### Results and corrections after the replays (26 Nov)
+
+Measured: replay 1, 7 of 21 dev windows alert; replay 2, 3 of 21; the windows overlap, so each run is one or two
+clusters of misses (weeks 12-22), not separate alarms. Every locked-only window has too few cleared answers;
+the mixed window spanning the switch (weeks 24-27) alerts in both. Calibration-in-the-large: the registered
+expectation (negative on the locked stream) was checked against the median of four overlapping windows,
++0.038; pooled over the whole locked stream it is −0.010, so the two summaries disagree in sign and the
+expectation is not cleanly met or missed. Two lines above overstate: "nothing else in the pipeline is above
+30 ms" has no per-stage timing behind it (outputs/efficiency/ times whole answers only), and the "latency
+alert" names a response without a defined signal; latency is measured, not monitored.

@@ -14,13 +14,17 @@ those participants were used for training only.
 **Parts (all frozen 6 Nov under a pre-registered procedure).**
 - Input rules R1-R11 run first and refuse with a named reason (docs/rule_ledger.md).
 - Photo: ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned; pinned revision and SHA-256), last stage
-  fine-tuned, two heads (grams, 4 carb bins); 27.8M parameters. Role: carb-entry assist. It did not pass
-  its pre-registered risk gate (+0.025 AUROC, −0.010 to +0.061).
+  fine-tuned, two heads (grams, 4 carb bins); 27.8M parameters, 15.5M fine-tuned. It did not pass its
+  pre-registered risk gate (+0.025 AUROC, −0.010 to +0.061), yet its estimate is 4 of the fusion's 19
+  inputs and a meal without a usable photo is refused: the sensor-first product the gate described was not
+  built. A typed-carbs fallback exists in code, has no input surface, and is not monotone (known failure).
 - Unfamiliar-photo check: kNN distance to the training photos, cut 0.614; no carb guess above it.
 - Fusion: 20-parameter logistic regression over 8 profile inputs, 7 CGM/heart-rate trend features and 4
   photo inputs; Platt map (0.96, −0.20); per-person intercept fitted on the person's earlier labelled
   meals (shrinkage m = 1.0). The folder command and app have no history input yet, so they answer at the
-  population calibration (Platt only); the evaluation replays history in deployment order.
+  population calibration (Platt only); the evaluation replays history in deployment order. A profile
+  without onboarding priors gets the training medians (0.455, 48 mg/dL). At that served point development
+  clears 15.2% of meals with 9.6% of them spiking (cost reduction 8.7%), failing two targets.
 - SensorCNN (5,217 parameters, from scratch) is evaluated, not deployed: it ties the trend features.
 
 **Training data.** CGMacros v1.0.0 (PhysioNet, CC BY-NC-SA 4.0): 37 non-locked adults (23 healthy or
