@@ -1,7 +1,8 @@
 {
   "what": "the intermediate's promised comparisons, run once against the frozen evidence (pre-registered 8 Nov in docs/final_design.md); descriptive only",
   "r1_gbm_same_inputs": {
-    "point": 0.015231596623573259,
+    "point": 0.01598934043970679,
+    "bootstrap_mean": 0.015231596623573259,
     "ci95": [
       -0.0236396118495664,
       0.06208468273938195
@@ -12,7 +13,8 @@
     "verdict": "non-inferior"
   },
   "r2_class_weighting": {
-    "point": 0.005229780958431983,
+    "point": 0.0056041070658775505,
+    "bootstrap_mean": 0.005229780958431983,
     "ci95": [
       -0.0011439212862545843,
       0.012209327694041934
@@ -36,7 +38,8 @@
     }
   },
   "r4_branch_masking": {
-    "point": 0.002002915033545039,
+    "point": 0.001724340635654631,
+    "bootstrap_mean": 0.002002915033545039,
     "ci95": [
       -0.022587183251825904,
       0.02544985075030713
