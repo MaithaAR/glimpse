@@ -319,3 +319,17 @@ def test_status_table_timing_cusum_and_what_if(text, rm):
         f"{ef['locked']['share_of_perfectly_calibrated_draws_at_or_above_observed']:.0%}",
         "–",
     ]
+
+
+def test_subgroup_table(text, rm):
+    t = _tables(text)
+    for g in ("healthy", "prediabetes"):
+        r = rm["subgroups"][g]
+        lo, hi = r["auroc_ci95"]
+        assert t[g] == [
+            f"{r['people']}, {r['meals']}, {r['spike_rate'] * 100:.1f}%",
+            f"{r['auroc']:.3f} ({lo:.3f}–{hi:.3f})",
+            f"{r['mean_risk_minus_spike_rate']:+.3f}".replace("-", "−"),
+            f"{r['cleared_share'] * 100:.1f}% ({r['cleared']}), {r['missed']}, "
+            f"{r['people_with_a_clear']} of {r['people']}",
+        ], g

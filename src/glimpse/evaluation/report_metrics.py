@@ -494,6 +494,25 @@ def _cost_reduction(dec: pd.Series, spike: pd.Series, costs: dict) -> float:
     return 1 - expected_cost(dec.map(ACTION).to_numpy(), y, costs) / best
 
 
+def subgroups(dev: pd.DataFrame) -> dict:
+    """Glycaemic status, development (26 Nov, descriptive): AUROC with a person-bootstrap interval, the
+    calibration gap, and the decision shares and misses per group. Groups from outputs/cv/oof_predictions.csv."""
+    group = pd.read_csv("outputs/cv/oof_predictions.csv").groupby("person_id").group.first()
+    out = {}
+    for g, q in dev.assign(group=dev.person_id.map(group)).groupby("group"):
+        a = q[q.risk.notna()]
+        y, p = a.spike.to_numpy().astype(int), a.risk.to_numpy(float)
+        pt, lo, hi = person_bootstrap_ci(a.person_id.to_numpy(),
+                                         lambda i, y=y, p=p: float(roc_auc_score(y[i], p[i]))
+                                         if len(set(y[i])) == 2 else float("nan"))  # fmt: skip
+        cl = q[q.decision == "low risk"]
+        out[str(g)] = {"people": int(q.person_id.nunique()), "meals": int(len(q)), "spike_rate": float(q.spike.mean()),
+                       "auroc": pt, "auroc_ci95": [lo, hi], "mean_risk_minus_spike_rate": float(p.mean() - y.mean()),
+                       "cleared_share": float(len(cl) / len(q)), "cleared": int(len(cl)), "missed": int(cl.spike.sum()),
+                       "people_with_a_clear": int(cl.person_id.nunique())}  # fmt: skip
+    return out
+
+
 def share_cis(df: pd.DataFrame) -> dict:
     """Person-bootstrap intervals for the cleared and can't-judge shares (the protocol asks a 95% range for
     every usefulness criterion)."""
@@ -593,6 +612,7 @@ def run_report_metrics(cfg) -> dict:
     res["falling_now_what_if"] = falling_now_what_if(dev, costs)
     res["share_cis"] = {"dev": share_cis(dev), "locked": share_cis(locked)}
     res["served_imputed_priors"] = served_imputed_priors(cfg, dev, costs)
+    res["subgroups"] = subgroups(dev)
     res["cold_start_what_if"] = {"dev": cold_start_what_if(dev, costs), "locked": cold_start_what_if(locked, costs)}
     res["band_and_served_calibration"] = band_and_served_calibration(cfg, dev, locked, costs)
     res["intercept_by_history"] = intercept_by_history(dev, locked, tuple(res["served_operating_point"]["platt"]))

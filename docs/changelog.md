@@ -145,3 +145,5 @@ the regeneration is two commands on the author's Mac, listed in the hand-off).
 
 The overnight registrations (replay 3, probe C, the 26 Nov what-ifs) were written by the assistant under the
 author's standing instruction, not approved one by one.
+| Subgroup table by glycaemic status (AUROC interval, calibration gap, clears and misses): the intended users, people with prediabetes, get 9.7% of meals cleared and are under-predicted by 6 points | the fairness line had no intervals or usefulness split (2 of 3) | report §3; report_metrics.json `subgroups` |
+| Fresh-clone record committed from the dated notes (not a terminal log); ridge arm labelled post hoc; dev miss-interval source named; test count 168 | unverifiable claim; provenance (2 of 3) | outputs/finalize/fresh_clone_2026-11-25.md |

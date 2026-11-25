@@ -43,7 +43,7 @@ which the evaluation replays in deployment order. An optional `history.csv` per 
 answers' fusion logits and CGM labels) now feeds it through the same two-hour gate; the samples carry
 none. A profile without onboarding priors (every instructor case) gets training medians drawn from all 37
 non-locked people, type 2 diabetes included (spike rate 0.455, rise 48 mg/dL). Tooling: uv
-+ Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for every number, 167 tests in CI (150 run without the dataset or weights; 16 skip, 1 expected failure),
++ Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for every number, 168 tests in CI (151 run without the dataset or weights; 16 skip, 1 expected failure),
 W&B offline runs replayed from the committed training histories, and a git history (from 2 Nov; earlier
 ordering in the dated design docs) in which every pre-registration precedes its run.
 
@@ -63,7 +63,7 @@ ordering in the dated design docs) in which every pre-registration precedes its 
 |---|---|---|
 | trend + profile features, logistic regression | 16 | AUROC 0.686 |
 | SensorCNN, from scratch (mean ± sd of 3 seeds' AUROCs) | 5,217 | AUROC 0.688 ± 0.007 |
-| photo: frozen ConvNeXt features + ridge | 769 | carb MAE 20.4 g, bin F1 0.38; fusion gain +0.017 (−0.008, +0.041) |
+| photo: frozen ConvNeXt features + ridge (post hoc arm) | 769 | carb MAE 20.4 g, bin F1 0.38; fusion gain +0.017 (−0.008, +0.041) |
 | photo: last stage + heads fine-tuned (shipped) | 15.5M | carb MAE 22.6 g, bin F1 0.61; fusion gain +0.025 (−0.007, +0.059) |
 
 | Where serving time goes (one answer, 2-CPU cloud machine, median of 50) | ms |
@@ -183,7 +183,7 @@ person. Within every fold Platt AUROC equals raw; the pooled 0.714 mixes five fo
 | shipped fusion without its Platt map | 0.763 | −0.001 (−0.008, +0.005) |
 | fusion without the photo (the gate's no-meal arm) | 0.741 | +0.021 (−0.003, +0.053) |
 
-*The shipped replay applied to each model's out-of-fold logits: same folds, m and gated history; it reproduces the shipped risk exactly (largest difference 1e-16). No Platt map was fitted for the baselines. report_metrics.json (fair_baselines).*
+*The shipped replay applied to each model's out-of-fold logits: same folds, m and gated history; it reproduces the shipped risk exactly (largest difference 1e-16). No Platt map was fitted for the baselines. Profile only against the no-photo arm (0.708 against 0.741) is the CGM-removal contrast. report_metrics.json (fair_baselines).*
 
 ![Figure 3: reliability in the registered binning, development and locked (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals; equal-mass bins hold 30 or 31 development meals, 10 locked)](../outputs/figures/f3_reliability.png)
 
@@ -206,13 +206,19 @@ with the same intercept, the fused system's margin over gradient boosting is not
 development it trades calibration (Platt alone is better) for resolution; on the locked eight it repairs
 calibration, its offsets moving up toward the harder cohort, where the served Platt-only risk
 under-predicts by 11 points. The registered ECE target was mis-specified for this size: a perfectly
-calibrated model scores 0.052 on development. Discrimination is even across glycaemic status: AUROC 0.738 for the 11 healthy people
-(217 meals, 21% spike rate), 0.736 for the 12 prediabetic (243 meals, 43%), though the cohort limits
-firmer fairness claims. Per-person gaps shrank: rare spikers predicted 20.9% vs observed 14.2% (was
+calibrated model scores 0.052 on development. Discrimination is even across glycaemic status, but usefulness is not: the
+intended users, people with prediabetes, get 10% of their meals cleared and are under-predicted (table). Per-person gaps shrank: rare spikers predicted 20.9% vs observed 14.2% (was
 29.3%); frequent 42.6% vs 52.9% (was 37.0%). The deployed values were frozen from the all-development
 replay by a pre-registered procedure (docs/final_design.md amendment): Platt (0.96, −0.20), m = 1.0,
 cut-offs (0.15, 0.16). Like folds 1 and 5, whose bands have zero width, the replay chose a near-degenerate
 abstention band; §4 reports what that costs.
+
+| development by glycaemic status | people, meals, spike rate | AUROC (95% person-clustered) | mean risk − spike rate | cleared, spikes among them, people with a clear |
+|---|---|---|---|---|
+| healthy | 11, 224, 21.0% | 0.738 (0.566–0.859) | +0.036 | 37.5% (84), 7, 11 of 11 |
+| prediabetes | 12, 257, 43.2% | 0.736 (0.648–0.796) | −0.061 | 9.7% (25), 1, 6 of 12 |
+
+*AUROC and calibration over answered meals; shares over all meals. report_metrics.json (subgroups).*
 
 | fold | m | cut-offs (lo, hi) |
 |---|---|---|
@@ -249,7 +255,7 @@ far over its cap; at twice it, savings fall to 3.1% and missed-among-cleared ris
 | mean cost per meal: shipped / always caution / always low risk | – | 0.575 / 0.672 / 1.642 | 0.608 / 0.575 / 2.124 | – |
 | verdict (protocol labels: met / on track / at risk) | – | on track: estimates meet, intervals cross | not met (at risk): 3 of 4 miss | not met: 2 of 4 / 2 of 4 |
 
-*Served = the deployed cut-offs on the Platt-only risk, recomputed from the committed answers (dev: per-fold models; locked: frozen Platt on the frozen fusion's raw risk); nothing refitted or rescored. outputs/report_metrics/report_metrics.json (decisions, errors, served_operating_point), outputs/locked_eval/locked_summary.json.*
+*Served = the deployed cut-offs on the Platt-only risk, recomputed from the committed answers (dev: per-fold models; locked: frozen Platt on the frozen fusion's raw risk); nothing refitted or rescored. outputs/report_metrics/report_metrics.json (decisions, errors, served_operating_point, served_imputed_priors, share_cis), outputs/figures/figures.json (the dev miss interval), outputs/locked_eval/locked_summary.json.*
 
 In plain terms: of every 100 development meals the app clears 22.7, flags 63.6 and declines 13.7; of the
 cleared, about 7 still spike, visible to a dietitian since the CGM reports every outcome. Only 17 people
@@ -392,7 +398,7 @@ pipeline, so the endpoint was never computed and cannot be now.
 
 After the locked run, a fresh clone on the Mac under the final serving code (install, data, pinned
 weights, prepare, selftest, evaluate, figures, both input suites) reproduced every number in the report
-of that day exactly (the transcript is in the project notes, not the repository). `just evaluate` reruns the development evaluation, then `just report-numbers`
+of that day exactly (the record is outputs/finalize/fresh_clone_2026-11-25.md; the terminal log was not committed). `just evaluate` reruns the development evaluation, then `just report-numbers`
 recomputes the descriptive metrics, replays and figures from committed outputs (no dataset or weights);
 `just reproduce-all` chains the compute studies, and the README maps every table to its recipe. Tests check the main tables'
 cells against those files on every commit; `just verify-outputs` fails if the data-free outputs drift.

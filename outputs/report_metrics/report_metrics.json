@@ -2219,6 +2219,38 @@
     ],
     "median_abs_logit_shift": 0.3255383038619788
   },
+  "subgroups": {
+    "healthy": {
+      "people": 11,
+      "meals": 224,
+      "spike_rate": 0.20982142857142858,
+      "auroc": 0.7376048817696416,
+      "auroc_ci95": [
+        0.5657788267958673,
+        0.8588470805367364
+      ],
+      "mean_risk_minus_spike_rate": 0.03555804772704915,
+      "cleared_share": 0.375,
+      "cleared": 84,
+      "missed": 7,
+      "people_with_a_clear": 11
+    },
+    "prediabetes": {
+      "people": 12,
+      "meals": 257,
+      "spike_rate": 0.43190661478599224,
+      "auroc": 0.7360248447204969,
+      "auroc_ci95": [
+        0.6476614827350732,
+        0.7962704115737205
+      ],
+      "mean_risk_minus_spike_rate": -0.06075136003067588,
+      "cleared_share": 0.09727626459143969,
+      "cleared": 25,
+      "missed": 1,
+      "people_with_a_clear": 6
+    }
+  },
   "cold_start_what_if": {
     "dev": {
       "0": {
