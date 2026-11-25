@@ -5,5 +5,35 @@
   "training_loo_q90": 0.4448011517524719,
   "real_photos_median": 0.4326874613761902,
   "real_photos_above_cut": 0,
-  "real_photos_n": 14
+  "real_photos_n": 14,
+  "simulated_stream": {
+    "rule": "alert when the weekly median distance exceeds the training q90 (0.445)",
+    "weeks": [
+      {
+        "week": 1,
+        "n": 20,
+        "median": 0.3661268502473831,
+        "alert": false
+      },
+      {
+        "week": 2,
+        "n": 20,
+        "median": 0.25386783480644226,
+        "alert": false
+      },
+      {
+        "week": 3,
+        "n": 20,
+        "median": 0.25181983411312103,
+        "alert": false
+      },
+      {
+        "week": 4,
+        "n": 6,
+        "median": 0.70907062292099,
+        "alert": true
+      }
+    ],
+    "fires_on_week_4_only": true
+  }
 }
