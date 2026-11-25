@@ -52,10 +52,16 @@ def test_prior_spike_rate_out_of_range_is_refused(tmp_path):
     assert a.decision == "can't judge" and "prior_spike_rate" in a.reason
 
 
+def _full_window_csv() -> str:
+    """A complete 2-hour window so the pipeline gets past the CGM rules to the photo check."""
+    rows = [f"2024-06-01T{10 + m // 60:02d}:{m % 60:02d},100" for m in range(0, 125, 5)]
+    return "timestamp,glucose_mgdl\n" + "\n".join(rows)
+
+
 def test_uppercase_photo_name_is_found_and_unreadable_profile_is_structured(tmp_path):
     case = tmp_path / "in" / "01_upper"
     case.mkdir(parents=True)
-    (case / "cgm.csv").write_text("timestamp,glucose_mgdl\n2024-06-01T10:00,100")
+    (case / "cgm.csv").write_text(_full_window_csv())
     (case / "PHOTO.JPG").write_bytes(b"not a jpeg")
     (case / "profile.json").write_text(json.dumps(GOOD | {"meal_time": "2024-06-01T12:00"}))
     locked = tmp_path / "in" / "02_locked_profile"
