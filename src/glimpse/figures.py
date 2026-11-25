@@ -140,7 +140,12 @@ def f3_reliability(plt, da: pd.DataFrame) -> dict:
                     label=f"{label}: ECE {ece_w:.3f} equal-width, {ece:.3f} equal-mass")  # fmt: skip
             for m_, o_, n_ in rows:  # hollow marker: a bin with fewer than 5 meals
                 ax.plot([m_], [o_], "o", ms=4, color=c, mfc=c if n_ >= 5 else "white")
-            if col == "risk":
+            if col == "risk":  # 95% Wilson interval per bin for the shipped risk (26 Nov)
+                for m_, o_, n_ in rows:
+                    z, den = 1.96, 1 + 1.96**2 / n_
+                    mid = (o_ + z**2 / (2 * n_)) / den
+                    half = z * np.sqrt(o_ * (1 - o_) / n_ + z**2 / (4 * n_**2)) / den
+                    ax.plot([m_, m_], [mid - half, mid + half], color=c, lw=0.7, alpha=0.6)
                 for m, o, n in rows:
                     ax.annotate(
                         str(n),

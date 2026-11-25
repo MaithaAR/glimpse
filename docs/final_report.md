@@ -192,7 +192,7 @@ Within every fold Platt AUROC equals raw; the pooled 0.714 mixes five fold maps.
 | label threshold 30 / 50 / 70 mg/dL: AUROC (spike rate) | 0.738 (57%) / 0.762 (33%) / 0.794 (19%) |
 | photo arm with the photo masked vs no-meal arm (wiring check) | +0.002 (−0.023, +0.025) |
 
-![Figure 3: reliability in the registered binning, development and locked (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals; equal-mass bins hold 30 or 31 development meals, 10 locked)](../outputs/figures/f3_reliability.png)
+![Figure 3: reliability in the registered binning, development and locked (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals, thin bars the 95% Wilson interval of each shipped bin; equal-mass bins hold 30 or 31 development meals, 10 locked)](../outputs/figures/f3_reliability.png)
 
 | calibration | development, shipped | locked, shipped | served, Platt only: development / locked |
 |---|---|---|---|

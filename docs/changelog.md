@@ -188,3 +188,4 @@ Added at the close: the within-person drop has a person-bootstrap interval, −0
 helps between people (report §3; report_metrics.json `within_person`).
 Also at the close: signal 2b (rolling AUROC below the locked value) added to the monitoring table, labelled
 circular because its threshold is the locked AUROC itself (outputs/monitoring/replay.json `summary`).
+Figure 3 shows a 95% Wilson interval for each shipped bin, so small bins are not over-read.
