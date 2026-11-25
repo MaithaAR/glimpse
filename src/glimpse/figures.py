@@ -73,11 +73,12 @@ def f1_system(plt) -> None:
     arrow(3.4, 1.6, 8.2, 0.45, c=ORANGE)  # failed input rule: refusal
     arrow(14.85, 2.9, 13.2, 3.85, c=GREEN, ls="--")  # the answered meal is labelled later
     arrow(12.0, 3.4, 12.0, 2.9, c=GREEN, ls="--")  # ... and joins the person's history
-    ax.text(7.2, 4.45, "one scoring path: report numbers = demo = app = the grader's folder command "
+    ax.text(7.2, 4.45, "one scoring path (Pipeline.answer) for the evaluation, demo, app and folder command; "
+            "served, baseline and what-if rows are arithmetic on its logged answers\n"
             "(the app, and the folder command without history.csv, answer at the population calibration)",
             ha="center", fontsize=8.2, style="italic", color=GREY)  # fmt: skip
     ax.set_xlim(-0.2, 16.2)
-    ax.set_ylim(-0.2, 4.7)
+    ax.set_ylim(-0.2, 4.85)
     fig.savefig(OUT / "f1_system.png")
     plt.close(fig)
 

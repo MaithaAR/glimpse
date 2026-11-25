@@ -415,6 +415,34 @@ def with_intercept(dev: pd.DataFrame, logits: pd.Series, platt: bool) -> pd.Seri
     return pd.Series(out)
 
 
+def within_person(dev: pd.DataFrame) -> dict:
+    """What the intercept does inside a person (26 Nov, descriptive): mean of per-person AUROCs (people with both
+    outcomes among answered meals) for raw, Platt-only and shipped risk; and a history-only baseline, each
+    person's running spike rate over the same gated earlier meals, shrunk to the fold's training spike rate
+    with weight m (no fusion at all), scored pooled like the report's AUROCs."""
+    a = dev[dev.risk.notna()].sort_values("row")
+    per = {c: [] for c in ("risk_raw", "risk_platt", "risk")}
+    for _, g in a.groupby("person_id"):
+        if g.spike.nunique() == 2:
+            for c in per:
+                per[c].append(roc_auc_score(g.spike, g[c]))
+    ev = json.loads(Path("outputs/evaluation_v2/dev_summary.json").read_text())
+    m = {f["fold"]: f["m"] for f in ev["folds"]}
+    pop = {f: float(dev[dev.fold != f].spike.mean()) for f in m}
+    rate = {}
+    for _, g in a.groupby("person_id"):
+        f, y = int(g.fold.iloc[0]), g.spike.to_numpy(float)
+        for row, k in zip(g.row, g.n_history.astype(int), strict=True):
+            rate[int(row)] = (y[:k].sum() + m[f] * pop[f]) / (k + m[f])
+    r = pd.Series(rate).loc[a.row].to_numpy()
+    y, sids, sh = a.spike.to_numpy().astype(int), a.person_id.to_numpy(), a.risk.to_numpy(float)
+    pt, lo, hi = person_bootstrap_ci(sids, lambda i: float(roc_auc_score(y[i], sh[i]) - roc_auc_score(y[i], r[i])))
+    return {"people_with_both_outcomes": len(per["risk"]),
+            "mean_within_person_auroc": {c: float(np.mean(v)) for c, v in per.items()},
+            "history_only_running_rate": {"auroc": float(roc_auc_score(y, r)), "shipped_minus_this": pt,
+                                          "ci95": [lo, hi]}}  # fmt: skip
+
+
 def fair_baselines(dev: pd.DataFrame) -> dict:
     """Each comparison model with the same per-person intercept as the shipped risk (no Platt: none was fitted
     for them), paired against the shipped risk on the 460 answered meals. Descriptive, 26 Nov."""
@@ -654,6 +682,7 @@ def run_report_metrics(cfg) -> dict:
     res["share_cis"] = {"dev": share_cis(dev), "locked": share_cis(locked)}
     res["served_imputed_priors"] = served_imputed_priors(cfg, dev, costs)
     res["subgroups"] = subgroups(dev)
+    res["within_person"] = within_person(dev)
     res["cold_start_what_if"] = {"dev": cold_start_what_if(dev, costs), "locked": cold_start_what_if(locked, costs)}
     res["band_and_served_calibration"] = band_and_served_calibration(cfg, dev, locked, costs)
     res["intercept_by_history"] = intercept_by_history(dev, locked, tuple(res["served_operating_point"]["platt"]))

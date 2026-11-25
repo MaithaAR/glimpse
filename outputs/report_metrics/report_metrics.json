@@ -2333,6 +2333,22 @@
       "people_with_a_clear": 6
     }
   },
+  "within_person": {
+    "people_with_both_outcomes": 22,
+    "mean_within_person_auroc": {
+      "risk_raw": 0.679705870555413,
+      "risk_platt": 0.679705870555413,
+      "risk": 0.6016766715288836
+    },
+    "history_only_running_rate": {
+      "auroc": 0.698879101566686,
+      "shipped_minus_this": 0.06346042564135534,
+      "ci95": [
+        0.030371840052379046,
+        0.11338891147456684
+      ]
+    }
+  },
   "cold_start_what_if": {
     "dev": {
       "0": {

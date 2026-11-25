@@ -3,7 +3,8 @@
 The submission was tagged `submission-v1` (48693f5) on 25 Nov after two audit rounds. Three further
 cold grades that night by AI agents given the rubric (scores 92.5, 86.5 and 88.5 of 100) produced the findings below. Each
 change is listed with its reason. Nothing in this round changed a serving artifact, a threshold, a
-pre-registered verdict or a locked-set number: `checkpoints/` is byte-identical to the tag, and the locked
+pre-registered verdict or a locked-set number; serving behaviour changed in wording (R11 additions), one
+refusal reason (R12) and one output rule (R13, eighth pass), none of which alters a reported decision: `checkpoints/` is byte-identical to the tag, and the locked
 eight were not rescored (new locked metrics are arithmetic on the committed `locked_answers.csv`).
 
 ## 26 Nov 2026
@@ -160,3 +161,11 @@ author's standing instruction, not approved one by one.
 | R7 mitigation sentence no longer cites the unwired confirm-carbs tier; abstention next step says "a new photo" | the escalation named a surface that does not exist (2 of 3) | report §1, §5 |
 | Rule R13 (output rule): no low risk without history or both onboarding priors; the meal is referred with a named reason. On the samples' path (dev, approximate) clears 55 -> 0, misses 9 -> 0, can't judge 17.3%, cost -0.3%. No risk, weight, Platt map or cut-off changed; evaluated and locked answers all carry priors, and a test re-decides the locked answers unchanged. Unit and bare-pipeline tests; not run end to end with weights | the report said no meal should be cleared on that path while the code cleared 11% (3 of 3) | src/glimpse/serve/rules.py, pipeline.py; docs/rule_ledger.md; tests/test_serve.py |
 | Figure 1: R13 in the cut-off box, "new photo or dietitian", profile with optional priors | stale labels (2 of 3) | outputs/figures/f1_system.png |
+
+## 26 Nov 2026, ninth pass (after strict grades 76.0, 81.5, 74.5 and a holistic grade of 88)
+
+| Change | Why | Evidence |
+|---|---|---|
+| Within-person AUROC: averaged per person, raw 0.680 against shipped 0.602; a no-model running spike rate under the same gate scores 0.699, shipped +0.063 (+0.030, +0.113). The intercept's gain is between people (base rates), not within them | the pooled AUROC could come entirely from base-rate learning; no within-person number existed (1 of 3) | report_metrics.json `within_person`; report §3 |
+| Bottom line corrected for R13 (the samples' path now clears nothing); Figure 1 subtitle scoped; gate interval labelled "not the gate" in §1; recovered answers under degraded photos noted; probe C counts reconciled with §4; R13 described as answering a measured failure | the opening described pre-R13 behaviour; inconsistencies (2-3 of 3) | report; outputs/figures/f1_system.png |
+| README diagram, samples/README (prior fields, R13), instructor MANIFEST row 09, this changelog's header | front-door staleness (2 of 3) | README.md, samples/ |

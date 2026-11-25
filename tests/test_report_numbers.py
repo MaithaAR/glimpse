@@ -382,3 +382,16 @@ def test_r13_cells(text, rm):
     assert sp["share_low_risk"] == 0
     assert f"{sp['share_abstain'] * 100:.1f}% can't judge" in text
     assert f"with rule R13: 0 cleared, {_pct(sp['cost_reduction'])}" in text
+
+
+def test_within_person_rows(text, rm):
+    t = _tables(text)
+    wp = rm["within_person"]
+    mw = wp["mean_within_person_auroc"]
+    key = f"mean within-person AUROC ({wp['people_with_both_outcomes']} people with both outcomes), raw → shipped"
+    assert t[key][0] == f"{mw['risk_raw']:.3f} → {mw['risk']:.3f}"
+    assert f"AUROC falls from {mw['risk_raw']:.3f} to {mw['risk']:.3f}" in text
+    h = wp["history_only_running_rate"]
+    row = t["no model: each person's running spike rate, same gate, shrunk to the other folds' rate"]
+    assert row == [f"{h['auroc']:.3f}", f"+{h['shipped_minus_this']:.3f} (+{h['ci95'][0]:.3f}, +{h['ci95'][1]:.3f})"]
+    assert f"does {h['shipped_minus_this']:.3f} better than a" in text

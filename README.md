@@ -22,7 +22,9 @@ profile ─────────────┘          │ yes
                                 ├─ 2-h window (24 × 5 min, same code as training) + profile ─┐
                                 └─ ConvNeXt-Tiny photo model → carb range (4 bins) + grams ──┴─> logistic-regression
                                                                                                 fusion → spike risk
+                    + per-person intercept from earlier labelled meals (history.csv), when there are any
                     risk < 0.15 → LOW RISK · ≥ 0.16 → CAUTION · in between → CAN'T JUDGE (borderline)
+                    R13: no LOW RISK without history or both onboarding priors → CAN'T JUDGE + reason
 ```
 The from-scratch SensorCNN (5k parameters) is trained and evaluated as the required scratch model. It ties
 hand-made trend features, so the deployed fusion uses those features (see the report).

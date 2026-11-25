@@ -16,7 +16,7 @@ docs/final_design.md §6; the observed result of the first naive run is recorded
 | 06_profile_implausible | age 7, BMI 85 | can't judge, naming the field |
 | 07_profile_blank | all profile fields null | can't judge, no defaults filled |
 | 08_dark_photo | near-black photo | can't judge or caution; never low risk |
-| 09_screenshot | app screenshot, not food | unfamiliar -> confirm-carbs tier |
+| 09_screenshot | app screenshot, not food | unfamiliar photo -> can't judge (the confirm-carbs tier has no input surface) |
 | 10_exif_rotated | 00's photo stored rotated with EXIF orientation | identical decision to 00_clean |
 | 11_local_dish | unfamiliar local dish | ideally confirm-carbs; the shipped check passes it (documented limitation, report §5 T6) |
 | 12_zero_byte | empty photo.jpg | structured can't judge; the run continues |

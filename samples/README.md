@@ -17,3 +17,7 @@
   (`fusion_logit` from an earlier `results.jsonl`, `spiked` the CGM's 0/1 label at +2 h). Meals labelled at
   least two hours before the current meal feed the personal intercept; without the file (every sample here)
   the answer uses the population calibration.
+- Optional onboarding priors in `profile.json` (26 Nov note): `prior_spike_rate` (0-1, the share of the person's
+  first meals that spiked) and `prior_rise` (mean rise, mg/dL). Rule R13: with neither history nor both priors,
+  a would-be low-risk answer becomes can't judge with a named reason, so every sample here answers caution or
+  can't judge (docs/rule_ledger.md).
