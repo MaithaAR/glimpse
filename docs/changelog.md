@@ -4,7 +4,7 @@ The submission was tagged `submission-v1` (48693f5) on 25 Nov after two audit ro
 cold grades that night by AI agents given the rubric (scores 92.5, 86.5 and 88.5 of 100) produced the findings below. Each
 change is listed with its reason. Nothing in this round changed a serving artifact, a threshold, a
 pre-registered verdict or a locked-set number; serving behaviour changed in wording (R11 additions), one
-refusal reason (R12) and one output rule (R13, eighth pass), none of which alters a reported decision: `checkpoints/` is byte-identical to the tag, and the locked
+refusal reason (R12) and one output rule (R13, eighth pass), none of which alters an evaluated or locked decision (R13 changes the no-history, no-prior served path, reported as such): `checkpoints/` is byte-identical to the tag, and the locked
 eight were not rescored (new locked metrics are arithmetic on the committed `locked_answers.csv`).
 
 ## 26 Nov 2026
@@ -173,3 +173,13 @@ author's standing instruction, not approved one by one.
 | Figure 7 gains a cost panel from `coverage_risk`: on development any abstention raises cost; on the locked eight abstaining the nearest 10% would have lowered it (0.543 against 0.593), descriptive | the coverage curve was not tied to the cost model (2 of 3) | outputs/figures/f7_coverage.png |
 | Figure 6's local panel shows row 847, a confident false clear, instead of the meal nearest risk 0.5 | the old example said nothing about the 0.15 cut (1 of 3) | outputs/figures/f6_shap.png |
 | Figure 4 adds the intercept's paired gain and the CGM contrast (green) and states the removal sign convention | the central effect and the CGM contribution were missing from the effects figure (2 of 3) | outputs/figures/f4_effects.png |
+
+## 26 Nov 2026, close of the round (after strict grades 75.0, 79.0, 77.0 and a holistic grade of 85)
+
+Last fixes: the CGM contrast labelled exploratory (the no-photo arm keeps heart rate); R13 described the same
+way everywhere (no low risk with neither history nor both onboarding priors); R13's cost stated as -0.3%;
+Figure 4's D8 row drawn as a control; Figure 6's local risk labelled raw fusion; this header no longer
+claims R13 changes no decision. Still open and needing the author's Mac (weights and data): rerun the
+folder, stress and demo suites under the current code and commit them with a fresh-clone terminal log;
+int8 decision agreement; an image-level probe of the ConvNeXt; author sign-off on the overnight
+registrations and on R13.

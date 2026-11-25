@@ -50,7 +50,7 @@ def f1_system(plt) -> None:
         1.7,
         2.3,
         1.2,
-        "cut-offs 0.15 / 0.16\nlow risk | caution\n+ reason (R13: no clear\nwithout history or priors)",
+        "cut-offs 0.15 / 0.16\nlow risk | caution\n+ reason (R13: no clear without\nhistory or both priors)",
         fc="#e6f0fa",
     )
     box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 new photo\nor dietitian", fc="#fdf0e6")
@@ -176,7 +176,7 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
         ("photo minus true carbs (non-inferiority)", fu["rq1_photo_vs_logged"]["point"],
          fu["rq1_photo_vs_logged"]["ci95"], GREY),
         ("D8 photo gain, exact-macro meals removed", d8["gain_photo_meals_only"]["point"],
-         d8["gain_photo_meals_only"]["ci95"], ORANGE),
+         d8["gain_photo_meals_only"]["ci95"], GREY),
         ("D8 control: photo gain, random drop", d8["control_random_drop_gain"]["point"],
          d8["control_random_drop_gain"]["ci95"], GREY),
         ("change when heart rate is dropped", ch["delta_vs_full"]["no_heart_rate"]["point"],
@@ -329,7 +329,7 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     axes[1].set_yticks(np.arange(len(top))[::-1], [shown[j] for j in top], fontsize=6.8)
     axes[1].axvline(0, color=GREY, lw=0.8)
     axes[1].set_xlabel("SHAP contribution (logit units)")
-    axes[1].set_title(f"False clear (row 847): base {base_logit:+.2f} + terms = logit {logit_i:+.2f} (risk "
+    axes[1].set_title(f"False clear (row 847, raw fusion): base {base_logit:+.2f} + terms = logit {logit_i:+.2f} (risk "
                       f"{1 / (1 + np.exp(-logit_i)):.2f}); top 8 of 19 terms", fontsize=8.5)  # fmt: skip
     fig.tight_layout()
     fig.savefig(OUT / "f6_shap.png")

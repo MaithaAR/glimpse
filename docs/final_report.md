@@ -131,7 +131,7 @@ MAE and Spearman, where patients' own counts err by about 15–20% (Brazeau et a
 (imputed at serving, +0.003); it stays only because the feature set was fixed before the ablation. The
 backbone is 80% of the photo path's time; the gate's no-photo arm, given the same intercept, scores 0.741
 (shipped minus it +0.021, −0.003 to +0.053) in 0.35 ms of model time, the product a next version should ship. The profile carries the system
-(dropping it costs 0.122, Figure 4); the CGM adds an established +0.033 (§3).
+(dropping it costs 0.122, Figure 4); the CGM block, with heart rate, adds +0.033 (exploratory, §3).
 
 ## 3. Evaluation and ablations
 The 45 CGMacros participants are healthy, prediabetic and T2D adults (ages 18 to 69, 64% female), each
@@ -269,7 +269,7 @@ far over its cap; at twice it, savings fall to 3.1% and missed-among-cleared ris
 
 *Served = the deployed cut-offs on the Platt-only risk, recomputed from the committed answers (dev: per-fold models; locked: frozen Platt on the frozen fusion's raw risk); nothing refitted or rescored. outputs/report_metrics/report_metrics.json (decisions, errors, served_operating_point, served_imputed_priors, share_cis), outputs/figures/figures.json (the dev miss interval), outputs/locked_eval/locked_summary.json.*
 
-In plain terms: of every 100 development meals the evaluated system (with history) clears 22.7, flags 63.6 and declines 13.7; of the
+Of every 100 development meals the evaluated system (with history) clears 22.7, flags 63.6 and declines 13.7; of the
 cleared, about 7 still spike. Only 17 people
 had cleared meals, so the miss interval's upper end exceeds the cap; the 8 misses spread across 6 people. The frozen band (0.15, 0.16) is one point wide. On the locked cohort, where
 risks ran higher, 139 of 153 meals landed above it: a dietitian would see nearly every meal flagged, and
@@ -278,7 +278,7 @@ Without history the served point (last column) fails two targets on development 
 on the locked eight. The samples also lack onboarding priors: filled with the serving medians (development,
 frozen coefficients standing in for the fold models'), AUROC drops to 0.637 and 9 of 55 cleared meals
 spike, costlier than always flagging. Rule R13 (26 Nov, after the locked run) therefore refers such meals
-instead of clearing them: no misses, 17.3% can't judge, the cost of always flagging. Abstention
+instead of clearing them: no misses, 17.3% can't judge, about the cost of always flagging (−0.3%). Abstention
 does not pay here. Deciding the 45 borderline development meals would have cost less (0.539 against 0.555
 per answered meal): they spiked at 27%, above the 20% at which abstaining beats caution at the declared
 prices, because risks just above the low cut are under-predicted. Abstaining on the meals closest to the
@@ -462,7 +462,7 @@ regulatory review, built so that a clinical study could evaluate it.
 |---|---|
 | RQ1, RQ2 | the proposal's questions: does the photo match true logged carbs (RQ1); does a from-scratch CNN beat hand-made trend features (RQ2) |
 | D1-D8 | dated design decisions in docs/final_design.md (D7: the gate's endpoints; D8: the exact-macro exclusion test) |
-| R1-R13 | rules in docs/rule_ledger.md (R13 acts on the output: no low risk without history or priors): R1-R5 and R8-R13 added after observed failures, R6 a preventive check, R7 a recorded limitation |
+| R1-R13 | rules in docs/rule_ledger.md (R13 acts on the output: no low risk with neither history nor both onboarding priors): R1-R5 and R8-R12 added after observed failures, R13 after a measured one, R6 a preventive check, R7 a recorded limitation |
 | T1-T8 | failure classes (§5) |
 | partition v2 | the final split: 23 development people in 5 outer folds, 14 T2D training-only, 8 locked |
 | cgm_auto | the CGM's own label at +2 h, the training spike rule |
