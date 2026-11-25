@@ -1,0 +1,17 @@
+# fresh clone of 669e75a in a cloud container, 2026-11-26 03:35 +04, no dataset, no weights
+$ python -m pytest -o addopts='' -q
+.........s.s......ss...........                                          [100%]
+158 passed, 16 skipped, 1 xfailed in 8.72s
+$ ruff check . && ruff format --check .
+All checks passed!
+112 files already formatted
+$ just verify-outputs
+just wordcount
+uv run python -c "t=open('docs/final_report.md').read(); ls=[l for l in t.splitlines() if not (l.lstrip().startswith(('|','![')) or (l.lstrip().startswith('*') and not l.lstrip().startswith('**')))]; print(len(' '.join(ls).split()), 'words (cap 3,000; tables, figures and their captions excluded per the final rubric)')"
+2995 words (cap 3,000; tables, figures and their captions excluded per the final rubric)
+git diff --exit-code outputs/report_metrics outputs/monitoring/replay.json outputs/figures/figures.json
+(the pipeline above exits 0: git diff --exit-code found no change)
+$ git status --short (empty = byte-identical regeneration)
+?? .venv
+$ git diff --stat submission-v1 HEAD -- checkpoints outputs/locked_eval (empty = frozen)
+Note: .venv is a symlink to the locked environment, the only untracked path. What this does not cover: anything needing the CGMacros data or the pinned weights (selftest, predict-folder, stress, demo, evaluate); those run on the author's Mac.
