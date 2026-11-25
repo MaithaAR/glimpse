@@ -1,0 +1,48 @@
+{
+  "what": "Probe C: profile and onboarding priors counterfactual (registered 26 Nov in docs/probes_s13.md before",
+  "n_meals": 460,
+  "cutoffs": [
+    0.15,
+    0.16
+  ],
+  "inputs": {
+    "HbA1c": {
+      "coefficient_per_sd": 0.24544552334947708,
+      "share_risk_rises_10th_to_90th": 1.0,
+      "median_risk_change": 0.06188936390455274,
+      "share_decision_differs": 0.10869565217391304,
+      "expected_direction_met": true
+    },
+    "fasting glucose": {
+      "coefficient_per_sd": 0.21056787035351723,
+      "share_risk_rises_10th_to_90th": 1.0,
+      "median_risk_change": 0.06790604803473557,
+      "share_decision_differs": 0.10869565217391304,
+      "expected_direction_met": true
+    },
+    "prior spike rate": {
+      "coefficient_per_sd": 0.16690444573516866,
+      "share_risk_rises_10th_to_90th": 1.0,
+      "median_risk_change": 0.09687476686219407,
+      "share_decision_differs": 0.14565217391304347,
+      "expected_direction_met": true
+    },
+    "prior rise": {
+      "coefficient_per_sd": 0.2671593428474022,
+      "share_risk_rises_10th_to_90th": 1.0,
+      "median_risk_change": 0.12240220564367339,
+      "share_decision_differs": 0.16956521739130434,
+      "expected_direction_met": true
+    }
+  },
+  "imputed_priors": {
+    "medians": [
+      0.45454545454545453,
+      48.391216931216924
+    ],
+    "median_abs_risk_change": 0.050732325682680164,
+    "share_decision_differs": 0.10652173913043478,
+    "cleared_own_priors": 68,
+    "cleared_imputed": 46
+  }
+}

@@ -47,9 +47,9 @@ def f1_system(plt) -> None:
     box(10.8, 1.7, 2.4, 1.2, "personal intercept\nfrom earlier labelled\nmeals (m = 1.0)")
     box(13.7, 1.7, 2.3, 1.2, "cut-offs 0.15 / 0.16\nlow risk | caution\n+ reason", fc="#e6f0fa")
     box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 confirm carbs\nor dietitian", fc="#fdf0e6")
-    box(10.8, 3.4, 2.4, 0.9, "CGM label at +2 h\n(evaluation replay only)", fc="#eef7ee")
+    box(10.8, 3.4, 2.4, 0.9, "CGM label at +2 h\n(replay; or history.csv)", fc="#eef7ee")
     ax.text(12.4, 0.75, "borderline risk", fontsize=6.8, color=ORANGE)
-    ax.text(4.6, 0.75, "failed input rule, blank or\nunreadable photo", fontsize=6.8, color=ORANGE)
+    ax.text(3.9, 0.45, "failed input rule, blank or\nunreadable photo", fontsize=6.8, color=ORANGE)
     ax.text(10.55, 1.45, "unfamiliar\nphoto", fontsize=6.8, color=ORANGE)
     for y0 in (3.45, 2.15, 0.85):
         arrow(1.9, y0, 2.4, 2.15)
@@ -67,7 +67,7 @@ def f1_system(plt) -> None:
     arrow(14.85, 2.9, 13.2, 3.85, c=GREEN, ls="--")  # the answered meal is labelled later
     arrow(12.0, 3.4, 12.0, 2.9, c=GREEN, ls="--")  # ... and joins the person's history
     ax.text(7.2, 4.45, "one scoring path: report numbers = demo = app = the grader's folder command "
-            "(the folder command and app answer without history: population calibration only)",
+            "(the app, and the folder command without history.csv, answer at the population calibration)",
             ha="center", fontsize=8.2, style="italic", color=GREY)  # fmt: skip
     ax.set_xlim(-0.2, 16.2)
     ax.set_ylim(-0.2, 4.7)
@@ -97,7 +97,13 @@ def f2_per_fold(plt, ev: dict) -> None:
     ax.set_ylabel("AUROC (held-out people)")
     ax.set_ylim(0.58, 0.9)
     ax.legend(frameon=False, fontsize=8, loc="upper left")
-    ax.set_title("Personalisation improves every fold (5/5); pooled CIs are person-clustered", fontsize=9)
+    pg = json.loads(Path("outputs/report_metrics/report_metrics.json").read_text())["paired_personal_minus_raw"]
+    g = pg["dev"]["auroc"]
+    ax.set_title(
+        f"Raw vs personal intercept per fold: higher in {pg['dev']['folds_improved']} of 5; pooled gain "
+        f"{g['point']:+.3f} ({g['ci95'][0]:+.3f}, {g['ci95'][1]:+.3f})".replace("-", "\u2212"),
+        fontsize=9,
+    )
     fig.savefig(OUT / "f2_per_fold_auroc.png")
     plt.close(fig)
 
@@ -121,14 +127,24 @@ def f3_reliability(plt, da: pd.DataFrame) -> dict:
             ece = ece_equal_mass(p, y)
             if frame is da:
                 out[col], out[col + "_equal_width"] = ece, ece_w
-            ax.plot([r[0] for r in rows], [r[1] for r in rows], "-", color=c,
+            big = [r for r in rows if r[2] >= 5]  # lines join only bins with 5+ meals
+            ax.plot([r[0] for r in big], [r[1] for r in big], "-", color=c,
                     label=f"{label}: ECE {ece_w:.3f} equal-width, {ece:.3f} equal-mass")  # fmt: skip
             for m_, o_, n_ in rows:  # hollow marker: a bin with fewer than 5 meals
                 ax.plot([m_], [o_], "o", ms=4, color=c, mfc=c if n_ >= 5 else "white")
             if col == "risk":
                 for m, o, n in rows:
-                    ax.annotate(str(n), (m, o), textcoords="offset points", xytext=(0, 6), ha="center",
-                                fontsize=6.5, color=BLUE)  # fmt: skip
+                    ax.annotate(
+                        str(n),
+                        (m, o),
+                        textcoords="offset points",
+                        xytext=(0, 7),
+                        ha="center",
+                        fontsize=6.5,
+                        color=BLUE,
+                        zorder=5,
+                        bbox={"boxstyle": "square,pad=0.05", "fc": "white", "ec": "none", "alpha": 0.8},
+                    )
         ax.set_xlabel("predicted spike probability (15 equal-width bins)")
         ax.set_xlim(0, 0.9)
         ax.set_ylim(0, 1.0)
@@ -286,13 +302,14 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     mean_abs = np.abs(contrib).mean(axis=0)
     order = np.argsort(mean_abs)
     axes[0].barh(np.arange(len(order)), mean_abs[order], color=BLUE)
-    axes[0].set_yticks(np.arange(len(order)), [FEATURE_NAMES[j] for j in order], fontsize=6.8)
+    shown = [n.replace("window sd", "window spread") for n in FEATURE_NAMES]
+    axes[0].set_yticks(np.arange(len(order)), [shown[j] for j in order], fontsize=6.8)
     axes[0].set_xlabel("mean |SHAP| (logit units)")
     axes[0].set_title("Global: what moves the fusion", fontsize=9)
     top = np.argsort(-np.abs(contrib[i]))[:8]
     vals = contrib[i][top]
     axes[1].barh(np.arange(len(top))[::-1], vals, color=[BLUE if v > 0 else ORANGE for v in vals])
-    axes[1].set_yticks(np.arange(len(top))[::-1], [FEATURE_NAMES[j] for j in top], fontsize=6.8)
+    axes[1].set_yticks(np.arange(len(top))[::-1], [shown[j] for j in top], fontsize=6.8)
     axes[1].axvline(0, color=GREY, lw=0.8)
     axes[1].set_xlabel("SHAP contribution (logit units)")
     axes[1].set_title(f"One meal: base {base_logit:+.2f} + terms = logit {logit_i:+.2f} (risk "

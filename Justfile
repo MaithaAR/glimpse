@@ -158,6 +158,7 @@ verify-outputs:
 report-numbers:
     uv run glimpse report-metrics
     uv run glimpse monitoring-replay
+    uv run glimpse probe-c
     uv run glimpse figures
     just wordcount
 
@@ -225,3 +226,7 @@ clean:
 # prose words in the report, tables, figures and their captions excluded (the final rubric's rule)
 wordcount:
     uv run python -c "t=open('docs/final_report.md').read(); ls=[l for l in t.splitlines() if not (l.lstrip().startswith(('|','![')) or (l.lstrip().startswith('*') and not l.lstrip().startswith('**')))]; print(len(' '.join(ls).split()), 'words (cap 3,000; tables, figures and their captions excluded per the final rubric)')"
+
+# probe C: profile and onboarding priors counterfactual on the frozen fusion (registered 26 Nov; data-free)
+probe-c:
+    uv run glimpse probe-c

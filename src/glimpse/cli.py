@@ -370,6 +370,14 @@ def _stage_timing(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _probe_c(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Profile and priors counterfactual on the frozen fusion (registered 26 Nov; data-free)."""
+    from glimpse.studies.probe_c import run_probe_c
+
+    run_probe_c(cfg)
+    return 0
+
+
 def _monitoring_replay(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Outcome and behaviour monitoring rules replayed on the committed answers (registered 26 Nov)."""
     from glimpse.studies.monitoring_replay import run_monitoring_replay
@@ -461,6 +469,7 @@ def main(argv: list[str] | None = None) -> int:
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
     sub.add_parser("stage-timing", help="serving time per stage on this machine, incl. the no-photo path")
+    sub.add_parser("probe-c", help="profile and onboarding-priors counterfactual on the frozen fusion (data-free)")
     sub.add_parser("monitoring-replay", help="outcome and behaviour monitoring rules replayed on the logged answers")
     sub.add_parser(
         "report-metrics", help="AUPRC, Brier, both ECE binnings, baselines, policy costs (committed answers)"
@@ -511,6 +520,7 @@ def main(argv: list[str] | None = None) -> int:
         "figures": _figures,
         "timing": _timing,
         "splits-v2": _splits_v2,
+        "probe-c": _probe_c,
         "stage-timing": _stage_timing,
         "monitoring-replay": _monitoring_replay,
         "report-metrics": _report_metrics,

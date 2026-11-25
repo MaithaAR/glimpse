@@ -296,12 +296,17 @@ def served_imputed_priors(cfg, dev: pd.DataFrame, costs: dict) -> dict:
     risk[has] = 1 / (1 + np.exp(-lg))
     y = dev.spike.to_numpy().astype(int)
     out = _served(dev, risk, lo, hi, costs, cfg.targets.model_dump())
-    out.update({"auroc": float(roc_auc_score(y[has], risk[has])),
-                "auroc_own_priors": float(roc_auc_score(y[has], dev.risk_platt.to_numpy(float)[has])),
-                "mean_risk": float(np.nanmean(risk)), "spike_rate_answered": float(y[has].mean()),
-                "ece_equal_width_15": float(reliability(risk[has], y[has], bins=15)[1]),
-                "imputed_medians": imp.statistics_[idx].tolist(),
-                "median_abs_logit_shift": float(np.median(np.abs(lg - _logit(dev.risk_platt.to_numpy(float)[has]))))})  # noqa: E501
+    out.update(
+        {
+            "auroc": float(roc_auc_score(y[has], risk[has])),
+            "auroc_own_priors": float(roc_auc_score(y[has], dev.risk_platt.to_numpy(float)[has])),
+            "mean_risk": float(np.nanmean(risk)),
+            "spike_rate_answered": float(y[has].mean()),
+            "ece_equal_width_15": float(reliability(risk[has], y[has], bins=15)[1]),
+            "imputed_medians": imp.statistics_[idx].tolist(),
+            "median_abs_logit_shift": float(np.median(np.abs(lg - _logit(dev.risk_platt.to_numpy(float)[has])))),
+        }
+    )  # noqa: E501
     return out
 
 
