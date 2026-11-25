@@ -1712,6 +1712,11 @@
         "resolution": 0.03498445317276661,
         "uncertainty": 0.2205056710775047
       },
+      "risk_platt": {
+        "reliability": 0.0009103399414574639,
+        "resolution": 0.027597825265764823,
+        "uncertainty": 0.2205056710775047
+      },
       "risk": {
         "reliability": 0.004012460123167575,
         "resolution": 0.04300467216695734,
@@ -1727,6 +1732,11 @@
       "risk": {
         "reliability": 0.007405278337635508,
         "resolution": 0.020820899470899473,
+        "uncertainty": 0.2436
+      },
+      "served_platt_only": {
+        "reliability": 0.03312606384276981,
+        "resolution": 0.022225050549078012,
         "uncertainty": 0.2436
       }
     }
@@ -2091,6 +2101,110 @@
     }
   },
   "heart_rate_r2_from_other_inputs": 0.18552325015190274,
+  "fair_baselines": {
+    "reproduces_shipped_max_abs_diff": 1.1102230246251565e-16,
+    "profile_lr": {
+      "auroc_with_intercept": 0.7080091729355538,
+      "shipped_minus_this": 0.05433035427248756,
+      "ci95": [
+        0.02884671782086894,
+        0.09027380351961949
+      ]
+    },
+    "trend_lr": {
+      "auroc_with_intercept": 0.7416575580273901,
+      "shipped_minus_this": 0.02068196918065124,
+      "ci95": [
+        -0.0029404786953104805,
+        0.05131075831678609
+      ]
+    },
+    "trend_gbm": {
+      "auroc_with_intercept": 0.7496731605906684,
+      "shipped_minus_this": 0.01266636661737297,
+      "ci95": [
+        -0.02150433857276942,
+        0.042966741665389725
+      ]
+    },
+    "sensor_cnn_3seed_mean": {
+      "auroc_with_intercept": 0.7358923251677062,
+      "shipped_minus_this": 0.026447202040335127,
+      "ci95": [
+        0.0031488227550923124,
+        0.05924837981962189
+      ]
+    },
+    "shipped fusion without Platt": {
+      "auroc_with_intercept": 0.7631539467198183,
+      "shipped_minus_this": -0.0008144195117769648,
+      "ci95": [
+        -0.007843850959324408,
+        0.004924371810841523
+      ]
+    }
+  },
+  "band_and_served_calibration": {
+    "band": {
+      "answered": 460,
+      "cost_shipped": 0.5554347826086956,
+      "cost_without_band": 0.5391304347826087,
+      "borderline_meals": 45,
+      "borderline_spike_rate": 0.26666666666666666,
+      "abstain_beats_caution_below_spike_rate": 0.2
+    },
+    "bins_near_cutoffs_dev": {
+      "0.10-0.15": {
+        "n": 51,
+        "mean_risk": 0.12596684072724404,
+        "spike_rate": 0.0784313725490196
+      },
+      "0.15-0.20": {
+        "n": 57,
+        "mean_risk": 0.17605316178092784,
+        "spike_rate": 0.2631578947368421
+      },
+      "0.20-0.25": {
+        "n": 56,
+        "mean_risk": 0.22345236997676535,
+        "spike_rate": 0.23214285714285715
+      }
+    },
+    "served_calibration": {
+      "dev": {
+        "ece_equal_width_15": 0.02345685723056684,
+        "ece_equal_mass_15": 0.05581711126507391,
+        "calibration_in_the_large": 0.0018293624165925393,
+        "log_loss": 0.5717718179388036,
+        "brier": 0.19368110039081443
+      },
+      "locked": {
+        "ece_equal_width_15": 0.16151004216941178,
+        "ece_equal_mass_15": 0.15689799935259255,
+        "calibration_in_the_large": -0.10830909786036547,
+        "log_loss": 0.7194312408310438,
+        "brier": 0.25540617606245064
+      }
+    },
+    "cost_reduction_ci95": {
+      "dev": [
+        -0.04630376344086019,
+        0.3146669443639525
+      ],
+      "locked": [
+        -0.19446839080459769,
+        0.05940594059405935
+      ],
+      "served_dev": [
+        -0.04649863138686137,
+        0.21995006162607844
+      ],
+      "served_locked": [
+        -0.5443866787221215,
+        0.1784327059079523
+      ]
+    }
+  },
   "calibration_in_the_large_pooled": {
     "dev": -0.015318443762357747,
     "locked": -0.009896302372908894
