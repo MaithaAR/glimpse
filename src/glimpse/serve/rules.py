@@ -35,10 +35,16 @@ def window_problem(w, cfg: GlimpseConfig) -> str | None:
     if seen.size and (seen.min() < lo or seen.max() > hi):
         return f"a glucose reading is outside the sensor's range ({lo}-{hi} mg/dL)"
     if not passes_premeal_checks(w, pc.min_cgm_readings_last_30min, pc.min_cgm_coverage, pc.max_cgm_gap_min):
-        return (f"glucose data incomplete: {w.readings_last_30min} readings in the last 30 min (need "
-                f"{pc.min_cgm_readings_last_30min}), {w.coverage:.0%} of the 2 h covered (need "
-                f"{pc.min_cgm_coverage:.0%}), longest gap {w.max_gap_min:.0f} min "
-                f"(max {pc.max_cgm_gap_min:.0f})")  # fmt: skip
+        failed = []  # name only the criteria that failed (26 Nov: passing ones read as failures)
+        if w.readings_last_30min < pc.min_cgm_readings_last_30min:
+            failed.append(
+                f"{w.readings_last_30min} readings in the last 30 min (need {pc.min_cgm_readings_last_30min})"
+            )
+        if w.coverage < pc.min_cgm_coverage:
+            failed.append(f"{w.coverage:.0%} of the 2 h covered (need {pc.min_cgm_coverage:.0%})")
+        if w.max_gap_min > pc.max_cgm_gap_min:
+            failed.append(f"a gap of {w.max_gap_min:.0f} min (max {pc.max_cgm_gap_min:.0f})")
+        return "glucose data incomplete: " + ", ".join(failed or ["the pre-meal checks failed"])
     return None
 
 

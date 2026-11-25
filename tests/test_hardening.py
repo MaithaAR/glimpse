@@ -109,3 +109,20 @@ def test_decision_reason_never_reads_as_equal_to_its_cut():
         text = decision_reason(dec, risk, lo, hi)
         shown = float(text.split()[1].rstrip("%")) / 100
         assert (shown < lo) if dec == "low risk" else (shown >= hi - 1e-12), text
+
+
+def test_window_reason_names_only_the_failing_criteria():
+    """26 Nov: a window failing only on its gap used to list the passing criteria too, as if they failed."""
+    from types import SimpleNamespace
+
+    import numpy as np
+
+    from glimpse.config import load_config
+    from glimpse.serve.rules import window_problem
+
+    cfg = load_config("configs/default.yaml")
+    w = SimpleNamespace(values=np.full(24, 110.0), readings_last_30min=5, coverage=0.71, max_gap_min=35.0)
+    reason = window_problem(w, cfg)
+    assert reason == "glucose data incomplete: a gap of 35 min (max 20)"
+    w = SimpleNamespace(values=np.full(24, 110.0), readings_last_30min=1, coverage=0.04, max_gap_min=115.0)
+    assert window_problem(w, cfg).count("need") == 2 and "max 20" in window_problem(w, cfg)

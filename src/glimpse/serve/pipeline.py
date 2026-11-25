@@ -44,7 +44,7 @@ def _bin_onehot(grams: float) -> list[float]:
 
 
 class Pipeline:
-    """Loads the frozen 28-person pipeline once; `answer` scores one meal.
+    """Loads the frozen serving pipeline once (fusion fitted on the 37 non-locked people); `answer` scores one meal.
 
     `photo_table` switches the carb-estimate source from the live photo model to precomputed per-fold estimates
     (evaluation); everything from the rules to the Answer is the same code either way."""
@@ -158,6 +158,9 @@ class Pipeline:
         passed: list[str] = []
         flags: list[str] = list(m.input_flags) + ([] if m.hr_times else ["hr_missing"])
         base = {"flags": flags, "model_versions": self.model_versions}
+        if m.glucose_mgdl and min(m.glucose_mgdl) <= 0:  # rule R12: zero or negative is a broken export, not mmol/L
+            return cant_judge("a glucose reading is zero or negative; the export is broken, check the file",
+                              checks_failed=["cgm_range"], **base)  # fmt: skip
         if m.glucose_mgdl and max(m.glucose_mgdl) < 30:  # rule R1: a mmol/L export reads as 4-9, never as mg/dL
             return cant_judge("the glucose values look like mmol/L; multiply by 18 or export the file in mg/dL",
                               checks_failed=["cgm_units"], **base)  # fmt: skip
