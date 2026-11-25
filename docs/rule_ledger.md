@@ -134,3 +134,8 @@ Order check (26 Nov): that last addition (dbac561, 08:08 on 25 Nov) landed befor
 09:56), so the locked eight went through the final serving code. The committed instructor and stress runs
 (25a118c, 08:01) predate it by seven minutes; the change only adds two accepted key spellings and no
 committed case uses them, so those answers are unchanged by construction.
+Two further notes (26 Nov). The fresh clone run after the locked run on 25 Nov reran both suites under the
+final serving code and reproduced them. And one more R11 addition, found when a grader read the locked
+answers: an answered meal's reason printed the risk at whole percent, so a risk of 0.148 read "risk 15% is
+below the low-risk cut-off 15%". The reason now prints one decimal (more only when rounding would reach
+the cut); decisions are unchanged, and the committed answer files keep the wording they were made with.

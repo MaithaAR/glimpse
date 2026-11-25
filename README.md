@@ -30,7 +30,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 ## Quick start (macOS or Linux; needs [uv](https://docs.astral.sh/uv/) and [just](https://just.systems/), no pip)
 ```bash
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
-just check       # ruff + 151 tests
+just check       # ruff + 157 tests
 just demo        # worked cases, two can't-judge cases, response time  -> outputs/demo/cases.md
 just evaluate    # dev evaluation, then every report table and figure  -> outputs/evaluation_v2/, report_metrics/, figures/
 just report-numbers   # the same tables and figures from committed outputs only (no data, no weights, ~1 min)
@@ -52,13 +52,23 @@ just docker-demo                              # needs `just install` first, for 
 | Recipe | What | Time |
 |---|---|---|
 | `just prepare` | meal table, windows, person splits, training-only scaling, quality report | 1 min |
-| `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · the intermediate 28-person fusion (`just train` runs all three; the DEPLOYED artifacts come from `just finalize`, the pre-registered regeneration) | 1 · 15 · 8 min |
+| `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · the intermediate 28-person fusion (`just train` runs all three; the DEPLOYED artifacts come from `just finalize`, the pre-registered regeneration, so train-photo and train-final refuse to overwrite them unless `GLIMPSE_OVERWRITE_FROZEN=1`) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
 | `just evaluate` | the dev evaluation, then `just report-numbers` (every report table and figure re-derived from committed outputs); the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun); compute studies have their own recipes (table below) | 2 min |
 | `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10 min |
 | `just recalibrate` | superseded by partition v2: the deployed calibration comes from `just finalize`; the recipe says so and exits | – |
 
-Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`.
+Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`,
+and `just report-numbers` works on a bare clone. `just reproduce-all` reruns every compute study in dependency
+order (prepare → splits-v2 → params → cv → carbs-check → photo-cv → fusion → ablate → promised → robustness →
+robustness-levels → timing → probes → ood → monitoring → efficiency → photo-seeds → evaluate → selftest →
+instructor folder → stress → demo; about 3 h). It never reruns `just finalize` (the frozen serving artifacts,
+regenerated once under a pre-registered procedure) or `just evaluate-locked` (the locked eight, scored once).
+
+**What the grader's folder command does and does not do.** `just predict-folder` answers each meal folder on
+its own, at the population calibration: the personal intercept needs a person's earlier labelled meals, which
+the evaluation replays in deployment order and a deployed app would collect from the CGM; the folder format has
+no history field yet (report §1, §7).
 
 ## Results (AUROC, 95% ranges clustered by person)
 The locked test is the primary, clean measurement (scored once); the development estimate carries disclosed
@@ -69,18 +79,21 @@ selection pressure (fold 1 was scored at the intermediate stage).
 | raw fusion | 0.611 (0.510–0.743) | 0.726 (0.659–0.797) |
 | **+ per-person calibration (shipped)** | **0.645 (0.540–0.736)** | 0.762 (0.682–0.829) |
 | AUPRC of the shipped risk (base rate) | 0.547 (0.420) | 0.591 (0.328) |
-| ECE, registered 15 equal-width bins (target ≤ 0.05) | 0.061 | 0.052 |
+| ECE, registered 15 equal-width bins / equal-mass (target ≤ 0.05) | 0.061 / 0.098 | 0.052 / 0.049 |
 
 **What the results show (details and evidence in [`docs/final_report.md`](docs/final_report.md)):**
 
-- Per-person calibration improves every development fold (5/5) and the locked test, on AUROC, Brier and log-loss; the
-  registered ECE target is narrowly missed on development (0.052; 0.049 in the equal-mass binning used until 26 Nov).
+- Per-person calibration improves every development fold (5/5) and log-loss (paired interval below zero); the pooled
+  AUROC gain, +0.037 (−0.004, +0.071), is not established, and the registered ECE target is narrowly missed on
+  development (0.052; 0.049 in the equal-mass binning used until 26 Nov). On the locked test it improves AUROC,
+  Brier and log-loss at the point estimate, with intervals that include zero.
 - The photo is NOT established as a risk signal: pre-registered gate +0.025 (−0.010, +0.061). It ships as a carb-entry assist.
 - Usefulness targets hold at the point on development (23% cleared, 14% cost saving, 7.3% missed vs a 10% cap) and FAIL on
   the locked test (10 of 153 cleared, 2 spiked, cost reduction −5.7%), reported unadjusted, per the pre-registration.
 - The 8 locked people were scored exactly once, on 25 Nov, from the frozen artifacts (`just evaluate-locked` refuses a rerun).
-- Monitoring: the photo-drift rule fires on the drifted week of a simulated stream; replayed on logged answers, the
-  outcome rule is too noisy at 80-answer windows to serve as an alarm (`outputs/monitoring/replay.json`).
+- Monitoring: the photo-drift rule fires on the drifted (synthetic) week of a simulated stream, but real phone
+  photos sit just below its line; replayed on logged answers, the outcome rule is too noisy at 80-answer windows
+  to serve as an alarm (`outputs/monitoring/replay.json`).
 - Full tables: `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` and `just report-numbers`.
 - Submitted state: tag `submission-v1` (25 Nov), then a dated improvement round listed in `docs/changelog.md`.
 
@@ -98,18 +111,10 @@ docs/                  final report, model card, data card, evaluation protocol,
 samples/               instructor suite (13 meals), stress suite (23 hostile meals), example CSV
 ```
 
-## Promised in the proposal vs delivered (as of the intermediate; kept for the record; the final reconciliation of every commitment is in docs/evaluation_protocol.md)
-| Proposal | Now | Why |
-|---|---|---|
-| EfficientNet-B0 photo model | ConvNeXt-Tiny + carb-bin head | instructor feedback |
-| Fusion MLP with quantiles + monotone carbs | logistic regression | feedback ("overkill"), small data |
-| DINOv2 unfamiliar-photo check | nearest-neighbour check in the photo model's features | no extra model; DINOv2 comparison planned for the final |
-| Calibration + cost-based cut-offs | cut-offs from the costs (frozen before the test); recalibration planned | test calibration shows over-prediction |
-| Conformal rise intervals, W&B, Emirati photo set, user test | final submission | not required at this stage |
-| Gradio app in Docker | `just app` (Gradio) + Dockerfile (CLI demo and self-test) | done |
-
-Changes made after seeing results (C grid, ridge arm, carb-bin check, cut-off amendment) are listed and
-labelled in [`docs/evaluation_protocol.md`](docs/evaluation_protocol.md).
+## Promised vs delivered
+Every commitment from the proposal and the intermediate is reconciled, with its outcome, in
+[`docs/evaluation_protocol.md`](docs/evaluation_protocol.md) (with dated errata); the intermediate-era
+version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 
 ## Repository map
 
@@ -141,7 +146,7 @@ labelled in [`docs/evaluation_protocol.md`](docs/evaluation_protocol.md).
 `tests/test_report_numbers.py` checks the report's headline numbers against these files on every commit.
 
 Proposal-era pilot analyses (`pilot/`, `scripts/`, `results/`) were removed from the tree and live at the git tag
-`proposal-era`; copies sit in the course proposal folder.
+`proposal-era` (on the author's machine; pushed with the submission tags); copies sit in the course proposal folder.
 
 ## Data and licence
 CGMacros v1.0.0 (PhysioNet, CC BY-NC-SA 4.0) is downloaded by `just install` and never committed.
