@@ -127,4 +127,6 @@ missed on case-sensitive filesystems -> matched case-insensitively. An unreadabl
 past the R9 catch as a raw error row -> structured refusal. An output folder nested inside the input
 folder became a bogus meal on the second run -> excluded from case collection. Borderline reasons
 printed the risk at whole percent, colliding with the cut ("the risk (16%) is borderline, between 15%
-and 16%") -> one decimal.
+and 16%") -> one decimal. Added 25 Nov, found when our own test tripped over it: a profile.json
+written with the model-side field names (a1c_pct, fasting_glucose_mgdl) was silently dropped and then
+reported missing -> both spellings accepted.
