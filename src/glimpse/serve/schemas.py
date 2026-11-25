@@ -87,6 +87,7 @@ class Answer(BaseModel):
     flags: list[str] = Field(default_factory=list)
     model_versions: dict[str, str] = Field(default_factory=dict)
     carb_source: Literal["photo", "user", "none"] = "none"
+    # where a refusal points the user; "confirm_carbs" is advice only: no input surface sets typed carbs yet
     escalate_to: Literal["none", "confirm_carbs", "human"] = "none"
     # point estimate from the regression head; kept in results, not shown (the two heads were trained separately
     # and their agreement is not yet measured, so the user sees the bin head's range and confidence only)

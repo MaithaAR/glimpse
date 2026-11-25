@@ -1,7 +1,8 @@
 """Mocked feedback loop (intermediate stage): what happened after the meal, saved next to what the app said.
 
 Two sources: the user ("ate it all / ate part of it / did not eat it", optionally the rise they saw), and the CGM
-itself 2 hours later (`auto_rise`), which labels the meal with the same rule as the training data. Records are
+itself 2 hours later (`auto_rise`), which labels the meal with the training rule applied to raw readings (the
+training label uses 5-minute means, so near 50 mg/dL the two can disagree). Records are
 validated (Pydantic) and appended as JSON lines to `prototype.feedback_file`; in the product they would queue for
 review and, after checks, for retraining."""
 
