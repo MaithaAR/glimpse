@@ -8,8 +8,8 @@
   },
   "shap": {
     "base_logit": -0.7146975218368059,
-    "local_logit": 0.05387018654324677,
-    "sum_check_abs_err": 1.6653345369377348e-16,
+    "local_logit": -2.7683553097708957,
+    "sum_check_abs_err": 0.0,
     "coefs": {
       "last glucose": -0.15253784412603505,
       "slope 30 min": 0.10229185813352688,

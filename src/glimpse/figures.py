@@ -304,8 +304,9 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     zdf = pd.DataFrame(z, columns=FEATURE_NAMES)
     zdf.insert(0, "row", rows)
     zdf.to_csv(OUT / "shap_features_z.csv", index=False)  # a grader can redo the sum check without data/
-    # local meal: the answered meal whose raw risk is closest to 0.5 (stated, deterministic)
-    i = int(np.argmin(np.abs(answered.risk_raw.to_numpy() - 0.5)))
+    # local meal (26 Nov): row 847, a confident false clear (T5, cold start) the report discusses; it was the meal
+    # whose raw risk is closest to 0.5 before, which says little about the 0.15 cut
+    i = int(np.where(rows == 847)[0][0])
     logit_i = float(z[i] @ coefs + lr.intercept_[0])
     recon = base_logit + float(contrib[i].sum())
     assert abs(recon - logit_i) < 1e-6, f"SHAP terms do not sum to the logit: {recon} vs {logit_i}"
@@ -323,7 +324,7 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     axes[1].set_yticks(np.arange(len(top))[::-1], [shown[j] for j in top], fontsize=6.8)
     axes[1].axvline(0, color=GREY, lw=0.8)
     axes[1].set_xlabel("SHAP contribution (logit units)")
-    axes[1].set_title(f"One meal: base {base_logit:+.2f} + terms = logit {logit_i:+.2f} (risk "
+    axes[1].set_title(f"False clear (row 847): base {base_logit:+.2f} + terms = logit {logit_i:+.2f} (risk "
                       f"{1 / (1 + np.exp(-logit_i)):.2f}); top 8 of 19 terms", fontsize=8.5)  # fmt: skip
     fig.tight_layout()
     fig.savefig(OUT / "f6_shap.png")

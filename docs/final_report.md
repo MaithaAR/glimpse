@@ -395,7 +395,7 @@ photo terms (together 0.33 logit per meal against an unestablished gain): attrib
 use, ablation out-of-sample loss. Heart rate is not redundant (R² 0.19 from the other inputs), so its
 −0.21 coefficient is best read as in-sample signal that does not generalise.
 
-![Figure 6: exact linear SHAP for the frozen fusion, in-sample (the sum to the logit is an arithmetic check); the local meal is the one whose out-of-fold raw risk is closest to 0.5](../outputs/figures/f6_shap.png)
+![Figure 6: exact linear SHAP for the frozen fusion, in-sample (the sum to the logit is an arithmetic check); the local panel is row 847, a confident false clear (T5) that spiked](../outputs/figures/f6_shap.png)
 
 Probe C, registered last, moved each profile input from its 10th to its 90th percentile: risk rises with
 HbA1c, fasting glucose, prior spike rate and prior rise on every meal (median +0.06 to +0.12), which the
