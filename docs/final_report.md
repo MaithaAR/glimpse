@@ -28,7 +28,7 @@ two hours later (`cgm_auto`, the training spike rule), so the system learns each
 logging effort; abstentions escalate to confirm-carbs or a dietitian. A wellness nudge, not a
 medical device.
 
-One scoring path: every number here, the demo, the app and the grader's
+One scoring path: every decision and risk here, the demo, the app and the grader's
 `just predict-folder <in> <out>` go through the same `Pipeline.answer`; plain-code input rules run
 first (§4). Tooling: uv + Python 3.14 (locked), strict Pydantic throughout, a `just` recipe for
 every number, 143 tests in CI, W&B offline exports, and a git history (from 2 Nov; earlier
@@ -56,6 +56,7 @@ held-out people the photo head reaches 22.6 g MAE, Spearman 0.53 and bin F1 0.61
 backbone's features gets a better MAE, 20.4 g, but F1 0.38; the heads earn their 3,845 parameters on the bins, though the heads agree on only 51% of bins, not the
 old 90% aim;
 patients' own counts err by ~15–20%: Brazeau 2013, Vasiloglou 2018).
+
 The profile comprises eight inputs: age, BMI, HbA1c, fasting glucose, meal hour (as sine and
 cosine) and two onboarding priors (spike rate and mean rise); it is the channel whose removal costs
 the most (0.122 AUROC). Hand-made trend features summarise the 2-h CGM/HR window; SensorCNN, the required from-scratch model
@@ -63,6 +64,7 @@ the most (0.122 AUROC). Hand-made trend features summarise the 2-h CGM/HR window
 test people excluded, 0.691 AUROC against the engineered-feature logistic regression's 0.686, a
 paired gain of +0.002 (−0.016, +0.022) that fails the pre-registered bar, so the hand-made features
 stayed.
+
 Fusion is a 20-parameter logistic regression. With 23 development people and four inner folds behind
 every choice, that is the capacity the data supports; it is also the course's own prescription for
 this data size (frozen pretrained features plus a simple classifier). Gradient boosting, the usual
@@ -85,7 +87,7 @@ the verdict, per its own rule),
 the shipped product is sensor + confirmed carbs, with the photo head as a carb-entry assist, not an
 established risk signal. Three results agree. RQ1: even the participants' true logged carbs gain only
 +0.024 (−0.003, +0.056) over profile + trend, and the photo estimate lands within +0.002 of them
-(non-inferior): an information ceiling no photo encoder can break. The pre-registered D8 split: excluding training meals that share an
+(non-inferior): a carbohydrate-information ceiling on this cohort. The pre-registered D8 split: excluding training meals that share an
 exact macro profile with a held person's meal kills the photo gain (−0.005) while a size-matched
 random drop keeps it (+0.037, interval −0.024 to +0.099, a descriptive contrast): the small gain
 rides on CGMacros' repeated standardised meals.
@@ -106,14 +108,13 @@ fold 1 contains the five people the intermediate evaluation already scored (the 
 and the calibration fix was chosen after a diagnosis made on those people, so the development
 estimate carries selection pressure the locked eight do not. The personalised model beats raw in all five outer
 folds (Figure 2); the pooled estimate excluding the previously-scored fold 1 is 0.757 (0.651–0.833) against
-0.762 overall, and the locked eight, scored once in §6, are the only clean measurement.
+0.762 overall, and the locked eight (§6) are the only clean measurement.
 
 Postprandial response is person-specific (Zeevi et al. 2015; Berry et al. 2020). The
 calibration fix: a per-fold Platt map on inner out-of-fold risks plus a penalised per-person
 intercept b_p(t), fitted only on the person's earlier meals and replayed in deployment order under
 a 2-hour label-availability gate; deployment gets those labels free from the CGM. Reading note: within every fold
-the Platt AUROC equals the raw AUROC exactly, because a monotone per-fold map cannot reorder meals
-inside its fold; the pooled Platt figure (0.714) below raw (0.726) is an artefact of mixing five
+the Platt AUROC equals raw exactly: a monotone per-fold map cannot reorder meals within its fold; the pooled Platt figure (0.714) below raw (0.726) is an artefact of mixing five
 fold-specific maps, and the calibration evidence is the reliability diagram (Figure 3), the
 equal-mass ECE (15 bins; 0.059 raw to 0.049 shipped), the log-loss (0.537 personal vs 0.572/0.567) and the
 halved per-person gaps, not AUROC. For binary logits, Platt scaling is temperature scaling plus a
@@ -153,7 +154,17 @@ band; §4 reports that as a finding.
 Decisions are priced, not guessed: a missed spike costs 5× an unnecessary caution, abstention
 (2, 0.5), declared assumptions (the 5:1 ratio is a ~17% action threshold in decision-curve terms:
 Vickers & Elkin 2006), with a pre-registered cost sensitivity sweep committed alongside; across its 16 settings the
-cleared share moves from 0.4% to 43%, so the operating point is cost-driven. All four usefulness targets were fixed before any result
+cleared share moves from 0.4% to 43%, so the operating point is cost-driven:
+
+| missed-spike cost (abstain price fixed) | cleared | abstain | missed-among-cleared | cost saved |
+|---|---|---|---|---|
+| 3× | 43.5% | 4.4% | 15.3% | 22.9% |
+| 5× (declared) | 22.7% | 13.7% | 7.3% | 14.4% |
+| 7× | 11.9% | 24.5% | 8.8% | 6.5% |
+| 10× | 8.3% | 28.1% | 7.5% | 4.5% |
+
+*Pricing a miss higher buys a lower miss rate among cleared meals by clearing fewer of them
+(committed sweep, outputs/evaluation_v2).* All four usefulness targets were fixed before any result
 (docs/evaluation_protocol.md) and all four hold at the point estimate on development, the
 protocol's on-track label (the locked eight fail them, §6): cost reduction 14% (min 10%),
 cleared 22.7% (min 20%), abstain 14% (max 20%), missed-among-cleared 7.3% (max 10%). In plain terms: of
@@ -175,7 +186,7 @@ Abstaining instead of guessing is established practice for medical ML (Kompa et 
 | CGM dropout 10/30/50% (unchanged / dangerous) | 100% / 0.0% | 99.8% / 0.0% | 99.6% / 0.2% |
 | pre-meal gap 10/25/40 min (unchanged / new refusals) | 100% / 0% | 11% / 89% | 11% / 89% |
 | photo blur r=2/6/10 (unchanged / dangerous) | 98% / 0.7% | 94% / 0.9% | 89% / 1.7% |
-| photo brightness x0.5/x0.25/x0.1 (unchanged / new refusals) | 98% / 1% | 96% / 2% | 10% / 90% |
+| photo brightness ×0.5/×0.25/×0.1 (unchanged / new refusals) | 98% / 1% | 96% / 2% | 10% / 90% |
 
 *Figure 5 and the table: degradation is graded where inputs stay usable (blur) and collapses to refusal at the designed
 thresholds (the 20-minute gap rule, the contrast rule in near-darkness); dangerous flips stay below
@@ -231,16 +242,16 @@ one of the three dietitian questions (§4).
 The 8 locked subjects were scored once, on 25 Nov, from frozen artifacts verified by a fresh-clone
 run; every reported number comes from the same Pipeline.answer path the instructor command invokes.
 
-| risk (locked 8, 150 answered of 153 meals) | AUROC (95% person-clustered) | log-loss | ECE (15 bins) |
+| risk (locked 8, 150 scored of 153 meals) | AUROC (95% person-clustered) | log-loss | ECE (15 bins) |
 |---|---|---|---|
 | raw fusion | 0.611 (0.510–0.743) | 0.707 | 0.143 |
 | + personal intercept (shipped) | **0.645 (0.540–0.736)** | **0.650** | **0.098** |
 
 Decisions on the locked 8: 10 low risk, 139 caution, 4 can't judge; missed-among-cleared 2 of 10;
 cost reduction −5.7% against the best constant policy. The development estimate (0.762) lies above
-the locked interval: the selection pressure §3 concedes is measured here, not hypothetical. The
-personal intercept still improves raw on the locked people, as it did in all five development
-folds. We pre-committed, before that run, that the result is reported as measured, in the same
+the locked interval: §3's selection pressure and the harder cohort (42.5% vs 32.8% spike rate)
+both act here, inseparable at n=8. The
+personal intercept still improves raw on the locked people, as in all five development folds. We pre-committed, before that run, that the result is reported as measured, in the same
 form as §3, with no re-tuning after; so it was. A fresh-clone dry-run (5 Nov) proved the chain:
 clone, `uv sync`, one documented weights step (pinned revision, SHA-256) reproduce the selftest and
 both input suites; the dry run found and fixed two onboarding defects. The serving
@@ -269,7 +280,7 @@ losing paragraph, the probes caught their authors, and the locked eight are touc
 **Appendix: taught-technique coverage.** Group split, pristine locked set (weeks 4-5); nested CV,
 thresholds over class weights (week 2); wall-clock as a first-class number (week 3); frozen
 features + simple classifier, differential rates, hue-preserving augmentation (weeks 5-6);
-shuffled-label control, ceiling analysis, error taxonomy, pre-registration, subgroup caution,
+shuffled-photo control, ceiling analysis, error taxonomy, pre-registration, subgroup caution,
 graceful degradation (week 11); cost-chosen thresholds, refusal to human review, validated outputs,
 worst-slice reporting (week 9); sequence models measured against the bar (weeks 8-10, RQ2). Not
 used, reasons in the text: attention, full fine-tuning, ensembles, self-supervised pretraining.

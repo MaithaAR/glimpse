@@ -32,7 +32,8 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
 just check       # ruff + 143 tests
 just demo        # worked cases, two can't-judge cases, response time  -> outputs/demo/cases.md
-just evaluate    # all metrics, baselines, calibration, fixed test     -> outputs/evaluation/ (about 1 min)
+just evaluate    # all dev tables + the six report figures             -> outputs/evaluation_v2/, outputs/figures/
+just predict-folder samples/instructor outputs/folder_run   # the grader's entry point: a folder of meals in, structured answers out
 just app         # local screen at http://127.0.0.1:7860 (optional extra: Gradio)
 just predict --cgm samples/cgm_example.csv --photo my_lunch.jpg --age 45 --bmi 28 --a1c 5.9 --fasting 100
 just selftest    # offline check of every frozen part, no dataset needed
@@ -50,11 +51,11 @@ just docker-demo                              # needs `just install` first, for 
 | Recipe | What | Time |
 |---|---|---|
 | `just prepare` | meal table, windows, person splits, training-only scaling, quality report | 1 min |
-| `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · 28-person fusion + frozen cut-offs (`just train` runs all three) | 1 · 15 · 8 min |
+| `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · the intermediate 28-person fusion (`just train` runs all three; the DEPLOYED artifacts come from `just finalize`, the pre-registered regeneration) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
-| `just evaluate` | tables, figures, targets; scores the fixed test (refuses if the frozen cut-offs were changed) | 1 min |
+| `just evaluate` | every dev table and figure in the report; the locked-8 table is committed once by design (`just evaluate-locked` refuses a rerun); budget/levels/latency have `just params` / `robustness-levels` / `efficiency` | 1 min |
 | `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10 min |
-| `just recalibrate` | validation-chosen cut-offs on recalibrated risk, checked on CV without the test people (no test labels) -> `outputs/evaluation/recalibration.md` | 1 min |
+| `just recalibrate` | superseded by partition v2: the deployed calibration comes from `just finalize`; the recipe says so and exits | – |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`.
 
@@ -76,14 +77,14 @@ Cross-validated predictions are committed in `outputs/`, so `just evaluate` work
 ## Repository
 ```
 configs/default.yaml   every setting (validated by Pydantic at start-up)
-src/glimpse/           data/ (download, meals, windows, splits, photos, quality) · models/ · training/ (scratch, photo,
-                       cv, photo_cv, fusion, final) · evaluation.py + run_evaluation.py · demo.py (app logic) · app.py
-                       (screen) · feedback.py (mocked feedback) · cli.py (`glimpse` command)
+src/glimpse/           data/ · models/ · training/ (incl. finalize.py, the pre-registered artifact regeneration) ·
+                       evaluation/ (run.py, locked.py, metrics.py) · serve/ (pipeline, rules, io, folder — the one
+                       scoring path) · studies/ (robustness, promised, ood, probes, monitoring, efficiency) ·
+                       figures.py · demo_cases.py · app.py · feedback.py · cli.py (`glimpse` command)
 checkpoints/           trained models, frozen cut-offs (hashed), unfamiliar-photo reference
 outputs/               evaluation tables and figures, learning curves, cross-validated predictions, demo cases
 docs/                  intermediate report, data card, model card, evaluation protocol (decisions fixed in advance)
-samples/               synthetic CGM CSV for `just predict`
-pilot/ scripts/ results/  proposal-pilot code and logs, frozen (GitHub only; left out of the submitted zip)
+samples/               instructor suite (13 meals), stress suite (23 hostile meals), example CSV
 ```
 
 ## Promised in the proposal vs delivered (as of the intermediate; kept for the record — the final reconciliation of every commitment is in docs/evaluation_protocol.md)
@@ -108,8 +109,9 @@ labelled in [`docs/evaluation_protocol.md`](docs/evaluation_protocol.md).
 | `training/photo.py` | shared photo-model library (caches, losses, loops) | – | used by the three below |
 | `training/train_photo.py`, `scratch.py`, `final.py` | the training runs | `just train-*`, `just photo-seeds` | `checkpoints/`, `outputs/training/` |
 | `training/cv.py`, `photo_cv.py`, `fusion.py` | person-level cross-validation | `just cv`, `just photo-cv`, `just fusion` | `outputs/cv,photo_cv,fusion/` |
-| `evaluation.py`, `run_evaluation.py`, `recalibrate.py` | metrics, calibration, cut-offs, fixed test | `just evaluate`, `just recalibrate` | `outputs/evaluation/` |
-| `demo.py`, `demo_cases.py`, `app.py`, `feedback.py` | the product path, worked cases, UI, feedback | `just demo`, `just predict`, `just app` | `outputs/demo,feedback/` |
+| `evaluation/` (run.py, locked.py, metrics.py) | dev evaluation, the one-shot locked run, statistics | `just evaluate`, `just evaluate-locked` | `outputs/evaluation_v2/`, `outputs/locked_eval/` |
+| `serve/` + `demo_cases.py`, `app.py`, `feedback.py` | the one scoring path, folder runner, worked cases, UI, feedback | `just demo`, `just predict-folder`, `just app` | `outputs/demo,folder_run,feedback/` |
+| `studies/` + `figures.py` | robustness (+levels), promised comparisons, OOD, probes, monitoring, efficiency, report figures | `just robustness`, `just promised`, `just ood`, `just probes`, `just monitoring`, `just efficiency`, `just figures` | `outputs/…`, `outputs/figures/` |
 
 Proposal-era pilot analyses (`pilot/`, `scripts/`, `results/`) were removed from the tree and live at the git tag
 `proposal-era`; copies sit in the course proposal folder.

@@ -1,4 +1,10 @@
-# Model card: GLIMPSE pre-meal spike warning (intermediate)
+# Model card: GLIMPSE pre-meal spike warning (intermediate; kept for the record)
+
+> **Superseded 6 Nov 2026.** This card describes the intermediate system. The final system differs:
+> the photo is gated to a carb-entry assist (pre-registered gate, docs/gate_s8.md), the deployed
+> cut-offs are 0.15 / 0.16 from `just finalize`, development AUROC is 0.726 raw / 0.762 with the
+> per-person intercept, and the locked 8 scored 0.645 on 25 Nov (outputs/locked_eval). The current
+> description is docs/final_report.md.
 
 **What it does.** It predicts the chance that a meal raises glucose by ≥ 50 mg/dL within 2 h. The inputs are a
 before-meal photo, the 2 h of CGM and heart rate before the meal, and a short profile. The answer is *low risk*

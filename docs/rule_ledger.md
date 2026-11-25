@@ -76,7 +76,7 @@ photos and the key instructor cases:
 
 | quantile | cut | in-dist flagged | real phone photos flagged |
 |---|---|---|---|
-| 0.99 (deployed) | 0.609 | 1.0% | 0 / 14 |
+| 0.99 (deployed then; final reference cut is 0.614) | 0.609 | 1.0% | 0 / 14 |
 | 0.98 | 0.556 | 2.1% (over budget) | 1 / 14 |
 | 0.95 | 0.501 | 5.1% | 5 / 14 |
 | 0.90 | 0.465 | 10.1% | 7 / 14 |

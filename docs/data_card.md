@@ -32,14 +32,14 @@ Out-of-range glucose (outside 40–400 mg/dL): 0 readings.
 | Train (14 target + 14 type 2 diabetes) | 28 | 633 | 547 | 0.48 (target 0.39, T2D 0.59) |
 | Validation (target) | 4 | 133 | 99 | 0.19 |
 | Test = outer fold 1 (target) | 5 | 125 | 96 | 0.29 |
-| Locked (target, sealed) | 8 | 181 | 153 | — not used |
+| Locked (target, sealed) | 8 | 181 | 153 | scored once, 25 Nov (outputs/locked_eval) |
 | 5 outer CV folds (23 development target people) | 23 | | **481** | 0.24–0.51 per fold |
 
 - **Main estimate:** person-level 5-fold cross-validation over the 23 development target people. Every one of them is tested once (481 scored meals). The fixed split is the rubric's held-out split and the demo's split.
 - **Rates differ** between groups because people differ (per-person spike rate 0 to 0.84) and type 2 diabetes people, who spike more, train only. Results are therefore reported for the target cohort, with base-rate-aware measures and calibration. 4 validation people (99 meals) is a noisy basis for choosing settings.
 
 ## Leakage controls
-- People never cross groups (checked in code). The 8 locked people are verified by SHA-256 and never touched by `glimpse prepare` or training.
+- People never cross groups (checked in code). The 8 locked people are verified by SHA-256, never touched by `glimpse prepare` or training, and were scored exactly once on 25 Nov (`just evaluate-locked`; the guard refuses a rerun).
 - Scaling statistics and missing-value fills come from training people only. The personal prior uses only a person's own first 72 h.
 - Inputs end at the meal time; a test changes every after-meal reading and checks the input is identical.
 - Photos: 1,221 development photos checked with exact (SHA-256) and look-alike (64-bit dHash, ≤ 4 bits) fingerprints: **0 cross-split duplicates**. With person-level splits this can only catch a file or ID mix-up. Within a person, look-alike photo pairs are rare (rate 0.0001), so repeated meals are not simply the same picture.
@@ -49,7 +49,7 @@ Out-of-range glucose (outside 40–400 mg/dL): 0 readings.
 |---|---|---|
 | CGMacros before-meal photos, fixed training people | intermediate | 865 |
 | CGMacros before-meal photos, all development people (worst case over CV folds) | intermediate | 1,221 |
-| Nutrition5k overhead plates (optional pre-training; estimate) | final, planned | 800 |
+| Nutrition5k overhead plates (optional pre-training; estimate) | CUT at the final design stage; never used | 800 |
 | **Running total (worst case, incl. planned)** | | **2,021** |
 `glimpse prepare` stops with an error if the total exceeds the cap.
 

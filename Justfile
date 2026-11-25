@@ -39,7 +39,7 @@ check: lint test
 params:
     uv run glimpse params
 
-# train both models
+# the three training runs in order (the deployed artifacts then come from `just finalize`)
 train: train-scratch train-photo train-final
 
 # train the from-scratch SensorCNN: epochs chosen on inner folds, then the 28-person model + checkpoint
@@ -82,21 +82,27 @@ ood *ARGS:
 robustness:
     uv run glimpse robustness
 
+# the two pre-registered counterfactual probes, photo swap and flat-vs-rising (S13)
 probes:
     uv run glimpse probes
 
+# parameters vs caps, serving latency and artifact sizes on this machine (S12)
 efficiency:
     uv run glimpse efficiency
 
+# drift baseline + the simulated four-week stream with the week-4 alert (S11, rubric 4e)
 monitoring:
     uv run glimpse monitoring
 
+# the pre-registered serving-artifact regeneration (docs/final_design.md amendment); stops itself on any criterion miss
 finalize:
     uv run glimpse finalize
 
+# the six report figures, rendered from committed evidence only (pre-commitment: nothing retuned from their look)
 figures:
     uv run glimpse figures
 
+# pre-registered meal-time shift robustness, 15 minutes either way (7 Nov)
 timing:
     uv run glimpse timing
 
@@ -120,7 +126,7 @@ evaluate:
 photo-seeds:
     uv run glimpse photo-seeds
 
-# recalibration: being rebuilt on partition v2 (S5, D3/D4); the command says so and exits
+# superseded by partition v2: the deployed calibration comes from `just finalize`; the command says so and exits
 recalibrate:
     uv run glimpse recalibrate
 
@@ -139,6 +145,7 @@ promised:
 # demo with the frozen pipeline: worked cases from the test people, two can't-judge cases, response time
 demo:
     uv run glimpse demo
+    @echo "UI: just app -> http://127.0.0.1:7860 (optional Gradio extra)"
 
 # answer one meal from your own files, e.g. just predict --cgm my_cgm.csv --photo lunch.jpg --age 45 --bmi 28 --a1c 5.9 --fasting 100
 predict *ARGS:
@@ -172,4 +179,4 @@ clean:
     find . -name "__pycache__" -type d -prune -exec rm -rf {} +
 
 wordcount:
-    uv run python -c "import re; t=re.sub(r'<!--.*?-->','',open('docs/final_report.md').read(),flags=re.S); ls=[l for l in t.splitlines() if not l.lstrip().startswith(('|','!['))]; print(len(' '.join(ls).split()), 'words (cap 3,000; tables, figures, captions excluded per the final rubric)')"
+    uv run python -c "t=open('docs/final_report.md').read(); ls=[l for l in t.splitlines() if not (l.lstrip().startswith(('|','![')) or (l.lstrip().startswith('*') and not l.lstrip().startswith('**')))]; print(len(' '.join(ls).split()), 'words (cap 3,000; tables, figures and their captions excluded per the final rubric)')"

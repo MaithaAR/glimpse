@@ -5,6 +5,11 @@ case produces one structured answer row (a decision and a plain-sentence reason)
 never a raw error row, and the run exits 0. Naive observed behaviour and fixes: docs/rule_ledger.md
 (R8 timezone, R9 malformed profile.json, R10 mixed timestamp precision).
 
+Note (25 Nov): cases 02, 08, 11, 13 and 19 carry a deliberately unreadable placeholder photo, so
+their committed rows end refusing on the photo after the CSV path has run; the CSV behaviours those
+rows name (timezone drop, duplicate-row sort, BOM/CRLF, string profile, junk files) are enforced by
+tests/test_stress.py on every commit and visible in the rows' flags.
+
 | case | hostile input | expected behaviour |
 |---|---|---|
 | 01_semicolon_csv | semicolon-delimited CSV | can't judge, names the missing columns |
