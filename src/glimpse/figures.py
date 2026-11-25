@@ -238,9 +238,10 @@ def f7_coverage(plt) -> None:
     """Coverage vs risk, descriptive (26 Nov): abstain on the meals whose risk is closest to the low-risk cut,
     decide the rest; development at each fold's cut, locked at the deployed 0.15. From report_metrics.json."""
     cr = json.loads(Path("outputs/report_metrics/report_metrics.json").read_text())["coverage_risk"]
-    fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.2))
+    fig, axes = plt.subplots(1, 3, figsize=(12.0, 3.2))
     for name, c in (("development", BLUE), ("locked eight", ORANGE)):
         rows = cr["dev" if name == "development" else "locked"]
+        axes[2].plot([r["abstain_share"] for r in rows], [r["cost"] for r in rows], "o-", color=c, ms=3.5, label=name)
         xs = [r["abstain_share"] for r in rows]
         axes[0].plot(xs, [r["cleared_share"] for r in rows], "o-", color=c, ms=3.5, label=name)
         pts = [(r["abstain_share"], r["missed_among_cleared"]) for r in rows if r["missed_among_cleared"] is not None]
@@ -260,6 +261,8 @@ def f7_coverage(plt) -> None:
         ax.legend(frameon=False, fontsize=7.5)
     axes[0].set_title("Coverage: abstaining near the cut removes clears", fontsize=9)
     axes[1].set_title("Spikes among the cleared meals", fontsize=9)
+    axes[2].set_ylabel("mean cost per answered meal (declared prices)")
+    axes[2].set_title("Cost per answered meal at the declared prices", fontsize=9)
     fig.tight_layout()
     fig.savefig(OUT / "f7_coverage.png")
     plt.close(fig)

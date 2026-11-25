@@ -298,7 +298,7 @@ it buys little.
 
 *"Same decision" includes meals already refused before the perturbation; degraded photos also turn up to 2.6% of earlier refusals into answers (`recovered_answers`, blur r=10); low risk↔caution flips are `dangerous_flips` in the evidence files. Pre-registered 22 Nov; outputs/robustness/levels.json, the run Figure 5 draws with timing.json and promised.json (outputs/robustness/robustness.json is the earlier 2 Nov single-level run under pre-freeze pipelines, kept for the record).*
 
-![Figure 7: coverage vs risk, abstaining on the meals closest to the low-risk cut (development at each fold's cut, locked at 0.15; n of cleared meals printed), descriptive](../outputs/figures/f7_coverage.png)
+![Figure 7: coverage vs risk and cost, abstaining on the meals closest to the low-risk cut (development at each fold's cut, locked at 0.15; n of cleared meals printed), descriptive; on development any abstention raises cost, on the locked eight abstaining the nearest 10% would have lowered it (0.543 against 0.593)](../outputs/figures/f7_coverage.png)
 
 Degradation is graded while inputs stay usable (blur) and turns into refusal at the designed thresholds
 (the 20-minute gap rule, the contrast rule in near-darkness); past a rule every meal refuses, so the gap
