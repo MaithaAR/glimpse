@@ -38,6 +38,9 @@ from glimpse.training.photo import (
 
 def train_photo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> Path:
     """Inner folds choose the head epochs and keep/reject phase 2; then the 28-person model is trained and saved."""
+    from glimpse.training.final import refuse_to_overwrite_frozen
+
+    refuse_to_overwrite_frozen()  # it repoints checkpoints/photo_convnext_latest.txt, which serving loads
     torch.set_num_threads(min(cfg.training.num_threads, os.cpu_count() or 1))
     hp, pc, log = cfg.training.photo, cfg.photo, logger.bind(stage="train", model=MODEL)
     out, cache = Path(cfg.paths.outputs) / "training", Path("data/cache")

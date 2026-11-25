@@ -75,8 +75,19 @@ def checkpoint_estimates(cfg: GlimpseConfig, ds: MealDataset, rows_all, maps_eva
     return pd.DataFrame({"row": rows_all[pos], "photo_g": g, **dict(zip(BINS, b.T, strict=True))})
 
 
+def refuse_to_overwrite_frozen() -> None:
+    """The intermediate training recipes write into checkpoints/, where `just finalize` froze the serving
+    artifacts on 6 Nov. Refuse unless the user asks for it explicitly (guard added 26 Nov)."""
+    frozen = THRESHOLDS.exists() and "m_personal" in json.loads(THRESHOLDS.read_text())
+    if frozen and os.environ.get("GLIMPSE_OVERWRITE_FROZEN") != "1":
+        raise RuntimeError("checkpoints/ holds the frozen serving artifacts (`just finalize`, 6 Nov); this "
+                           "intermediate recipe would overwrite them. Run it in a separate clone, or set "
+                           "GLIMPSE_OVERWRITE_FROZEN=1 to overwrite on purpose.")  # fmt: skip
+
+
 def train_final(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
     """Fit the 28-person fusion, choose and freeze thresholds on the validation people."""
+    refuse_to_overwrite_frozen()
     torch.set_num_threads(min(cfg.training.num_threads, os.cpu_count() or 1))
     log, out = logger.bind(stage="final"), Path(cfg.paths.outputs) / "final"
     out.mkdir(parents=True, exist_ok=True)
