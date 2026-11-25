@@ -53,7 +53,8 @@ def run_monitoring_replay(cfg) -> dict:
 
     from glimpse.training.final import FINAL
 
-    res["cusum_served"] = cusum_served(dev, locked, tuple(joblib.load(FINAL)["calibration"]))
+    res["cusum_served"] = cusum_served(dev, locked, tuple(joblib.load(FINAL)["calibration"]),
+                                       (th["low_risk_below"], th["caution_from"]))  # fmt: skip
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "replay.json").write_text(json.dumps(res, indent=2))
     for name, r in (("replay 1", res), ("replay 2 (deployed cut-offs)", res["deployed_operating_point"])):
@@ -67,20 +68,39 @@ def run_monitoring_replay(cfg) -> dict:
     return res
 
 
-def cusum_served(dev: pd.DataFrame, locked: pd.DataFrame, platt: tuple[float, float], k: float = 0.5,
-                 h: float = 4.0) -> dict:  # fmt: skip
+def cusum_served(dev: pd.DataFrame, locked: pd.DataFrame, platt: tuple[float, float],
+                 cuts: tuple[float, float] | None = None, k: float = 0.5, h: float = 4.0) -> dict:  # fmt: skip
     """Replay 3 (registered 26 Nov): one-sided CUSUM on the served (Platt-only) risk's per-block
-    calibration (spike rate minus mean risk) and on the caution share, standardised on the dev blocks."""
+    calibration (spike rate minus mean risk) and on the caution share, standardised on the dev blocks.
+
+    Correction (26 Nov, after review): the caution share registered here is taken from the logged decisions,
+    whose dev part used each fold's own cut-offs, so a shift in it at the dev/locked seam can come from the
+    cut-off change alone. Two added rows put both streams at the deployed cut-offs: the shipped risk
+    (`caution_share_deployed_cutoffs`) and the served Platt-only risk (`caution_share_served`). They are
+    descriptive, added after the first result was seen."""
     lk = locked.copy()
     q = np.clip(lk.risk_raw.to_numpy(float), 1e-6, 1 - 1e-6)
     lk["served"] = 1 / (1 + np.exp(-(platt[0] * np.log(q / (1 - q)) + platt[1])))
     lk.loc[lk.risk_raw.isna(), "served"] = np.nan
     dv = dev.assign(served=dev.risk_platt)
+    if cuts is not None:
+        from glimpse.serve.rules import decision
+
+        dv["dec_deployed"] = at_deployed_cutoffs(dev, *cuts).decision.to_numpy()
+        lk["dec_deployed"] = lk.decision
+        for d in (dv, lk):
+            has = d.served.notna()
+            d["dec_served"] = d.decision
+            d.loc[has, "dec_served"] = [decision(float(r), *cuts) for r in d.loc[has, "served"]]
     blocks = _blocks(dv, "dev") + _blocks(lk, "locked")
     first_locked = next(i + 1 for i, b in enumerate(blocks) if b.stream.iloc[0] == "locked")
     out = {}
     for name, fn in (("calibration", lambda b: float(b.spike[b.served.notna()].mean() - b.served.mean())),
-                     ("caution_share", lambda b: float((b.decision == "caution").mean()))):  # fmt: skip
+                     ("caution_share", lambda b: float((b.decision == "caution").mean())),
+                     ("caution_share_deployed_cutoffs", lambda b: float((b.dec_deployed == "caution").mean())),
+                     ("caution_share_served", lambda b: float((b.dec_served == "caution").mean()))):  # fmt: skip
+        if name != "calibration" and name != "caution_share" and cuts is None:
+            continue
         x = np.array([fn(b) for b in blocks])
         ref = x[[b.stream.iloc[0] == "dev" for b in blocks]]
         z = (x - ref.mean()) / ref.std(ddof=1)

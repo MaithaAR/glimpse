@@ -60,7 +60,7 @@ just docker-demo                              # needs `just install` first, for 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`,
 and `just report-numbers` works on a bare clone. `just reproduce-all` reruns every compute study in dependency
 order (prepare → splits-v2 → params → cv → carbs-check → photo-cv → fusion → ablate → promised → robustness →
-robustness-levels → timing → probes → ood → monitoring → efficiency → photo-seeds → evaluate → selftest →
+robustness-levels → timing → probes → ood → monitoring → efficiency → stage-timing → photo-seeds → evaluate → selftest →
 instructor folder → stress → demo; about 3 h). It never reruns `just finalize` (the frozen serving artifacts,
 regenerated once under a pre-registered procedure) or `just evaluate-locked` (the locked eight, scored once).
 
@@ -137,7 +137,7 @@ version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 
 | Report table or figure | Recipe | File |
 |---|---|---|
-| §1 budget, latency | `just params`, `just efficiency` | `outputs/param_budget.csv`, `outputs/efficiency/` |
+| §1 budget, latency | `just params`, `just efficiency`, `just stage-timing` | `outputs/param_budget.csv`, `outputs/efficiency/` |
 | §1 quality vs cost, §3 baselines | `just cv`; `just report-numbers` | `outputs/cv/cv_summary.json`, `outputs/report_metrics/` |
 | §2 photo recipe, what the photo does | `just photo-cv`, `just fusion`, `just ablate`, `just photo-seeds`, `just promised` | `outputs/photo_cv/`, `outputs/fusion/`, `outputs/ablations/`, `outputs/training/`, `outputs/promised/` |
 | §3 results table, fold cut-offs, Figures 2-3 | `just evaluate` (`evaluate-locked` once) | `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` |

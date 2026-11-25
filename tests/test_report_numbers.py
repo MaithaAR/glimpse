@@ -276,11 +276,38 @@ def test_status_table_timing_cusum_and_what_if(text, rm):
     st = _load("outputs/efficiency/stage_timing.json")
     row = t["whole photo path / no-photo path (sensors + profile only)"][0]
     assert row == f"{st['photo_path_median_ms']:.1f} / {st['no_photo_path_median_ms']:.2f}"
-    assert f"{st['backbone_share_of_photo_path']:.0%} of serving time" in text
+    assert t["backbone's share of the photo path"] == [f"{st['backbone_share_of_photo_path']:.0%}"]
+    assert f"backbone is {st['backbone_share_of_photo_path']:.0%} of the photo path's time" in text
     cu = _load("outputs/monitoring/replay.json")["cusum_served"]
     assert cu["calibration"]["alarms"] == [] and cu["caution_share"]["dev_false_alarms"] == 0
     week = cu["caution_share"]["first_locked_alarm_week"] - cu["caution_share"]["first_locked_week"] + 1
-    assert f"in the {week}th locked week" in text
+    assert f"one alarm, {week}th locked week" in text
+    assert cu["caution_share_deployed_cutoffs"]["alarms"] == [] and cu["caution_share_served"]["alarms"] == []
+    np_ = rm["fair_baselines"]["no-photo fusion (the gate's no-meal arm)"]
+    assert t["fusion without the photo (the gate's no-meal arm)"] == [
+        f"{np_['auroc_with_intercept']:.3f}",
+        f"+{np_['shipped_minus_this']:.3f} ({np_['ci95'][0]:+.3f}, {np_['ci95'][1]:+.3f})".replace("-", "−"),
+    ]
+    sh = rm["share_cis"]
+    for row, key in (("cleared as low risk", "cleared"), ("can't judge", "cant_judge")):
+        for j, coh in ((1, "dev"), (2, "locked")):
+            c = sh[coh][key]
+            want = f"{c['point'] * 100:.1f}% ({c['ci95'][0] * 100:.1f}–{c['ci95'][1] * 100:.1f}%)"
+            assert t[row][j] == want, (row, coh)
+    cs = rm["cold_start_what_if"]
+    d0, d3, l0, l3 = cs["dev"]["0"], cs["dev"]["3"], cs["locked"]["0"], cs["locked"]["3"]
+    assert abs(d0["cost_reduction"] - d3["cost_reduction"]) < 1e-9
+    want = (
+        f"drop {d0['cleared'] - d3['cleared']} clears and {d0['missed'] - d3['missed']} misses on development"
+        f" at unchanged cost, but {l0['cleared'] - l3['cleared']} clears and {l0['missed'] - l3['missed']} miss"
+    )
+    assert want in text.replace("\n", " ")
+    ef = rm["ece_noise_floor"]
+    assert t["share of perfectly calibrated draws scoring at or above the observed ECE"] == [
+        f"{ef['dev']['share_of_perfectly_calibrated_draws_at_or_above_observed']:.0%}",
+        f"{ef['locked']['share_of_perfectly_calibrated_draws_at_or_above_observed']:.0%}",
+        "–",
+    ]
     wi = rm["falling_now_what_if"]
     want = (f"would flip {wi['would_flip']} of {wi['cleared']} clears, avoiding {wi['misses_avoided']} of the "
             f"{wi['misses_total']} misses at the cost\nof {wi['clears_lost_without_a_spike']} clears")  # fmt: skip

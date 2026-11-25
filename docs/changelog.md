@@ -120,3 +120,14 @@ the regeneration is two commands on the author's Mac, listed in the hand-off).
 | Fine-tuned count includes the final norm trained with the last stage (15,475,973) | off by 1,536 (1 of 3) | report_metrics.json |
 | Stale code comments fixed (app disclaimer 37 adults, Pipeline.answer, tier-2 docstring, heads comment, section references); Dockerfile copies samples/; figures log prints the registered ECE; Figure 3 hollow markers for bins under 5 meals | front-door accuracy (2 of 3) | src/, Dockerfile, outputs/figures/ |
 | Model card R11 dates and ECE floor row; README history.csv, skip note and squash note; rule ledger provenance note; design-doc map of leftover planned names; outputs/evaluation/ labelled as intermediate | stale or dangling references (2 of 3) | docs/, README.md, outputs/evaluation/README.md |
+
+## 26 Nov 2026, sixth pass (after strict grades 82.75, 75.5, 83.0 and a holistic grade of 84)
+
+| Change | Why | Evidence |
+|---|---|---|
+| Caution-share CUSUM rerun with both streams at the deployed cut-offs (shipped and served risk): no alarm; the fifth pass's locked-week alarm came from the cut-off change at the dev/locked seam; status table and §4 corrected | the alarm was read as catching the cohort shift (2 of 3) | outputs/monitoring/replay.json `cusum_served`; docs/monitoring.md |
+| "80% of serving time" corrected to 80% of the photo path; no-photo fusion given the same intercept (0.741, shipped minus it +0.021, −0.003 to +0.053) added to the fair-baseline table | the timing claim misread its own file; the cost side had no quality row (3 of 3) | report §1, §2, §3; report_metrics.json `fair_baselines` |
+| Person-bootstrap intervals for the cleared and can't-judge shares; ECE reported with the share of perfectly calibrated draws at or above it; status labels use the protocol's met / on track / at risk | the protocol asks a range for every criterion and names its labels (2 of 3) | report_metrics.json `share_cis`, `ece_noise_floor` |
+| Exploratory cold-start what-if (no clear before three labelled meals) and the offset's size by labelled meals | T5 cold starts had no before/after; the intercept's growth with history was unshown | report_metrics.json `cold_start_what_if`, `intercept_by_history` |
+| History statements made consistent (the folder command accepts history.csv; the app does not); heads counted once; 27.82M | contradictions (2 of 3) | report §1, §2, §4, §7 |
+| `just stage-timing` recipe added and chained in `reproduce-all` | the file named a recipe that did not exist (1 of 3) | Justfile, README |

@@ -114,6 +114,10 @@ stress:
 train-final:
     uv run glimpse final
 
+# where serving time goes, stage by stage, random-initialised backbone (no download; 26 Nov, descriptive)
+stage-timing:
+    uv run glimpse stage-timing
+
 # dev evaluation on partition v2 (every risk from Pipeline.answer, one Pipeline per fold), then `report-numbers`
 evaluate:
     uv run glimpse evaluate
@@ -137,6 +141,7 @@ reproduce-all:
     just ood
     just monitoring
     just efficiency
+    just stage-timing
     just photo-seeds
     just evaluate
     just selftest

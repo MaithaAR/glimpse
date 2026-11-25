@@ -275,7 +275,8 @@ def ece_noise_floor(y: np.ndarray, p: np.ndarray, sids: np.ndarray, draws: int =
     rng = np.random.default_rng(seed)
     sims = [reliability(p, (rng.random(len(p)) < p).astype(float), bins=15)[1] for _ in range(draws)]
     obs = person_bootstrap_ci(sids, lambda i: reliability(p[i], y[i], bins=15)[1])
-    return {"observed": obs[0], "observed_ci95": [obs[1], obs[2]],
+    return {"observed": obs[0], "observed_ci95_biased_upward": [obs[1], obs[2]],
+            "share_of_perfectly_calibrated_draws_at_or_above_observed": float(np.mean(np.array(sims) >= obs[0])),
             "perfectly_calibrated_median": float(np.median(sims)),
             "perfectly_calibrated_q95": float(np.quantile(sims, 0.95))}  # fmt: skip
 
@@ -357,6 +358,8 @@ def fair_baselines(dev: pd.DataFrame) -> dict:
     shipped = a.risk.to_numpy(float)
     arms = {m: pd.Series(_logit(base[m].to_numpy(float)), index=base.index) for m in MODELS[1:]}
     arms["shipped fusion without Platt"] = pd.Series(_logit(dev.risk_raw.to_numpy(float)), index=dev.row)
+    fz = pd.read_csv("outputs/fusion/fusion_oof.csv").set_index("row")
+    arms["no-photo fusion (the gate's no-meal arm)"] = pd.Series(_logit(fz.no_meal.to_numpy(float)), index=fz.index)
     for name, lg in arms.items():
         r = with_intercept(dev, lg, platt=False).loc[a.index].to_numpy(float)
         d, lo, hi = paired_person_bootstrap(y, shipped, r, sids)
@@ -442,6 +445,47 @@ def falling_now_what_if(dev: pd.DataFrame) -> dict:
             "clears_lost_without_a_spike": int((flagged.spike == 0).sum())}  # fmt: skip
 
 
+def share_cis(df: pd.DataFrame) -> dict:
+    """Person-bootstrap intervals for the cleared and can't-judge shares (the protocol asks a 95% range for
+    every usefulness criterion)."""
+    sids = df.person_id.to_numpy()
+    out = {}
+    for name, dec in (("cleared", "low risk"), ("cant_judge", "can't judge")):
+        hit = (df.decision == dec).to_numpy(float)
+        pt, lo, hi = person_bootstrap_ci(sids, lambda i, h=hit: float(h[i].mean()))
+        out[name] = {"point": pt, "ci95": [lo, hi]}
+    return out
+
+
+def cold_start_what_if(df: pd.DataFrame, costs: dict) -> dict:
+    """Exploratory deployment rule (26 Nov): never clear a meal until the person has k labelled meals (cleared
+    meals with fewer become caution). Arithmetic on the committed answers; nothing refitted."""
+    y = df.spike.to_numpy().astype(int)
+    best = min(expected_cost(np.zeros_like(y), y, costs), expected_cost(np.ones_like(y), y, costs))
+    out = {}
+    for k in (0, 1, 3, 5):
+        dec = df.decision.where(~((df.decision == "low risk") & (df.n_history < k)), "caution")
+        cl = dec == "low risk"
+        out[str(k)] = {"cleared": int(cl.sum()), "cleared_share": float(cl.mean()), "missed": int(df.spike[cl].sum()),
+                       "missed_among_cleared": float(df.spike[cl].mean()) if cl.any() else None,
+                       "cost_reduction": 1 - expected_cost(dec.map(ACTION).to_numpy(), y, costs) / best}  # fmt: skip
+    return out
+
+
+def intercept_by_history(dev: pd.DataFrame, locked: pd.DataFrame, platt: tuple[float, float]) -> dict:
+    """The per-person offset b (shipped minus Platt-only logit) by how many labelled meals it was fitted on."""
+    lk_platt = 1 / (1 + np.exp(-(platt[0] * _logit(locked.risk_raw.to_numpy(float)) + platt[1])))
+    out = {}
+    for name, df, base in (("dev", dev, dev.risk_platt.to_numpy(float)), ("locked", locked, lk_platt)):
+        b = pd.Series(_logit(df.risk.to_numpy(float)) - _logit(base), index=df.index)
+        ok = df.risk.notna()
+        buckets = pd.cut(df.n_history[ok], [-1, 0, 4, 9, 1000], labels=["0", "1-4", "5-9", "10+"])
+        g = b[ok].groupby(buckets, observed=True)
+        out[name] = {str(k): {"n": int(v.size), "median_abs_b": float(v.abs().median()), "median_b": float(v.median())}
+                     for k, v in g}  # fmt: skip
+    return out
+
+
 def run_report_metrics(cfg) -> dict:
     """Write outputs/report_metrics/report_metrics.json; log the headline additions."""
     from glimpse.training.final import cost_dict
@@ -498,7 +542,10 @@ def run_report_metrics(cfg) -> dict:
     res["heart_rate_r2_from_other_inputs"] = heart_rate_r2()
     res["fair_baselines"] = fair_baselines(dev)
     res["falling_now_what_if"] = falling_now_what_if(dev)
+    res["share_cis"] = {"dev": share_cis(dev), "locked": share_cis(locked)}
+    res["cold_start_what_if"] = {"dev": cold_start_what_if(dev, costs), "locked": cold_start_what_if(locked, costs)}
     res["band_and_served_calibration"] = band_and_served_calibration(cfg, dev, locked, costs)
+    res["intercept_by_history"] = intercept_by_history(dev, locked, tuple(res["served_operating_point"]["platt"]))
     lk = locked[locked.risk_raw.notna()]
     pa, pb = res["served_operating_point"]["platt"]
     res["brier_decomposition"]["locked"]["served_platt_only"] = brier_decomposition(

@@ -121,3 +121,10 @@ z_t − 0.5), alarm when S_t > 4, reset after an alarm. The same rule on the cau
 is reported alongside. Expected: few or no alarms on dev blocks (they define the reference, so a dev alarm
 would be a false alarm), and a calibration alarm within the locked blocks. Reported as measured in
 outputs/monitoring/replay.json (`cusum_served`).
+
+Result and correction (26 Nov, after the sixth grading round). The calibration CUSUM did not alarm. The
+caution-share CUSUM alarmed once, in the 7th locked week, with no dev false alarm; but its dev blocks carry
+each fold's own cut-offs and its locked blocks the deployed ones, so a shift at the seam can come from the
+cut-off change alone. Two rows added after that result put both streams at the deployed cut-offs, on the
+shipped risk (`caution_share_deployed_cutoffs`) and on the served risk (`caution_share_served`): neither
+alarms. The alarm is an artifact of the replay, and no registered rule caught the real cohort shift.
