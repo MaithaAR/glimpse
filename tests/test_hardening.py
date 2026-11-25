@@ -9,6 +9,7 @@ from glimpse.serve.io import _plain, answer_from_files, read_cgm_csv
 from test_serve import bare_pipeline
 
 GOOD = {"age": 42.0, "bmi": 27.5, "a1c_pct": 5.8, "fasting_glucose_mgdl": 102.0}
+FILE_PROF = {"age": 42.0, "bmi": 27.5, "a1c": 5.8, "fasting_glucose": 102.0}  # profile.json key spellings
 
 
 def _csv(tmp_path, text):
@@ -63,7 +64,7 @@ def test_uppercase_photo_name_is_found_and_unreadable_profile_is_structured(tmp_
     case.mkdir(parents=True)
     (case / "cgm.csv").write_text(_full_window_csv())
     (case / "PHOTO.JPG").write_bytes(b"not a jpeg")
-    (case / "profile.json").write_text(json.dumps(GOOD | {"meal_time": "2024-06-01T12:00"}))
+    (case / "profile.json").write_text(json.dumps(FILE_PROF | {"meal_time": "2024-06-01T12:00"}))
     locked = tmp_path / "in" / "02_locked_profile"
     locked.mkdir()
     (locked / "cgm.csv").write_text("timestamp,glucose_mgdl\n2024-06-01T10:00,100")
@@ -89,7 +90,7 @@ def test_output_dir_inside_input_dir_is_not_a_meal(tmp_path):
     case = tmp_path / "in" / "01_only"
     case.mkdir(parents=True)
     (case / "cgm.csv").write_text("timestamp,glucose_mgdl\n2024-06-01T10:00,100")
-    (case / "profile.json").write_text(json.dumps(GOOD))
+    (case / "profile.json").write_text(json.dumps(FILE_PROF))
     app = bare_pipeline(risk=0.4, table={})
     predict_folder(app, tmp_path / "in", tmp_path / "in" / "out")
     predict_folder(app, tmp_path / "in", tmp_path / "in" / "out")
