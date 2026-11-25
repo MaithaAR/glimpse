@@ -73,3 +73,23 @@ it changes a frozen artifact, threshold or reported result.
   most locked blocks; calibration-in-the-large near zero on dev and negative (under-prediction) on
   locked. Whatever it shows is reported as measured (`just monitoring-replay` ->
   outputs/monitoring/replay.json).
+
+### Note on the replay above, and a second replay at the deployed operating point (registered 26 Nov, before its run)
+
+Two corrections to the wording above, found by the second grading round. The dev answers sorted by
+`row` come person by person, so a "week" of 20 answers holds one to three people: the stream is a
+sequence of users arriving, not five months of calendar time. And the dev answers were decided at each
+fold's own cut-offs (fold 1: 0.21 / 0.21), not at the deployed (0.15, 0.16), so the dev behaviour shares
+and the behaviour threshold describe five different operating points.
+
+Replay 2 keeps every rule of replay 1 (blocks of 20, windows of four blocks, 2a at the 0.10 cap with at
+least 10 cleared, 2b against 0.645 reported only, calibration-in-the-large descriptive) and changes one
+thing: every dev answer that has a risk is re-decided at the deployed cut-offs (low risk below 0.15,
+caution from 0.16, can't judge between), the decision the app would have given; answers without a risk
+stay can't judge. The locked answers already used the deployed cut-offs and are unchanged. The behaviour
+threshold becomes the highest caution share of any dev block under these decisions. Nothing is refitted.
+Expected: more dev cautions than in replay 1 (the deployed caution cut-off 0.16 is below most fold
+cut-offs), 2a still noisy on dev windows, locked windows still too few cleared to judge, and the
+behaviour rule able to fire only if some locked block exceeds every dev block. Reported as measured in
+outputs/monitoring/replay.json (`deployed_operating_point`). Replay 1's calibration-in-the-large
+expectation for the locked stream (negative) was wrong: it measured +0.038.
