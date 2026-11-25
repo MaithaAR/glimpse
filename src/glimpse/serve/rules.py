@@ -1,5 +1,5 @@
 """Deterministic rules, in plain functions tested without any model: the pre-model input checks, the
-cut-off decision, the user-facing wording, and the unfamiliar-photo distance. Report: rules ledger in §2/§7."""
+cut-off decision, the user-facing wording, and the unfamiliar-photo distance. Report: §4 and docs/rule_ledger.md."""
 
 from __future__ import annotations
 

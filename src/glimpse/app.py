@@ -1,5 +1,5 @@
-"""GLIMPSE screen (Step 6b): a small local web page on top of the same `Glimpse.predict` the demo and the
-evaluation use. Start with `just app`, then open http://127.0.0.1:7860. Runs offline on the local weights.
+"""GLIMPSE screen: a small local web page on top of the same `Pipeline.answer` the demo, the folder command
+and the evaluation use. Start with `just app`, then open http://127.0.0.1:7860. Runs offline on the local weights.
 
 The user gives a before-meal photo, the CGM export of the last 2 hours (CSV with timestamp, glucose_mgdl and
 optionally hr_bpm) and a short profile. Example meals from the test people can be loaded with one click."""
@@ -21,7 +21,7 @@ from glimpse.utils.logging import setup_logging
 
 COLOURS = {"low risk": "#1e8449", "caution": "#b9770e", "can't judge": "#5d6d7e"}
 DISCLAIMER = ("Research prototype for a second look before eating. Not a medical device and not medical advice. "
-              "Trained on 28 adults (CGMacros); results for other people may differ.")  # fmt: skip
+              "Trained on 37 adults (CGMacros); results for other people may differ.")  # fmt: skip
 
 
 def _examples(cfg) -> dict[str, dict]:

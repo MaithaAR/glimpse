@@ -16,6 +16,7 @@ COPY src ./src
 COPY configs ./configs
 COPY splits ./splits
 COPY checkpoints ./checkpoints
+COPY samples ./samples
 RUN uv sync --locked --no-dev
 
 # 3. pinned ConvNeXt-Tiny weights (exact Hugging Face commit, SHA-256 verified); offline from here on

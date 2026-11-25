@@ -1,6 +1,6 @@
 """The product's data contracts: what a meal submission must contain and what every answer carries.
 
-Validated with strict Pydantic; JSON at the boundary. Report: the structured-output examples in §2."""
+Validated with strict Pydantic; JSON at the boundary. Report: §1 and the README's folder-command notes."""
 
 from __future__ import annotations
 
@@ -89,8 +89,8 @@ class Answer(BaseModel):
     carb_source: Literal["photo", "user", "none"] = "none"
     # where a refusal points the user; "confirm_carbs" is advice only: no input surface sets typed carbs yet
     escalate_to: Literal["none", "confirm_carbs", "human"] = "none"
-    # point estimate from the regression head; kept in results, not shown (the two heads were trained separately
-    # and their agreement is not yet measured, so the user sees the bin head's range and confidence only)
+    # point estimate from the regression head; kept in results, not shown (the two heads share one training loss
+    # but agree on the bin for only 51% of meals, report §2, so the user sees the bin head's range only)
     carbs_g: float | None = Field(default=None, ge=0)
     carb_bin: str | None = None
     carb_bin_prob: float | None = Field(default=None, ge=0, le=1)

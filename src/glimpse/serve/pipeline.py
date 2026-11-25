@@ -2,8 +2,9 @@
 
 `just demo`, `just predict`, the app and the folder command answer through `Pipeline` with the live photo model;
 evaluation joins via a precomputed per-fold estimate table through the same decision code. Tier 2 (confirm-carbs,
-D5): when the photo cannot be used but the user typed a carb estimate, the risk is still produced from it.
-Report: system diagram in §2; the parity test in tests/test_serve.py is the evaluation-equals-deployment proof."""
+D5): `MealInput.user_carbs_g` would stand in for an unusable photo, but no entry point sets it yet and its
+risk is not monotone in the typed carbs (tests/test_known_failures.py). Report: system diagram, Figure 1 (§1);
+the parity test in tests/test_serve.py is the evaluation-equals-deployment proof."""
 
 from __future__ import annotations
 
@@ -73,7 +74,7 @@ class Pipeline:
         # D4: evaluation injects each fold's inner-chosen cut-offs; the app uses the frozen config values
         self.lo, self.hi = cutoffs if cutoffs is not None else (pc.low_risk_below, pc.caution_from)
         # fix 1 (D3): Platt (slope, intercept) on the fusion logit + the personal-intercept prior precision.
-        # The defaults are the identity, so demo/predict/the app behave exactly as before until S16 freezes them.
+        # The defaults are the identity; the frozen values come from `just finalize` (6 Nov) via the bundle.
         self.calib, self.m_personal = calibration, m_personal
         self.table = photo_table
         self.model_versions = {"fusion": "fold-local" if fusion is not None else FINAL.name,
