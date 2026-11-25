@@ -102,10 +102,10 @@ def finetune_ledger(ds: MealDataset, sp: Splits, photo_root: Path, cap: int) -> 
             "stage": "intermediate",
             "items": n_photos(dev),
         },
-        {
-            "dataset": "Nutrition5k overhead plates (optional pre-training; estimate)",
-            "stage": "final, planned",
-            "items": 800,
+        {  # planned 800 items; cut at the final design stage and never used (label corrected 26 Nov)
+            "dataset": "Nutrition5k overhead plates (planned 800 for optional pre-training)",
+            "stage": "cut, never used",
+            "items": 0,
         },
     ]
     t = pd.DataFrame(rows)

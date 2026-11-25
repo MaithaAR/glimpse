@@ -1,6 +1,6 @@
 """Report figures, rendered ONLY from committed evidence files (`just figures`). Pre-commitment in
 docs/final_design.md (7 Nov): figures visualise shipped results; nothing is retuned from their look.
-F1 system diagram - F2 per-fold AUROC - F3 reliability + ECE - F4 effect sizes - F5 robustness."""
+F1 system diagram - F2 per-fold AUROC - F3 reliability + ECE - F4 effect sizes - F5 robustness - F6 SHAP."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def f1_system(plt) -> None:
     box(0.0, 2.6, 1.9, 1.0, "meal photo")
     box(0.0, 1.3, 1.9, 1.0, "CGM + HR\n(2 h window)")
     box(0.0, 0.0, 1.9, 1.0, "profile (4 fields → 8 inputs)")
-    box(2.5, 1.3, 2.4, 1.0, "input rules R1\u2013R10:\nrefuse + name\nthe problem")
+    box(2.5, 1.3, 2.4, 1.0, "input rules R1\u2013R11:\nrefuse + name\nthe problem")
     box(5.5, 2.6, 2.8, 1.0, "ConvNeXt-Tiny (pinned;\nlast stage tuned) + 2 heads")
     box(5.5, 1.3, 2.8, 1.0, "engineered trend features")
     box(5.5, 0.0, 2.8, 1.0, "kNN unfamiliar-photo\ncheck (cut 0.614)")
@@ -78,7 +78,7 @@ def f2_per_fold(plt, ev: dict) -> None:
         ax.text(x, a["ci95"][1] + 0.012, name, ha="center", fontsize=7.2, color=c)
     ax.axhline(ev["risk_raw"]["auroc"]["point"], color=GREY, lw=0.8, ls=":")
     ax.text(5.4, ev["risk_raw"]["auroc"]["point"] + 0.004, "pooled raw 0.726", fontsize=7.5, color=GREY)
-    ax.set_xticks(xs, [f"fold {f['fold']}\nn={f['n']}" for f in folds], fontsize=7.5)
+    ax.set_xticks(xs, [f"fold {f['fold']}\n{f['n']} answered" for f in folds], fontsize=7.5)
     ax.set_ylabel("AUROC (held-out people)")
     ax.set_ylim(0.58, 0.9)
     ax.legend(frameon=False, fontsize=8, loc="upper left")
@@ -88,23 +88,28 @@ def f2_per_fold(plt, ev: dict) -> None:
 
 
 def f3_reliability(plt, da: pd.DataFrame) -> dict:
-    """Equal-mass reliability for raw vs shipped risks over the answered development meals, with ECE."""
+    """Reliability in the protocol's registered binning (15 equal-width bins, meals per bin printed) for raw
+    vs shipped risks over the answered development meals; the legend gives ECE in both binnings (26 Nov)."""
+    from glimpse.evaluation.metrics import reliability
+
     d = da.dropna(subset=["risk"])
     y = d.spike.to_numpy().astype(float)
     out = {}
-    fig, ax = plt.subplots(figsize=(4.4, 4.0))
+    fig, ax = plt.subplots(figsize=(4.8, 4.2))
     ax.plot([0, 1], [0, 1], color=GREY, lw=0.8, ls="--")
-    for col, label, c in (("risk_raw", "raw fusion", GREY), ("risk", "personalised (shipped)", BLUE)):
+    for col, label, c in (("risk_raw", "raw fusion", GREY), ("risk", "shipped", BLUE)):
         p = d[col].to_numpy().astype(float)
-        order = np.argsort(p)
-        mids, obs = [], []
-        for chunk in np.array_split(order, 10):
-            mids.append(p[chunk].mean())
-            obs.append(y[chunk].mean())
+        rows, ece_w = reliability(p, y, bins=15)
         ece = ece_equal_mass(p, y)
         out[col] = ece
-        ax.plot(mids, obs, "o-", color=c, label=f"{label}  (ECE {ece:.3f})", ms=4)
-    ax.set_xlabel("predicted spike probability (curve: 10 equal-mass bins; ECE: 15)")
+        out[col + "_equal_width"] = ece_w
+        ax.plot([r[0] for r in rows], [r[1] for r in rows], "o-", color=c, ms=4,
+                label=f"{label}: ECE {ece_w:.3f} equal-width, {ece:.3f} equal-mass")  # fmt: skip
+        if col == "risk":
+            for m, o, n in rows:
+                ax.annotate(str(n), (m, o), textcoords="offset points", xytext=(0, 6), ha="center", fontsize=6.5,
+                            color=BLUE)  # fmt: skip
+    ax.set_xlabel("predicted spike probability (15 equal-width bins; blue numbers = meals per bin)")
     ax.set_ylabel("observed spike rate")
     ax.set_xlim(0, 0.9)
     ax.set_ylim(0, 0.9)
@@ -146,31 +151,39 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
     plt.close(fig)
 
 
-def f5_robustness(plt, rb: dict) -> None:
-    """Decision behaviour under the six pre-registered perturbations: refusal, not silent change."""
+def f5_robustness(plt, lv: dict) -> None:
+    """Decision behaviour under every pre-registered perturbation, from ONE run per condition (26 Nov: the
+    four S9 kinds at three levels from levels.json, the meal-time shifts, and missing heart rate)."""
     tm = json.loads((Path("outputs/robustness") / "timing.json").read_text())
-    rb = rb | {"t_minus": tm["meal_time_minus_15min"], "t_plus": tm["meal_time_plus_15min"]}
-    kinds = ["cgm_dropout", "cgm_gap", "photo_blur", "photo_dark", "t_minus", "t_plus"]
-    labels = ["CGM dropout\n30%", "25-min\npre-meal gap", "photo blur\nr=6", "photo darken\n×0.25",
-              "meal time\n15 min early", "meal time\n15 min late"]  # fmt: skip
-    fig, ax = plt.subplots(figsize=(6.6, 3.1))
-    xs = np.arange(len(kinds))
-    unchanged = [rb[k]["unchanged"] for k in kinds]
-    newcj = [rb[k]["newly_cant_judge"] for k in kinds]
-    danger = [rb[k]["dangerous_flips"] for k in kinds]
+    hr = json.loads(Path("outputs/promised/promised.json").read_text())["r6_missing_inputs"]["missing_hr"]["flips"]
+    names = {"cgm_dropout": ("dropout", "{:.0%}"), "cgm_gap": ("gap", "{:g} min"), "photo_blur": ("blur", "r={:g}"),
+             "photo_dark": ("dark", "\u00d7{:g}")}  # fmt: skip
+    conds, labels = [], []
+    for kind, (short, fmt) in names.items():
+        for level in lv["levels"][kind]:
+            conds.append(lv[kind][f"{level:g}"])
+            labels.append(f"{short}\n{fmt.format(level)}")
+    conds += [tm["meal_time_minus_15min"], tm["meal_time_plus_15min"], hr]
+    labels += ["15 min\nearly", "15 min\nlate", "no heart\nrate"]
+    fig, ax = plt.subplots(figsize=(8.6, 3.2))
+    xs = np.arange(len(conds))
+    unchanged = [c["unchanged"] for c in conds]
+    newcj = [c["newly_cant_judge"] for c in conds]
+    danger = [c["dangerous_flips"] for c in conds]
     other = [max(0.0, 1 - u - n - d) for u, n, d in zip(unchanged, newcj, danger, strict=True)]
-    bottom = np.zeros(len(kinds))
+    bottom = np.zeros(len(conds))
     for vals, label, c in ((unchanged, "unchanged", "#a0c4e8"), (newcj, "newly can't judge (refusal)", BLUE),
                            (other, "other benign flips", GREY), (danger, "dangerous flips", RED)):  # fmt: skip
         ax.bar(xs, vals, bottom=bottom, label=label, color=c, width=0.62)
         bottom += np.array(vals)
-    for i, d in enumerate(danger):  # the word is in the legend; six bars leave room for the number only
-        ax.text(i, 1.03, f"{d:.1%}", ha="center", fontsize=7.5, color=RED if d else GREEN)
-    ax.set_xticks(xs, labels, fontsize=7.0)
+    for i, d in enumerate(danger):  # the word is in the legend; the bars leave room for the number only
+        ax.text(i, 1.03, f"{d:.1%}", ha="center", fontsize=6.6, color=RED if d else GREEN)
+    ax.set_xticks(xs, labels, fontsize=6.6)
     ax.set_ylim(0, 1.12)
     ax.set_ylabel("share of meals")
     ax.legend(frameon=False, fontsize=7.5, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.14))
-    ax.set_title("Degraded input triggers refusal, not a silently changed answer", fontsize=9)
+    ax.set_title("Graded change while input stays usable, refusal at the designed thresholds; red = dangerous flips",
+                 fontsize=9)  # fmt: skip
     fig.savefig(OUT / "f5_robustness.png")
     plt.close(fig)
 
@@ -186,20 +199,25 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     background mean) in the standardised space; the local panel's terms are checked to sum to the logit."""
     import joblib
 
-    from glimpse.data.dataset import MealDataset
     from glimpse.training.final import FINAL
-    from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
 
-    ds = MealDataset.load(Path("data/dataset"))
-    oof = pd.read_csv("outputs/photo_cv/photo_oof.csv")
-    nested = pd.read_csv("outputs/photo_cv/photo_nested.csv")
-    fx = with_table(photo_table(nested[nested.fold == 1]) | photo_table(oof), len(PHOTO_COLS))
     answered = da.dropna(subset=["risk"])
     rows = answered.row.astype(int).to_numpy()
-    x_raw = fx(ds, rows)
     pipe = joblib.load(FINAL)["models"]["photo"]
-    z = pipe[:-1].transform(x_raw)
     lr = pipe[-1]
+    if Path("data/dataset.json").exists():
+        from glimpse.data.dataset import MealDataset
+        from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
+
+        ds = MealDataset.load(Path("data/dataset"))
+        oof = pd.read_csv("outputs/photo_cv/photo_oof.csv")
+        nested = pd.read_csv("outputs/photo_cv/photo_nested.csv")
+        fx = with_table(photo_table(nested[nested.fold == 1]) | photo_table(oof), len(PHOTO_COLS))
+        z = pipe[:-1].transform(fx(ds, rows))
+    else:  # no dataset (a grader's clean checkout): the committed standardised features, same rows and order
+        zc = pd.read_csv(OUT / "shap_features_z.csv")
+        assert (zc.row.to_numpy() == rows).all(), "shap_features_z.csv rows differ from the answered dev meals"
+        z = zc[FEATURE_NAMES].to_numpy()
     coefs = lr.coef_[0]
     base_logit = float((z @ coefs).mean() + lr.intercept_[0])
     contrib = (z - z.mean(axis=0)) * coefs  # (n, 19) exact SHAP for a linear model
@@ -224,7 +242,7 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     axes[1].set_yticks(np.arange(len(top))[::-1], [FEATURE_NAMES[j] for j in top], fontsize=6.8)
     axes[1].axvline(0, color=GREY, lw=0.8)
     axes[1].set_xlabel("SHAP contribution (logit units)")
-    axes[1].set_title(f"One meal (raw risk {answered.risk_raw.iloc[i]:.2f}): terms sum to its logit",
+    axes[1].set_title(f"One meal (frozen-fusion risk {1 / (1 + np.exp(-logit_i)):.2f}): terms sum to its logit",
                       fontsize=9)  # fmt: skip
     fig.tight_layout()
     fig.savefig(OUT / "f6_shap.png")
@@ -273,16 +291,18 @@ def run_figures(cfg=None) -> dict:
     fu = json.loads(Path("outputs/fusion/fusion_summary.json").read_text())
     ch = json.loads(Path("outputs/ablations/channels.json").read_text())
     d8 = json.loads(Path("outputs/ablations/d8_profile_excluded.json").read_text())
-    rb = json.loads(Path("outputs/robustness/robustness.json").read_text())
+    lv = json.loads(Path("outputs/robustness/levels.json").read_text())
     f1_system(plt)
     f2_per_fold(plt, ev)
     ece = f3_reliability(plt, da)
     f4_effects(plt, fu, ch, d8)
-    f5_robustness(plt, rb)
+    f5_robustness(plt, lv)
     shap_report = f6_shap(plt, da)
     report = {"what": "report figures rendered from committed evidence only (pre-commitment in "
                       "docs/final_design.md); ECE = equal-mass, 15 bins, answered dev meals",
-              "ece_raw": ece["risk_raw"], "ece_personal": ece["risk"], "shap": shap_report,
+              "ece_raw": ece["risk_raw"], "ece_personal": ece["risk"],
+              "ece_equal_width_15": {"raw": ece["risk_raw_equal_width"], "personal": ece["risk_equal_width"]},
+              "shap": shap_report,
               **_answer_stats(da),
               "files": sorted(p.name for p in OUT.glob("*.png"))}  # fmt: skip
     (OUT / "figures.json").write_text(json.dumps(report, indent=2))

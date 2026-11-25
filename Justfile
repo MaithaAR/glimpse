@@ -106,6 +106,7 @@ figures:
 timing:
     uv run glimpse timing
 
+# the 23 hostile input folders through the instructor command (outputs/stress_run)
 stress:
     uv run glimpse predict-folder samples/stress outputs/stress_run
 
@@ -117,10 +118,25 @@ train-final:
 amend-thresholds:
     uv run glimpse amend-thresholds
 
-# development evaluation on partition v2 (D2): every risk comes from Pipeline.answer, one Pipeline per fold
+# dev evaluation on partition v2 (every risk from Pipeline.answer, one Pipeline per fold), then `report-numbers`
 evaluate:
     uv run glimpse evaluate
+    just report-numbers
+
+# re-derive every report table and figure from committed outputs (no dataset or weights needed, ~1 min)
+report-numbers:
+    uv run glimpse report-metrics
+    uv run glimpse monitoring-replay
     uv run glimpse figures
+    just wordcount
+
+# the outcome and behaviour monitoring rules replayed on the logged answers (registered 26 Nov in docs/monitoring.md)
+monitoring-replay:
+    uv run glimpse monitoring-replay
+
+# descriptive metrics from the committed answer files (outputs/report_metrics/report_metrics.json)
+report-metrics:
+    uv run glimpse report-metrics
 
 # seed spread of the shipped 12+2 recipe: 3 fresh seeds scored on the validation people (~15 min; nothing deployed changes)
 photo-seeds:

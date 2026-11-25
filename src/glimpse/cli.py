@@ -362,6 +362,22 @@ def _splits_v2(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _monitoring_replay(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Outcome and behaviour monitoring rules replayed on the committed answers (registered 26 Nov)."""
+    from glimpse.studies.monitoring_replay import run_monitoring_replay
+
+    run_monitoring_replay(cfg)
+    return 0
+
+
+def _report_metrics(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Descriptive metrics re-derived from the committed answer files (no dataset, no weights, no refit)."""
+    from glimpse.evaluation.report_metrics import run_report_metrics
+
+    run_report_metrics(cfg)
+    return 0
+
+
 def _selftest(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Check that every frozen part loads offline and the full path runs (used inside the container)."""
     from glimpse.demo_cases import selftest
@@ -436,6 +452,10 @@ def main(argv: list[str] | None = None) -> int:
     od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
+    sub.add_parser("monitoring-replay", help="outcome and behaviour monitoring rules replayed on the logged answers")
+    sub.add_parser(
+        "report-metrics", help="AUPRC, Brier, both ECE binnings, baselines, policy costs (committed answers)"
+    )
     sub.add_parser("selftest", help="check the frozen pipeline loads offline and runs (no dataset needed)")
     sub.add_parser("prepare", help="meal table, dataset, person splits and the training-only normaliser")
     args = p.parse_args(argv)
@@ -482,6 +502,8 @@ def main(argv: list[str] | None = None) -> int:
         "figures": _figures,
         "timing": _timing,
         "splits-v2": _splits_v2,
+        "monitoring-replay": _monitoring_replay,
+        "report-metrics": _report_metrics,
         "selftest": _selftest,
     }
     return commands[args.command](cfg, args)
