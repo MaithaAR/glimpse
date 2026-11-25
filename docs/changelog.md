@@ -87,3 +87,22 @@ Declined in this pass: wiring a carbs or history input into the folder command (
 grader's entry point that could not be run end-to-end here); a stress run through the personalised path;
 real photos in the five stress cases and real-photo format cases; an int8 or no-photo latency study; an
 occlusion probe (all need the dataset or the weights).
+
+## 26 Nov 2026, fourth pass (after a fourth set of cold grades: 81.0, 76.75, 77.5)
+
+| Change | Why | Evidence |
+|---|---|---|
+| Fair baselines: the shipped intercept replayed exactly on every comparison model; gradient boosting reaches 0.750 and the fused system's margin over it is not established; the bottom line now says the intercept carries most of the edge | the results table compared a personalised model with non-personalised baselines (1 of 3) | report_metrics.json `fair_baselines` (reproduces the shipped risk to 1e-16) |
+| The abstention band shown to cost money on development (0.555 vs 0.539 per answered meal; the borderline meals spiked at 27%, above the 20% break-even); calibration at the cut-offs added | the band was presented as harmless (1 of 3) | `band_and_served_calibration` |
+| Served (Platt-only) calibration added: fine on development (0.023), under-predicts the locked cohort by 11 points (ECE 0.162) | the confidence the grader receives was never calibrated (1 of 3) | same |
+| Person-bootstrap intervals on cost reduction for every column | the main business metric had no interval (1 of 3) | same |
+| ECE: the biased bootstrap interval dropped; the target called mis-specified for n = 460; README and protocol wording aligned | inconsistent readings across documents (3 of 3) | docs/evaluation_protocol.md errata |
+| `cgm_auto` described as the training rule on raw readings, not the training label itself | the label differs by up to 9.5 mg/dL in the demo cases (1 of 3) | src/glimpse/feedback.py |
+| Figure 1: R1–R12, the labelling loop marked as evaluation-replay only, the blank-photo exit, the kNN gate labelled; Figure 7 prints n per point | regressions from the third pass and missing counts (3 of 3) | outputs/figures/ |
+| T5 text no longer claims one mechanism; taxonomy root cause split; recipe table's warm-up scoped to the heads phase; stress-suite sentence corrected (the CSV stressor is parsed, the answer never reached); monitoring table's cluster and mixed-window counts corrected; replay 2's description corrected | wording errors (2 of 3) | report §4-§5, docs/monitoring.md |
+| Test count stated with skips and the expected failure; batch commits disclosed; data card's "no participant data" reworded; instructor MANIFEST notes; Justfile comments; schema note that confirm-carbs is advice only | front-door accuracy (1-2 of 3) | README, docs/, samples/, Justfile |
+
+Still declined, with reasons unchanged: a history or carbs input for the folder command, regenerating the
+folder, stress and demo runs under the 26 Nov reason wording, an occlusion probe, an int8 or no-photo latency
+study, real photos in the five stress cases (all need the weights or dataset, which this machine did not have;
+the regeneration is two commands on the author's Mac, listed in the hand-off).

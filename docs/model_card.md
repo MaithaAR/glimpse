@@ -11,8 +11,8 @@ docs/final_report.md with its evidence file.
 device. Not for type 1 diabetes, insulin dosing or treatment decisions. No claim for type 2 diabetes:
 those participants were used for training only.
 
-**Parts (all frozen 6 Nov under a pre-registered procedure).**
-- Input rules R1-R11 run first and refuse with a named reason (docs/rule_ledger.md).
+**Parts.** The model artifacts were frozen 6 Nov under a pre-registered procedure; the input rules gained R11 (8 Nov, 25 Nov) and R12 (26 Nov), which change wording and refusals, not risks.
+- Input rules R1-R12 run first and refuse with a named reason (docs/rule_ledger.md).
 - Photo: ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned; pinned revision and SHA-256), last stage
   fine-tuned, two heads (grams, 4 carb bins); 27.8M parameters, 15.5M fine-tuned. It did not pass its
   pre-registered risk gate (+0.025 AUROC, −0.010 to +0.061), yet its estimate is 4 of the fusion's 19
@@ -39,7 +39,7 @@ standardised meals. 1,221 photos at most touched by fine-tuning (cap 10,000).
 | AUROC, raw fusion | 0.726 | 0.611 |
 | AUPRC (base rate) | 0.591 (0.328) | 0.547 (0.420) |
 | Brier (constant forecast) | 0.180 (0.221) | 0.230 (0.244) |
-| ECE, registered 15 equal-width bins / equal-mass (target ≤ 0.05) | 0.052 / 0.049 | 0.061 / 0.098 |
+| ECE, registered 15 equal-width bins / equal-mass (target ≤ 0.05; a perfectly calibrated model shows 0.052 / 0.094 at these sizes) | 0.052 / 0.049 | 0.061 / 0.098 |
 | AUROC gain of the intercept over raw, paired | +0.037 (−0.004, +0.071), 5 of 5 folds | +0.033 (−0.054, +0.100) |
 | low risk / caution / can't judge | 23% / 64% / 14% | 7% / 91% / 3% |
 | spikes among meals cleared | 7.3% (2.9–14.2%) | 2 of 10 |

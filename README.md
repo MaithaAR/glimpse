@@ -30,8 +30,8 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 ## Quick start (macOS or Linux; needs [uv](https://docs.astral.sh/uv/) and [just](https://just.systems/), no pip)
 ```bash
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
-just check       # ruff + 162 tests
-just demo        # worked cases, two can't-judge cases, response time  -> outputs/demo/cases.md
+just check       # ruff + 163 tests (16 need the dataset)
+just demo        # worked cases (in-sample for the frozen model), two can't-judge cases, response time -> outputs/demo/
 just evaluate    # dev evaluation, then every report table and figure  -> outputs/evaluation_v2/, report_metrics/, figures/
 just report-numbers   # the same tables and figures from committed outputs only (no data, no weights, ~1 min)
 just predict-folder samples/instructor outputs/folder_run   # the grader's entry point: a folder of meals in, structured answers out
@@ -55,7 +55,7 @@ just docker-demo                              # needs `just install` first, for 
 | `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · the intermediate 28-person fusion (`just train` runs all three; the DEPLOYED artifacts come from `just finalize`, the pre-registered regeneration, so train-photo and train-final refuse to overwrite them unless `GLIMPSE_OVERWRITE_FROZEN=1`) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
 | `just evaluate` | the dev evaluation, then `just report-numbers` (every report table and figure re-derived from committed outputs); the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun); compute studies have their own recipes (table below) | 2 min |
-| `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10 min |
+| `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10-15 min |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`,
 and `just report-numbers` works on a bare clone. `just reproduce-all` reruns every compute study in dependency
@@ -84,8 +84,9 @@ selection pressure (fold 1 was scored at the intermediate stage).
 **What the results show (details and evidence in [`docs/final_report.md`](docs/final_report.md)):**
 
 - Per-person calibration improves every development fold (5/5) and log-loss (paired interval below zero); the pooled
-  AUROC gain, +0.037 (−0.004, +0.071), is not established, and the registered ECE target is narrowly missed on
-  development (0.052; 0.049 in the equal-mass binning used until 26 Nov). On the locked test it improves AUROC,
+  AUROC gain, +0.037 (−0.004, +0.071), is not established; given the same intercept, gradient boosting on sensors
+  and profile reaches 0.750. Development ECE (0.052) equals what a perfectly calibrated model shows at this size, so
+  the registered 0.05 target cannot be judged at n = 460. On the locked test it improves AUROC,
   Brier and log-loss at the point estimate, with intervals that include zero.
 - The photo is NOT established as a risk signal: pre-registered gate +0.025 (−0.010, +0.061). The frozen fusion still takes
   the photo estimate as 4 of its 19 inputs: the sensor-first product the gate's verdict described was not built.

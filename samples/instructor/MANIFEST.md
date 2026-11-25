@@ -23,6 +23,8 @@ docs/final_design.md §6; the observed result of the first naive run is recorded
 
 Real phone photos (EXIF-stripped, resized): 00_clean (tuna rice bowl), 10_exif_rotated (the same
 photo stored turned 90 CCW with EXIF orientation 6) and 11_local_dish (lamb with biryani-style
-rice, an Emirati home meal). Cases 02-07 keep synthetic plate placeholders: their behaviours are
-decided by the CGM or profile before the photo matters. samples/local_photos/ holds 14 more real
+rice, an Emirati home meal). Cases 02-04 and 06-07 keep synthetic plate placeholders: their behaviours are
+decided by the CGM or profile before the photo matters; 05_no_heart_rate reuses the 00_clean photo.
+(26 Nov) "confirm-carbs tier" for 09 and 11 means the answer's escalate_to field: the app has no input for
+typed carbs yet, so it is advice to the user, not a working step (report §2). samples/local_photos/ holds 14 more real
 phone photos (meals, desserts, a crepe, a croissant, a fruit plate) for the OOD evaluation set.

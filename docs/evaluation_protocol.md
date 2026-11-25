@@ -146,3 +146,6 @@ Nothing in this table changes a shipped artifact, threshold or verdict.
   0.328) and 0.547 (0.420); Brier 0.180 and 0.230.
 - **D7's locked primary endpoint** (photo arm vs profile + trend on the locked eight) was not computed: the
   single locked run scored only the shipped pipeline and cannot be repeated. See docs/final_design.md, 26 Nov.
+- **ECE target, reading corrected (26 Nov, third pass).** The "narrow miss" above is superseded: a perfectly
+  calibrated model scores ECE 0.052 at n = 460 in the registered binning (labels drawn as Bernoulli(risk)), so
+  the 0.05 target was mis-specified for this sample size and the development value cannot be judged against it.

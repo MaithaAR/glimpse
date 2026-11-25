@@ -98,7 +98,7 @@ monitoring:
 finalize:
     uv run glimpse finalize
 
-# the six report figures, rendered from committed evidence only (pre-commitment: nothing retuned from their look)
+# the seven report figures, rendered from committed evidence only (pre-commitment: nothing retuned from their look)
 figures:
     uv run glimpse figures
 
@@ -164,7 +164,7 @@ monitoring-replay:
 report-metrics:
     uv run glimpse report-metrics
 
-# seed spread of the shipped 12+2 recipe: 3 fresh seeds scored on the validation people (~15 min; nothing deployed changes)
+# seed spread of the shipped 12+2 recipe: 3 fresh seeds scored on the validation people (~10-15 min; nothing deployed changes)
 photo-seeds:
     uv run glimpse photo-seeds
 
@@ -217,5 +217,6 @@ clean:
     git checkout -- outputs/demo  # the demo's committed example files are evidence: restore them, never delete them
     find . -name "__pycache__" -type d -prune -exec rm -rf {} +
 
+# prose words in the report, tables, figures and their captions excluded (the final rubric's rule)
 wordcount:
     uv run python -c "t=open('docs/final_report.md').read(); ls=[l for l in t.splitlines() if not (l.lstrip().startswith(('|','![')) or (l.lstrip().startswith('*') and not l.lstrip().startswith('**')))]; print(len(' '.join(ls).split()), 'words (cap 3,000; tables, figures and their captions excluded per the final rubric)')"

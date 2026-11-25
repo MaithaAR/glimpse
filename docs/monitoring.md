@@ -104,3 +104,7 @@ expectation (negative on the locked stream) was checked against the median of fo
 expectation is not cleanly met or missed. Two lines above overstate: "nothing else in the pipeline is above
 30 ms" has no per-stage timing behind it (outputs/efficiency/ times whole answers only), and the "latency
 alert" names a response without a defined signal; latency is measured, not monitored.
+One more correction (26 Nov, third grading round): replay 2 is described above as "the decision the app
+would have given". It re-decides the evaluated, with-history risk at the deployed cut-offs; the app and the
+folder command answer without history (Platt only), whose usefulness is reported separately in the report §4
+(served column, outputs/report_metrics/report_metrics.json `served_operating_point`).

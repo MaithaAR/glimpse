@@ -5,7 +5,7 @@ Numbers below come from `glimpse prepare` (seed 20260927). The generated files i
 ## Source, provenance and licence
 - **CGMacros v1.0.0**, PhysioNet open access ([link](https://physionet.org/content/cgmacros/1.0.0/)), licence **CC BY-NC-SA 4.0** (non-commercial, share-alike).
 - 45 adults (15 healthy, 16 prediabetes, 14 type 2 diabetes by A1c) followed for about 10 days: Dexcom G6 CGM (5-min), Fitbit heart rate, before-meal photos, logged macros with share eaten, and lab tests.
-- `just install` downloads the participant CSVs and the 1,486 before-meal photos listed in `splits/photo_list.txt` straight from PhysioNet's online archive (resumable). **No participant data or photos are committed.**
+- `just install` downloads the participant CSVs and the 1,486 before-meal photos listed in `splits/photo_list.txt` straight from PhysioNet's online archive (resumable). **No raw participant records or photos are committed**; derived per-meal features (outputs/figures/shap_features_z.csv) and the answer files (pseudonymous person ids) are, under the dataset's licence.
 
 ## What one example is
 One meal: the **2 hours of glucose and heart rate before it** (24 five-minute slots), 8 profile inputs (age, BMI, A1c, fasting glucose, meal hour as two clock values, personal spike rate and mean rise from the person's first 72 h) and the before-meal photo.
