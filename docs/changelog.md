@@ -253,6 +253,7 @@ All three strict graders and the holistic one found the report explaining and ch
 | v2 minus v1 now the observed difference (−0.015), as v1's paired rows are; the bootstrap mean (−0.017) is kept in v2_metrics.json | mixed conventions in one table (1 of 3) | outputs/report_metrics/v2_metrics.json |
 | Bottom line: calibration "on track", v1 "scores higher by a difference the data cannot establish"; within-person AUROC levels (0.60, 0.54); baselines on 481 meals; photo gain like for like (+0.021); v2 false cautions and the missing-heart-rate failure in the taxonomy; registered misses labelled (probe C half met, B4 expectation not met); Figure 4 left reframed, 847 explained; R1-R15 everywhere, R15 preventive; dates corrected to 26 Nov (all commits are 26 Nov, +0400) | inconsistencies and unlabelled misses (3 of 3) | docs/final_report.md |
 | LibreView exports with a title line and mmol/L columns now reach rule R1's x18 guidance; R14's message prints one decimal (53.7, not 54) | unseen device exports (1 of 3) | tests/test_hardening_r14.py |
+| The photo recipe and unfamiliar-photo tables moved to the appendix with one sentence each in the report, to keep the PDF at 8 pages | page limit | docs/report_appendix.md |
 
 Registration-to-results times since the tag (commit order is the only evidence of order): v2 6874698 to
 3a7e72f, 4 min; replay 4 ec630a8 to 7fd3e8f, 1 min; stress quality 61b0c2e to 374c178, 23 min; probes and int8

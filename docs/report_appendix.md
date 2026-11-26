@@ -321,3 +321,22 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 
 The report's v1 prose as it stood before the v2 rewrite is kept for the record in docs/archive/report_v1_prose.md;
 it is not part of the report.
+
+## Moved from the report on 26 Nov (page limit)
+
+| Photo recipe | value | how it was set |
+|---|---|---|
+| optimiser and rates | AdamW; heads 1e-3 (warm-up + cosine), last stage 1e-4 | fixed in the config (taught differential rates) |
+| heads epochs per outer fold → shipped | 12–16 → 12 (median) | early stopping on 4 inner folds |
+| last stage: keep, epochs → shipped | kept in 5 of 5 folds; 2–3 → 2 | kept only if inner MAE drops ≥0.5 g (it fell from 27.5–29.8 g to 24.2–26.1 g) |
+| loss; augmentation | Huber on log(1+grams) + 0.5 × range cross-entropy; flips, crops keeping 80% of the area, brightness and contrast ±10%, no hue change | fixed in code, not ablated |
+| seed spread of the recipe (intermediate split, 3 seeds) | carb MAE 24.9 ± 1.9 g, range F1 0.55 ± 0.04 | outputs/training/photo_convnext_seeds.json |
+
+| unfamiliar-photo check at the 0.614 cut | photos | median kNN distance | flagged |
+|---|---|---|---|
+| training photos, leave-one-out (the budget) | 1,221 | 0.291 | 1.1% (budget 2%) |
+| real phone photos of local meals | 14 | 0.433 | 0 of 14 |
+| synthetic non-meal pictures (monitoring week 4) | 6 | 0.709 | the week's median is above the cut |
+| instructor screenshot / dark photo / local dish | 3 | 0.771 / 0.613 / 0.318 | screenshot only (the dark photo is caught by the contrast rule) |
+
+*No realistic labelled out-of-distribution set exists, so no detection AUROC is claimed. In v2 a flagged photo only withholds the carb estimate. outputs/ood/, outputs/monitoring/monitoring.json.*
