@@ -47,8 +47,8 @@ with neither history nor priors there is no personal basis to clear a meal, so a
 samples without `history.csv` sees caution or can't judge, never low risk.
 
 Tooling: uv with Python 3.14
-(locked), strict Pydantic, Loguru, a `just` recipe for every number, 204 tests (203 pass with the data
-and weights, one an expected failure; 187 pass without them; logs in outputs/finalize/), W&B offline runs
+(locked), strict Pydantic, Loguru, a `just` recipe for every number, 208 tests (207 pass with the data
+and weights, one an expected failure; 191 pass without them; logs in outputs/finalize/), W&B offline runs
 replayed from committed training histories (outputs/wandb/), and a git history from the 27 Sep proposal;
 from 2 Nov every registration commit precedes its results commit.
 
