@@ -8,7 +8,7 @@ def test_locked_run_guards_and_tunes_nothing():
 
     src = inspect.getsource(locked)
     assert "already been scored once" in src  # the score-once guard
-    assert "Pipeline(cfg)" in src  # the frozen serving path, no injected overrides
+    assert "Pipeline(cfg, sensor_first=False)" in src  # the frozen v1 serving path, no injected overrides
     for forbidden in ("_tune_sklearn", "choose_m_and_cutoffs", "fit_platt", "torch.save", "GridSearch"):
         assert forbidden not in src, forbidden  # nothing is fitted, chosen or saved over
 

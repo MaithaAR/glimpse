@@ -95,7 +95,20 @@ def _summary(rows: list[dict]) -> str:
     counts = Counter(r.get("decision", "error") for r in rows)
     lines = [f"# Folder run: {len(rows)} meals", ""]
     lines += [f"- {k}: {n}" for k, n in sorted(counts.items())]
-    lines += ["", "| meal | decision | reason |", "|---|---|---|"]
+    lines += ["", "| meal | decision | reason | carbs from the photo |", "|---|---|---|---|"]
     for r in rows:
-        lines.append(f"| {r['meal_id']} | {r.get('decision', 'error')} | {r.get('reason') or r.get('error', '')} |")
+        lines.append(
+            f"| {r['meal_id']} | {r.get('decision', 'error')} | {r.get('reason') or r.get('error', '')} | {_carbs(r)} |"
+        )
     return "\n".join(lines) + "\n"
+
+
+def _carbs(r: dict) -> str:
+    """The carb assist as the user would see it, or why it was withheld (v2 answers the risk regardless)."""
+    if r.get("carb_bin"):
+        return f"{r['carb_bin']} ({r.get('carb_bin_prob', 0):.0%} sure)"
+    plain = {"present": "no photo", "readable": "photo unreadable", "not_blank": "photo blank",
+             "familiar": "photo unlike a meal"}  # fmt: skip
+    why = [plain.get(f.removeprefix("carbs_unavailable_photo_"), f) for f in r.get("flags", [])
+           if f.startswith("carbs_unavailable")]  # fmt: skip
+    return f"withheld: {', '.join(why)}" if why else "–"

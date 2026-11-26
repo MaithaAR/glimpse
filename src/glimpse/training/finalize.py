@@ -180,3 +180,45 @@ def _write_config_cutoffs(lo: float, hi: float) -> None:
     if n1 != 1 or n2 != 1:
         raise RuntimeError("could not update the prototype cut-offs in configs/default.yaml")
     p.write_text(s)
+
+
+def finalize_sensor_first(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
+    """v2 freeze (docs/v2_sensor_first.md, registered 26 Nov): the 15-input trend + profile fusion at the
+    all-development level by the committed C recipe; Platt on the pooled out-of-fold v2 replay; m and the
+    cut-offs by `choose_m_and_cutoffs`. Writes checkpoints/sensor_first/ once; v1's files are not touched."""
+    from glimpse.training.baselines import trend_features
+
+    log, pc = logger.bind(stage="finalize-v2"), cfg.prototype
+    bundle_path, thr_path = Path(pc.sensor_first_bundle), Path(pc.sensor_first_thresholds)
+    if thr_path.exists():
+        raise RuntimeError(f"{thr_path} is frozen; v2 is written once (delete it by hand to redo, and say so)")
+    y = ds.labels()
+    non_locked = sorted({s.person_id for s in ds.samples} - set(sp.locked))
+    c, _ = _tune_sklearn(lambda v: logistic(v, cfg.seed), cfg.baselines.logreg_c_grid, trend_features, ds,
+                         non_locked, [list(f) for f in sp.dev_folds], y)  # fmt: skip
+    tr = meal_rows(ds, set(non_locked), scored_only=False)
+    assert_not_locked(np.array([ds.samples[i].person_id for i in tr]), sp.locked, "finalize v2")
+    lr = logistic(c, cfg.seed).fit(trend_features(ds, tr), y[tr])
+    da = pd.read_csv("outputs/evaluation_sensor_first/dev_answers.csv").dropna(subset=["risk_raw"])
+    p_oof, y_oof, person = da.risk_raw.to_numpy(), da.spike.to_numpy(), da.person_id.to_numpy()
+    times = np.array([ds.samples[int(r)].meal_time for r in da.row], dtype="datetime64[s]")
+    a, b = fit_platt(p_oof, y_oof)
+    if a <= 0:
+        a, b = 1.0, 0.0
+    sel = choose_m_and_cutoffs(apply_platt(p_oof, a, b), y_oof, person, times, cost_dict(cfg))
+    sel.pop("inner_risks", None)
+    frozen = {"main": {"low_risk_below": sel["low_risk_below"], "caution_from": sel["caution_from"]},
+              "m_personal": sel["m"], "platt": [a, b],
+              "provenance": "v2 sensor-first, all-development replay; docs/v2_sensor_first.md, 26 Nov"}  # fmt: skip
+    frozen["sha256"] = hash_thresholds(frozen)
+    bundle_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump({"models": {"sensor": lr}, "calibration": (a, b), "m_personal": sel["m"], "C": c,
+                 "inputs": "15 trend + profile (trend_features)", "train_people": non_locked}, bundle_path)  # fmt: skip
+    thr_path.write_text(json.dumps(frozen, indent=2))
+    report = {"fusion_C": c, "platt": [a, b], "m": sel["m"], "low_risk_below": sel["low_risk_below"],
+              "caution_from": sel["caution_from"], "replay_cost": sel["cost"], "oof_meals": int(len(da)),
+              "train_meals": int(len(tr)), "train_people": len(non_locked)}  # fmt: skip
+    (OUT / "finalize_sensor_first.json").write_text(json.dumps(report, indent=2))
+    log.info("v2 frozen: C={}, Platt ({:.2f}, {:+.2f}), m={}, cut-offs ({:.2f}, {:.2f})", c, a, b, sel["m"],
+             sel["low_risk_below"], sel["caution_from"])  # fmt: skip
+    return report

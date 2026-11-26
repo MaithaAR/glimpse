@@ -137,7 +137,11 @@ def run_demo(ds: MealDataset, sp: Splits, cfg: GlimpseConfig) -> dict:
              "Correct all-clear (low risk, no spike)": first(ok[clear & (ok.spike == 0)]),
              "Wrong answer (shown on purpose)": first(ok[(clear & (ok.spike == 1))
                                                          | (warn & (ok.spike == 0))])}  # fmt: skip
-    md = ["# GLIMPSE demo: worked cases (test people, frozen final pipeline)", ""]
+    md = [
+        "# GLIMPSE demo: worked cases (the intermediate split's test people; the frozen model trained on "
+        "them, so these are in-sample illustrations, not results)",
+        "",
+    ]
     for title, r in picks.items():
         if r is None:
             md.append(f"### {title}\n- none among the test meals")
@@ -230,10 +234,21 @@ def selftest(cfg: GlimpseConfig) -> dict:
     no_photo = app.answer(m.model_copy(update={"photo": None}))
     app.ood_cut = float("inf")  # let the noise picture through, only to exercise the scoring path end to end
     scored = app.answer(m)
-    checks = {"unfamiliar photo -> can't judge": unfamiliar.decision == "can't judge" and "unlike" in unfamiliar.reason,
-              "blank photo -> can't judge": blank.decision == "can't judge" and "blank" in blank.reason,
-              "no photo -> can't judge": no_photo.decision == "can't judge",
-              "full path gives a risk in [0, 1]": scored.risk is not None and 0 <= scored.risk <= 1}  # fmt: skip
+    if app.sensor_first:  # v2: a bad photo withholds the carb assist and names why; the risk is still answered
+        checks = {"unfamiliar photo -> no carb guess, risk kept": "carbs_unavailable_photo_familiar" in unfamiliar.flags
+                  and unfamiliar.carbs_g is None and unfamiliar.risk is not None,
+                  "blank photo -> no carb guess, risk kept": "carbs_unavailable_photo_not_blank" in blank.flags
+                  and blank.risk is not None,
+                  "no photo -> risk kept": "carbs_unavailable_photo_present" in no_photo.flags
+                  and no_photo.risk is not None,
+                  "full path gives a risk and carbs": scored.risk is not None and 0 <= scored.risk <= 1
+                  and scored.carbs_g is not None}  # fmt: skip
+    else:
+        checks = {"unfamiliar photo -> can't judge": unfamiliar.decision == "can't judge"
+                  and "unlike" in unfamiliar.reason,
+                  "blank photo -> can't judge": blank.decision == "can't judge" and "blank" in blank.reason,
+                  "no photo -> can't judge": no_photo.decision == "can't judge",
+                  "full path gives a risk in [0, 1]": scored.risk is not None and 0 <= scored.risk <= 1}  # fmt: skip
     log = logger.bind(stage="selftest")
     for k, ok in checks.items():
         log.info("{:<36} {}", k, "OK" if ok else "FAILED")

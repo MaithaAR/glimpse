@@ -1,0 +1,14 @@
+{
+  "fusion_C": 0.01,
+  "platt": [
+    0.978253749081053,
+    -0.16830384174595864
+  ],
+  "m": 1.0,
+  "low_risk_below": 0.15,
+  "caution_from": 0.22,
+  "replay_cost": 0.5706860706860707,
+  "oof_meals": 481,
+  "train_meals": 891,
+  "train_people": 37
+}

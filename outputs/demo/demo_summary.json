@@ -1,12 +1,12 @@
 {
   "test_meals": 96,
   "decisions": {
-    "caution": 70,
-    "low risk": 18,
-    "can't judge": 8
+    "caution": 68,
+    "can't judge": 21,
+    "low risk": 7
   },
-  "latency_ms_p50": 136.6979860000015,
-  "latency_ms_p95": 166.27538099996286,
+  "latency_ms_p50": 139.77536499999133,
+  "latency_ms_p95": 181.7031814999268,
   "latency_target_ms": 300.0,
   "latency_met": true,
   "machine": "Linux x86_64",
@@ -19,14 +19,14 @@
     "cut": 0.6140460968017578
   },
   "cases": {
-    "Correct warning (caution, and it spiked)": 545,
+    "Correct warning (caution, and it spiked)": 555,
     "Correct all-clear (low risk, no spike)": 543,
     "Wrong answer (shown on purpose)": 546
   },
   "cgm_auto_feedback": {
     "Correct warning (caution, and it spiked)": {
-      "auto_rise_mgdl": 60.46451612903226,
-      "dataset_rise_mgdl": 57.95333333333333,
+      "auto_rise_mgdl": 53.54838709677419,
+      "dataset_rise_mgdl": 53.09333333333335,
       "label": "spike"
     },
     "Correct all-clear (low risk, no spike)": {

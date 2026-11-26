@@ -1,0 +1,13 @@
+{
+  "main": {
+    "low_risk_below": 0.15,
+    "caution_from": 0.22
+  },
+  "m_personal": 1.0,
+  "platt": [
+    0.978253749081053,
+    -0.16830384174595864
+  ],
+  "provenance": "v2 sensor-first, all-development replay; docs/v2_sensor_first.md (26 Nov 2026)",
+  "sha256": "7b45e100c553c03cd7ec3c12b691d81ea4977371a0e0ea07ab2b7cf2b9891cdf"
+}

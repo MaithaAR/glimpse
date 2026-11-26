@@ -166,6 +166,17 @@ def _recalibrate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 2
 
 
+def _finalize_sensor_first(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """v2 freeze (docs/v2_sensor_first.md): writes checkpoints/sensor_first/ once."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.training.finalize import finalize_sensor_first
+
+    finalize_sensor_first(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")),
+                          cfg)  # fmt: skip
+    return 0
+
+
 def _evaluate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Development evaluation on partition v2: every risk from Pipeline.answer, one Pipeline per fold (D2)."""
     from glimpse.data.dataset import MealDataset
@@ -437,6 +448,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("fusion", help="add photo / logged carbs to profile + trend, with controls (Step 4c-3)")
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
+    sub.add_parser("finalize-sensor-first", help="v2 freeze: the sensor-first fusion, Platt, m and cut-offs")
     ev = sub.add_parser("evaluate", help="dev evaluation on partition v2: every risk from Pipeline.answer per fold")
     ev.add_argument("--sensor-first", action="store_true", help="v2 (docs/v2_sensor_first.md) instead of v1")
     sub.add_parser("photo-seeds", help="retrain the shipped 12+2 recipe with 3 fresh seeds; validation spread only")
@@ -503,6 +515,7 @@ def main(argv: list[str] | None = None) -> int:
         "final": _final,
         "amend-thresholds": _amend,
         "evaluate": _evaluate,
+        "finalize-sensor-first": _finalize_sensor_first,
         "recalibrate": _recalibrate,
         "photo-seeds": _photo_seeds,
         "demo": _demo,

@@ -33,7 +33,8 @@ def run_locked(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
     from glimpse.demo_cases import meal_input
 
     OUT.mkdir(parents=True, exist_ok=True)
-    app, y, lag = Pipeline(cfg), ds.labels(), timedelta(minutes=LABEL_LAG_MIN)
+    # the locked eight measured v1 (photo fusion); v2 is never scored on them (docs/v2_sensor_first.md)
+    app, y, lag = Pipeline(cfg, sensor_first=False), ds.labels(), timedelta(minutes=LABEL_LAG_MIN)
     rows_out = []
     for pid in sorted(sp.locked):
         hist: list[tuple[float, int, object]] = []

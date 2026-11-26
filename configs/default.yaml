@@ -79,6 +79,9 @@ prototype:                                   # the app (glimpse demo / predict /
   ood_neighbours: 5                          # unfamiliar photo: mean distance to the 5 nearest training photos ...
   ood_quantile: 0.99                         # ... above the 99th percentile of the training photos' own distances
   feedback_file: outputs/feedback/feedback.jsonl  # mocked user feedback (what happened after the meal)
+  product: sensor_first                      # v2 (docs/v2_sensor_first.md); photo_fusion = v1, the locked-tested model
+  sensor_first_bundle: checkpoints/sensor_first/fusion.joblib
+  sensor_first_thresholds: checkpoints/sensor_first/thresholds.json
 targets:                                     # fixed before seeing results (see docs/evaluation_protocol.md)
   primary_metric: auroc                      # target cohort, cross-validated out-of-fold predictions
   rq1_noninferiority_margin: 0.03
