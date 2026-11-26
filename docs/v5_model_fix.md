@@ -297,3 +297,20 @@ Pooled AUROC is reported beside it.
 
 Prediction: +0.02 to +0.05 within a person on the type-2 people, direction only; pooled unchanged.
 Whatever it shows goes into the report next to the original gate, which stands as it was.
+
+## Part 4 result (27 Nov, after the registration commit fd19089; scored once)
+
+outputs/v5_model_fix/photo_within_person.json.
+
+| people | with photo: pooled / within | without | photo permuted within the person | with minus without, within-person | pooled | control minus without, within-person | verdict |
+|---|---|---|---|---|---|---|---|
+| 14 type-2 (primary) | 0.791 / 0.834 | 0.771 / 0.815 | 0.768 / 0.794 | +0.019 (−0.021, +0.056) | +0.020 (−0.007, +0.050) | −0.022 (−0.061, +0.021) | direction only |
+| 8 confirmation | 0.802 / 0.702 | 0.753 / 0.619 | 0.739 / 0.553 | +0.082 (+0.035, +0.133) | +0.049 (+0.017, +0.092) | −0.066 (−0.119, −0.015) | the photo adds within a person |
+| 15 design | 0.761 / 0.680 | 0.758 / 0.645 | 0.762 / 0.687 | +0.036 (−0.029, +0.100) | +0.003 (−0.026, +0.039) | +0.042 (−0.018, +0.106) | direction only |
+
+By the registered rule the primary result is "direction only", as predicted. The photo's point estimate is
+positive in all three groups. On the 8 confirmation people, who are from the product's own population, both
+intervals are above zero and the permuted control is clearly worse. On the design people the permuted
+control does as well as the real photo, so there the gain is not tied to the meal. Mixed evidence: the photo
+is not shown to help on the primary group, and it is the first sign in this project of a meal-level signal
+from the photo. The original gate stands as reported.

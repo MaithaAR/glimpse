@@ -500,3 +500,53 @@ def second_look(D: Data) -> dict:
         res[name] = {"on_v1_answered": score(j, name) | {"ece": _ece(j.spike.to_numpy(), j[name].to_numpy())}, **c}
     (OUT / "second_look.json").write_text(json.dumps(res, indent=2))
     return res
+
+
+def photo_within_person(D: Data) -> dict:
+    """Part 4 (registered before the run): v5 photo only with, without and with permuted photo inputs."""
+    from dataclasses import replace
+
+    out_file = OUT / "photo_within_person.json"
+    if out_file.is_file():
+        raise SystemExit("Part 4 has been run; it is scored once (docs/v5_model_fix.md)")
+    v = FROZEN["photo_only"]
+    arms = {"with_photo": v, "without_photo": replace(v, photo=False)}
+    t2d, dev = sorted(D.sp.t2d), [p for f in D.sp.dev_folds for p in f]
+    halves, inner = [t2d[0::2], t2d[1::2]], [list(f) for f in D.sp.dev_folds]
+
+    def permuted(fold: int, rows: np.ndarray):
+        keep, rng = D.photo[fold].copy(), np.random.default_rng(0)
+        for p in np.unique(D.pid[rows]):
+            r = rows[D.pid[rows] == p]
+            D.photo[fold][r] = keep[rng.permutation(r)]
+        return keep
+
+    def frame(run, fold_of) -> pd.DataFrame:
+        d = None
+        for name, a in arms.items():
+            r = run(a).rename(columns={"risk": name})
+            d = r if d is None else d.merge(r[["row", name]], on="row")
+        keep = {f: permuted(f, d.row.to_numpy()) for f in fold_of}
+        r = run(v).rename(columns={"risk": "permuted_photo"})
+        for f, k in keep.items():
+            D.photo[f] = k
+        return d.merge(r[["row", "permuted_photo"]], on="row")
+
+    groups = {
+        "type2_14": pd.concat([frame(lambda a, h=h: predict_custom(a, D, halves[h], dev + halves[1 - h], inner, 1), [1])
+                               for h in (0, 1)], ignore_index=True),
+        "confirmation_8": frame(lambda a: predict(a, D, CONFIRM_FOLDS), CONFIRM_FOLDS),
+        "design_15": frame(lambda a: predict(a, D, DESIGN_FOLDS), DESIGN_FOLDS),
+    }  # fmt: skip
+    res = {"what": "Part 4: the photo within a person under the v5 recipe", "groups": {}}
+    for g, d in groups.items():
+        c, k = _boot(d, "with_photo", "without_photo"), _boot(d, "permuted_photo", "without_photo")
+        w = c["within_person_auroc"]
+        verdict = ("the photo adds within a person" if w["ci95"][0] > 0 and k["within_person_auroc"]["ci95"][0] <= 0
+                   else "direction only" if w["point"] > 0 and w["ci95"][0] <= 0 else "no")  # fmt: skip
+        res["groups"][g] = {"people": int(d.person_id.nunique()), "meals": len(d),
+                            "scores": {n: score(d, n) for n in ("with_photo", "without_photo", "permuted_photo")},
+                            "with_minus_without": c, "permuted_minus_without": k, "verdict": verdict}  # fmt: skip
+        d.to_csv(OUT / f"photo_within_{g}.csv", index=False)
+    out_file.write_text(json.dumps(res, indent=2))
+    return res
