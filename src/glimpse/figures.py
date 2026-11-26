@@ -404,6 +404,28 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
             "top_global": [FEATURE_NAMES[j] for j in np.argsort(-mean_abs)[:5]]}  # fmt: skip
 
 
+def f9_training(plt) -> None:
+    """Training against validation loss over the inner folds, from the committed histories (rubric 3d): the
+    photo model's heads phase and its last-stage phase, and SensorCNN, the from-scratch sequence model."""
+    ph = pd.read_csv("outputs/training/photo_convnext_history.csv")
+    sc = pd.read_csv("outputs/training/sensor_cnn_history.csv")
+    fig, axes = plt.subplots(1, 2, figsize=(11.0, 3.0))
+    for ax, d, title in ((axes[0], ph, "photo model (ConvNeXt-Tiny): heads, then the last stage"),
+                         (axes[1], sc, "SensorCNN, from scratch (5,217 weights)")):  # fmt: skip
+        for k, run in enumerate(r for r in d.run.unique() if r.startswith("inner-fold")):
+            g = d[d.run == run].sort_values("epoch")
+            ls = "--" if run.endswith("last-stage") else "-"
+            ax.plot(g.epoch, g.train_loss, color=BLUE, lw=0.9, ls=ls, alpha=0.8, label="training" if k == 0 else None)
+            ax.plot(g.epoch, g.val_loss, color=ORANGE, lw=0.9, ls=ls, alpha=0.8,
+                    label="validation" if k == 0 else None)  # fmt: skip
+        ax.set_title(title, fontsize=9)
+        ax.set_xlabel("epoch (each line one inner fold; dashed: last-stage phase)" if ax is axes[0] else "epoch")
+        ax.set_ylabel("loss")
+        ax.legend(frameon=False, fontsize=8)
+    fig.savefig(OUT / "fig_training.png")
+    plt.close(fig)
+
+
 def _answer_stats(da: pd.DataFrame) -> dict:
     """Committed provenance for three report numbers derived from the committed answers: ECE at a second
     bin count (a check on binning sensitivity; the registered binning is in report_metrics.json), the
@@ -449,6 +471,7 @@ def run_figures(cfg=None) -> dict:
     f4_effects(plt, fu, ch, d8)
     f5_robustness(plt, lv)
     shap_report = f6_shap(plt, da)
+    f9_training(plt)
     if Path("outputs/report_metrics/report_metrics.json").exists():
         f7_coverage(plt)
     if Path("outputs/v2_explain/v2_explain.json").exists():

@@ -594,7 +594,7 @@ def test_v2_explain_cells():
     ).replace("-", "−") in " ".join(text.split())
     assert f"moves v2's logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in text
     tp = r["temporal"]["last_third"]
-    flat = " ".join(text.split())
+    flat = " ".join(Path("docs/report_appendix.md").read_text().split())  # moved to the appendix (page limit)
     assert f"last third of meals v2 scores {tp['auroc']:.3f} ({tp['ci95'][0]:.3f}–{tp['ci95'][1]:.3f})" in flat
     f2 = r["temporal"]["first_two_thirds"]
     assert (

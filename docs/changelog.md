@@ -278,6 +278,16 @@ Code was sometimes drafted before its registration was committed.
 | D8 moved into the report: the photo's gain vanishes without repeated meal profiles | the professor's intermediate feedback named this risk | docs/final_report.md §2 |
 | Report rewritten around v1 served; a debugging-checklist table names the gaps (LR range test, label audit, zero-shot baseline) | the report contradicted the served product | docs/final_report.md |
 
-Author sign-off on the tenth to sixteenth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
+## 26 Nov 2026, seventeenth pass (after three cold grades against the rubric; presentation only, no new study)
+
+| Change | Why | Evidence |
+|---|---|---|
+| Registered predictions marked met or not met (S1-S5, C1, O1, O2); S1 shown as a range; S3 meal counts corrected | a consistency read found failed predictions reported without saying so | docs/final_report.md §3, §4 |
+| Training curves in the report (Figure 3, from the committed histories); photo recipe, freezing ablation and seed rows in §2; SensorCNN architecture; ConvNeXt cited | rubric 3d: training choices read as fixed, not shown (3 of 3 graders) | src/glimpse/figures.py `f9_training`, outputs/figures/fig_training.png |
+| The coverage figure, v2's history-length result and duplicated "why v1" text moved to the appendix | page limit; graders asked for less v2 bulk | docs/report_appendix.md |
+| Failure table states before/after for the rules (naive run 3ee062b: 2 raw errors, 1 whole-file rejection; now 0 of 25) | rubric 5b | docs/final_report.md §5 |
+| README grader path with the three answers and the no-history rule; history note corrected (GitHub history runs from 27 Sep); W&B offline runs committed; memory and parameter-budget sources in §1 | rubric 6b, 6c | README.md, outputs/wandb/ |
+
+Author sign-off on the tenth to seventeenth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
 to be added here by the author, dated, in her words.
 

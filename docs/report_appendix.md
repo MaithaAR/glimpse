@@ -283,7 +283,9 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 
 ## v2 detail (sensor first; docs/v2_sensor_first.md)
 
-Figure 4's local panel: meal 847 was chosen by the registered rule as the lowest-risk confident false clear; its one labelled meal spiked, so its intercept raises the logit, as for meal 864, unlike 6 of the 9 where it lowered it; SHAP is computed on the frozen fusion, not the fold model that answered.
+Figure 5's local panel: meal 847 was chosen by the registered rule as the lowest-risk confident false clear; its one labelled meal spiked, so its intercept raises the logit, as for meal 864, unlike 6 of the 9 where it lowered it; SHAP is computed on the frozen fusion, not the fold model that answered.
+
+History length (moved from report §3): On each person's last third of meals v2 scores 0.774 (0.681–0.841), against 0.740 on the first two thirds, but spikes among cleared meals rise from 9.6% (7 of 73) to 17.8% (8 of 45): more history does not make clears safer.
 
 Referral band (moved from report §4): v2's referral tier is unstable: the folds chose bands 0, 10, 1, 0 and 1 points wide, so its 40 referred development meals (spike rate 15%) came mostly from one fold. The frozen band, 0.15 to 0.22, is seven points wide; applied to the same development risks (in-sample, since it was chosen on them) it refers 86 meals (18%, spike rate 15%), clears 20% with 11 of 98 spiking, and saves 13.2% against always flagging.
 
@@ -327,6 +329,8 @@ The report's v1 prose as it stood before the v2 rewrite is kept for the record i
 it is not part of the report.
 
 ## Moved from the report on 26 Nov (page limit)
+
+![Figure A2 (moved from the report on 26 Nov): coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, v1 and v2; v1 locked at 0.15), descriptive](../outputs/figures/fig5_coverage.png)
 
 | Glossary | meaning |
 |---|---|

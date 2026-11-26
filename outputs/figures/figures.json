@@ -75,6 +75,7 @@
     "fig5_coverage.png",
     "fig6_effects.png",
     "fig7_shap.png",
-    "figA1_robustness.png"
+    "figA1_robustness.png",
+    "fig_training.png"
   ]
 }

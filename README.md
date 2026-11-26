@@ -5,6 +5,18 @@ one of three answers: **low risk**, **caution**, or **can't judge** (always with
 under 0.3 s (265 ms median on the author's Mac, 7 Nov; 116 ms on a 2-CPU cloud machine) and runs offline on local weights. It is a research prototype for adults with
 prediabetes: a second look before eating, not a medical device. MAAI7103 course project (Maitha Alhosani).
 
+**Grader path (three commands, about 10 minutes):**
+
+```bash
+just install                                                    # Python, locked libraries, data, pinned weights
+just predict-folder samples/instructor out/instructor           # 13 meals: answers and named refusals
+just predict-folder samples/returning_user out/returning_user   # the three answers: caution, can't judge, low risk
+```
+
+Without a `history.csv` of the person's earlier labelled meals, no meal is answered "low risk": rule R13
+withholds it, by design, because there is no personal basis to clear a meal. `samples/returning_user/02_with_priors_and_history`
+carries one.
+
 **Final submission (report: [`docs/final_report.md`](docs/final_report.md)):**
 
 - the full data pipeline for all four inputs (photo, CGM, heart rate, profile);
@@ -179,10 +191,9 @@ version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 
 `tests/test_report_numbers.py` checks the report's headline numbers against these files on every commit.
 
-History note: the repository's first commit (68b7f4e, 2 Nov) is a squash of the earlier history and carries a
-misleading title; dated design documents record what came before. Proposal-era pilot analyses (`pilot/`,
-`scripts/`, `results/`) were removed from the tree and live at the git tag
-`proposal-era` (on the author's machine); copies sit in the course proposal folder.
+History note: the GitHub history runs from the proposal (27 Sep) to the final commit. Proposal-era pilot
+analyses (`pilot/`, `scripts/`, `results/`) were removed from the tree on 1 Nov and live at the git tag
+`proposal-era`. From 2 Nov every registration commit precedes the commit with its results.
 
 ## Data and licence
 CGMacros v1.0.0 (PhysioNet, CC BY-NC-SA 4.0) is downloaded by `just install` and never committed.

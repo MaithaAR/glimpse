@@ -39,7 +39,7 @@ One scoring path (Figure 1): the evaluation, the demo, the app and the grader's
 named reason and who acts next: the user fixes the input, or a person reviews (docs/rule_ledger.md). Three
 safety rules were added after AI cold-grading rounds found failures on unseen inputs, none changing an
 evaluated decision: below 54 mg/dL the answer is "treat the
-low first", not a walk (R14); HbA1c in the diabetes range is out of scope (R15, preventive); and a CGM or
+low first", not a walk (R14); HbA1c in the diabetes range is out of scope (R15); and a CGM or
 heart-rate input beyond the training range in the risk-lowering direction is refused (R16), since a heart
 rate of 140 to 160 bpm alone turned a prediabetic caution into low risk in either product (no development
 or locked meal is affected). `prototype.product` selects v1 (served) or v2; v1's frozen files are
@@ -50,8 +50,8 @@ with neither history nor priors there is no personal basis to clear a meal, so a
 samples without `history.csv` sees caution or can't judge, never low risk. Tooling: uv with Python 3.14
 (locked), strict Pydantic, Loguru, a `just` recipe for every number, 203 tests (202 pass with the data
 and weights, one an expected failure; 186 pass without them; logs in outputs/finalize/), W&B offline runs
-replayed from committed training histories, and a git history from 2 Nov in which every registration
-commit precedes its results commit.
+replayed from committed training histories (outputs/wandb/), and a git history from the 27 Sep proposal;
+from 2 Nov every registration commit precedes its results commit.
 
 | Parameters and cost | v1 (served) | v2 (alternative) | cap |
 |---|---|---|---|
@@ -61,6 +61,7 @@ commit precedes its results commit.
 | trained from scratch in the product: carb heads 3,845 (inside the 15.5M) + fusion | 3,865 | 3,861 | 50M |
 | SensorCNN, trained from scratch, evaluated only (not in either product) | 5,217 | 5,217 | – |
 | parameters a served risk depends on | 27.8M photo model + 20 | 16 | – |
+| peak memory while serving; photo checkpoint on disk | 796 MB; 31 MB | 796 MB; 31 MB | – |
 | fine-tuning items (CGMacros photos) | 1,221 | 1,221 | 10,000 |
 | one whole meal, folder command, with / without photo (2-CPU cloud) | 116 ms (p95 142) / refused | 115 ms (p95 147) / 6.4 ms | ≤300 ms p95 |
 
@@ -73,17 +74,17 @@ commit precedes its results commit.
 | int8 photo model (460 development photos, in-sample) | 97.0% of v1's decisions kept; carb MAE 15.4 → 17.7 g, what v2 shows | 55 ms against 77 ms per photo |
 | SensorCNN from scratch instead of trend features (no intercept) | 0.688 ± 0.007 (3 seeds) | 5,217 parameters |
 
-*Timing: outputs/efficiency/end_to_end.json, whole folder-command answers (profile, CSV parsing at 4 ms, rules, models) with the pinned weights on a 2-CPU cloud machine, 50 runs; the author's Mac measured v1 at 265 ms warm median on 7 Nov. int8: outputs/efficiency/int8.json; registered on 1,221 photos, run on the 460 development photos that carry a v1 decision so agreement is per decision (a deviation, disclosed in docs/photo_probes_int8.md). AUROCs: outputs/evaluation_v2/, outputs/evaluation_sensor_first/, outputs/cv/.*
+*Parameter counts: outputs/param_budget.csv (`just params`); memory: outputs/efficiency/efficiency.json. Timing: outputs/efficiency/end_to_end.json, whole folder-command answers (profile, CSV parsing at 4 ms, rules, models) with the pinned weights on a 2-CPU cloud machine, 50 runs; the author's Mac measured v1 at 265 ms warm median on 7 Nov. int8: outputs/efficiency/int8.json; registered on 1,221 photos, run on the 460 development photos that carry a v1 decision so agreement is per decision (a deviation, disclosed in docs/photo_probes_int8.md). AUROCs: outputs/evaluation_v2/, outputs/evaluation_sensor_first/, outputs/cv/.*
 
 ## 2. Multimodal design and the photo gate
 A pinned, SHA-verified ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned) feeds two small heads,
 grams regression and a 4-range carb classifier, with only the last backbone stage fine-tuned. The profile
 has eight inputs, including two onboarding priors: each person's spike rate and mean rise over their
 first meals. Seven hand-made trend features summarise
-the 2-h CGM and heart-rate window. SensorCNN, the from-scratch sequence model, ties the trend features
-(+0.002, −0.016 to +0.022) and stays a baseline. The photo recipe is in the appendix. Fusion is logistic
-regression, the capacity 23
-development people support; gradient boosting on the same inputs is not shown better (+0.016,
+the 2-h CGM and heart-rate window. SensorCNN, trained from scratch (two 1-D convolutions, kernel 25
+minutes, over the 24 glucose and heart-rate slots), ties the trend features (+0.002, −0.016 to
++0.022) and stays a baseline. Figure 3 shows both training curves. Fusion is logistic regression, the
+capacity 23 development people support; gradient boosting on the same inputs is not shown better (+0.016,
 −0.024 to +0.062, fusion study without the intercept). v1's risk uses all three modalities; v2's uses
 sensors and profile, with the photo as a separate carb estimate.
 
@@ -95,10 +96,13 @@ sensors and profile, with the photo as a separate carb estimate.
 | photo estimate against logged carbs (margin 0.03) | +0.002 (−0.027, +0.027): non-inferior |
 | carb estimate on held-out people: MAE, Spearman, range F1 | 22.6 g, 0.53, 0.61 (frozen features + ridge: 20.4 g, 0.56, 0.38) |
 | the carb estimate's own value, 817 out-of-fold photos: MAE; carb range right | 23.5 g against 29.0 g for typing the training median; 60% against 18% |
+| photo recipe | AdamW; heads 1e-3 with warm-up and cosine, last stage 1e-4; Huber on log grams + 0.5 × range cross-entropy; flips, crops keeping 80%, ±10% brightness and contrast; epochs by early stopping on 4 inner folds |
+| freezing ablation: heads only, then + last stage (inner-fold carb MAE) | 27.5–29.8 g → 24.2–26.1 g; the last stage kept in 5 of 5 folds (rule: keep only if MAE drops ≥ 0.5 g) |
+| seed spread of the recipe (3 seeds, intermediate split) | carb MAE 24.9 ± 1.9 g; range F1 0.55 ± 0.04 |
 | probe D: grey out the middle half vs an equal-area border | the middle moves the grams more on 84% of development photos (in-sample) and 86% of 14 unseen phone photos |
 | probe E: zoom in so the food fills more of the frame | grams rise on 40% of development photos (in-sample); 57% of the 14 unseen, inconclusive |
 
-*outputs/fusion/, outputs/photo_cv/, outputs/promised/, outputs/probes/photo_probes.json; probes D and E registered in docs/photo_probes_int8.md before they ran.*
+*outputs/fusion/, outputs/photo_cv/, outputs/promised/, outputs/probes/photo_probes.json, outputs/training/photo_convnext_seeds.json; probes D and E registered in docs/photo_probes_int8.md before they ran.*
 
 The gate (docs/gate_s8.md) held both verdict paragraphs before its run; the winning one said the answer
 should rest on trend and profile, with the photo as a carb-entry aid. The 5 Nov amendment instead kept the
@@ -118,15 +122,13 @@ standardised meals.
 ## 3. Evaluation and ablations
 The 45 CGMacros participants (ages 18 to 69, 64% female) wore a CGM for about ten days. 158 of the 481 development
 meals (32.8%) spiked, with per-person rates
-from 0% to 68%. In partition v2, 23 development people form five outer folds, with four inner folds
+from 0% to 68%. In the final split (partition v2), 23 development people form five outer folds, with four inner folds
 choosing everything (fusion C, Platt map, intercept shrinkage m, cut-offs); 14 T2D people only train;
 8 people were locked at the proposal. Each development meal is scored once; the primary metric is AUROC.
 One caveat: fold 1 holds the five people the intermediate evaluation scored, and the calibration fix was
 designed after a diagnosis on them, so development carries selection pressure the locked eight do not.
 v2, chosen after v1's locked result, carries more, and its development number is likely optimistic as v1's
-was (0.762 on development, 0.645 locked). On each person's last third of meals v2 scores 0.774
-(0.681–0.841), against 0.740 on the first two thirds, but spikes among cleared meals rise from 9.6% (7 of
-73) to 17.8% (8 of 45): more history does not make clears safer.
+was (0.762 on development, 0.645 locked).
 
 Postprandial response is person-specific (Zeevi et al. 2015; Berry et al. 2020). The calibration fix is a
 per-fold Platt map plus a penalised per-person intercept fitted only on that person's earlier meals whose
@@ -166,11 +168,13 @@ per-fold Platt map plus a penalised per-person intercept fitted only on that per
 |---|---|---|
 | shuffled-label control: fusion refitted with labels shuffled within each training fold, 20 shuffles | AUROC 0.45 to 0.55 | 0.475 (range 0.359–0.599), against 0.750 unshuffled: met, no leak through the inputs |
 | learning curve: fusion refitted on 4 / 8 / 12 / all training people per fold | rising, all people within 0.03 of 12 | 0.640 / 0.715 / 0.733 / 0.750: met (+0.017); still creeping up |
-| identity shortcut: do the 4 photo inputs name the person? | above chance, far from perfect | 8.0% of meals against 6.1% for the commonest person: met, no shortcut through the photo |
+| identity shortcut: do the 4 photo inputs name the person? | above chance, far from perfect | 8.0% of meals against 6.1% for the commonest person: met; the photo does not name the person, though D8 suggests it may name the meal |
 | worst slices (served answers) | worst person below 0.6 | women 0.71 (6 of 66 clears spiked) against men 0.86; the worst three people 0.22 to 0.28, on 11 to 25 meals: met |
-| train against validation loss at the best validation epoch | small gap | not met for the photo model, 0.35 (9 runs): it overfits its 1,221 photos; met for SensorCNN, 0.02 (5 runs) |
+| train against validation loss at the best validation epoch | small gap | not met for the photo model, 0.35 (9 runs; Figure 3): it overfits its 1,221 photos; met for SensorCNN, 0.02 (5 runs) |
 
 *Development people only, no intercept, C fixed at 0.03 (S1, S2); outputs/final_checks/final_checks.json.*
+
+![Figure 3: training against validation loss in each inner fold, from the committed histories (outputs/training/): the photo model's heads, then its last stage (dashed), levels off by epoch 5 with a gap that does not close; SensorCNN's gap stays small](../outputs/figures/fig_training.png){width=62%}
 
 Most of the system's edge is
 the intercept's own: with it, gradient boosting comes within 0.013 of v1, and the photo adds 0.021
@@ -179,8 +183,6 @@ by about 0.08 in both
 products (19 of 22 people worse in v1, 20 of 22 in v2), because the offset drifts as each new label arrives. The system
 learns each person's base rate, 0.063 better than a plain running spike rate. Removing the CGM costs
 0.033 with an interval above zero (exploratory, post hoc); removing the profile costs 0.122 (Figure 6).
-
-![Figure 3: reliability in the registered binning, v1 development, v1 locked and v2 development (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals, bars the 95% Wilson interval of each shipped bin)](../outputs/figures/fig3_reliability.png)
 
 | calibration | v1 dev | v1 locked | v2 dev | without history: v1 dev / v1 locked / v2 dev (per-fold Platt) |
 |---|---|---|---|---|
@@ -191,13 +193,15 @@ learns each person's base rate, 0.063 better than a plain running spike rate. Re
 *Floor: labels drawn as Bernoulli(risk), 2,000 draws; ECE intervals are person-bootstrap and biased upward. v2's equal-mass ECE is 0.076. report_metrics.json, v2_metrics.json, outputs/v2_explain/v2_explain.json (calibration).*
 
 At this sample size the ECE target cannot separate either product from a perfectly calibrated model. A
-stricter null lets the intercept learn from labels drawn from the model itself (C1): v1's 0.052 is typical
+stricter null lets the intercept learn from labels drawn from the model itself (study C1): v1's 0.052 is typical
 (33% of draws at or below), while v2's 0.029 is lower than all but 1.5%, an anomaly the adaptive
 intercept does not explain (the registered prediction, typical, was not met). By the protocol's rule (met
-only if the whole interval meets the target) v2 is on track, not met. In Figure 3's v2 panel every bin's
+only if the whole interval meets the target) v2 is on track, not met. In Figure 4's v2 panel every bin's
 95% Wilson interval contains its mean risk. Without history, v1's risk under-predicts
 the harder locked cohort by 11 points, the clearest calibration failure. Discrimination is even across
 glycaemic status; usefulness is not (table).
+
+![Figure 4: reliability in the registered binning, v1 development, v1 locked and v2 development (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals, bars the 95% Wilson interval of each shipped bin)](../outputs/figures/fig3_reliability.png)
 
 | by glycaemic status, development | people, meals, spike rate | v1 AUROC (95%) | v1 cleared, spikes among them | v2 AUROC | v2 cleared, spikes among them |
 |---|---|---|---|---|---|
@@ -229,20 +233,13 @@ Without history both products are worse; without
 priors as well, v2 would clear 7% of meals with 7 of 34 spiking and cost more than always flagging. Rule
 R13 refers those meals instead: no misses, 21% referred, 5.3% more costly than always flagging.
 
-Why v1 is served. v2's registration said it would ship whatever the development result; on the numbers
-it is the riskier product, and the author set that rule aside after weighing the cap and the clean test.
-v2's misses among clears stay near or above 10% at every low-risk cut (Figure 4, left): the point dips
-under 10% only when fewer than 16% of meals are cleared, and with this few clears no interval could
-confirm the cap (even zero misses needs about 35 clears). Its 15 false clears (§5) sit on 8 people, 6 on people with
-prediabetes. A what-if that withholds clears for a prediabetic profile until 20 labelled meals (post hoc,
+Why v1 is served. v2 is the riskier product: its misses among clears stay near or above 10% at every
+low-risk cut (Figure 5, left), and its 15 false clears (§5) sit on 8 people, 6 with prediabetes.
+A what-if that withholds clears for a prediabetic profile until 20 labelled meals (post hoc,
 not shipped) cuts their misses from 6 to 2 and their clears from 30 to 3, with the overall saving at
-10.4%; it was chosen on the development data it would be scored on, so it is not shipped. A new user with
-onboarding priors but no history meets v1's no-history point: 9.6% of its development clears spiked, and
-21.9% on the locked eight (a user with neither history nor priors is never cleared, rule R13).
+10.4%; it was chosen on the development data it would be scored on, so it is not shipped.
 
-![Figure 4: v2 on development: spikes among cleared meals as the low-risk cut moves, with the frozen cut in-sample; exact linear SHAP of the frozen v2 fusion; one false clear split into fusion terms, the fold refit and Platt, and the per-person intercept (meal 847, the registered lowest-risk confident false clear; appendix); SHAP in-sample on the frozen fusion](../outputs/figures/fig4_v2.png)
-
-![Figure 5: coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, v1 and v2; v1 locked at 0.15), descriptive](../outputs/figures/fig5_coverage.png)
+![Figure 5: v2 on development: spikes among cleared meals as the low-risk cut moves, with the frozen cut in-sample; exact linear SHAP of the frozen v2 fusion; one false clear split into fusion terms, the fold refit and Platt, and the per-person intercept (meal 847, the registered lowest-risk confident false clear; appendix); SHAP in-sample on the frozen fusion](../outputs/figures/fig4_v2.png)
 
 | stress at the evaluated operating point (with history) | v2: AUROC, spikes among cleared | v2: caution → low risk | v1: AUROC | v1: caution → low risk |
 |---|---|---|---|---|
@@ -302,7 +299,7 @@ declared assumption hedged by the sweep.
 
 | failure class | count: v1 / v2 | corpus | root cause | action |
 |---|---|---|---|---|
-| rule refusal | 8 of 13, 25 of 25 / 5 of 13, 16 of 25; no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps), a low, out of scope | named refusal; rules R1–R16 (R6 preventive, R7 a recorded limitation) |
+| rule refusal | 8 of 13, 25 of 25 / 5 of 13, 16 of 25; no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps), a low, out of scope | named refusal; rules R1–R16 (R6 preventive, R7 a recorded limitation); before the rules, the 5 Nov naive run gave 2 raw errors and 1 whole-file rejection on 23 hostile inputs, now 0 of 25 |
 | missing-photo refusal | 21 of 481 / none | development meals | input | v1 asks the user for a photo; v2 answers them |
 | near-cut false clear (within 0.031 of the fold's cut) | 4 of 109 / 6 of 118 | cleared development meals | threshold; v2: 4 of 6 on people with prediabetes | the frozen band would refer 4 of v2's 6; the price of a hard cut |
 | confident false clear | 4 of 109 / 9 of 118 | cleared development meals | v2: in 6 of 9 the person's intercept lowered the logit by 0.7 to 1.1, a low base rate clearing a meal that spiked; 2 cold starts | the prediabetes what-if (§4), not shipped |
@@ -321,7 +318,7 @@ trace has a
 higher baseline and a smaller measured rise; our registration encoded naive physiology. Exact SHAP for the
 frozen v1 fusion (Figure 7) ranks prior rise first, then age, heart rate and prior spike rate. Attribution
 and ablation disagree for heart rate (−0.21 coefficient, +0.007 when removed): attribution measures
-in-sample use, ablation out-of-sample loss. In v2 (Figure 4) the same four lead, and the sign has a
+in-sample use, ablation out-of-sample loss. In v2 (Figure 5) the same four lead, and the sign has a
 reading (exploratory): within a person, a higher heart rate than usual before a meal goes with fewer
 spikes (−0.51, −0.88 to −0.25, person fixed effects); between people there is no link (Spearman 0.00). The
 per-person
@@ -352,7 +349,7 @@ cohort the opposite fails: with 91% of meals flagged, the nudge becomes noise a 
 The 8 locked people were scored once, on 25 Nov, with v1: 10 low risk, 139 caution, 4 can't judge;
 2 of 10 clears spiked; cost −5.7% against always caution. The development estimate lies above the locked
 interval; selection pressure and the harder cohort (42.0% of 150 scored meals spiked) both act,
-inseparable at n=8. D7 also registered the photo gate on the locked eight as the primary test; that run
+inseparable at n=8. Design decision D7 also registered the photo gate on the locked eight as the primary test; that run
 scored only v1, so the endpoint was never computed and cannot be now.
 
 `just evaluate` reruns the development evaluations and re-derives every other table from committed
@@ -372,13 +369,13 @@ sign-off. No v1 artifact or locked number changed.
 CGMacros is de-identified public PhysioNet data under the source study's ethics approval; no new human
 data. Forty-five people from one study, repeated standardised meals, no local cuisine; T2D participants
 only train, so no claim is made for them. v1 is served because it is the only model with a clean test,
-and it misses fewer spikes than v2; that test failed the usefulness targets, and D8 leaves the photo's
+and on development it misses fewer spikes than v2; that test failed the usefulness targets, and D8 leaves the photo's
 value unproven. The learning curve still creeps up, so more people, not a bigger model, is the next step,
 with clears for people with prediabetes withheld until a rule like §4's what-if is tested on new people.
 This is an advisory prototype with no clinical validation, end-user test or regulatory review, built so
 that a clinical study could evaluate it.
 
-**References** (glossary in the appendix). Zeevi et al., Cell 2015, doi:10.1016/j.cell.2015.11.001 · Berry et al., Nature
+**References** (glossary in the appendix). Liu et al., ConvNeXt, CVPR 2022 · Zeevi et al., Cell 2015, doi:10.1016/j.cell.2015.11.001 · Berry et al., Nature
 Medicine 2020, doi:10.1038/s41591-020-0934-0 · Vickers & Elkin, Med Decis Making 2006,
 doi:10.1177/0272989X06295361 · CGMacros: Scientific Data 2025, doi:10.1038/s41597-025-05851-7, and
 PhysioNet v1.0.0.
