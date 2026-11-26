@@ -256,7 +256,7 @@ clean): v7 photo only 0.814 pooled and 0.719 within-person against v1's 0.804 an
 
 What can be said:
 - On three separate groups of people (15 design, 8 confirmation, 14 type-2) the new recipe ranks a person's
-  own meals better than v1's recipe. On the one group never used for anything, the interval excludes zero.
+  own meals better than v1's recipe. On the one group never scored before (it was training data throughout), the interval excludes zero.
 - The gain comes from moving the person's history into the model (`prev_rise`), person-centred inputs and
   dropping near-cut training meals (v5). The microbiome adds little on top (v7 photo only against v5: +0.003
   within-person on the type-2 people), as first predicted.
@@ -274,7 +274,7 @@ What cannot be said:
 
 v1 stays served. v7 is the candidate for the talk.
 
-## Part 4, registered 27 Nov before any run: does the photo help within a person under the v5 recipe?
+## Part 4, registered 26 Nov before any run: does the photo help within a person under the v5 recipe?
 
 The report's photo gate (docs/gate_s8.md) tested pooled AUROC under v1's recipe and was not met. It never
 asked the within-person question, and v1's post-hoc intercept scrambles within-person ranking, which would
@@ -298,7 +298,7 @@ Pooled AUROC is reported beside it.
 Prediction: +0.02 to +0.05 within a person on the type-2 people, direction only; pooled unchanged.
 Whatever it shows goes into the report next to the original gate, which stands as it was.
 
-## Part 4 result (27 Nov, after the registration commit fd19089; scored once)
+## Part 4 result (26 Nov, after the registration commit fd19089; scored once)
 
 outputs/v5_model_fix/photo_within_person.json.
 
@@ -315,7 +315,7 @@ control does as well as the real photo, so there the gain is not tied to the mea
 is not shown to help on the primary group, and it is the first sign in this project of a meal-level signal
 from the photo. The original gate stands as reported.
 
-## Part 5, registered 27 Nov before any run: five more tests of v5 (photo only)
+## Part 5, registered 26 Nov before any run: five more tests of v5 (photo only)
 
 The author asked for more tests. Each has a fixed definition and prediction here; each is run once.
 People as before: 15 design, 8 confirmation, 14 type-2 (recipes refitted). The confirmation and type-2
@@ -340,7 +340,7 @@ same frozen recipe, not new clean tests. No recipe choice is made from them.
 - T5, slices. v5 against v1 by sex and by glycaemic status on the 23 development people: pooled AUROC per
   slice. Prediction: v5 is not lower than v1 by more than 0.03 in any slice.
 
-## Part 5 results (27 Nov, after the registration commit 6f5557c; run once)
+## Part 5 results (26 Nov, after the registration commit 6f5557c; run once)
 
 outputs/v5_model_fix/more_tests.json.
 

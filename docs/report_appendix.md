@@ -426,20 +426,20 @@ The report's italic source notes were shortened; the full versions are kept here
 
 Moved from report section 5 on 26 Nov: the per-person intercept moves v2's logit by 0.51 on average, against 0.64 for the whole fusion (outputs/v2_explain/v2_explain.json).
 
-Moved from report section 4 on 27 Nov (page limit), monitoring rows:
+Moved from report section 4 on 26 Nov (page limit), monitoring rows:
 
 | monitoring (docs/monitoring.md) | demonstration | result |
 |---|---|---|
 | CUSUM on calibration, v1 development then locked (registered) | blocks of 20 answers | no alarm (2.4 of 4), against a registered expectation of one |
 | CUSUM on the caution share (registered) | same | one alarm in the 7th locked block at the per-fold cut-offs; none at the deployed or served cut-offs |
 
-Moved from report section 4 on 27 Nov: at 70% CGM dropout only meals with too few recent readings are refused (20 in v2); the photo cannot move v2's risk; with the watch left off, v2's misses among clears fall to 11.6% and the saving rises to 12.8%, so at v2's cut heart rate does not help its decisions.
+Moved from report section 4 on 26 Nov: at 70% CGM dropout only meals with too few recent readings are refused (20 in v2); the photo cannot move v2's risk; with the watch left off, v2's misses among clears fall to 11.6% and the saving rises to 12.8%, so at v2's cut heart rate does not help its decisions.
 
-Moved from report section 5 on 27 Nov: a regularised photo branch (v3, robustness checks 5 to 7) cut the overfitting gap from 0.35 to 0.13 but raised carb error to 26.0 g; it stays a candidate. The earlier label audit of the 20 worst meals: 20% have a rise within 5 mg/dL of the 50 mg/dL cut, against 9% of all meals; none has poor coverage.
+Moved from report section 5 on 26 Nov: a regularised photo branch (v3, robustness checks 5 to 7) cut the overfitting gap from 0.35 to 0.13 but raised carb error to 26.0 g; it stays a candidate. The earlier label audit of the 20 worst meals: 20% have a rise within 5 mg/dL of the 50 mg/dL cut, against 9% of all meals; none has poor coverage.
 
-Moved from report sections 3 and 5 on 27 Nov: in Figure 5's v2 panel every bin's 95% Wilson interval contains its mean risk. In v2 the same four inputs lead the SHAP ranking (outputs/v2_explain/), and the sign has a reading (exploratory): within a person, a higher heart rate than usual before a meal goes with fewer spikes (−0.51, −0.88 to −0.25, person fixed effects).
+Moved from report sections 3 and 5 on 26 Nov: in Figure 5's v2 panel every bin's 95% Wilson interval contains its mean risk. In v2 the same four inputs lead the SHAP ranking (outputs/v2_explain/), and the sign has a reading (exploratory): within a person, a higher heart rate than usual before a meal goes with fewer spikes (−0.51, −0.88 to −0.25, person fixed effects).
 
-Moved from report sections 4 and 5 on 27 Nov (page limit). Failure classes:
+Moved from report sections 4 and 5 on 26 Nov (page limit). Failure classes:
 
 | failure class | count: v1 / v2 | corpus | root cause | action |
 |---|---|---|---|---|
@@ -458,4 +458,6 @@ Monitoring:
 |---|---|---|
 | power against volume, v1 (registered 26 Nov): calibration CUSUM, same shift | 300 streams | 23% / 46% / 56% / 69% detected within 120 / 240 / 480 / 960 answers, 5–7% false alarms; expectation (above 80% at 960) not met |
 
-Moved from report sections 1, 3 and 4 on 27 Nov: input rules R17 to R21 cover semicolon CSVs, a photo not named photo.*, Dexcom "Low"/"High" text, day-first Libre dates and units in the profile. Study C1 lets the intercept learn from labels drawn from the model itself; the registered prediction (v2 typical) was not met. For the risk inputs, a distance to the development people separates the 14 type-2 diabetes people's meals with AUROC 0.89; HbA1c alone does it perfectly and fasting glucose reaches 0.92.
+Moved from report sections 1, 3 and 4 on 26 Nov: input rules R17 to R21 cover semicolon CSVs, a photo not named photo.*, Dexcom "Low"/"High" text, day-first Libre dates and units in the profile. Study C1 lets the intercept learn from labels drawn from the model itself; the registered prediction (v2 typical) was not met. For the risk inputs, a distance to the development people separates the 14 type-2 diabetes people's meals with AUROC 0.89; HbA1c alone does it perfectly and fasting glucose reaches 0.92.
+
+Moved from report section 4 on 26 Nov: A what-if that withholds clears for a prediabetic profile until 20 labelled meals cuts their misses from 6 to 2 and their clears from 30 to 3 (saving 10.4%); it was chosen on the data it is scored on, so it is not shipped.

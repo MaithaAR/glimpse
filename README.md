@@ -216,7 +216,7 @@ photo not named photo.*, Dexcom Low/High text, day-first dates, units in the pro
 a last reading of 140 mg/dL or more, or a rise above 1.5 mg/dL/min; the answer becomes caution). With R22,
 v1 clears 18.1% of development meals (target 20%) and 6.9% of those spike; cost reduction 10.7%.
 
-After the tag (27 Nov): a candidate model, v5, and a variant with the meal confirmed, v7. v1 is still the
+After the tag (26 Nov): a candidate model, v5, and a variant with the meal confirmed, v7. v1 is still the
 served model. The work is registered step by step in docs/v5_model_fix.md (design on 15 development people,
 one scoring on the other 8, one on the 14 type-2 people who had never been scored) and its outputs are in
 `outputs/v5_model_fix/` (104 logged design variants, confirmation.json, transfer_check.json,

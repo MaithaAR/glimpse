@@ -767,7 +767,6 @@ def test_v5_candidate_cells():
     t = _load("outputs/v5_model_fix/transfer_check.json")
     p = _load("outputs/v5_model_fix/photo_within_person.json")["groups"]
     m = _load("outputs/v5_model_fix/more_tests.json")
-    s = _load("outputs/v5_model_fix/second_look.json")
 
     def ci(x: dict) -> str:
         return f"{x['point']:+.3f} ({x['ci95'][0]:+.3f}, {x['ci95'][1]:+.3f})".replace("-", "−")
@@ -781,12 +780,10 @@ def test_v5_candidate_cells():
     )
     sc = t["scores"]
     assert f"{sc['v1_recipe']['pooled']:.3f} / {sc['v1_recipe']['within']:.3f} |" in flat
-    for name in ("v5_photo_only", "v7_meal_confirmed"):
+    for name in ("v5_photo_only",):
         cell = f"{sc[name]['pooled']:.3f} / {sc[name]['within']:.3f}; within-person "
         assert cell + ci(t[f"{name}_minus_v1_recipe"]["within_person_auroc"]) in flat
         assert t[f"{name}_minus_v1_recipe"]["verdict"] == "transfers"
-    mc = s["meal_confirmed"]["on_v1_answered"]
-    assert f"{mc['pooled']:.3f} / {mc['within']:.3f} (second look)" in flat
     for g in ("design_15", "confirmation_8", "type2_14"):
         assert ci(p[g]["with_minus_without"]["within_person_auroc"]) in flat
         assert (

@@ -351,7 +351,7 @@ registrations at my instruction. The choices and the conclusions are mine. Maith
 | Sign-off date corrected from 27 Nov to 26 Nov, the day it was committed | date mismatch | docs/changelog.md |
 | Pilot policy in section 5 shortened to a proposal with no monthly rule and no 10% figure; approved by the author | the longer draft named a review that is not in the code | docs/final_report.md |
 
-## Twenty-third pass, 27 Nov (after the first upload; new registered work and the last graders' factual points)
+## Twenty-third pass, 26 Nov (after the first upload; new registered work and the last graders' factual points)
 
 | change | why | where |
 |---|---|---|
