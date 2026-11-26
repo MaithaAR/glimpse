@@ -130,6 +130,14 @@ v2-input-stress:
 v2-probes:
     uv run glimpse v2-probes
 
+# registered last-day checks (docs/final_switch.md): OOD AUROC, out-of-scope, monitoring power, calibration, course checks (~3 min)
+final-checks:
+    uv run glimpse final-checks
+
+# rule R16 for v1: training ranges (written once), counts and the heart-rate sweep
+v1-input-ranges:
+    uv run glimpse v1-input-ranges
+
 # v2 calibration, failure taxonomy and exact SHAP (docs/v2_explain.md; data-free once the features are committed)
 v2-explain:
     uv run glimpse v2-explain
@@ -158,6 +166,7 @@ evaluate-all:
     just photo-probes
     just end-to-end-timing
     just robustness-levels
+    just final-checks
     just report-numbers
 
 # v2 (docs/v2_sensor_first.md): the sensor-first freeze, written once to checkpoints/sensor_first/

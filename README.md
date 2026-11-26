@@ -14,30 +14,32 @@ prediabetes: a second look before eating, not a medical device. MAAI7103 course 
 
 The final report is [`docs/final_report.md`](docs/final_report.md); the intermediate milestone report is kept at [`docs/intermediate_report.md`](docs/intermediate_report.md).
 
-**Two products, one code path.** v2 (served, frozen 26 Nov) is the sensor-first product the photo gate's
-pre-written verdict called for: the risk comes from the CGM/heart-rate trend and the profile, and the photo model
-gives a carb estimate to confirm, never blocking an answer. v1 (frozen 6 Nov) also feeds the photo estimate into
-the risk; it is the model the 8 locked people measured once. `prototype.product` in `configs/default.yaml`
-switches between them; see [`docs/v2_sensor_first.md`](docs/v2_sensor_first.md).
+**Two products, one code path.** v1 (served, frozen 6 Nov) fuses the photo model's carb estimate with the
+CGM/heart-rate trend and the profile; it is the only model scored on the 8 locked people (once; usefulness
+targets not met). v2 (frozen 26 Nov) is the sensor-first product the photo gate's pre-written verdict called
+for; it was built after the locked result, tested on development only, not shown non-inferior and let more
+spikes through its clears, so it stays as the tested alternative. `prototype.product` in
+`configs/default.yaml` switches between them; the decision is recorded in
+[`docs/final_switch.md`](docs/final_switch.md).
 
-| development, 481 meals | v2 (served) | v1 | v1 on the locked eight (scored once) |
+| development, 481 meals | v1 (served) | v1 on the locked eight (scored once) | v2 (alternative) |
 |---|---|---|---|
-| AUROC (95% person-clustered) | 0.754 (0.673–0.815) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) |
-| ECE (target ≤ 0.05) | 0.029 | 0.052 | 0.061 |
-| spikes among cleared meals (cap 10%) | 12.7% | 7.3% | 2 of 10 |
+| AUROC (95% person-clustered) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) | 0.754 (0.673–0.815) |
+| ECE (target ≤ 0.05) | 0.052 | 0.061 | 0.029 |
+| spikes among cleared meals (cap 10%) | 7.3% | 2 of 10 | 12.7% |
 
-## Architecture (v2, served)
+## Architecture (v1, served)
 ```
 raw CGM/HR readings ─┐                                  (rules run before any model)
-profile ─────────────┼─> checks: CGM complete & in range? profile valid? ──no──> CAN'T JUDGE + reason
+profile ─────────────┼─> checks: CGM complete & in range? not low? profile valid & in scope? ──no──> CAN'T JUDGE + reason
                      │          │ yes
-                     │          └─ 2-h window (24 × 5 min, same code as training) + profile ─> logistic regression
-                     │                                                                          → spike risk
-                     │   + per-person intercept from earlier labelled meals (history.csv), when there are any
-                     │   risk < 0.15 → LOW RISK · ≥ 0.22 → CAUTION · in between → CAN'T JUDGE (borderline)
-                     │   R13: no LOW RISK without history or both onboarding priors → CAN'T JUDGE + reason
-before-meal photo ───┴─> readable, not blank, familiar? ─yes─> ConvNeXt-Tiny → carb range + grams, shown to confirm
-                                                        └no──> carb estimate withheld, flag names why (risk still given)
+before-meal photo ───┼─> readable, not blank, familiar? ──no──> CAN'T JUDGE + reason (v2: risk still given)
+                     │          │ yes: ConvNeXt-Tiny → grams + carb range (shown to confirm)
+                     └─ 2-h window (24 × 5 min, same code as training) + profile + 4 carb inputs ─> logistic regression
+                         R16: a sensor input beyond the training range (risk-lowering side) → CAN'T JUDGE
+                         + per-person intercept from earlier labelled meals (history.csv), when there are any
+                         risk < 0.15 → LOW RISK · ≥ 0.16 → CAUTION · in between → CAN'T JUDGE (borderline)
+                         R13: no LOW RISK without history or both onboarding priors → CAN'T JUDGE + reason
 ```
 The from-scratch SensorCNN (5k parameters) is trained and evaluated as the required scratch model. It ties
 hand-made trend features, so the deployed fusion uses those features (see the report).
@@ -84,12 +86,13 @@ its own, at the population calibration, unless the folder holds an optional `his
 answers: `meal_time,fusion_logit,spiked`; see samples/README.md), which feeds the personal intercept through the
 evaluation's two-hour gate. Only `samples/returning_user/02_with_priors_and_history` carries one (illustrative). A profile.json without `prior_spike_rate` /
 `prior_rise` gets training medians from all 37 non-locked people, type 2 diabetes included (0.455, 48 mg/dL).
-That no-history served point fails three of four usefulness targets on development (report §4), and with no
-history and no priors rule R13 never answers low risk. `history.csv` holds the logit of the product that wrote
+With priors but no history, v1 clears 15.2% of development meals with 9.6% spiking, and 21.9% spiking on the
+locked eight (report §4); with no history and no priors rule R13 never answers low risk. The three
+`samples/returning_user` folders show the three answers: caution, can't judge (borderline), low risk. `history.csv` holds the logit of the product that wrote
 it; rows tagged with the other product are skipped and counted in the answer's flags.
 
 ## Results (AUROC, 95% ranges clustered by person)
-The locked test measured v1 once and is the only clean measurement; v2 (served) has development numbers
+The locked test measured v1 (served) once and is the only clean measurement; v2 (alternative) has development numbers
 only, and they carry disclosed selection pressure (fold 1 was scored at the intermediate stage; v2 was chosen
 after the locked result). "v2" in `outputs/evaluation_v2/` and "partition v2" name the split, not the product:
 that folder is v1; product v2 lives in `outputs/evaluation_sensor_first/`.
@@ -97,8 +100,8 @@ that folder is v1; product v2 lives in `outputs/evaluation_sensor_first/`.
 | Risk model | **locked test (8 people, 153 meals; 150 with a risk)** | development (23 people; v1 460, v2 481 meals) |
 |---|---|---|
 | v1 raw fusion | 0.611 (0.510–0.743) | 0.726 (0.659–0.797) |
-| **v1 + per-person calibration (locked-tested)** | **0.645 (0.540–0.736)** | 0.762 (0.682–0.829) |
-| v2 sensor first + per-person calibration (served) | never scored on the locked eight | 0.754 (0.673–0.815) |
+| **v1 + per-person calibration (served, locked-tested)** | **0.645 (0.540–0.736)** | 0.762 (0.682–0.829) |
+| v2 sensor first + per-person calibration (alternative) | never scored on the locked eight | 0.754 (0.673–0.815) |
 | v1 AUPRC (base rate) | 0.547 (0.420) | 0.591 (0.328) |
 | v1 ECE, registered 15 equal-width bins / equal-mass (target ≤ 0.05) | 0.061 / 0.098 | 0.052 / 0.049 (v2: 0.029 / 0.076) |
 
@@ -168,6 +171,7 @@ version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 | §4 cost sweep, usefulness targets | `just evaluate` | `outputs/evaluation_v2/dev_summary.json`, `outputs/report_metrics/` |
 | §1 end-to-end timing, int8 | `just end-to-end-timing`, `just photo-probes` | `outputs/efficiency/end_to_end.json`, `int8.json` |
 | §3-§5 v2 calibration, taxonomy, SHAP, Figures 3 and 4 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
+| §3-§5 course checks, OOD AUROC, monitoring power, calibration null | `just final-checks` | `outputs/final_checks/final_checks.json` |
 | §4 stress table | `just stress-quality`, `just v2-input-stress` | `outputs/robustness/stress_quality.json`, `v2_input_stress.json` |
 | appendix stress levels, Figure A1 | `just robustness-levels`, `just timing`, `just promised` | `outputs/robustness/`, `outputs/promised/` |
 | §4 monitoring | `just monitoring`, `just monitoring-replay` | `outputs/monitoring/` |

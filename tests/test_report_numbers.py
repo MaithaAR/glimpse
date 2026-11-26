@@ -485,7 +485,7 @@ def test_v2_cells_in_the_report():
         == f"0 cleared; cost {_pc(r13['cost_reduction'])}"
     )
     sp = v2["shipped"]
-    assert t["v2 dev + personal intercept (served)"][1:4] == [
+    assert t["v2 dev + personal intercept (alternative)"][1:4] == [
         f"{sp['auprc']['point']:.3f} ({sp['auprc']['ci95'][0]:.3f}–{sp['auprc']['ci95'][1]:.3f})",
         f"{sp['brier']['point']:.3f} ({sp['brier']['ci95'][0]:.3f}–{sp['brier']['ci95'][1]:.3f})",
         f"{sp['log_loss']:.3f}",
@@ -583,24 +583,23 @@ def test_v2_explain_cells():
     fb = r["frozen_band_in_sample"]
     assert (
         f"refers {fb['in_band']} meals ({fb['in_band_share']:.0%}, spike rate {fb['in_band_spike_rate']:.0%}), "
-        f"clears {fb['share_low_risk']:.0%} with {fb['missed']} of\n{fb['cleared']} spiking"
-    ) in text
+        f"clears {fb['share_low_risk']:.0%} with {fb['missed']} of {fb['cleared']} spiking"
+    ) in " ".join(Path("docs/report_appendix.md").read_text().split())  # moved to the appendix (page limit)
     wi = r["prediabetes_whatif"]
     assert wi["20"]["prediabetes_missed"] == 2 and wi["20"]["prediabetes_cleared"] == 3
-    nv = wi["never"]
-    assert f"{_pc(nv['missed_among_cleared'])} misses and a {_pc(nv['cost_reduction'])} saving" in text
     hr = r["heart_rate"]
     assert (
         f"({hr['within_person_coefficient']:.2f}, {hr['within_person_ci95'][0]:.2f} to "
         f"{hr['within_person_ci95'][1]:.2f}, person fixed effects)"
     ).replace("-", "−") in " ".join(text.split())
-    assert f"moves the served logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in text
+    assert f"moves v2's logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in text
     tp = r["temporal"]["last_third"]
-    assert f"last third of meals {tp['auroc']:.3f} ({tp['ci95'][0]:.3f}–{tp['ci95'][1]:.3f})" in text
+    flat = " ".join(text.split())
+    assert f"last third of meals v2 scores {tp['auroc']:.3f} ({tp['ci95'][0]:.3f}–{tp['ci95'][1]:.3f})" in flat
     f2 = r["temporal"]["first_two_thirds"]
     assert (
         f"rise from {_pc(f2['missed_among_cleared'])} (7 of {f2['cleared']}) to {_pc(tp['missed_among_cleared'])} (8 of"
-        in text
+        in flat
     )
     cv = r["carb_value"]
     assert t["the carb estimate's own value, 817 out-of-fold photos: MAE; carb range right"][0] == (
@@ -666,5 +665,39 @@ def test_r16_counts_and_sweep():
     lo, hi = r["heart_rate_range"]
     for s in r["sweep"]:
         assert (s["rule_on"] == "can't judge") == (s["hr_bpm"] > hi) or s["rule_off"] == "can't judge"
-    text = REPORT.read_text()
-    assert f"{r['outside']['locked']['outside']} of 153 locked meals" in " ".join(text.split())
+    r1 = _load("outputs/probes/v1_hr_sweep.json")
+    assert r1["outside"]["development"]["outside"] == 0 and r1["outside"]["locked"]["outside"] == 0
+    assert r["outside"]["locked"]["outside"] == 0
+    assert "no development\nor locked meal is affected" in REPORT.read_text()
+    first_clear = min(x["hr_bpm"] for x in r1["sweep"] if x["rule_off"] == "low risk")
+    assert first_clear == 140 and all(x["rule_on"] != "low risk" for x in r1["sweep"])
+
+
+def test_final_checks_and_d8_cells():
+    """docs/final_switch.md checks (O1, O2, M1, C1, S1-S5) and D8 against their evidence files."""
+    text = " ".join(REPORT.read_text().split())
+    f = _load("outputs/final_checks/final_checks.json")
+    s1 = f["s1_s2"]["s1_shuffled"]
+    assert f"{s1['mean']:.3f} ({s1['min']:.3f}–{s1['max']:.3f}), against {s1['real']:.3f} unshuffled" in text
+    c = f["s1_s2"]["s2_learning_curve"]
+    assert " / ".join(f"{c[k]['mean']:.3f}" for k in ("4", "8", "12", "all (about 18)")) in text
+    s4 = f["s4"]
+    assert f"{s4['photo_inputs_accuracy']:.1%} of meals against {s4['majority_rate']:.1%}" in text
+    o1, o2 = f["o1"], f["o2"]
+    assert f"AUROC {o1['auroc']:.3f}" in text and o1["real_photos_max"] < o1["cut"]
+    assert f"AUROC {o2['auroc']:.2f}" in text and o2["auroc_single_input"]["HbA1c"] == 1.0
+    m = f["m1"]["v1"]
+    assert " / ".join(f"{m[k]['detected']:.0%}" for k in ("120", "240", "480", "960")) + " detected" in text
+    c1 = f["c1"]
+    assert f"({c1['v1']['share_null_at_or_below_observed']:.0%} of draws at or below)" in text
+    assert f"all but {c1['v2']['share_null_at_or_below_observed']:.1%}" in text
+    d8 = _load("outputs/ablations/d8_profile_excluded.json")
+    p = _load("outputs/report_metrics/report_metrics.json")["d8_paired"]
+    assert (
+        f"fell to {d8['gain_photo_vs_no_meal']['point']:.3f}, against {d8['control_random_drop_gain']['point']:+.3f}"
+    ).replace("-", "−") in text
+    assert (
+        f"difference {p['matched_removed_minus_random_drop']:.3f}, {p['ci95'][0]:.3f} to {p['ci95'][1]:+.3f}".replace(
+            "-", "−"
+        )
+    ) in text

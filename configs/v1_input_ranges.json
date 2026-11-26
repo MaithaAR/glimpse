@@ -1,0 +1,75 @@
+{
+  "what": "rule R16 for v1: min and max of each trend and profile input over the frozen v1 fusion's training meals (docs/final_switch.md); the rule checks the 7 sensor inputs, on the side where an extreme value lowers v1's risk; written once",
+  "training_meals": 891,
+  "ranges": {
+    "last glucose": [
+      67.28,
+      316.48
+    ],
+    "slope 30 min": [
+      -3.7085714285714273,
+      2.496228571428571
+    ],
+    "slope 60 min": [
+      -2.5864335664335663,
+      2.052307692307692
+    ],
+    "window mean": [
+      79.49333333333333,
+      377.3516666666667
+    ],
+    "window spread": [
+      0.8406346808612308,
+      66.02211750618122
+    ],
+    "window rise": [
+      -186.60000000000002,
+      114.6
+    ],
+    "heart rate": [
+      53.59166666666667,
+      119.74166666666666
+    ],
+    "age": [
+      24.0,
+      64.0
+    ],
+    "BMI": [
+      22.26523858,
+      49.08823644
+    ],
+    "HbA1c": [
+      4.6,
+      8.5
+    ],
+    "fasting glucose": [
+      80.0,
+      218.0
+    ],
+    "hour (sin)": [
+      -1.0,
+      0.9999619230641713
+    ],
+    "hour (cos)": [
+      -1.0,
+      1.0
+    ],
+    "prior spike rate": [
+      0.0,
+      1.0
+    ],
+    "prior rise": [
+      24.008291316526613,
+      115.08964285714283
+    ]
+  },
+  "risk_lowering_side": {
+    "last glucose": "above",
+    "slope 30 min": "below",
+    "slope 60 min": "below",
+    "window mean": "above",
+    "window spread": "above",
+    "window rise": "above",
+    "heart rate": "above"
+  }
+}

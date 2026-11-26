@@ -97,8 +97,8 @@ class Pipeline:
                 m_personal = float(bundle["m_personal"])
         else:
             self.fusion = fusion
-        rp = Path(getattr(pc, "v2_input_ranges", ""))
-        rj = json.loads(rp.read_text()) if self.sensor_first and rp.is_file() else {}
+        rp = Path(getattr(pc, "v2_input_ranges" if self.sensor_first else "v1_input_ranges", ""))
+        rj = json.loads(rp.read_text()) if rp.is_file() else {}
         self.input_ranges, self.input_sides = rj.get("ranges"), rj.get("risk_lowering_side")
         if self.sensor_first and fusion is None:
             frozen_all = load_thresholds(Path(pc.sensor_first_thresholds))
@@ -308,6 +308,11 @@ class Pipeline:
         ns = SimpleNamespace(glucose=g.values[None], heart_rate=h.values[None],
                              profile=profile_vector(m.profile, m.meal_time)[None])  # fmt: skip
         x = np.hstack([trend_features(ns, np.array([0])), [[np.log1p(est.grams), *probs[1:]]]])
+        far = outside_training_range(x[0, :15], getattr(self, "input_ranges", None), getattr(self, "input_sides", None))
+        if far:  # rule R16 (v1 too, docs/final_switch.md): extrapolation is not a forecast
+            return cant_judge(far, checks_passed=passed, checks_failed=["input_range"], escalate_to="human",
+                              **base, **carb)  # fmt: skip
+        passed.append("input_range")
         raw = float(self.fusion.predict_proba(x)[0, 1])
         risk_raw, risk_platt, risk = self._risk(raw, history)
         base |= {"fusion_logit": float(np.log(max(raw, 1e-6) / max(1.0 - raw, 1e-6))),

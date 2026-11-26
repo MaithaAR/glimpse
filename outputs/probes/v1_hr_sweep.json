@@ -1,0 +1,123 @@
+{
+  "what": "rule R16 for v1 (docs/final_switch.md)",
+  "heart_rate_range": [
+    53.59166666666667,
+    119.74166666666666
+  ],
+  "outside": {
+    "development": {
+      "meals": 481,
+      "outside": 0,
+      "decisions_of_those": {}
+    },
+    "locked": {
+      "meals": 153,
+      "outside": 0,
+      "decisions_of_those": {}
+    }
+  },
+  "sweep": [
+    {
+      "hr_bpm": 40,
+      "rule_off": "caution",
+      "risk_off": 0.5229888689188741,
+      "rule_on": "caution"
+    },
+    {
+      "hr_bpm": 50,
+      "rule_off": "caution",
+      "risk_off": 0.4760984390322617,
+      "rule_on": "caution"
+    },
+    {
+      "hr_bpm": 60,
+      "rule_off": "caution",
+      "risk_off": 0.42962564026572575,
+      "rule_on": "caution"
+    },
+    {
+      "hr_bpm": 70,
+      "rule_off": "caution",
+      "risk_off": 0.38436107655579616,
+      "rule_on": "caution"
+    },
+    {
+      "hr_bpm": 80,
+      "rule_off": "caution",
+      "risk_off": 0.3410142294013765,
+      "rule_on": "caution"
+    },
+    {
+      "hr_bpm": 90,
+      "rule_off": "caution",
+      "risk_off": 0.30017235438765627,
+      "rule_on": "caution"
+    },
+    {
+      "hr_bpm": 100,
+      "rule_off": "caution",
+      "risk_off": 0.2622751493879553,
+      "rule_on": "caution"
+    },
+    {
+      "hr_bpm": 110,
+      "rule_off": "caution",
+      "risk_off": 0.22760642420681473,
+      "rule_on": "caution"
+    },
+    {
+      "hr_bpm": 120,
+      "rule_off": "caution",
+      "risk_off": 0.19630096797193897,
+      "rule_on": "can't judge"
+    },
+    {
+      "hr_bpm": 130,
+      "rule_off": "caution",
+      "risk_off": 0.16836276666170627,
+      "rule_on": "can't judge"
+    },
+    {
+      "hr_bpm": 140,
+      "rule_off": "low risk",
+      "risk_off": 0.14368992428741872,
+      "rule_on": "can't judge"
+    },
+    {
+      "hr_bpm": 150,
+      "rule_off": "low risk",
+      "risk_off": 0.12210192021525364,
+      "rule_on": "can't judge"
+    },
+    {
+      "hr_bpm": 160,
+      "rule_off": "low risk",
+      "risk_off": 0.1033657909300214,
+      "rule_on": "can't judge"
+    },
+    {
+      "hr_bpm": 170,
+      "rule_off": "low risk",
+      "risk_off": 0.08721902733506447,
+      "rule_on": "can't judge"
+    },
+    {
+      "hr_bpm": 180,
+      "rule_off": "low risk",
+      "risk_off": 0.07338810358586019,
+      "rule_on": "can't judge"
+    },
+    {
+      "hr_bpm": 190,
+      "rule_off": "low risk",
+      "risk_off": 0.06160242430343001,
+      "rule_on": "can't judge"
+    },
+    {
+      "hr_bpm": 200,
+      "rule_off": "low risk",
+      "risk_off": 0.05160404582196172,
+      "rule_on": "can't judge"
+    }
+  ]
+}

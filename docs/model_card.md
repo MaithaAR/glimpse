@@ -12,16 +12,17 @@ device. Not for type 1 diabetes, insulin dosing or treatment decisions. No claim
 those participants were used for training only.
 
 **Two products, one code path** (`prototype.product` in configs/default.yaml).
-- **v2, sensor first (served; frozen 26 Nov, docs/v2_sensor_first.md).** Risk from a 16-parameter logistic
+- **v2, sensor first (the tested alternative; frozen 26 Nov, docs/v2_sensor_first.md; not served since the
+  author's decision in docs/final_switch.md).** Risk from a 16-parameter logistic
   regression over 7 CGM and heart-rate trend features and 8 profile inputs; Platt map (0.98, −0.17);
   per-person intercept from earlier labelled meals (m = 1.0); cut-offs low risk below 0.15, caution from
   0.22, can't judge between. The photo model gives a carb estimate for the user to confirm and never enters
   the risk: a missing, blank, unreadable or unfamiliar photo withholds only that estimate, with a named flag.
-- **v1, photo fusion (frozen 6 Nov; the model the locked eight measured).** Adds the photo model's grams and
+- **v1, photo fusion (served; frozen 6 Nov; the only model the locked eight measured).** Adds the photo model's grams and
   carb range as 4 of 19 inputs; Platt (0.96, −0.20), m = 1.0, cut-offs 0.15 and 0.16; refuses a meal
   without a usable photo. Its files are unchanged since the tag.
 - Rules R1-R12, R14 (glucose below 54 mg/dL: treat the low first), R15 (HbA1c 6.5% or above: out of
-  scope) and R16 (v2: a CGM or heart-rate input outside the training range) run first and refuse with a named reason; output rule R13 withholds low risk when there is
+  scope) and R16 (a CGM or heart-rate input beyond the training range, risk-lowering side) run first and refuse with a named reason; output rule R13 withholds low risk when there is
   neither history nor both onboarding priors (docs/rule_ledger.md).
 - Photo model: ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned; pinned revision and SHA-256), last
   stage fine-tuned, two heads; 27.8M parameters, 15.5M fine-tuned. It failed its pre-registered risk gate
@@ -36,7 +37,7 @@ standardised meals. 1,221 photos at most touched by fine-tuning (cap 10,000).
 
 **Evaluation.**
 
-| | v2, development (481 meals) | v1, development (481) | v1, locked (8 people, scored once 25 Nov, 153) |
+| | v2 (alternative), development (481 meals) | v1 (served), development (481) | v1, locked (8 people, scored once 25 Nov, 153) |
 |---|---|---|---|
 | AUROC (95% person-clustered) | 0.754 (0.673–0.815) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) |
 | meals answered with a risk | 481 | 460 | 150 |
@@ -50,7 +51,8 @@ v2 minus v1 on the 460 meals both answer: −0.015 (−0.045, +0.010), not non-i
 development estimates carry disclosed selection pressure (fold 1 was scored at the intermediate stage).
 
 **Known limits.** The intercept learns each person's base rate and ranks a person's own meals worse
-(within-person AUROC about 0.08 lower in both products). v2 is the riskier product for the intended users:
+(within-person AUROC about 0.08 lower in both products). The photo's small gain vanishes when training meals
+that repeat a held-out person's exact macros are removed (D8), so its value is unproven. v2 is the riskier product for the intended users:
 6 of its 30 clears for people with prediabetes spiked; its 15 false clears are 6 near-cut and 9 confident
 (docs/v2_explain.md). A missing heart rate turns 17 development cautions into low risk; wrong history
 labels cost the most AUROC. History rows carry the product that wrote them; rows from the other product are skipped. Without history and priors (every sample),

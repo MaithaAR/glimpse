@@ -1,0 +1,188 @@
+{
+  "what": "Registered last-day checks (`glimpse final-checks`; docs/final_switch.md): O1 photo OOD detection, O2 out-of-scope",
+  "s5": {
+    "photo model": {
+      "runs": 9,
+      "final_train_loss_mean": 0.4294714146358858,
+      "final_val_loss_mean": 0.8697483936945597,
+      "gap_at_best_val_epoch_mean": 0.3518233148060684,
+      "best_epoch_median": 17.0,
+      "val_metric_at_best_mean": 28.14818509419759
+    },
+    "SensorCNN": {
+      "runs": 5,
+      "final_train_loss_mean": 0.5305720502872742,
+      "final_val_loss_mean": 0.5773088932037354,
+      "gap_at_best_val_epoch_mean": 0.01932043950584337,
+      "best_epoch_median": 13.0,
+      "val_auroc_at_best_mean": 0.7449946395261385
+    }
+  },
+  "s3": {
+    "slices": {
+      "sex F": {
+        "people": 15,
+        "meals": 314,
+        "auroc": 0.7065175840978593,
+        "cleared": 66,
+        "missed": 6
+      },
+      "sex M": {
+        "people": 8,
+        "meals": 146,
+        "auroc": 0.8577422577422578,
+        "cleared": 43,
+        "missed": 2
+      },
+      "age under 40": {
+        "people": 7,
+        "meals": 157,
+        "auroc": 0.7836661546338967,
+        "cleared": 62,
+        "missed": 3
+      },
+      "age 40 to 55": {
+        "people": 11,
+        "meals": 207,
+        "auroc": 0.7153535353535353,
+        "cleared": 43,
+        "missed": 4
+      },
+      "age over 55": {
+        "people": 5,
+        "meals": 96,
+        "auroc": 0.7150326797385621,
+        "cleared": 4,
+        "missed": 1
+      }
+    },
+    "worst_three_people": [
+      {
+        "person": 32,
+        "meals": 11,
+        "auroc": 0.2222222222222222
+      },
+      {
+        "person": 6,
+        "meals": 21,
+        "auroc": 0.2666666666666666
+      },
+      {
+        "person": 9,
+        "meals": 25,
+        "auroc": 0.2826086956521739
+      }
+    ],
+    "people_with_both_outcomes": 22
+  },
+  "s4": {
+    "meals": 460,
+    "people": 23,
+    "majority_rate": 0.06086956521739131,
+    "photo_inputs_accuracy": 0.08043478260869565,
+    "sensor_profile_inputs_accuracy": 0.9782608695652174
+  },
+  "s1_s2": {
+    "meals": 460,
+    "note": "development people only, no intercept, C fixed at 0.03",
+    "s1_shuffled": {
+      "mean": 0.4750562592425898,
+      "min": 0.35945905398744077,
+      "max": 0.5987483658029533,
+      "real": 0.7500160740693114
+    },
+    "s2_learning_curve": {
+      "4": {
+        "mean": 0.6396086499924987,
+        "min": 0.5742300520799846,
+        "max": 0.762403823485287
+      },
+      "8": {
+        "mean": 0.7148374375790307,
+        "min": 0.6741678990119806,
+        "max": 0.7612893546796975
+      },
+      "12": {
+        "mean": 0.7327353779549497,
+        "min": 0.6991577187680833,
+        "max": 0.7608178486465633
+      },
+      "all (about 18)": {
+        "mean": 0.7500160740693114,
+        "min": 0.7500160740693114,
+        "max": 0.7500160740693114
+      }
+    }
+  },
+  "o2": {
+    "dev_meals": 481,
+    "t2d_meals": 261,
+    "t2d_people": 14,
+    "auroc": 0.8931185827737551,
+    "auroc_single_input": {
+      "HbA1c": 1.0,
+      "fasting glucose": 0.9196437817127473
+    },
+    "flag_at_dev_q95": 0.3716475095785441
+  },
+  "c1": {
+    "v1": {
+      "observed": 0.052095422615028426,
+      "null_median": 0.05768369868128778,
+      "share_null_at_or_below_observed": 0.33
+    },
+    "v2": {
+      "observed": 0.029254775580157745,
+      "null_median": 0.0520912672693154,
+      "share_null_at_or_below_observed": 0.015
+    }
+  },
+  "m1": {
+    "v1": {
+      "120": {
+        "detected": 0.23,
+        "false_alarm_before": 0.05333333333333334
+      },
+      "240": {
+        "detected": 0.46,
+        "false_alarm_before": 0.056666666666666664
+      },
+      "480": {
+        "detected": 0.5633333333333334,
+        "false_alarm_before": 0.07333333333333333
+      },
+      "960": {
+        "detected": 0.69,
+        "false_alarm_before": 0.06333333333333334
+      }
+    },
+    "v2": {
+      "120": {
+        "detected": 0.22666666666666666,
+        "false_alarm_before": 0.04
+      },
+      "240": {
+        "detected": 0.42333333333333334,
+        "false_alarm_before": 0.07666666666666666
+      },
+      "480": {
+        "detected": 0.57,
+        "false_alarm_before": 0.07666666666666666
+      },
+      "960": {
+        "detected": 0.6433333333333333,
+        "false_alarm_before": 0.056666666666666664
+      }
+    }
+  },
+  "o1": {
+    "in_distribution": 74,
+    "out_of_distribution": 31,
+    "auroc": 0.987794245858762,
+    "cut": 0.6140460968017578,
+    "flagged_in": 0.013513513513513514,
+    "flagged_out": 0.8064516129032258,
+    "caught_by_contrast_rule": 10,
+    "real_photos_max": 0.5705879330635071
+  }
+}

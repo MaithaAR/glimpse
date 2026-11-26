@@ -268,6 +268,16 @@ Code was sometimes drafted before its registration was committed.
 | The prediabetes withholding rule stays undeployed by the author's decision; the report states that the served v2 breaks the cap and why | the report recommended a rule the served product does not apply | docs/final_report.md §4 |
 | Figure files renamed to their report numbers (fig1 to fig7, figA1 in the appendix) | file names did not match (3 of 3) | outputs/figures/ |
 
-Author sign-off on the tenth to fifteenth passes (v2, R13 to R16 and every registration since the tag):
+## 26 Nov 2026, sixteenth pass (the author's decision after a council review; registered 7c8f7f6 and 3f580fc)
+
+| Change | Why | Evidence |
+|---|---|---|
+| v1 served again; v2 kept as the tested alternative; R16 extended to v1 (no evaluated decision changes) | v2 broke the 10% cap and had no clean test; v1 is the only model scored on the locked eight | docs/final_switch.md; configs/default.yaml |
+| Served runs are v1's (outputs/folder_run, stress_run, returning_user_run, demo); v2's moved to outputs/v2_sensor_first/ | the served product changed | outputs/ |
+| Studies O1 (photo OOD AUROC 0.988), O2 (out-of-scope AUROC 0.89), M1 (monitoring power 23-69%, expectation not met), C1 (v1's ECE typical under an adaptive-intercept null; v2's is not), S1-S5 course checks (shuffled labels 0.475, learning curve still rising, worst slices, no photo identity shortcut, photo-model overfitting) | the course's own tests, found by reading every lecture and lab | outputs/final_checks/final_checks.json |
+| D8 moved into the report: the photo's gain vanishes without repeated meal profiles | the professor's intermediate feedback named this risk | docs/final_report.md §2 |
+| Report rewritten around v1 served; a debugging-checklist table names the gaps (LR range test, label audit, zero-shot baseline) | the report contradicted the served product | docs/final_report.md |
+
+Author sign-off on the tenth to sixteenth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
 to be added here by the author, dated, in her words.
 

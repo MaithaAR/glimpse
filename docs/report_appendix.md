@@ -223,7 +223,7 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 
 | failure class | count | corpus | root cause | action |
 |---|---|---|---|---|
-| T1 rule refusal | 7 of 13 (an 8th is the unfamiliar-photo check); 23 of 23 | instructor cases; stress suite | input (format, units, gaps) | named refusal; rules R1-R12, before/after in the rule ledger |
+| T1 rule refusal | 7 of 13 (an 8th is the unfamiliar-photo check); 25 of 25 | instructor cases; stress suite | input (format, units, gaps) | named refusal; rules R1-R16, before/after in the rule ledger |
 | T2 missing-photo abstention | 21 of 481 | development meals | input | refuse; typed carbs not wired |
 | T3 borderline abstention | 45 of 481 | development meals (folds 2–4 only) | threshold band | dietitian review |
 | T4 near-cut false clear | 4 of 109 | cleared development meals | threshold: the closer half, 0.005–0.030 below the cut | none; the price of a hard cut (Figure 7) |
@@ -283,6 +283,10 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 
 ## v2 detail (sensor first; docs/v2_sensor_first.md)
 
+Figure 4's local panel: meal 847 was chosen by the registered rule as the lowest-risk confident false clear; its one labelled meal spiked, so its intercept raises the logit, as for meal 864, unlike 6 of the 9 where it lowered it; SHAP is computed on the frozen fusion, not the fold model that answered.
+
+Referral band (moved from report §4): v2's referral tier is unstable: the folds chose bands 0, 10, 1, 0 and 1 points wide, so its 40 referred development meals (spike rate 15%) came mostly from one fold. The frozen band, 0.15 to 0.22, is seven points wide; applied to the same development risks (in-sample, since it was chosen on them) it refers 86 meals (18%, spike rate 15%), clears 20% with 11 of 98 spiking, and saves 13.2% against always flagging.
+
 | v2 fold | C | Platt (slope, intercept) | m | cut-offs (low, caution) | AUROC raw → with intercept |
 |---|---|---|---|---|---|
 | v2 fold 1 | 0.01 | (1.10, −0.11) | 1.0 | 0.18, 0.18 | 0.706 → 0.770 |
@@ -324,6 +328,16 @@ it is not part of the report.
 
 ## Moved from the report on 26 Nov (page limit)
 
+| Glossary | meaning |
+|---|---|
+| v1, v2 | v1: photo fusion, frozen 6 Nov, locked-tested, served; v2: sensor first, frozen 26 Nov, the tested alternative |
+| intercept, m | the per-person offset learned from earlier labelled meals; its shrinkage toward zero |
+| Platt | population recalibration of the fusion logit |
+| R1–R16 | the rules in docs/rule_ledger.md, each with the failure that prompted it (R6 and R15 preventive, R7 a recorded limitation) |
+| partition v2 | the final split: 23 development people in 5 outer folds, 14 T2D training only, 8 locked; outputs/evaluation_v2/ is v1 on partition v2, product v2 lives in outputs/evaluation_sensor_first/ |
+| D7, D8 | design decisions: the photo gate's endpoints; the repeated-meal test |
+
+
 | Photo recipe | value | how it was set |
 |---|---|---|
 | optimiser and rates | AdamW; heads 1e-3 (warm-up + cosine), last stage 1e-4 | fixed in the config (taught differential rates) |
@@ -339,4 +353,4 @@ it is not part of the report.
 | synthetic non-meal pictures (monitoring week 4) | 6 | 0.709 | the week's median is above the cut |
 | instructor screenshot / dark photo / local dish | 3 | 0.771 / 0.613 / 0.318 | screenshot only (the dark photo is caught by the contrast rule) |
 
-*No realistic labelled out-of-distribution set exists, so no detection AUROC is claimed. In v2 a flagged photo only withholds the carb estimate. outputs/ood/, outputs/monitoring/monitoring.json.*
+*Study O1 (report §4, docs/final_switch.md) adds a detection AUROC, 0.988, on 31 synthetic or generated non-meal pictures against 74 real meal photos; no realistic labelled out-of-distribution set exists. In v2 a flagged photo only withholds the carb estimate. outputs/ood/, outputs/monitoring/monitoring.json.*

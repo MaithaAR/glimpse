@@ -394,13 +394,14 @@ def heart_rate_r2() -> float:
     return float(LinearRegression().fit(x, y).score(x, y))
 
 
-def with_intercept(dev: pd.DataFrame, logits: pd.Series, platt: bool) -> pd.Series:
+def with_intercept(dev: pd.DataFrame, logits: pd.Series, platt: bool,
+                   summary: str = "outputs/evaluation_v2/dev_summary.json") -> pd.Series:  # fmt: skip
     """Replay the shipped per-person intercept on any out-of-fold logit: per fold m, the same history
     (each answer's first n_history earlier answered meals of that person, as the evaluation gated them),
     with or without the fold's Platt map. Reproduces the shipped `risk` exactly from `risk_raw` (tested)."""
     from glimpse.calibration import personal_offset
 
-    ev = json.loads(Path("outputs/evaluation_v2/dev_summary.json").read_text())
+    ev = json.loads(Path(summary).read_text())
     folds = {f["fold"]: f for f in ev["folds"]}
     out = {}
     for _, g in dev[dev.risk_raw.notna()].sort_values("row").groupby("person_id"):

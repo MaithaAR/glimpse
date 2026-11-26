@@ -36,32 +36,34 @@ def f1_system(plt) -> None:
         ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
                     arrowprops={"arrowstyle": "->", "color": c, "lw": 1.1, "linestyle": ls})  # fmt: skip
 
-    box(0.0, 3.0, 1.9, 0.9, "meal photo\n(optional in v2)")
+    box(0.0, 3.0, 1.9, 0.9, "meal photo\n(needed by v1;\noptional in v2)")
     box(0.0, 1.7, 1.9, 0.9, "CGM + heart rate\n(2 h before)")
     box(0.0, 0.4, 1.9, 0.9, "profile: 4 fields +\n2 optional priors")
-    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12, R14, R15")
+    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12, R14\u2013R16")
     box(4.9, 3.0, 2.5, 0.9, "ConvNeXt-Tiny (last stage\ntuned): grams + range")
     box(4.9, 1.7, 2.5, 0.9, "trend features\n+ profile inputs")
     box(7.9, 3.2, 2.4, 0.9, "kNN unfamiliar-photo\ncheck (cut 0.614)")
-    box(10.8, 3.2, 2.6, 0.9, "carb estimate shown to\nconfirm (v2: not a risk input)", fc="#f3f0fa")
-    box(7.9, 1.7, 2.4, 1.2, "logistic fusion\nv2: 16 parameters\nPlatt (0.98, \u22120.17)")
+    box(10.8, 3.2, 2.6, 0.9, "carb estimate shown\nto confirm (in v2,\nits only use)", fc="#f3f0fa")
+    box(7.9, 1.7, 2.4, 1.2, "logistic fusion\nv1: 20 parameters\nPlatt (0.96, \u22120.20)")
     box(10.8, 1.7, 2.4, 1.2, "personal intercept\nfrom earlier labelled\nmeals (m = 1.0)")
     box(13.7, 1.7, 2.4, 1.2,
-        "v2 cut-offs 0.15 / 0.22\nlow risk | caution + reason\nR13: no clear without\nhistory or both priors",
+        "v1 cut-offs 0.15 / 0.16\nlow risk | caution + reason\nR13: no clear without\nhistory or both priors",
         fc="#e6f0fa")  # fmt: skip
     box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 fix the input, or\na person reviews", fc="#fdf0e6")
     box(13.7, 3.4, 2.4, 0.9, "CGM label at +2 h\n(replay; or history.csv)", fc="#eef7ee")
     ax.text(12.4, 0.75, "borderline risk", fontsize=6.8, color=ORANGE)
     ax.text(3.9, 0.45, "failed CGM or\nprofile rule", fontsize=6.8, color=ORANGE)
-    ax.text(10.85, 4.17, "bad or unfamiliar photo:\nestimate withheld, risk kept", fontsize=6.4, color=ORANGE)
+    ax.text(
+        10.85, 4.17, "bad or unfamiliar photo: v1 refuses;\nv2 withholds the estimate only", fontsize=6.4, color=ORANGE
+    )
     for y0 in (3.45, 2.15, 0.85):
         arrow(1.9, y0, 2.4, 2.15)
     arrow(4.4, 2.15, 4.9, 2.15)
     arrow(4.4, 2.5, 4.9, 3.45)
     arrow(7.4, 3.6, 7.9, 3.6)  # the photo embedding feeds the unfamiliar-photo check
     arrow(10.3, 3.65, 10.8, 3.65)  # familiar photo: carb estimate shown
-    arrow(9.1, 3.2, 9.1, 2.9, ls="--")  # v1 only: the carb inputs reach the fusion
-    ax.text(9.2, 2.98, "v1 only: 4 carb inputs", fontsize=6.4, color=GREY)
+    arrow(9.1, 3.2, 9.1, 2.9)  # v1 (served): the carb inputs reach the fusion
+    ax.text(9.2, 2.98, "v1: 4 carb inputs (not in v2)", fontsize=6.4, color=GREY)
     arrow(7.4, 2.15, 7.9, 2.15)
     arrow(10.3, 2.3, 10.8, 2.3)
     arrow(13.2, 2.3, 13.7, 2.3)
@@ -70,7 +72,7 @@ def f1_system(plt) -> None:
     arrow(14.9, 2.9, 14.9, 3.4, c=GREEN, ls="--")  # the answered meal is labelled later
     arrow(13.7, 3.6, 12.0, 2.9, c=GREEN, ls="--")  # ... and joins the person's history
     ax.text(8.0, 4.62, "one scoring path (Pipeline.answer) for the evaluation, demo, app and folder command; "
-            "v2 served, v1 (photo fusion, locked-tested) by a config switch\n"
+            "v1 served (photo fusion, locked-tested); v2 (sensor first) by a config switch\n"
             "(the app, and the folder command without history.csv, answer at the population calibration)",
             ha="center", fontsize=8.0, style="italic", color=GREY)  # fmt: skip
     ax.set_xlim(-0.2, 16.3)
@@ -93,7 +95,7 @@ def f2_per_fold(plt, ev: dict) -> None:
         ax.plot([i + 0.22, i + 0.22], [f["auroc_raw"], f["auroc_personal"]], color=GREEN, lw=1, alpha=0.6, zorder=1)
     ax.scatter(xs + 0.22, [f["auroc_raw"] for f in v2f], color=GREEN, marker="x", s=18, label="v2 raw", zorder=2)
     ax.scatter(xs + 0.22, [f["auroc_personal"] for f in v2f], color=GREEN, marker="^", s=22,
-               label="v2 personalised (served)", zorder=2)  # fmt: skip
+               label="v2 personalised (alternative)", zorder=2)  # fmt: skip
     for name, key, x, c in (("v1 pooled", "risk_personal", 5.0, BLUE),
                             ("v1 pooled\nexcl. fold 1", "risk_personal_excluding_fold1", 5.8, ORANGE)):  # fmt: skip
         a = ev[key]["auroc"]
@@ -129,7 +131,7 @@ def f3_reliability(plt, da: pd.DataFrame) -> dict:
     out = {}
     fig, axes = plt.subplots(1, 3, figsize=(13.2, 4.2), sharey=True)
     panels = (("v1, development, 460 meals", da), ("v1, locked eight, 150 meals", lk),
-              ("v2 (served), development, 481 meals", v2))  # fmt: skip
+              ("v2 (alternative), development, 481 meals", v2))  # fmt: skip
     for ax, (name, frame) in zip(axes, panels, strict=True):
         d = frame.dropna(subset=["risk"])
         y = d.spike.to_numpy().astype(float)
@@ -323,7 +325,7 @@ def f8_v2(plt) -> None:
     axes[1].set_yticks(np.arange(len(order)), [names[j].replace("window sd", "window spread") for j in order],
                        fontsize=6.8)  # fmt: skip
     axes[1].set_xlabel("mean |SHAP| (logit units); orange = higher value, lower risk")
-    axes[1].set_title(f"v2 global; the intercept moves the served logit {sh['split']['mean_abs_intercept_shift']:.2f}",
+    axes[1].set_title(f"v2 global; the intercept moves the logit {sh['split']['mean_abs_intercept_shift']:.2f}",
                       fontsize=9)  # fmt: skip
     loc = sh["local"]
     terms = sorted(loc["terms"].items(), key=lambda kv: -abs(kv[1]))[:7]

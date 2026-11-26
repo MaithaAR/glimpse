@@ -162,7 +162,7 @@ stress and demo runs were regenerated with it on 26 Nov (d54ded7): every no-hist
 answers caution or can't judge.
 
 ## v2 and the photo rules (26 Nov, docs/v2_sensor_first.md)
-In v2 (sensor first, served) the photo rules R6 and R7, the contrast rule and the unfamiliar-photo check no
+In v2 (sensor first, the tested alternative) the photo rules R6 and R7, the contrast rule and the unfamiliar-photo check no
 longer refuse a meal: the photo is not a risk input, so a missing, unreadable, blank or unfamiliar photo
 withholds only the carb estimate, and a flag names why (`carbs_unavailable_photo_present`, `_readable`,
 `_not_blank`, `_familiar`). Before (v1): the instructor's screenshot, dark photo and zero-byte photo answered
@@ -214,3 +214,8 @@ locked meals lay outside the training ages or BMI), and to the risk-lowering sid
 stress traces were refused although smoothness raises the risk). Before/after: no development, locked or
 sample decision changes; the heart-rate sweep (outputs/probes/v2_hr_sweep.json) answers caution up to
 110 bpm and refuses 120 bpm and above, where it had cleared from 160 bpm. Tests: tests/test_hardening_r14.py.
+
+R16 for v1 (26 Nov, docs/final_switch.md): with v1 served again, R16 applies to it as well, with ranges from
+v1's frozen training meals and sides from v1's coefficients (configs/v1_input_ranges.json). Before/after: no
+development or locked decision of v1 changes (re-evaluated, byte-identical answers); the heart-rate sweep
+(outputs/probes/v1_hr_sweep.json) refuses 120 bpm and above, where v1 had cleared from 140 bpm.

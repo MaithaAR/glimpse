@@ -5,10 +5,10 @@ One sub-folder per meal: `photo.jpg|png`, `cgm.csv` (timestamp, glucose_mgdl[, h
 `just predict-folder samples/instructor outputs/folder_run`. Each case fixes one behaviour from
 docs/final_design.md §6; the observed result of the first naive run is recorded in docs/rule_ledger.md.
 
-Required behaviours were fixed for v1 (photo fusion). The last column is what v2 (served since 26 Nov) does:
+Required behaviours were fixed for v1 (photo fusion, served). The last column is what v2, the tested alternative, does:
 the photo no longer refuses a meal; it only withholds the carb estimate, with the reason in the summary.
 
-| case | what it tests | required behaviour (v1) | v2 (outputs/folder_run) |
+| case | what it tests | required behaviour (v1) | v2 (outputs/v2_sensor_first/folder_run) |
 |---|---|---|---|
 | 00_clean | well-formed input | an answer with risk and carb bin | caution 48.4%, 30-59 g |
 | 01_mmol | glucose 4-9 (mmol/L) | can't judge: values look like mmol/L; multiply by 18 | same |

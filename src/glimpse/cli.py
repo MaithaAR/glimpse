@@ -208,6 +208,25 @@ def _v2_input_ranges(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _v1_input_ranges(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Rule R16 for v1: ranges, counts and the heart-rate sweep (docs/final_switch.md)."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.studies.v2_ranges import run_v1_ranges
+
+    run_v1_ranges(cfg, MealDataset.load(Path("data/dataset")))
+    return 0
+
+
+def _final_checks(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Registered last-day checks O1, O2, M1, C1, S1-S5 (docs/final_switch.md); needs the data and weights."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.final_checks import run_final_checks
+
+    run_final_checks(cfg, MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")))
+    return 0
+
+
 def _verify_outputs(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Data-free outputs against the committed ones, numbers to 1e-9."""
     from glimpse.verify import verify_outputs
@@ -537,6 +556,8 @@ def main(argv: list[str] | None = None) -> int:
     vp = sub.add_parser("v2-probes", help="v2 probes B and C and input monitors (probe B needs the data)")
     vp.add_argument("--data-free", action="store_true", help="keep the committed probe B; redo C and monitors")
     sub.add_parser("v2-input-ranges", help="rule R16: v2 training input ranges, counts and the heart-rate sweep")
+    sub.add_parser("v1-input-ranges", help="rule R16 for v1: ranges, counts and the heart-rate sweep")
+    sub.add_parser("final-checks", help="registered last-day checks: OOD, monitoring power, calibration, course checks")
     sub.add_parser("verify-outputs", help="data-free outputs against the committed ones (numbers to 1e-9)")
     sub.add_parser("v2-explain", help="v2 calibration, failure taxonomy and exact SHAP (descriptive)")
     sub.add_parser("v2-input-stress", help="v2 under missing heart rate, missing priors and noisy history")
@@ -615,6 +636,8 @@ def main(argv: list[str] | None = None) -> int:
         "v2-metrics": _v2_metrics,
         "v2-explain": _v2_explain,
         "verify-outputs": _verify_outputs,
+        "final-checks": _final_checks,
+        "v1-input-ranges": _v1_input_ranges,
         "v2-input-ranges": _v2_input_ranges,
         "v2-probes": _v2_probes,
         "v2-input-stress": _v2_input_stress,
