@@ -458,3 +458,5 @@ Moved from report section 5 on 27 Nov (page limit):
 | the course's debugging checks | evidence | status |
 |---|---|---|
 | classical and zero-shot photo baselines (check 4) | colour histogram + ridge 27.5 g, against 20.4 g for frozen summaries + ridge; zero-shot needs CLIP weights this offline build cannot fetch | classical done; zero-shot a gap |
+
+Moved from report sections 1 and 3 on 27 Nov (word limit): as first shipped, rules R14 to R16 changed no development or locked decision; the later R14 amendment refers one development meal. A stricter null (study C1) finds v1's 0.052 typical (33% of draws at or below) and v2's 0.029 lower than all but 1.5%, an anomaly the adaptive intercept does not explain. On the external data, with carb errors the size of the photo model's (a simulation with errors drawn independently of the meal) the carb gain is still +0.101 (docs/external_bigideas.md, Part 2).

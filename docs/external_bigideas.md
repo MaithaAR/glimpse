@@ -1,4 +1,4 @@
-# External check on a second dataset, 27 Nov 2026 (plan written before scoring; plan, code and results share one commit, so the history cannot show the order)
+# External check on a second dataset, 27 Nov 2026 (Part 1: plan and results share one commit; Parts 2 and 3: the plan commit precedes the result)
 
 Exploratory, planned and run on the day of the deadline; not a pre-registered study. The served model (v1)
 is unchanged and cannot be scored here: the second dataset has no meal photos, and v1 refuses a meal without
@@ -192,8 +192,8 @@ above the spike rate: calibration is worse than v2's (0.053, +0.5), because the 
 cohort that spikes more often.
 
 Reading.
-- For the first time a GLIMPSE model's decisions save cost on people it never saw, with an interval that
-  excludes zero: 16.3% against always caution, and 1 of its 21 clears spiked. Three of the four targets are on
+- On this one dataset, and on a third look at the same 12 people, the carb-aware model's decisions save cost
+  with an interval that excludes zero: 16.3% against always caution, and 1 of its 21 clears spiked. Three of the four targets are on
   track; none is met by the protocol's whole-interval rule.
 - It is cautious: it clears 10.4% of meals, half the target.
 - The expectation (more clears than v2, a cost interval through zero, at most two targets on track) was
@@ -204,3 +204,17 @@ Reading.
 Limits. Third look at the same 12 people, with no correction for that. The carbs are the person's own log,
 not a photo estimate; with photos the gain would be smaller by an unknown amount. 21 cleared meals is a
 small count. Model only: the product's refusal rules are not applied. The served model is unchanged.
+
+## Follow-up checks (27 Nov, after a grader's questions; outputs/external_bigideas/external_checks.json)
+
+Run after Parts 1 to 3 were known, on the same 201 meals, so they are descriptive.
+
+- Does the intercept change the ranking? AUROC with it minus without it: +0.004 (−0.097 to +0.110). Not shown
+  either way.
+- How many people does the frozen v2 rank below chance on their own meals? 6 of the 11 with both outcomes.
+- Is the carb gain spread over people? 10 of 11 rank better with carbs than without.
+- Is the carb gain only snacks against meals? Dropping every food-log entry under 200 kcal leaves 148 meals
+  (spike rate 33.1%). The gain is +0.081 (+0.004 to +0.155), smaller and still above zero; carbs alone score
+  0.632 there. So part of the +0.126 is carbs telling snacks from meals, and part is not.
+- Part 1's plan and results share one commit; the plans of Parts 2 and 3 were committed 7 and 5 minutes before
+  their results.

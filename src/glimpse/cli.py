@@ -266,6 +266,9 @@ def _external_bigideas(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     run_external_bigideas(cfg)
     run_external_part2(cfg)
     run_external_part3(cfg)
+    from glimpse.studies.external_bigideas import run_external_checks
+
+    run_external_checks(cfg)
     return 0
 
 

@@ -67,7 +67,7 @@ def build(cfg) -> tuple[pd.DataFrame, np.ndarray]:
             )
             rise = float(obs.max() - pre.mean())
             rows.append({"person_id": int(pid), "t": t, "rise": rise, "spike": int(rise >= L.spike_threshold_mgdl),
-                         "carbs": float(f.carbs[t]), "a1c": float(demo.HbA1c[pid]),
+                         "carbs": float(f.carbs[t]), "kcal": float(f.kcal[t]), "a1c": float(demo.HbA1c[pid]),
                          "next_meal_within": any(t < u <= t + horizon for u in times[i + 1 : i + 3]),
                          "premeal_ok": bool(passes_premeal_checks(gw, pc.min_cgm_readings_last_30min,
                                                                   pc.min_cgm_coverage, pc.max_cgm_gap_min))})  # fmt: skip
@@ -361,4 +361,57 @@ def run_external_part3(cfg) -> dict:
                         "targets_met_or_on_track": int(sum(v["label"] != "at risk" for v in ext.values() if isinstance(v, dict)))}}  # fmt: skip
     (OUT / "external_part3.json").write_text(json.dumps(res, indent=2))
     logger.bind(stage="external").info("{}", json.dumps(res)[:1500])
+    return res
+
+
+def run_external_checks(cfg) -> dict:
+    """Follow-up checks a grader asked for (27 Nov, after Parts 1 to 3): is the intercept's effect on ranking
+    distinguishable from zero; is the carb gain spread over people; does it survive without snacks (entries
+    under 200 kcal removed); how many people does frozen v2 rank below chance."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import meal_rows
+    from glimpse.training.baselines import logistic
+    from glimpse.training.fusion import logged_carbs
+
+    M, X = build(cfg)
+    keep = M.scored.to_numpy()
+    s, Xs = M[keep].reset_index(drop=True), X[keep]
+    ans = pd.read_csv(OUT / "external_answers.csv")
+    y, sid = s.spike.to_numpy().astype(int), s.person_id.to_numpy()
+    assert (ans.spike.to_numpy() == y).all()
+    r_int, r_raw = ans.risk.to_numpy(), ans.risk_platt_only.to_numpy()
+
+    def paired(u, v, mask=None):
+        m = np.ones(len(y), bool) if mask is None else mask
+
+        def fn(i):
+            yy = y[m][i]
+            return float(roc_auc_score(yy, u[m][i]) - roc_auc_score(yy, v[m][i])) if len(set(yy)) == 2 else float("nan")
+
+        pt, lo, hi = person_bootstrap_ci(sid[m], fn)
+        return {"point": pt, "ci95": [lo, hi], "meals": int(m.sum())}
+
+    bundle = joblib.load("checkpoints/sensor_first/fusion.joblib")
+    ds = MealDataset.load(Path("data/dataset"))
+    tr = meal_rows(ds, set(bundle["train_people"]), scored_only=False)
+    with_c = logistic(bundle["C"], cfg.seed).fit(np.hstack([trend_features(ds, tr), logged_carbs(ds, tr)]), ds.labels()[tr])
+    f1 = with_c.decision_function(np.hstack([Xs, np.log1p(s.carbs.to_numpy(float))[:, None]]))
+    f0 = bundle["models"]["sensor"].decision_function(Xs)
+    per = {}
+    for p in np.unique(sid):
+        k = sid == p
+        if len(set(y[k])) == 2:
+            per[int(p)] = {"v2_frozen": float(roc_auc_score(y[k], r_int[k])), "without_carbs": float(roc_auc_score(y[k], f0[k])),
+                           "with_carbs": float(roc_auc_score(y[k], f1[k]))}
+    big = s.kcal.to_numpy(float) >= 200
+    res = {"what": "External follow-up checks (27 Nov), same 201 meals of 12 people",
+           "intercept_minus_no_intercept_auroc": paired(r_int, r_raw),
+           "people_with_both_outcomes": len(per),
+           "people_ranked_below_chance_by_frozen_v2": int(sum(v["v2_frozen"] < 0.5 for v in per.values())),
+           "people_ranked_better_with_carbs": int(sum(v["with_carbs"] > v["without_carbs"] for v in per.values())),
+           "carb_gain_all_meals": paired(f1, f0),
+           "carb_gain_meals_of_200_kcal_or_more": paired(f1, f0, big) | {"spike_rate": float(y[big].mean())},
+           "carbs_alone_meals_of_200_kcal_or_more": float(roc_auc_score(y[big], s.carbs.to_numpy(float)[big])),
+           "per_person_within_auroc": per}  # fmt: skip
+    (OUT / "external_checks.json").write_text(json.dumps(res, indent=2))
     return res

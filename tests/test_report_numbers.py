@@ -674,7 +674,7 @@ def test_r16_counts_and_sweep():
     r1 = _load("outputs/probes/v1_hr_sweep.json")
     assert r1["outside"]["development"]["outside"] == 0 and r1["outside"]["locked"]["outside"] == 0
     assert r["outside"]["locked"]["outside"] == 0
-    assert "changed no development or locked decision" in " ".join(REPORT.read_text().split())
+    assert "Their effect on scored decisions is in docs/rule_ledger.md" in " ".join(REPORT.read_text().split())
     first_clear = min(x["hr_bpm"] for x in r1["sweep"] if x["rule_off"] == "low risk")
     assert first_clear == 140 and all(x["rule_on"] != "low risk" for x in r1["sweep"])
 
@@ -695,8 +695,8 @@ def test_final_checks_and_d8_cells():
     m = f["m1"]["v1"]
     assert " / ".join(f"{m[k]['detected']:.0%}" for k in ("120", "240", "480", "960")) + " detected" in text
     c1 = f["c1"]
-    assert f"({c1['v1']['share_null_at_or_below_observed']:.0%} of draws at or below)" in text
-    assert f"all but {c1['v2']['share_null_at_or_below_observed']:.1%}" in text
+    assert f"({c1['v1']['share_null_at_or_below_observed']:.0%} of draws at or below)" in APPENDIX.read_text()
+    assert f"all but {c1['v2']['share_null_at_or_below_observed']:.1%}" in APPENDIX.read_text()
     d8 = _load("outputs/ablations/d8_profile_excluded.json")
     p = _load("outputs/report_metrics/report_metrics.json")["d8_paired"]
     assert (
@@ -780,14 +780,21 @@ def test_external_and_post_freeze_cells():
         f"scores {raw['with_carbs']:.3f} on these meals, {raw['gain']:+.3f} ({raw['ci95'][0]:+.3f}, {raw['ci95'][1]:+.3f})"  # noqa: E501
         in flat
     )
+    assert 0.05 < sim["mean_gain"] < raw["gain"] and p2["refit_matches_frozen_v2_max_abs_logit_difference"] < 1e-6
     assert (
-        f"the gain is still {sim['mean_gain']:+.3f}" in flat
-        and p2["refit_matches_frozen_v2_max_abs_logit_difference"] < 1e-6
-    )
-    assert (
-        f"lifts it to {raw['with_carbs']:.3f} ({raw['gain']:+.3f}, {raw['ci95'][0]:+.3f} to {raw['ci95'][1]:+.3f})"
+        f"scores {raw['with_carbs']:.3f} there, {raw['gain']:+.3f} ({raw['ci95'][0]:+.3f} to {raw['ci95'][1]:+.3f})"
         in flat
     )
+    ck = _load("outputs/external_bigideas/external_checks.json")
+    big = ck["carb_gain_meals_of_200_kcal_or_more"]
+    assert f"the gain is {big['point']:+.3f} ({big['ci95'][0]:+.3f}, {big['ci95'][1]:+.3f})" in flat
+    assert f"{ck['people_ranked_better_with_carbs']} of {ck['people_with_both_outcomes']} people rank better" in flat
+    assert (
+        f"ranks {ck['people_ranked_below_chance_by_frozen_v2']} of {ck['people_with_both_outcomes']} people's own"
+        in flat
+    )
+    cg = _load("outputs/external_bigideas/external_part3.json")["cgmacros_out_of_fold"]["usefulness"]["cost_reduction"]
+    assert f"saves {cg['point']:.1%} ({cg['ci95'][0]:+.1%} to {cg['ci95'][1]:+.1%})".replace("-", "−") in flat
     p3 = _load("outputs/external_bigideas/external_part3.json")["external"]["usefulness"]
     cr, cs = p3["cost_reduction"], p3["cleared_share"]
     assert flat.count(f"{cr['point']:.1%} ({cr['ci95'][0]:.1%}–{cr['ci95'][1]:.1%})".replace("%–", "–")) >= 3
@@ -807,7 +814,7 @@ def test_external_and_post_freeze_cells():
         f"flips {fw['would_flip']} clears and avoids {fw['misses_avoided']} of the {fw['misses_total']} misses" in flat
     )
     v3 = _load("outputs/robustness_v3/robustness_v3.json")["r5_v3"]["carb_v3"]
-    assert f"range heads on frozen features reach {v3['bin_f1']:.2f} (v3)" in flat
+    assert f"range heads on frozen features reach {v3['bin_f1']:.2f} (v3, heads only, appendix)" in flat
     p = _load("outputs/post_freeze/post_freeze.json")
     j, c, m, a, dl = p["jpeg_stress"], p["crop_ablation"], p["embedding_map"], p["photo_average"], p["decision_layer"]
     assert (

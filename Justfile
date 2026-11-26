@@ -164,7 +164,7 @@ evaluate-fast:
     uv run glimpse probes
     just report-numbers
 
-# every evaluation and study behind the report's tables (about an hour with data and weights)
+# every evaluation and study behind the report's tables (60 to 90 minutes with data and weights)
 evaluate:
     just fusion
     just ablate
@@ -179,6 +179,7 @@ evaluate:
     just robustness-v3
     just rules-r22
     just post-freeze
+    if [ -f data/bigideas/bigideas_cgm.csv ]; then just external-bigideas; fi
     just report-numbers
 
 # the old name of `evaluate`, kept so earlier notes still work

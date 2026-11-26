@@ -1,0 +1,89 @@
+{
+  "what": "External follow-up checks (27 Nov), same 201 meals of 12 people",
+  "intercept_minus_no_intercept_auroc": {
+    "point": 0.004052287581699288,
+    "ci95": [
+      -0.09651452115711656,
+      0.10974324406596007
+    ],
+    "meals": 201
+  },
+  "people_with_both_outcomes": 11,
+  "people_ranked_below_chance_by_frozen_v2": 6,
+  "people_ranked_better_with_carbs": 10,
+  "carb_gain_all_meals": {
+    "point": 0.12588235294117645,
+    "ci95": [
+      0.060495991100005905,
+      0.18763940406760657
+    ],
+    "meals": 201
+  },
+  "carb_gain_meals_of_200_kcal_or_more": {
+    "point": 0.08101422387136681,
+    "ci95": [
+      0.004167171402036718,
+      0.15519573488938662
+    ],
+    "meals": 148,
+    "spike_rate": 0.3310810810810811
+  },
+  "carbs_alone_meals_of_200_kcal_or_more": 0.6324469181612038,
+  "per_person_within_auroc": {
+    "2": {
+      "v2_frozen": 0.5,
+      "without_carbs": 0.6538461538461539,
+      "with_carbs": 0.6153846153846154
+    },
+    "3": {
+      "v2_frozen": 0.4444444444444444,
+      "without_carbs": 0.6666666666666666,
+      "with_carbs": 0.7777777777777779
+    },
+    "4": {
+      "v2_frozen": 0.3888888888888889,
+      "without_carbs": 0.5,
+      "with_carbs": 0.7222222222222222
+    },
+    "5": {
+      "v2_frozen": 0.4313725490196078,
+      "without_carbs": 0.7843137254901961,
+      "with_carbs": 1.0
+    },
+    "6": {
+      "v2_frozen": 0.5,
+      "without_carbs": 0.6363636363636364,
+      "with_carbs": 0.9
+    },
+    "8": {
+      "v2_frozen": 0.43333333333333335,
+      "without_carbs": 0.6166666666666666,
+      "with_carbs": 0.8
+    },
+    "9": {
+      "v2_frozen": 0.5636363636363637,
+      "without_carbs": 0.7636363636363637,
+      "with_carbs": 0.7818181818181817
+    },
+    "10": {
+      "v2_frozen": 0.5466666666666666,
+      "without_carbs": 0.5466666666666666,
+      "with_carbs": 0.76
+    },
+    "11": {
+      "v2_frozen": 0.452991452991453,
+      "without_carbs": 0.4871794871794871,
+      "with_carbs": 0.5213675213675213
+    },
+    "12": {
+      "v2_frozen": 0.4,
+      "without_carbs": 0.5,
+      "with_carbs": 0.9
+    },
+    "14": {
+      "v2_frozen": 0.5416666666666667,
+      "without_carbs": 0.6666666666666667,
+      "with_carbs": 0.8055555555555556
+    }
+  }
+}

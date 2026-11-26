@@ -62,7 +62,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
 just check       # ruff + the test suite (some tests skip until the dataset and weights are downloaded)
 just demo        # worked cases (in-sample), two can't-judge cases, timing -> outputs/demo/, then the UI at :7860
-just evaluate    # every report table and figure (needs data and weights; about an hour; evaluate-fast: 15) -> outputs/
+just evaluate    # every report table and figure (needs data and weights; 60 to 90 minutes; evaluate-fast: 15) -> outputs/
 just report-numbers   # the same tables and figures from committed outputs only (no data, no weights, about 5 min on a 2-CPU machine)
 just predict-folder samples/instructor outputs/folder_run   # the grader's entry point: a folder of meals in, structured answers out
 just app         # local screen at http://127.0.0.1:7860 (optional extra: Gradio)
@@ -84,7 +84,7 @@ just docker-demo                              # needs `just install` first, for 
 | `just prepare` | meal table, windows, person splits, training-only scaling, quality report | 1 min |
 | `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · the intermediate 28-person fusion (`just train` runs all three; the DEPLOYED artifacts come from `just finalize`, the pre-registered regeneration, so train-photo and train-final refuse to overwrite them unless `GLIMPSE_OVERWRITE_FROZEN=1`) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
-| `just evaluate-fast` | parameter budget, both dev evaluations (v1 and v2), v2's metrics, probes and explanation, the unfamiliar-photo check, monitoring, probes A and B, then `just report-numbers` (every other table and figure re-derived from committed outputs); `just evaluate` also recomputes the stress, int8, timing and registered-check studies; the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun) | about 15 min on a 2-CPU machine (`evaluate` about an hour) |
+| `just evaluate-fast` | parameter budget, both dev evaluations (v1 and v2), v2's metrics, probes and explanation, the unfamiliar-photo check, monitoring, probes A and B, then `just report-numbers` (every other table and figure re-derived from committed outputs); `just evaluate` also recomputes the stress, int8, timing and registered-check studies; the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun) | about 15 min on a 2-CPU machine (`evaluate` 60 to 90 minutes) |
 | `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10-15 min |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`,
