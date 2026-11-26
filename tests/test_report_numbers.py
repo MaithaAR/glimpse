@@ -739,3 +739,19 @@ def test_robustness_v3_cells(text):
     assert f"seed spread ({s7['range']:.3f})" in flat and f"ordinary gain ({s7['photo_gain']:.3f};" in flat
     r8 = r["r8_reweighted"]
     assert f"from {r8['auroc_unweighted']:.3f} to {r8['auroc_reweighted']:.3f}" in flat
+
+
+def test_rules_r22_and_holm_cells(text):
+    """Rule R22's counted effect and the Holm check (26 Nov) against their committed outputs."""
+    r = _load("outputs/rules_r22/rules_r22.json")
+    flat = " ".join(text.split())
+    a1, a2 = r["v1"]["after"], r["v2"]["after"]
+    assert r["v1"]["before"]["cleared"] == 109 and r["v1"]["r22_clears_to_caution"] == 22
+    assert f"{a1['cleared_share']:.1%}; {a1['missed_among_cleared']:.1%} ({a1['missed']} of {a1['cleared']})" in flat
+    assert f"{a2['cleared_share']:.1%}; {a2['missed_among_cleared']:.1%}" in flat
+    assert f"turns {r['v1']['r22_clears_to_caution']} of v1's" in flat or "turns 22 of v1's 109" in flat
+    assert f"only {r['v1']['spiked_among_r22']} of which spiked" in flat
+    assert f"{r['locked_counted_only']['r22_clears_to_caution']} of 10 clears become caution" in flat
+    h = _load("outputs/report_metrics/holm.json")["contrasts"]
+    survivors = {k for k, v in h.items() if v["survives_holm_0.05"]}
+    assert survivors == {"v1 minus a running spike rate", "within-person AUROC, intercept minus raw (v1)"}
