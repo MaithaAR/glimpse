@@ -1,0 +1,2323 @@
+[
+ {
+  "variant": {
+   "name": "v1 recipe (reference)",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7424182161678433,
+   "within": 0.5910744665068337,
+   "sum": 1.333492682674677,
+   "brier": 0.1745757142355865,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7350192413413964,
+   "within": 0.5866236249507288,
+   "sum": 1.3216428662921254,
+   "brier": 0.17742200705280595,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v1 recipe, no intercept",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 0.18742575084702692,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7009895547003848,
+   "within": 0.663038152950815,
+   "sum": 1.3640277076512,
+   "brier": 0.18763303009121599,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "intercept m=4",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 4.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7370985383315103,
+   "within": 0.6217583707668249,
+   "sum": 1.3588569090983351,
+   "brier": 0.17523917572329512,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7332600329851567,
+   "within": 0.618291808089736,
+   "sum": 1.3515518410748928,
+   "brier": 0.17683029030173533,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "intercept m=8",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 8.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7263597494282589,
+   "within": 0.6338260510289495,
+   "sum": 1.3601858004572085,
+   "brier": 0.17853192081004327,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.725563496426608,
+   "within": 0.6292537422461145,
+   "sum": 1.3548172386727226,
+   "brier": 0.17958447191523635,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "intercept m=16",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 16.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7175599085214279,
+   "within": 0.6508490863225163,
+   "sum": 1.3684089948439442,
+   "brier": 0.18175578891235705,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7188015393073117,
+   "within": 0.6477689890318926,
+   "sum": 1.3665705283392042,
+   "brier": 0.18243586259244918,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "rate intercept m=2",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "rate",
+   "m": 2.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7530078552252162,
+   "within": 0.5642924015061695,
+   "sum": 1.3173002567313858,
+   "brier": 0.17181861924281364,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.745409565695437,
+   "within": 0.56037396127194,
+   "sum": 1.305783526967377,
+   "brier": 0.17494892549925684,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "rate intercept m=8",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "rate",
+   "m": 8.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7503728746146963,
+   "within": 0.6028508389534959,
+   "sum": 1.3532237135681922,
+   "brier": 0.170941614673794,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7448598130841122,
+   "within": 0.5974558635585207,
+   "sum": 1.3423156766426327,
+   "brier": 0.1730180669413081,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "frozen after 5, m=2",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 2.0,
+   "start_after": 0,
+   "freeze_at": 5,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7277518146564582,
+   "within": 0.6282909345083258,
+   "sum": 1.356042749164784,
+   "brier": 0.1770067696266952,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7211105002748763,
+   "within": 0.6224054944123594,
+   "sum": 1.3435159946872357,
+   "brier": 0.1790498216913072,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "frozen after 10, m=2",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 2.0,
+   "start_after": 0,
+   "freeze_at": 10,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.747240727851248,
+   "within": 0.6211499514084055,
+   "sum": 1.3683906792596534,
+   "brier": 0.1723844906521328,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7402968664101155,
+   "within": 0.6179057735589647,
+   "sum": 1.3582026399690803,
+   "brier": 0.17447908931495057,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "start after 3",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 3,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7398329521726161,
+   "within": 0.5852838897995903,
+   "sum": 1.3251168419722066,
+   "brier": 0.1752643517905675,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.696927513174903,
+   "within": 0.6649061290293174,
+   "sum": 1.3618336422042203,
+   "brier": 1.7850549805198401,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7319406267179769,
+   "within": 0.5825755649860024,
+   "sum": 1.3145161917039792,
+   "brier": 0.1781474947779532,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "centred",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7529084219946306,
+   "within": 0.6173177723153568,
+   "sum": 1.3702261943099874,
+   "brier": 0.17200156862513577,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7330217758774982,
+   "within": 0.6797926932166063,
+   "sum": 1.4128144690941045,
+   "brier": 2.040008382691031,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7473336998350742,
+   "within": 0.6151189574849631,
+   "sum": 1.3624526573200373,
+   "brier": 0.17473246699424477,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "carbs confirmed",
+   "photo": true,
+   "centred": false,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7426170826290146,
+   "within": 0.6105225205551292,
+   "sum": 1.3531396031841438,
+   "brier": 0.17553785763708654,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.6949885651784825,
+   "within": 0.6867618875130952,
+   "sum": 1.3817504526915778,
+   "brier": 2.0066966217491347,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.736998350742166,
+   "within": 0.610008526751662,
+   "sum": 1.347006877493828,
+   "brier": 0.1779048096156193,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "carbs col, photo only",
+   "photo": true,
+   "centred": false,
+   "carbs": "photo",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7333200755692553,
+   "within": 0.5756780943604614,
+   "sum": 1.3089981699297166,
+   "brier": 0.17767749725876128,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.6944913990255543,
+   "within": 0.6596196521317294,
+   "sum": 1.3541110511572838,
+   "brier": 1.839760227064658,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7264980758658603,
+   "within": 0.5721921991640398,
+   "sum": 1.2986902750299003,
+   "brier": 0.1806698559730261,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "carbs confirmed, no photo cols",
+   "photo": false,
+   "centred": false,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7540021875310728,
+   "within": 0.6039883636671077,
+   "sum": 1.3579905511981805,
+   "brier": 0.17126689252138336,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7092572337675251,
+   "within": 0.7040261850334313,
+   "sum": 1.4132834188009564,
+   "brier": 1.8269122030973481,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7493128092358439,
+   "within": 0.5990975916710725,
+   "sum": 1.3484104009069164,
+   "brier": 0.17295654701586796,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "target rise",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "rise",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.739584369096152,
+   "within": 0.5845285747532123,
+   "sum": 1.3241129438493644,
+   "brier": 0.17471503723310697,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7100526996122104,
+   "within": 0.6451229504526607,
+   "sum": 1.355175650064871,
+   "brier": 1.908079925190492,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7305662451896647,
+   "within": 0.5694416879557994,
+   "sum": 1.3000079331454641,
+   "brier": 0.17796510082543948,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "target soft",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "soft",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7461469623148056,
+   "within": 0.5870927763415686,
+   "sum": 1.3332397386563741,
+   "brier": 0.17357229875029645,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.709903549766332,
+   "within": 0.6634414798388228,
+   "sum": 1.3733450296051548,
+   "brier": 1.9039892249473147,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7376030786146235,
+   "within": 0.5807516953952246,
+   "sum": 1.318354774009848,
+   "brier": 0.1767006722805779,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "drop near 5",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7497265586158893,
+   "within": 0.5914682715745517,
+   "sum": 1.341194830190441,
+   "brier": 0.17264611353745626,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7170130257532067,
+   "within": 0.672106880282001,
+   "sum": 1.3891199060352077,
+   "brier": 1.9264905961239398,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7421660252886202,
+   "within": 0.5851445952508756,
+   "sum": 1.3273106205394958,
+   "brier": 0.17549186115793516,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "drop near 10",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 10.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7472407278512478,
+   "within": 0.5868869081357003,
+   "sum": 1.334127635986948,
+   "brier": 0.17289353506976965,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7125385303768519,
+   "within": 0.6696944860918291,
+   "sum": 1.382233016468681,
+   "brier": 1.925984539404415,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7384277075316107,
+   "within": 0.5796776213211505,
+   "sum": 1.318105328852761,
+   "brier": 0.17602740865224517,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "gbm",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "gbm",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7111961817639455,
+   "within": 0.5378040471337573,
+   "sum": 1.2490002288977027,
+   "brier": 0.18134762743989252,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.6632196480063637,
+   "within": 0.6372775973355683,
+   "sum": 1.3004972453419321,
+   "brier": 1.7531442563137731,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7083012644310062,
+   "within": 0.5423729967027068,
+   "sum": 1.250674261133713,
+   "brier": 0.1825970486662936,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "rise + centred",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "rise",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7471412946206623,
+   "within": 0.6014228588552261,
+   "sum": 1.3485641534758883,
+   "brier": 0.1719057074717647,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7377945709456101,
+   "within": 0.6652519187289718,
+   "sum": 1.403046489674582,
+   "brier": 2.1648376392299933,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7386476085761408,
+   "within": 0.5896152707318484,
+   "sum": 1.3282628793079891,
+   "brier": 0.17528479090765364,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "rise + carbs confirmed",
+   "photo": true,
+   "centred": false,
+   "carbs": "confirmed",
+   "target": "rise",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.742766232474893,
+   "within": 0.6089975735929843,
+   "sum": 1.3517638060678774,
+   "brier": 0.17491351831451085,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7170130257532067,
+   "within": 0.6735229819384408,
+   "sum": 1.3905360076916475,
+   "brier": 2.1019910671827216,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7345794392523364,
+   "within": 0.600529667230341,
+   "sum": 1.3351091064826774,
+   "brier": 0.1779899302777453,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "rise + centred + carbs confirmed",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "rise",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7509694739982102,
+   "within": 0.6301918458174497,
+   "sum": 1.3811613198156598,
+   "brier": 0.17221884687374825,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7388386198667595,
+   "within": 0.6877519890201048,
+   "sum": 1.4265906088868643,
+   "brier": 2.368579766615131,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7423309510720176,
+   "within": 0.6206756699854844,
+   "sum": 1.363006621057502,
+   "brier": 0.17545597921270709,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "centred + carbs confirmed",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7543999204534155,
+   "within": 0.6312833626384351,
+   "sum": 1.3856832830918506,
+   "brier": 0.17228967489310656,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7345629909515761,
+   "within": 0.7069211052858395,
+   "sum": 1.4414840962374156,
+   "brier": 2.203703088687642,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7494227597581089,
+   "within": 0.6297651294096756,
+   "sum": 1.3791878891677845,
+   "brier": 0.1746128796721284,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf + carb_centred",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7545987869145868,
+   "within": 0.6388438950564554,
+   "sum": 1.3934426819710422,
+   "brier": 0.17191759046856683,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7368002386397534,
+   "within": 0.7090559354762253,
+   "sum": 1.4458561741159786,
+   "brier": 2.206503247348546,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7499175371083012,
+   "within": 0.6356829526849868,
+   "sum": 1.3856004897932879,
+   "brier": 0.17422440141784012,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf + similar",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "similar"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7481853435418118,
+   "within": 0.6244814173123351,
+   "sum": 1.372666760854147,
+   "brier": 0.17255888581363918,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7274535149647012,
+   "within": 0.7084121653083006,
+   "sum": 1.4358656802730019,
+   "brier": 2.171590262112409,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7431555799890049,
+   "within": 0.6239123762169783,
+   "sum": 1.3670679562059833,
+   "brier": 0.17501467308643157,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf + prev_rise",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7577309336780352,
+   "within": 0.630914592519665,
+   "sum": 1.3886455261977002,
+   "brier": 0.17203527645803066,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7442080143183852,
+   "within": 0.6967481527239981,
+   "sum": 1.4409561670423834,
+   "brier": 2.2795318935208777,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7530511269928533,
+   "within": 0.6297003145948608,
+   "sum": 1.382751441587714,
+   "brier": 0.17446465572525732,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf + all three",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "similar",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7508203241523317,
+   "within": 0.6241520731460344,
+   "sum": 1.374972397298366,
+   "brier": 0.17245749177828917,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7383911703291239,
+   "within": 0.7020784962487862,
+   "sum": 1.44046966657791,
+   "brier": 2.228724526972358,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7457943925233645,
+   "within": 0.6227412812089267,
+   "sum": 1.3685356737322913,
+   "brier": 0.17497480554077713,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf + cc + sim",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "similar"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7488316595406185,
+   "within": 0.6292832454716512,
+   "sum": 1.3781149050122696,
+   "brier": 0.17206257248969514,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7293427463458289,
+   "within": 0.7147262260909604,
+   "sum": 1.4440689724367892,
+   "brier": 2.184615263460626,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7437603078614623,
+   "within": 0.6296057494783657,
+   "sum": 1.3733660573398279,
+   "brier": 0.1745513013896322,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen (photo only) + carb_centred",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7476881773888834,
+   "within": 0.609002550500135,
+   "sum": 1.3566907278890183,
+   "brier": 0.17359513425889245,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7253654171224022,
+   "within": 0.6756107962086222,
+   "sum": 1.4009762133310244,
+   "brier": 2.032508757892518,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7418911489829576,
+   "within": 0.6059379494092181,
+   "sum": 1.3478290983921757,
+   "brier": 0.1763925594553596,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen (photo only) + cc + sim",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "similar"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7454012130854131,
+   "within": 0.5979883239859085,
+   "sum": 1.3433895370713216,
+   "brier": 0.17510004628208597,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7231778860495176,
+   "within": 0.6601139490318233,
+   "sum": 1.3832918350813408,
+   "brier": 2.0272607387729837,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7401319406267179,
+   "within": 0.5959172030989982,
+   "sum": 1.3360491437257163,
+   "brier": 0.17788312914566864,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen (photo only) + prev_rise",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7560902853733718,
+   "within": 0.6158224990700837,
+   "sum": 1.3719127844434555,
+   "brier": 0.17168921006390314,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7449040469324849,
+   "within": 0.6727077431872118,
+   "sum": 1.4176117901196967,
+   "brier": 2.1337788674368263,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7503023639362287,
+   "within": 0.6133768939928996,
+   "sum": 1.3636792579291284,
+   "brier": 0.17455963148267517,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf, drop5",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7664810579695733,
+   "within": 0.6386173064723788,
+   "sum": 1.4050983644419521,
+   "brier": 0.16851885208544787,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7491299592323755,
+   "within": 0.7125221475607949,
+   "sum": 1.4616521067931703,
+   "brier": 2.285817036151314,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7620670698185816,
+   "within": 0.6372688888081719,
+   "sum": 1.3993359586267535,
+   "brier": 0.17054049953780573,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf, frozen10 m2",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 2.0,
+   "start_after": 0,
+   "freeze_at": 10,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7611613801332406,
+   "within": 0.6604445358720721,
+   "sum": 1.4216059160053127,
+   "brier": 0.16885604839739424,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7345629909515761,
+   "within": 0.7069211052858395,
+   "sum": 1.4414840962374156,
+   "brier": 2.203703088687642,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7569543705332601,
+   "within": 0.6625201308424039,
+   "sum": 1.419474501375664,
+   "brier": 0.17061974666848315,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf, m=4",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 4.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.750720890921746,
+   "within": 0.6674405302605785,
+   "sum": 1.4181614211823246,
+   "brier": 0.17121468165454093,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7345629909515761,
+   "within": 0.7069211052858395,
+   "sum": 1.4414840962374156,
+   "brier": 2.203703088687642,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7477185266630018,
+   "within": 0.6684354320449539,
+   "sum": 1.4161539587079557,
+   "brier": 0.1727189484157012,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf, rate m=8",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "rate",
+   "m": 8.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7637466441284677,
+   "within": 0.6486507809152736,
+   "sum": 1.4123974250437414,
+   "brier": 0.16645024302521258,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7345629909515761,
+   "within": 0.7069211052858395,
+   "sum": 1.4414840962374156,
+   "brier": 2.203703088687642,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7582188015393072,
+   "within": 0.6478695884235549,
+   "sum": 1.406088389962862,
+   "brier": 0.16881455735952114,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cen+conf, no intercept",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {}
+  },
+  "all_meals": {
+   "pooled": 0.7345629909515761,
+   "within": 0.7069211052858395,
+   "sum": 1.4414840962374156,
+   "brier": 0.17915291703098787,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7345629909515761,
+   "within": 0.7069211052858395,
+   "sum": 1.4414840962374156,
+   "brier": 2.203703088687642,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7356239692138538,
+   "within": 0.710587823557821,
+   "sum": 1.4462117927716749,
+   "brier": 0.1798842151965443,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cc+pr, none",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7461966789300984,
+   "within": 0.7038861258619712,
+   "sum": 1.4500828047920695,
+   "brier": 0.17560043746056372,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7461966789300984,
+   "within": 0.7038861258619712,
+   "sum": 1.4500828047920695,
+   "brier": 2.2897592861261025,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7460142935678944,
+   "within": 0.7066269182080268,
+   "sum": 1.452641211775921,
+   "brier": 0.17647582798646463,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "hist_rate, none",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "hist_rate"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7360544894103609,
+   "within": 0.6894370584684595,
+   "sum": 1.4254915478788204,
+   "brier": 0.1780242642033287,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7360544894103609,
+   "within": 0.6894370584684595,
+   "sum": 1.4254915478788204,
+   "brier": 2.342287338794847,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7354590434304562,
+   "within": 0.6928049868363878,
+   "sum": 1.4282640302668441,
+   "brier": 0.17916798941216777,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "pr+hist_rate, none",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise",
+     "hist_rate"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7425176493984289,
+   "within": 0.6894236805420381,
+   "sum": 1.431941329940467,
+   "brier": 0.17606586443817562,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7425176493984289,
+   "within": 0.6894236805420381,
+   "sum": 1.431941329940467,
+   "brier": 2.409167608251852,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7411764705882353,
+   "within": 0.6909641770825345,
+   "sum": 1.4321406476707699,
+   "brier": 0.17724358375380486,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cc+pr+hist_rate, none",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise",
+     "hist_rate"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7415730337078652,
+   "within": 0.69285895344591,
+   "sum": 1.4344319871537752,
+   "brier": 0.1762816252208778,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7415730337078652,
+   "within": 0.69285895344591,
+   "sum": 1.4344319871537752,
+   "brier": 2.391890384105053,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7401319406267179,
+   "within": 0.6933893489763056,
+   "sum": 1.4335212896030236,
+   "brier": 0.17739647060758848,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cc+pr+hr+n, none",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise",
+     "hist_rate",
+     "hist_n"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7400318186337874,
+   "within": 0.6887541456575271,
+   "sum": 1.4287859642913145,
+   "brier": 0.17686151701413685,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7400318186337874,
+   "within": 0.6887541456575271,
+   "sum": 1.4287859642913145,
+   "brier": 2.409734324631575,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7377680043980209,
+   "within": 0.6890163055249502,
+   "sum": 1.4267843099229711,
+   "brier": 0.17807036158833076,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cc+pr, none, drop5",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7627523118226109,
+   "within": 0.7126890359148812,
+   "sum": 1.4754413477374921,
+   "brier": 0.17019141168539706,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7627523118226109,
+   "within": 0.7126890359148812,
+   "sum": 1.4754413477374921,
+   "brier": 2.4547574568771218,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7618471687740517,
+   "within": 0.7151819864341477,
+   "sum": 1.4770291552081993,
+   "brier": 0.17105735620042695,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cc+pr+hr, none, drop5",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise",
+     "hist_rate"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7597693149050412,
+   "within": 0.7018383999253565,
+   "sum": 1.4616077148303976,
+   "brier": 0.17035906507354348,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7597693149050412,
+   "within": 0.7018383999253565,
+   "sum": 1.4616077148303976,
+   "brier": 2.5861969650305006,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7576140736668499,
+   "within": 0.7031282796362888,
+   "sum": 1.4607423533031385,
+   "brier": 0.1715503259078763,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cc+pr, m=8 residual",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 8.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7546485035298797,
+   "within": 0.6829483753408874,
+   "sum": 1.437596878870767,
+   "brier": 0.17094830116561377,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7461966789300984,
+   "within": 0.7038861258619712,
+   "sum": 1.4500828047920695,
+   "brier": 2.2897592861261025,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7519516217702034,
+   "within": 0.6832301160173649,
+   "sum": 1.4351817377875684,
+   "brier": 0.17226573137259327,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "cc+pr, m=16 residual",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 16.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7511186238440887,
+   "within": 0.6939447914761925,
+   "sum": 1.445063415320281,
+   "brier": 0.17254117535172936,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7461966789300984,
+   "within": 0.7038861258619712,
+   "sum": 1.4500828047920695,
+   "brier": 2.2897592861261025,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7487080813633864,
+   "within": 0.6948250369617012,
+   "sum": 1.4435331183250875,
+   "brier": 0.17366300454908334,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "photo-only cc+pr+hr none",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise",
+     "hist_rate"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.738689470020881,
+   "within": 0.6527727330372258,
+   "sum": 1.391462203058107,
+   "brier": 0.17684062546059034,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.738689470020881,
+   "within": 0.6527727330372258,
+   "sum": 1.391462203058107,
+   "brier": 2.25814107578898,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7368884002199011,
+   "within": 0.6528123620242231,
+   "sum": 1.3897007622441242,
+   "brier": 0.17832518590591256,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "photo-only pr+hr none drop5",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise",
+     "hist_rate"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7588744158297703,
+   "within": 0.6633832617105564,
+   "sum": 1.4222576775403266,
+   "brier": 0.17061799069484143,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7588744158297703,
+   "within": 0.6633832617105564,
+   "sum": 1.4222576775403266,
+   "brier": 2.327167829542378,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7579989004947774,
+   "within": 0.6624421073483494,
+   "sum": 1.4204410078431269,
+   "brier": 0.17193293149153072,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "no photo, no carbs: pr+hr none",
+   "photo": false,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 0.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise",
+     "hist_rate"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7456000795465844,
+   "within": 0.621640953383707,
+   "sum": 1.3672410329302913,
+   "brier": 0.17471363115526753,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7456000795465844,
+   "within": 0.621640953383707,
+   "sum": 1.3672410329302913,
+   "brier": 1.8851118051466622,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7457943925233645,
+   "within": 0.6164361679157636,
+   "sum": 1.3622305604391283,
+   "brier": 0.17566060854605367,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "conf cc+pr drop5, no photo cols",
+   "photo": false,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7659341752013522,
+   "within": 0.7291102458107288,
+   "sum": 1.495044421012081,
+   "brier": 0.1682286126428358,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7659341752013522,
+   "within": 0.7291102458107288,
+   "sum": 1.495044421012081,
+   "brier": 2.2621097403072103,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.765915338097856,
+   "within": 0.7307728668154552,
+   "sum": 1.496688204913311,
+   "brier": 0.16861467988973441,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "conf cc+pr drop8",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 8.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7620065625932186,
+   "within": 0.7187816823541461,
+   "sum": 1.4807882449473646,
+   "brier": 0.17029238996482982,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7620065625932186,
+   "within": 0.7187816823541461,
+   "sum": 1.4807882449473646,
+   "brier": 2.528495701969679,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7595382078064871,
+   "within": 0.7193201643399966,
+   "sum": 1.4788583721464836,
+   "brier": 0.17151206400892655,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "conf cc+pr drop3",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 3.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7522123893805309,
+   "within": 0.7096113934374804,
+   "sum": 1.4618237828180112,
+   "brier": 0.17335714315339693,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7522123893805309,
+   "within": 0.7096113934374804,
+   "sum": 1.4618237828180112,
+   "brier": 2.3883240492226,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7505772402418911,
+   "within": 0.7118449444868209,
+   "sum": 1.462422184728712,
+   "brier": 0.17455039867458835,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "conf pr drop5",
+   "photo": true,
+   "centred": true,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7611116635179477,
+   "within": 0.7081718055160083,
+   "sum": 1.469283469033956,
+   "brier": 0.17083544866371275,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7611116635179477,
+   "within": 0.7081718055160083,
+   "sum": 1.469283469033956,
+   "brier": 2.3789244435473975,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7606926882902694,
+   "within": 0.7100070657723213,
+   "sum": 1.4706997540625908,
+   "brier": 0.17155692763615074,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "photo-only cc+pr drop5",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7527095555334593,
+   "within": 0.6747202073735891,
+   "sum": 1.4274297629070483,
+   "brier": 0.17250842169191205,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7527095555334593,
+   "within": 0.6747202073735891,
+   "sum": 1.4274297629070483,
+   "brier": 2.2030475285031006,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7518416712479384,
+   "within": 0.6760280710498737,
+   "sum": 1.4278697422978122,
+   "brier": 0.17360652826085396,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "photo-only pr drop5",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 0.17070041642996306,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7605827377680044,
+   "within": 0.6807877248139135,
+   "sum": 1.441370462581918,
+   "brier": 0.17168178020138916,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "photo-only pr drop5, no centred",
+   "photo": true,
+   "centred": false,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7343641244904047,
+   "within": 0.6666763773442518,
+   "sum": 1.4010405018346566,
+   "brier": 0.1788645344784149,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7343641244904047,
+   "within": 0.6666763773442518,
+   "sum": 1.4010405018346566,
+   "brier": 2.029424354960354,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7353490929081912,
+   "within": 0.6625593832272576,
+   "sum": 1.3979084761354488,
+   "brier": 0.17955192884362534,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "conf cc+pr drop5, no centred",
+   "photo": true,
+   "centred": false,
+   "carbs": "confirmed",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "carb_centred",
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7382420204832455,
+   "within": 0.7047999870499871,
+   "sum": 1.4430420075332326,
+   "brier": 0.1777069649474887,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7382420204832455,
+   "within": 0.7047999870499871,
+   "sum": 1.4430420075332326,
+   "brier": 2.2749785101058855,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7401319406267179,
+   "within": 0.7083828320802006,
+   "sum": 1.4485147727069185,
+   "brier": 0.17812494710841106,
+   "meals": 299
+  }
+ }
+]

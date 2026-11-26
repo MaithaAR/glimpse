@@ -64,3 +64,31 @@ that include zero.
 
 No further variant is scored on the confirmation people. v1 stays served. Whatever the outcome, the design
 log and the confirmation go into the talk as they are.
+
+## Design frozen (26 Nov, before the confirmation people are scored)
+
+56 variants were scored on the design people; all are in outputs/v5_model_fix/design_log.json. v1's shipped
+risk on the same people: pooled AUROC 0.737, within-person 0.586 (299 answered meals).
+
+What the design part showed:
+- The post-hoc intercept trades one number for the other. Every version of it (stronger shrinkage, a running
+  rate, frozen after 5 or 10 meals, a late start) moved pooled and within-person AUROC in opposite directions.
+- Putting the person's history into the model as an input works better than adding it afterwards: the mean
+  rise of the person's earlier labelled meals (`prev_rise`), with no offset at all.
+- Trend numbers relative to the person's own earlier meals help (v4's B1 change).
+- Dropping training meals within 5 mg/dL of the cut helps; 3 and 8 help less. Training on the rise itself and
+  soft labels did not help. Boosted trees were worse.
+- Confirmed carbs help most within a person, and with them the 4 photo inputs are better left out.
+
+The frozen design, v5, is two logistic models with the same recipe (C tuned on the inner folds, per-fold
+Platt map, no post-hoc intercept, training meals within 5 mg/dL of the cut dropped):
+
+| | inputs | design people: pooled / within-person |
+|---|---|---|
+| v5, carbs confirmed by the user | 15 trend and profile + 7 person-centred trend + carbs + carbs relative to the person's usual + `prev_rise` (25) | 0.766 / 0.729 |
+| v5, photo only | 15 trend and profile + 4 photo + 7 person-centred trend + `prev_rise` (27) | 0.761 / 0.680 |
+
+When the user confirms nothing, the first model is not used; the second answers. A meal with no photo and no
+confirmed carbs is answered by the second model with its photo inputs imputed (v1 refuses those meals).
+
+These numbers are selected on the design people and are optimistic. The confirmation below is the estimate.
