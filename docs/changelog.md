@@ -331,6 +331,8 @@ Code was sometimes drafted before its registration was committed.
 | README checkpoint table (served, alternative, baseline, superseded) | rubric 6d | README.md |
 | v3 paragraph and v2's monitoring rows moved to the appendix | page limit | docs/report_appendix.md |
 
-Author sign-off on the tenth to twenty-first passes (v2, the return to v1, R13 to R16 and every registration since the tag):
-to be added here by the author, dated, in her words.
-
+Author sign-off, 27 Nov 2026. I read every pass from the tenth to the twenty-first and agree with what is
+recorded here. These decisions were mine: serving v1 again after v2 was not shown to be as good; limiting R16
+to the sensor inputs and to the risk-lowering side; not labelling the 14 local photos with carbs; keeping v3
+as a candidate only; and adding R22 even though it costs clears on development. The assistant wrote code and
+registrations at my instruction. The choices and the conclusions are mine. Maitha Alhosani

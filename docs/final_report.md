@@ -308,9 +308,8 @@ dietitian consultation did not complete, so the cost matrix stays a declared ass
 *outputs/folder_run and outputs/stress_run (v1, served), outputs/v2_sensor_first/ (v2), report_metrics.json (errors, false_clears_exploratory), v2_explain.json (taxonomy), outputs/probes/. Half of v1's 8 development false clears are in fold 1; v2's 15 spread over all five folds (6 in fold 5).*
 
 Probe B was registered as an expected pass (a rising pre-meal trace raises risk on at least 90% of meals)
-and failed: risk rose on only 8.5% of meals in both products. The label is baseline-relative, so a meal eaten
-on a rising trace has a
-higher baseline and a smaller measured rise; our registration encoded naive physiology. Exact SHAP for the
+and failed: risk rose on only 8.5% of meals in both products. The label is baseline-relative, so a meal
+eaten on a rising trace has a higher baseline and a smaller measured rise. Exact SHAP for the
 frozen v1 fusion (Figure 7) ranks prior rise first, then age, heart rate and prior spike rate. Attribution
 and ablation disagree for heart rate (−0.21 coefficient, +0.007 when removed): attribution measures
 in-sample use, ablation out-of-sample loss. In v2 the same four lead (outputs/v2_explain/), and the sign has a
@@ -333,11 +332,13 @@ intercept moves v2's logit by 0.51 on average, against 0.64 for the whole fusion
 A regularised photo branch (v3, robustness checks 5 to 7) cut the overfitting gap from 0.35 to 0.13 but
 raised carb error to 26.0 g; it stays a candidate (appendix).
 
-![Figure 7: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/fig7_shap.png){width=58%}
+![Figure 7: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/fig7_shap.png){width=54%}
 
-False clears, the costliest error, fell on healthy people in v1 (7 of its 8 development false clears),
-while people with prediabetes were rarely cleared; on the harder locked cohort v1 flagged 91% of meals, a
-nudge a user learns to ignore.
+Who gets hurt. A false clear tells a person with prediabetes that a meal is safe when it is not, and we
+priced it as the worst error. In v1 most false clears fell on healthy people, and R22 now holds back a
+clear when glucose is already high or rising. The other harm is alert fatigue: on the
+locked people v1 said caution for 91% of meals, and a warning that is always on gets ignored. A
+caution-first tool only helps if it clears often enough to be believed.
 
 ## 6. Reproducibility
 The 8 locked people were scored once, on 25 Nov, with v1 (10 low risk, 139 caution, 4 can't judge). The
@@ -352,9 +353,8 @@ run scored only v1, so the endpoint was never computed and cannot be now.
 re-derives every data-free output and fails on drift beyond 1e-9.
 
 **AI-assisted development.** Code and documents were built with an LLM assistant, and the commits say
-so. The author set the goals and approved each pre-registration, freeze and verdict. After the tag, AI cold
-grades led to the dated rounds in docs/changelog.md; the assistant wrote those registrations under her
-instruction, and the changelog ends with her dated sign-off. No v1 artifact or locked number changed.
+so. The author set the goals and approved each registration, freeze and verdict; her dated sign-off in
+docs/changelog.md names her decisions after the tag. No v1 artifact or locked number changed.
 
 ## 7. Limitations and conclusion
 CGMacros is de-identified public PhysioNet data under the source study's ethics approval; no new human
@@ -370,4 +370,4 @@ learning curve still creeps up), the §4 what-if tested on new people, and per-p
 
 **References.** Liu et al., ConvNeXt, CVPR 2022 · Zeevi et al., Cell 2015, doi:10.1016/j.cell.2015.11.001 ·
 Berry et al., Nat Med 2020, doi:10.1038/s41591-020-0934-0 · Vickers & Elkin, Med Decis Making 2006,
-doi:10.1177/0272989X06295361 · CGMacros, Sci Data 2025, doi:10.1038/s41597-025-05851-7 (PhysioNet v1.0.0).
+doi:10.1177/0272989X06295361 · CGMacros (PhysioNet), Sci Data 2025, doi:10.1038/s41597-025-05851-7.
