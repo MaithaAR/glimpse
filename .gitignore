@@ -7,6 +7,7 @@ __pycache__/
 results/photo_features*.npz
 .venv/
 logs/
-outputs/
+# outputs/ is evidence and is tracked; only the mocked feedback store is local
+outputs/feedback/
 .pytest_cache/
 .ruff_cache/

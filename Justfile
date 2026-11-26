@@ -121,7 +121,38 @@ stage-timing:
 # dev evaluation on partition v2 (every risk from Pipeline.answer, one Pipeline per fold), then `report-numbers`
 evaluate:
     uv run glimpse evaluate
+    uv run glimpse evaluate --sensor-first
+    uv run glimpse v2-metrics
     just report-numbers
+
+# `evaluate` plus the cheaper compute studies behind the report's other tables (~40 min with data and weights)
+evaluate-all:
+    just fusion
+    just ablate
+    just promised
+    just evaluate
+    just stress-quality
+    just photo-probes
+
+# v2 (docs/v2_sensor_first.md): the sensor-first freeze, written once to checkpoints/sensor_first/
+finalize-sensor-first:
+    uv run glimpse finalize-sensor-first
+
+# v2 beside v1 on development (needs the dataset for the samples' path)
+v2-metrics:
+    uv run glimpse v2-metrics
+
+# quality under stress at the evaluated operating point, v2 and v1 (registered 26 Nov; ~25 min)
+stress-quality:
+    uv run glimpse stress-quality
+
+# photo probes D and E and int8 against fp32 (registered 26 Nov; ~10 min)
+photo-probes:
+    uv run glimpse photo-probes
+
+# monitoring replay 4: CUSUM detection power under a simulated cohort shift (data-free)
+monitoring-power:
+    uv run glimpse monitoring-power
 
 # every compute study behind the report in dependency order, ~3 h (not `finalize` or `evaluate-locked`)
 reproduce-all:
@@ -142,6 +173,8 @@ reproduce-all:
     just monitoring
     just efficiency
     just stage-timing
+    just stress-quality
+    just photo-probes
     just photo-seeds
     just evaluate
     just selftest
@@ -152,12 +185,13 @@ reproduce-all:
 # regenerate the data-free outputs and fail if they differ from the committed ones (no dataset or weights needed)
 verify-outputs:
     just report-numbers
-    git diff --exit-code outputs/report_metrics outputs/monitoring/replay.json outputs/figures/figures.json
+    git diff --exit-code outputs/report_metrics outputs/monitoring outputs/probes outputs/figures/figures.json
 
 # re-derive every report table and figure from committed outputs (no dataset or weights needed, ~1 min)
 report-numbers:
     uv run glimpse report-metrics
     uv run glimpse monitoring-replay
+    uv run glimpse monitoring-power
     uv run glimpse probe-c
     uv run glimpse figures
     just wordcount
