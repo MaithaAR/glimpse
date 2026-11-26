@@ -252,6 +252,16 @@ def _timing(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _stress_quality(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Quality under stress at the evaluated operating point, v2 and v1 (registered 26 Nov)."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.stress_quality import run_stress_quality
+
+    run_stress_quality(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _robustness_levels(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Rubric 4d: the four perturbations at three magnitudes each (pre-registered 22 Nov)."""
     from pathlib import Path
@@ -481,6 +491,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("robustness", help="decision-flip rates under CGM dropout/gap and photo blur/dark (S9)")
     sub.add_parser("promised", help="the intermediate's promised comparisons, run once (pre-registered 8 Nov)")
     sub.add_parser("evaluate-locked", help="S16: score the 8 locked people ONCE against the frozen artifacts")
+    sub.add_parser("stress-quality", help="AUROC, misses and flips by direction under stress, v2 and v1")
     sub.add_parser("robustness-levels", help="the four perturbations at three magnitudes each (rubric 4d)")
     sub.add_parser("probes", help="photo-swap and flat-vs-rising CGM counterfactual probes (S13)")
     sub.add_parser("efficiency", help="parameters vs caps, serving latency, artifact sizes (S12)")
@@ -538,6 +549,7 @@ def main(argv: list[str] | None = None) -> int:
         "promised": _promised,
         "evaluate-locked": _evaluate_locked,
         "robustness-levels": _robustness_levels,
+        "stress-quality": _stress_quality,
         "probes": _probes,
         "efficiency": _efficiency,
         "monitoring": _monitoring,
