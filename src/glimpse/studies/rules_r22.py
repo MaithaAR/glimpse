@@ -1,7 +1,8 @@
 """Rule R22 and the R14 amendment (docs/rule_ledger.md, registered 26 Nov before any run): their effect counted
 on the committed development answers of both products (`glimpse rules-r22`). The rules are applied to each
-answer with the same last reading and 30-min slope the serving code uses; risks are unchanged. On the locked
-eight only the number of affected clears is counted; their outcomes are not read."""
+answer with approximately the serving code's last reading and 30-min slope (from the 5-min slot means); risks
+are unchanged. On the locked eight only the number of affected clears is counted; their outcomes are not
+read."""
 
 from __future__ import annotations
 

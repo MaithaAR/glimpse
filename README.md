@@ -166,7 +166,7 @@ version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 | file | status |
 |---|---|
 | `photo_convnext_final_v2_e14.pt` (named in `photo_convnext_latest.txt`), `photo_ood_reference.pt` | served: the photo model and the unfamiliar-photo reference (both products) |
-| `fusion_final.joblib`, `thresholds.json` | served: v1's fusion, Platt map, m and cut-offs 0.15 / 0.16 (frozen 6 Nov) |
+| `fusion_final.joblib`, `thresholds.json` | served: v1's fusion, Platt map, m and cut-offs 0.15 / 0.16 (frozen 5 Nov UTC, 6 Nov Abu Dhabi) |
 | `sensor_first/fusion.joblib`, `sensor_first/thresholds.json` | v2, the tested alternative (frozen 26 Nov) |
 | `sensor_cnn_e13_valauc0.662.pt` (named in `sensor_cnn_latest.txt`), `normaliser.json` | SensorCNN, the from-scratch baseline: evaluated, not served |
 | `photo_convnext_e17_valmae26.2.pt`, `thresholds_amended.json`, `thresholds_validation_recal.json` | superseded intermediate-stage files, kept as evidence for the dated design documents; serving never loads them |

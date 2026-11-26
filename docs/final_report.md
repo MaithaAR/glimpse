@@ -18,7 +18,7 @@ crosses zero. After grading, rule R22 stopped clears on a high or fast-rising pr
 | AUROC (95% person-clustered) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) | 0.754 (0.673–0.815); 0.748 on v1's 460 |
 | meals answered with a risk | 460 | 150 | 481 |
 | ECE, registered 15 bins (target ≤ 0.05) | 0.052: not met by 0.002 (a perfect model scores about the same here) | 0.061: not met | 0.029, below a perfect model's median 0.051: on track |
-| usefulness targets (protocol labels: met / on track / at risk) | 1 met, 3 on track (development labels) | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk (spikes among cleared) |
+| usefulness targets (protocol labels: met / on track / at risk) | 1 met, 3 on track (development labels, before R22) | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk (spikes among cleared) |
 | spikes among cleared meals (cap 10%) | 7.3% (2.9–14.2%) | 2 of 10; 8 of the 10 clears from one person (person-bootstrap interval 0–100%) | 12.7% (5.9–22.6%) |
 | the same, people with prediabetes | 1 of 25 | not split | 6 of 30 |
 | served without history (onboarding priors only): cleared; spikes among them | 15.2%; 9.6% | 20.9%; 21.9% (7 of 32) | – |
@@ -51,8 +51,8 @@ personal basis to clear a meal, so a grader running the samples without `history
 can't judge, never low risk.
 
 Tooling: uv with Python 3.14
-(locked), strict Pydantic, Loguru, a `just` recipe for every number, 210 tests (209 pass with the data
-and weights, one an expected failure; 193 pass without them; logs in outputs/finalize/), W&B offline runs
+(locked), strict Pydantic, Loguru, a `just` recipe for every number, 214 tests (213 pass with the data
+and weights, one an expected failure; 197 pass without them; logs in outputs/finalize/), W&B offline runs
 replayed from committed training histories (outputs/wandb/), and a git history from the 27 Sep proposal;
 from 2 Nov every registration commit precedes its results commit.
 
@@ -167,7 +167,7 @@ per-fold Platt map plus a penalised per-person intercept fitted only on that per
 | CGM removal: trend + profile minus profile only, both with the intercept | +0.033 (+0.007, +0.065) | – |
 | mean within-person AUROC, intercept minus raw: v1 / v2 | −0.078 (−0.110, −0.046) / −0.086 (−0.127, −0.045) | – |
 
-*Paired person bootstrap, 2,000 draws. Holm over these 7 development contrasts (p from each interval by a normal approximation; outputs/report_metrics/holm.json): only the running-spike-rate and within-person contrasts survive; the CGM, intercept and v2 contrasts do not. Every intercept baseline uses the shipped replay on its own out-of-fold logits (it reproduces the shipped risk to 1e-16). report_metrics.json (paired_personal_minus_raw, fair_baselines, within_person), v2_metrics.json (paired_v2_minus_v1, within_person).*
+*Paired person bootstrap, 2,000 draws. Holm over the 7 v1 and v2-minus-v1 development contrasts (p from each interval by a normal approximation; outputs/report_metrics/holm.json): only the running-spike-rate and v1 within-person contrasts survive; the other five do not. Every intercept baseline uses the shipped replay on its own out-of-fold logits (it reproduces the shipped risk to 1e-16). report_metrics.json (paired_personal_minus_raw, fair_baselines, within_person), v2_metrics.json (paired_v2_minus_v1, within_person).*
 
 | course checks on v1 (registered in docs/final_switch.md before they ran) | prediction | result |
 |---|---|---|
@@ -179,13 +179,14 @@ per-fold Platt map plus a penalised per-person intercept fitted only on that per
 
 *Shuffled-label and learning-curve checks: development people only, no intercept, C fixed at 0.03, hence 0.750 and not 0.762; outputs/final_checks/final_checks.json.*
 
-Most of the system's edge is
-the intercept's own: with it, gradient boosting comes within 0.013 of v1, and the photo adds 0.021
+Much of the system's edge is
+the intercept's: with it, gradient boosting comes within 0.013 of v1, and the photo adds 0.021
 (−0.003, +0.053) under v1's procedure. It works between people, not within them. Averaged per person, AUROC falls
 by about 0.08 in both
 products (19 of 22 people worse in v1, 20 of 22 in v2), consistent with the offset drifting as each
 new label arrives. The system learns each person's base rate, 0.063 better than a plain running spike
-rate. Removing the CGM costs 0.033 with an interval above zero (exploratory, post hoc); removing the
+rate. Removing the CGM costs 0.033 with an interval above zero (exploratory, post hoc, not significant after
+Holm); removing the
 profile costs 0.122 (Figure 6).
 
 ![Figure 3: training against validation loss in each inner fold, from the committed histories (outputs/training/): the photo model's heads, then its last stage (dashed; first two epochs off the scale), flattens after about epoch 10 with a gap that does not close; SensorCNN's gap stays small](../outputs/figures/fig_training.png){width=62%}
@@ -222,7 +223,8 @@ answered meals rises from 47.0% to 48.1% (report_metrics.json coverage_risk).
 Rule R22, added after grading and approved before its count, withholds a clear when the last pre-meal
 reading is 140 mg/dL or more or glucose rises faster than 1.5 mg/dL/min. It turns 22 of v1's 109
 development clears into caution, only 2 of which spiked (the label is a rise from the pre-meal baseline),
-so clears fall to 18.1%, below the 20% target; the author kept it, since "low risk" at 185 mg/dL misleads.
+so clears fall to 18.1%, below the 20% target, and the cost reduction to 10.7%; the author kept it, since
+"low risk" at 185 mg/dL misleads. The table below predates R22.
 
 | Usefulness target (fixed before any result) | target | v1 dev (481) | v1 locked (153) | v2 dev (481) | v2, no history, frozen cut-offs |
 |---|---|---|---|---|---|
@@ -230,7 +232,7 @@ so clears fall to 18.1%, below the 20% target; the author kept it, since "low ri
 | cleared as low risk | ≥20% | 22.7% (13.2–34.0%) | 6.5% (0.6–15.9%) | 24.5% (13.5–37.5%) | 11.0% |
 | can't judge | ≤20% | 13.7% (8.7–19.2%) | 2.6% (0.6–5.0%) | 8.3% (2.5–15.2%) | 18.5% |
 | missed among cleared | ≤10% | 7.3% (2.9–14.2%) | 20% (2 of 10; exact 2.5–55.6%) | 12.7% (5.9–22.6%), 15 of 118 | 15.1% (8 of 53) |
-| verdict (met / on track / at risk) | – | 1 met, 3 on track (development labels) | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk | 3 of 4 at risk |
+| verdict (met / on track / at risk) | – | 1 met, 3 on track (development labels, before R22) | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk | 3 of 4 at risk |
 
 *v1's served point (no history) clears 15.2% with 9.6% spiking on development; on the locked eight it clears 20.9% with 21.9% spiking (report_metrics.json served_operating_point). report_metrics.json, v2_metrics.json (decisions, served_no_history), outputs/locked_eval/locked_summary.json.*
 
@@ -328,9 +330,8 @@ intercept moves v2's logit by 0.51 on average, against 0.64 for the whole fusion
 | label audit of the 20 worst meals (check 3) | 20% have a rise within 5 mg/dL of the 50 mg/dL cut, against 9% of all meals; none has poor coverage | done: part of the confident errors is label noise at the cut |
 | classical and zero-shot photo baselines (check 4) | colour histogram + ridge 27.5 g, against 20.4 g for frozen summaries + ridge; zero-shot needs CLIP weights this offline build cannot fetch | classical done; zero-shot a gap |
 
-A regularised photo branch (v3, robustness checks 5 to 7) cut the train-validation gap from 0.35 to
-0.13 but raised carb error from 22.6 to 26.0 g; without repeated meals its photo gain is +0.009 (−0.010,
-+0.031), so it stays a candidate (appendix).
+A regularised photo branch (v3, robustness checks 5 to 7) cut the overfitting gap from 0.35 to 0.13 but
+raised carb error to 26.0 g; it stays a candidate (appendix).
 
 ![Figure 7: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/fig7_shap.png){width=58%}
 
@@ -364,12 +365,9 @@ only train, so no claim is made for them. The three weakest points, as we see th
 3. Most of the edge is a per-person base rate; within a person, v1 ranks meals at AUROC 0.60 (v2 0.54).
 
 What this supports: an advisory research prototype, with no clinical validation, end-user test or
-regulatory review, that clears a meal only with personal history or onboarding
-priors. The learning curve still creeps up, so
-more people, not a bigger model, comes next, with clears for prediabetes withheld until a rule like §4's
-what-if is tested on new people, and per-person monitoring.
+regulatory review, that clears a meal only with personal history or priors. Next: more people (the
+learning curve still creeps up), the §4 what-if tested on new people, and per-person monitoring.
 
-**References.** Liu et al., ConvNeXt, CVPR 2022 · Zeevi et al., Cell 2015,
-doi:10.1016/j.cell.2015.11.001 · Berry et al., Nature Medicine 2020, doi:10.1038/s41591-020-0934-0 ·
-Vickers & Elkin, Med Decis Making 2006, doi:10.1177/0272989X06295361 · CGMacros: Scientific Data 2025,
-doi:10.1038/s41597-025-05851-7, and PhysioNet v1.0.0.
+**References.** Liu et al., ConvNeXt, CVPR 2022 · Zeevi et al., Cell 2015, doi:10.1016/j.cell.2015.11.001 ·
+Berry et al., Nat Med 2020, doi:10.1038/s41591-020-0934-0 · Vickers & Elkin, Med Decis Making 2006,
+doi:10.1177/0272989X06295361 · CGMacros, Sci Data 2025, doi:10.1038/s41597-025-05851-7 (PhysioNet v1.0.0).
