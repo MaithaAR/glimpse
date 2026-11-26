@@ -481,7 +481,8 @@ def transfer_check(D: Data) -> dict:
     d.to_csv(OUT / "transfer_check.csv", index=False)
     res = {"what": "v7 transfer check on the 14 type-2 people, scored once", "people": int(d.person_id.nunique()),
            "meals": len(d), "spike_rate": float(d.spike.mean()),
-           "scores": {n: score(d, n) | {"ece": _ece(d.spike.to_numpy(), d[n].to_numpy())} for n in recipes}}  # fmt: skip
+           "scores": {n: score(d, n) | {"ece": _ece(d.spike.to_numpy(), d[n].to_numpy())}
+                      for n in recipes}}  # fmt: skip
     for n in ("v5_photo_only", "v7_photo_only", "v7_meal_confirmed"):
         c = _boot(d, n, "v1_recipe")
         res[f"{n}_minus_v1_recipe"] = c | {"verdict": _verdict(c)}

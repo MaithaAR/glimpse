@@ -226,3 +226,50 @@ v1 as shipped on the same people: 0.737 / 0.586. The microbiome was predicted no
 design people; with 23 people that is the input most likely to be chance, and the transfer check is where
 that shows. The gains are steady and small. Nothing in the data gives a large jump: the published ceiling
 with true macronutrients and the microbiome is a correlation of 0.80 on lunches.
+
+## Transfer check (26 Nov, after the freeze commit b2c080b; scored once)
+
+outputs/v5_model_fix/transfer_check.json. The 14 type-2 people, 261 scored meals, spike rate 58.6%. Every
+recipe is refitted the same way on the 23 development people plus the other half of the type-2 people.
+
+| recipe | pooled AUROC | within-person AUROC | Brier | ECE |
+|---|---|---|---|---|
+| v1 recipe (post-hoc intercept, m = 1) | 0.791 | 0.787 | 0.186 | 0.085 |
+| v5, photo only | 0.791 | 0.834 | 0.182 | 0.062 |
+| v7, photo only | 0.797 | 0.837 | 0.179 | 0.052 |
+| v7, meal confirmed | 0.825 | 0.857 | 0.165 | 0.097 |
+
+| minus the v1 recipe (95% over the 14 people) | pooled | within-person | Brier | verdict |
+|---|---|---|---|---|
+| v5, photo only | −0.001 (−0.025, +0.039) | +0.048 (+0.021, +0.082) | −0.005 (−0.018, +0.006) | transfers |
+| v7, photo only | +0.006 (−0.023, +0.046) | +0.050 (+0.026, +0.079) | −0.008 (−0.021, +0.004) | transfers |
+| v7, meal confirmed | +0.034 (−0.011, +0.086) | +0.071 (+0.026, +0.121) | −0.022 (−0.042, +0.001) | transfers |
+
+By the registered rule all three transfer: within-person ranking is higher with an interval above zero, and
+neither pooled AUROC nor the Brier score is worse. The prediction was "direction only"; the result is
+stronger than predicted.
+
+Second look at the confirmation people (folds 4 and 5, second_look.json; already used once for v5, so not
+clean): v7 photo only 0.814 pooled and 0.719 within-person against v1's 0.804 and 0.636, within-person
++0.083 (−0.009, +0.170), Brier 0.193 against 0.186. v7 meal confirmed 0.843 and 0.779, within-person +0.143
+(+0.012, +0.300), Brier 0.178.
+
+What can be said:
+- On three separate groups of people (15 design, 8 confirmation, 14 type-2) the new recipe ranks a person's
+  own meals better than v1's recipe. On the one group never used for anything, the interval excludes zero.
+- The gain comes from moving the person's history into the model (`prev_rise`), person-centred inputs and
+  dropping near-cut training meals (v5). The microbiome adds little on top (v7 photo only against v5: +0.003
+  within-person on the type-2 people), as first predicted.
+- Pooled AUROC does not move for the photo-only model. With the meal confirmed it rises by about 0.03 to 0.04
+  in all three groups, never with an interval above zero.
+- Calibration: better than the v1 recipe on the type-2 people, worse than shipped v1 on the confirmation
+  people. Mixed, so not claimed.
+
+What cannot be said:
+- That v7 beats the shipped v1 on the product's own population on clean data. The type-2 people are outside
+  the product's scope and spike far more often; the comparison there is recipe against recipe, not the
+  shipped files. The locked eight stay spent.
+- That the "meal confirmed" model is a product. It needs the user to confirm macronutrients, which the
+  product was built to avoid; it is the measured value of that information.
+
+v1 stays served. v7 is the candidate for the talk.
