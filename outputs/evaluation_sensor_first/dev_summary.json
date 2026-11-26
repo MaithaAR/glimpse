@@ -1,0 +1,909 @@
+{
+  "note": "every risk and decision from Pipeline.answer, one Pipeline per fold; m and cut-offs chosen inside each fold's inner folds only (D4 realised per fold; deployment values frozen later)",
+  "meals": 481,
+  "answered_with_risk": 481,
+  "risk_personal": {
+    "auroc": {
+      "point": 0.7537328055805934,
+      "ci95": [
+        0.6727585357153816,
+        0.8151571407614303
+      ]
+    },
+    "log_loss": 0.5436985794268991,
+    "n": 481
+  },
+  "risk_platt_only": {
+    "auroc": {
+      "point": 0.6859348669514442,
+      "ci95": [
+        0.6033576606669998,
+        0.7704273950282584
+      ]
+    },
+    "log_loss": 0.5856452911650554,
+    "n": 481
+  },
+  "risk_raw": {
+    "auroc": {
+      "point": 0.6940079162911001,
+      "ci95": [
+        0.6129270913955674,
+        0.7773789820270808
+      ]
+    },
+    "log_loss": 0.585130504579812,
+    "n": 481
+  },
+  "per_fold_auroc": [
+    {
+      "fold": 1,
+      "n": 96,
+      "auroc_raw": 0.7058823529411764,
+      "auroc_platt": 0.7058823529411764,
+      "auroc_personal": 0.770483193277311
+    },
+    {
+      "fold": 2,
+      "n": 109,
+      "auroc_raw": 0.681853281853282,
+      "auroc_platt": 0.681853281853282,
+      "auroc_personal": 0.7308880308880309
+    },
+    {
+      "fold": 3,
+      "n": 110,
+      "auroc_raw": 0.73992673992674,
+      "auroc_platt": 0.73992673992674,
+      "auroc_personal": 0.7435897435897436
+    },
+    {
+      "fold": 4,
+      "n": 71,
+      "auroc_raw": 0.6619047619047619,
+      "auroc_platt": 0.6619047619047619,
+      "auroc_personal": 0.7341269841269842
+    },
+    {
+      "fold": 5,
+      "n": 95,
+      "auroc_raw": 0.727761485826002,
+      "auroc_platt": 0.727761485826002,
+      "auroc_personal": 0.7634408602150539
+    }
+  ],
+  "risk_personal_excluding_fold1": {
+    "auroc": {
+      "point": 0.7488084464555054,
+      "ci95": [
+        0.6412248905011526,
+        0.8200136056673729
+      ]
+    },
+    "log_loss": 0.5535759792601136,
+    "n": 385
+  },
+  "decisions": {
+    "share_low_risk": 0.24532224532224534,
+    "share_caution": 0.6715176715176715,
+    "share_abstain": 0.08316008316008316,
+    "cost": 0.6029106029106029,
+    "best_trivial_cost": 0.6715176715176715,
+    "cost_reduction": 0.10216718266253866,
+    "missed_among_cleared": 0.1271186440677966,
+    "n_cleared": 118,
+    "useful": false
+  },
+  "abstained_no_photo": 0,
+  "abstained_borderline": 40,
+  "calibration_by_person_personal": {
+    "corr_spike_rate_vs_gap": -0.8223853059434756,
+    "rare_spikers": {
+      "people": 10,
+      "predicted": 0.20442587913308521,
+      "observed": 0.125
+    },
+    "frequent_spikers": {
+      "people": 13,
+      "predicted": 0.4084182525027484,
+      "observed": 0.5058365758754864
+    }
+  },
+  "calibration_by_person_platt_only": {
+    "corr_spike_rate_vs_gap": -0.8071066536543483,
+    "rare_spikers": {
+      "people": 10,
+      "predicted": 0.2944167064936774,
+      "observed": 0.125
+    },
+    "frequent_spikers": {
+      "people": 13,
+      "predicted": 0.35678107218454463,
+      "observed": 0.5058365758754864
+    }
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "C": 0.01,
+      "platt_slope": 1.097135090894229,
+      "platt_intercept": -0.11471976721627766,
+      "m": 1.0,
+      "low_risk_below": 0.18,
+      "caution_from": 0.18,
+      "inner_cost": 0.5532467532467532,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.13,
+          "caution_from": 0.16,
+          "cost": 0.5662337662337662
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.18,
+          "cost": 0.5532467532467532
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.22,
+          "caution_from": 0.25,
+          "cost": 0.561038961038961
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.23,
+          "caution_from": 0.29,
+          "cost": 0.5701298701298702
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.25,
+          "caution_from": 0.27,
+          "cost": 0.5935064935064935
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.16,
+          "caution_from": 0.26,
+          "cost": 0.6103896103896104
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.0,
+          "caution_from": 0.28,
+          "cost": 0.6246753246753247
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.0,
+          "caution_from": 0.27,
+          "cost": 0.6311688311688312
+        }
+      ]
+    },
+    {
+      "fold": 2,
+      "C": 0.01,
+      "platt_slope": 1.0488005696117972,
+      "platt_intercept": -0.1473739826670087,
+      "m": 2.0,
+      "low_risk_below": 0.16,
+      "caution_from": 0.26,
+      "inner_cost": 0.543010752688172,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.12,
+          "caution_from": 0.21,
+          "cost": 0.5564516129032258
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.15,
+          "caution_from": 0.23,
+          "cost": 0.5470430107526881
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.16,
+          "caution_from": 0.26,
+          "cost": 0.543010752688172
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.5698924731182796
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.5806451612903226
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.6075268817204301
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.6263440860215054
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.15,
+          "caution_from": 0.22,
+          "cost": 0.6438172043010753
+        }
+      ]
+    },
+    {
+      "fold": 3,
+      "C": 0.01,
+      "platt_slope": 1.1758820976618418,
+      "platt_intercept": -0.0544858240431135,
+      "m": 1.0,
+      "low_risk_below": 0.16,
+      "caution_from": 0.17,
+      "inner_cost": 0.5566037735849056,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.1,
+          "caution_from": 0.12,
+          "cost": 0.5660377358490566
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.16,
+          "caution_from": 0.17,
+          "cost": 0.5566037735849056
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.5741239892183289
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.13,
+          "caution_from": 0.2,
+          "cost": 0.6024258760107817
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.18,
+          "cost": 0.6118598382749326
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.6118598382749326
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.24,
+          "cost": 0.610512129380054
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.0,
+          "caution_from": 0.19,
+          "cost": 0.6253369272237197
+        }
+      ]
+    },
+    {
+      "fold": 4,
+      "C": 0.01,
+      "platt_slope": 1.0687511055651844,
+      "platt_intercept": -0.23624681131380804,
+      "m": 1.0,
+      "low_risk_below": 0.17,
+      "caution_from": 0.17,
+      "inner_cost": 0.5365853658536586,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.16,
+          "caution_from": 0.16,
+          "cost": 0.5658536585365853
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.17,
+          "caution_from": 0.17,
+          "cost": 0.5365853658536586
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.23,
+          "cost": 0.5865853658536585
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.23,
+          "cost": 0.6060975609756097
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.2,
+          "caution_from": 0.21,
+          "cost": 0.6134146341463415
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.27,
+          "cost": 0.624390243902439
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.26,
+          "cost": 0.6378048780487805
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.2,
+          "caution_from": 0.2,
+          "cost": 0.6341463414634146
+        }
+      ]
+    },
+    {
+      "fold": 5,
+      "C": 0.03,
+      "platt_slope": 0.9088097875835841,
+      "platt_intercept": -0.19109324945686584,
+      "m": 2.0,
+      "low_risk_below": 0.18,
+      "caution_from": 0.19,
+      "inner_cost": 0.5323834196891192,
+      "cost_vs_m_curve": [
+        {
+          "m": 0.5,
+          "low_risk_below": 0.13,
+          "caution_from": 0.22,
+          "cost": 0.560880829015544
+        },
+        {
+          "m": 1.0,
+          "low_risk_below": 0.16,
+          "caution_from": 0.16,
+          "cost": 0.538860103626943
+        },
+        {
+          "m": 2.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.19,
+          "cost": 0.5323834196891192
+        },
+        {
+          "m": 4.0,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.538860103626943
+        },
+        {
+          "m": 8.0,
+          "low_risk_below": 0.2,
+          "caution_from": 0.2,
+          "cost": 0.5751295336787565
+        },
+        {
+          "m": 16.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.18,
+          "cost": 0.5854922279792746
+        },
+        {
+          "m": 32.0,
+          "low_risk_below": 0.18,
+          "caution_from": 0.19,
+          "cost": 0.5673575129533679
+        },
+        {
+          "m": Infinity,
+          "low_risk_below": 0.19,
+          "caution_from": 0.19,
+          "cost": 0.5544041450777202
+        }
+      ]
+    }
+  ],
+  "cost_sweep": [
+    {
+      "missed_spike": 3.0,
+      "abstain_multiplier": 0.5,
+      "cutoffs_per_fold": {
+        "1": [
+          0.16,
+          0.42
+        ],
+        "2": [
+          0.16,
+          0.41
+        ],
+        "3": [
+          0.06,
+          0.41
+        ],
+        "4": [
+          0.17,
+          0.41
+        ],
+        "5": [
+          0.18,
+          0.38
+        ]
+      },
+      "cost_reduction": 0.3583591331269349,
+      "share_low_risk": 0.18503118503118504,
+      "share_abstain": 0.5446985446985447,
+      "missed_among_cleared": 0.15730337078651685
+    },
+    {
+      "missed_spike": 3.0,
+      "abstain_multiplier": 1.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.27,
+          0.27
+        ],
+        "2": [
+          0.26,
+          0.26
+        ],
+        "3": [
+          0.18,
+          0.18
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.19,
+          0.19
+        ]
+      },
+      "cost_reduction": 0.22600619195046434,
+      "share_low_risk": 0.3762993762993763,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.14917127071823205
+    },
+    {
+      "missed_spike": 3.0,
+      "abstain_multiplier": 2.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.27,
+          0.27
+        ],
+        "2": [
+          0.26,
+          0.26
+        ],
+        "3": [
+          0.18,
+          0.18
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.19,
+          0.19
+        ]
+      },
+      "cost_reduction": 0.22600619195046434,
+      "share_low_risk": 0.3762993762993763,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.14917127071823205
+    },
+    {
+      "missed_spike": 3.0,
+      "abstain_multiplier": 4.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.27,
+          0.27
+        ],
+        "2": [
+          0.26,
+          0.26
+        ],
+        "3": [
+          0.18,
+          0.18
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.19,
+          0.19
+        ]
+      },
+      "cost_reduction": 0.22600619195046434,
+      "share_low_risk": 0.3762993762993763,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.14917127071823205
+    },
+    {
+      "missed_spike": 5.0,
+      "abstain_multiplier": 0.5,
+      "cutoffs_per_fold": {
+        "1": [
+          0.05,
+          0.42
+        ],
+        "2": [
+          0.1,
+          0.41
+        ],
+        "3": [
+          0.06,
+          0.41
+        ],
+        "4": [
+          0.05,
+          0.41
+        ],
+        "5": [
+          0.06,
+          0.38
+        ]
+      },
+      "cost_reduction": 0.3599071207430341,
+      "share_low_risk": 0.033264033264033266,
+      "share_abstain": 0.6964656964656964,
+      "missed_among_cleared": 0.1875
+    },
+    {
+      "missed_spike": 5.0,
+      "abstain_multiplier": 1.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.18,
+          0.18
+        ],
+        "2": [
+          0.16,
+          0.26
+        ],
+        "3": [
+          0.16,
+          0.17
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.18,
+          0.19
+        ]
+      },
+      "cost_reduction": 0.10216718266253866,
+      "share_low_risk": 0.24532224532224534,
+      "share_abstain": 0.08316008316008316,
+      "missed_among_cleared": 0.1271186440677966
+    },
+    {
+      "missed_spike": 5.0,
+      "abstain_multiplier": 2.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.18,
+          0.18
+        ],
+        "2": [
+          0.17,
+          0.17
+        ],
+        "3": [
+          0.17,
+          0.17
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.18,
+          0.18
+        ]
+      },
+      "cost_reduction": 0.10526315789473684,
+      "share_low_risk": 0.2577962577962578,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.12096774193548387
+    },
+    {
+      "missed_spike": 5.0,
+      "abstain_multiplier": 4.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.18,
+          0.18
+        ],
+        "2": [
+          0.17,
+          0.17
+        ],
+        "3": [
+          0.17,
+          0.17
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.18,
+          0.18
+        ]
+      },
+      "cost_reduction": 0.10526315789473684,
+      "share_low_risk": 0.2577962577962578,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.12096774193548387
+    },
+    {
+      "missed_spike": 7.0,
+      "abstain_multiplier": 0.5,
+      "cutoffs_per_fold": {
+        "1": [
+          0.05,
+          0.42
+        ],
+        "2": [
+          0.05,
+          0.41
+        ],
+        "3": [
+          0.06,
+          0.41
+        ],
+        "4": [
+          0.05,
+          0.41
+        ],
+        "5": [
+          0.06,
+          0.38
+        ]
+      },
+      "cost_reduction": 0.3738390092879257,
+      "share_low_risk": 0.016632016632016633,
+      "share_abstain": 0.7130977130977131,
+      "missed_among_cleared": 0.125
+    },
+    {
+      "missed_spike": 7.0,
+      "abstain_multiplier": 1.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.05,
+          0.18
+        ],
+        "2": [
+          0.16,
+          0.26
+        ],
+        "3": [
+          0.06,
+          0.17
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.18,
+          0.19
+        ]
+      },
+      "cost_reduction": -0.009287925696594534,
+      "share_low_risk": 0.1288981288981289,
+      "share_abstain": 0.1995841995841996,
+      "missed_among_cleared": 0.1774193548387097
+    },
+    {
+      "missed_spike": 7.0,
+      "abstain_multiplier": 2.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.16,
+          0.16
+        ],
+        "2": [
+          0.16,
+          0.16
+        ],
+        "3": [
+          0.16,
+          0.16
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.18,
+          0.18
+        ]
+      },
+      "cost_reduction": -0.024767801857585203,
+      "share_low_risk": 0.23284823284823286,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.13392857142857142
+    },
+    {
+      "missed_spike": 7.0,
+      "abstain_multiplier": 4.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.16,
+          0.16
+        ],
+        "2": [
+          0.16,
+          0.16
+        ],
+        "3": [
+          0.16,
+          0.16
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.18,
+          0.18
+        ]
+      },
+      "cost_reduction": -0.024767801857585203,
+      "share_low_risk": 0.23284823284823286,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.13392857142857142
+    },
+    {
+      "missed_spike": 10.0,
+      "abstain_multiplier": 0.5,
+      "cutoffs_per_fold": {
+        "1": [
+          0.05,
+          0.42
+        ],
+        "2": [
+          0.05,
+          0.41
+        ],
+        "3": [
+          0.06,
+          0.41
+        ],
+        "4": [
+          0.05,
+          0.41
+        ],
+        "5": [
+          0.06,
+          0.38
+        ]
+      },
+      "cost_reduction": 0.36455108359133126,
+      "share_low_risk": 0.016632016632016633,
+      "share_abstain": 0.7130977130977131,
+      "missed_among_cleared": 0.125
+    },
+    {
+      "missed_spike": 10.0,
+      "abstain_multiplier": 1.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.05,
+          0.18
+        ],
+        "2": [
+          0.1,
+          0.26
+        ],
+        "3": [
+          0.06,
+          0.17
+        ],
+        "4": [
+          0.05,
+          0.17
+        ],
+        "5": [
+          0.06,
+          0.19
+        ]
+      },
+      "cost_reduction": 0.02786377708978316,
+      "share_low_risk": 0.033264033264033266,
+      "share_abstain": 0.29521829521829523,
+      "missed_among_cleared": 0.1875
+    },
+    {
+      "missed_spike": 10.0,
+      "abstain_multiplier": 2.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.05,
+          0.05
+        ],
+        "2": [
+          0.16,
+          0.16
+        ],
+        "3": [
+          0.06,
+          0.06
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.18,
+          0.18
+        ]
+      },
+      "cost_reduction": -0.1826625386996905,
+      "share_low_risk": 0.1288981288981289,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.1774193548387097
+    },
+    {
+      "missed_spike": 10.0,
+      "abstain_multiplier": 4.0,
+      "cutoffs_per_fold": {
+        "1": [
+          0.05,
+          0.05
+        ],
+        "2": [
+          0.16,
+          0.16
+        ],
+        "3": [
+          0.06,
+          0.06
+        ],
+        "4": [
+          0.17,
+          0.17
+        ],
+        "5": [
+          0.18,
+          0.18
+        ]
+      },
+      "cost_reduction": -0.1826625386996905,
+      "share_low_risk": 0.1288981288981289,
+      "share_abstain": 0.0,
+      "missed_among_cleared": 0.1774193548387097
+    }
+  ]
+}
