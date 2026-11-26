@@ -68,13 +68,13 @@
     }
   },
   "files": [
-    "f1_system.png",
-    "f2_per_fold_auroc.png",
-    "f3_reliability.png",
-    "f4_effects.png",
-    "f5_robustness.png",
-    "f6_shap.png",
-    "f7_coverage.png",
-    "f8_v2.png"
+    "fig1_system.png",
+    "fig2_per_fold_auroc.png",
+    "fig3_reliability.png",
+    "fig4_v2.png",
+    "fig5_coverage.png",
+    "fig6_effects.png",
+    "fig7_shap.png",
+    "figA1_robustness.png"
   ]
 }

@@ -657,3 +657,14 @@ def test_round13_cells():
     assert (
         f"the photo adds {f['shipped_minus_this']:.3f}\n({f['ci95'][0]:+.3f}, {f['ci95'][1]:+.3f})".replace("-", "−")
     ) in text
+
+
+def test_r16_counts_and_sweep():
+    """Rule R16's registered predictions against outputs/probes/v2_hr_sweep.json."""
+    r = _load("outputs/probes/v2_hr_sweep.json")
+    assert r["outside"]["development"]["outside"] == 0
+    lo, hi = r["heart_rate_range"]
+    for s in r["sweep"]:
+        assert (s["rule_on"] == "can't judge") == (s["hr_bpm"] > hi) or s["rule_off"] == "can't judge"
+    text = REPORT.read_text()
+    assert f"{r['outside']['locked']['outside']} of 153 locked meals" in " ".join(text.split())

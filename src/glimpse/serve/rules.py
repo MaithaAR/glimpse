@@ -35,6 +35,28 @@ def low_glucose(last_mgdl: float) -> str | None:
     return None
 
 
+V2_INPUTS = ["last glucose", "slope 30 min", "slope 60 min", "window mean", "window spread", "window rise",
+             "heart rate", "age", "BMI", "HbA1c", "fasting glucose", "hour (sin)", "hour (cos)", "prior spike rate",
+             "prior rise"]  # fmt: skip
+
+
+def outside_training_range(x: np.ndarray, ranges: dict | None, sides: dict | None = None) -> str | None:
+    """Rule R16 (26 Nov, docs/v2_hardening.md Part C): a sensor input beyond the range of the frozen v2 fusion's
+    training meals, on the side where it lowers the risk, is extrapolation toward a false clear (a heart rate of
+    160 bpm alone turned caution into low risk). Only the 7 sensor inputs, and only that side (the author's two
+    amendments after the first counts); missing (imputed) inputs are not checked."""
+    if not ranges:
+        return None
+    for name, v in list(zip(V2_INPUTS, np.asarray(x, float).ravel(), strict=True))[:7]:
+        lo, hi = ranges[name]
+        side = (sides or {}).get(name)
+        if not math.isfinite(v) or lo <= v <= hi or (side == "above" and v < lo) or (side == "below" and v > hi):
+            continue
+        return (f"{name} {v:.4g} is outside the range the model was trained on ({lo:.4g} to {hi:.4g}); "
+                "can't judge (rule R16)")  # fmt: skip
+    return None
+
+
 def out_of_scope(profile: dict[str, float]) -> str | None:
     """Rule R15 (26 Nov): HbA1c in the diabetes range is outside the population GLIMPSE makes claims for."""
     a1c = float(profile.get("a1c_pct", float("nan")))

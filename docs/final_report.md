@@ -34,26 +34,27 @@ locked eight are spent on v1.
 ## 1. System and tooling
 The user is an adult with prediabetes in a CGM programme who wants fewer spikes but stops logging food
 within days. Before a meal they photograph it and get one plain sentence with its reason. The CGM labels
-every meal two hours later, so the system learns each person without logging. It is a wellness nudge, not
-a medical device.
+every meal two hours later, so the system learns each person without logging.
 
 One scoring path (Figure 1): the evaluation, the demo, the app and the grader's
 `just predict-folder <in> <out>` all call `Pipeline.answer`. Plain-code rules run first and refuse with a
-named reason and who acts next: the user fixes the input, or a person reviews (docs/rule_ledger.md). Two
-safety rules followed grading: an unseen test meal at 48 mg/dL got walk advice, so below 54 mg/dL the answer
-is "treat the low first" (R14), and an HbA1c in the diabetes range is out of scope (R15, preventive);
-neither changes an evaluated decision. `prototype.product` in the config selects v2 (served) or v1; v1's
+named reason and who acts next: the user fixes the input, or a person reviews (docs/rule_ledger.md). Three
+safety rules followed grading, none changing an evaluated decision: below 54 mg/dL the answer is "treat the
+low first", not a walk (R14); HbA1c in the diabetes range is out of scope (R15, preventive); and a CGM or
+heart-rate input beyond the training range in the risk-lowering direction is refused (R16), since a heart
+rate of 160 bpm alone turned a prediabetic caution into low risk (0 of 153 locked meals would be refused).
+`prototype.product` in the config selects v2 (served) or v1; v1's
 frozen files are byte-identical to the tag. The per-person intercept needs labelled meals: the evaluation
 replays them in deployment order, and the folder command takes them as an optional `history.csv`. A
 profile without onboarding priors gets training medians, and rule R13 then withholds any low-risk answer:
 with neither history nor priors there is no personal basis to clear a meal, so a grader running the
 samples without `history.csv` sees caution or can't judge, never low risk. Tooling: uv with Python 3.14
-(locked), strict Pydantic, Loguru, a `just` recipe for every number, 200 tests (all pass with the data
-and weights, one an expected failure; 184 run without them; logs in outputs/finalize/), W&B offline runs
+(locked), strict Pydantic, Loguru, a `just` recipe for every number, 202 tests (all pass with the data
+and weights, one an expected failure; 186 run without them; logs in outputs/finalize/), W&B offline runs
 replayed from committed training histories, and a git history from 2 Nov in which every registration
 commit precedes its results commit.
 
-![Figure 1: the one scoring path, its refusal exits and the labelling loop](../outputs/figures/f1_system.png)
+![Figure 1: the one scoring path, its refusal exits and the labelling loop](../outputs/figures/fig1_system.png)
 
 | Parameters and cost | v1 (photo fusion) | v2 (served) | cap |
 |---|---|---|---|
@@ -131,7 +132,7 @@ per-fold Platt map plus a penalised per-person intercept fitted only on that per
 2-hour label window has closed. Within a fold Platt preserves the ranking; the intercept changes it
 (Figure 2).
 
-![Figure 2: per-fold AUROC, raw against the personal intercept, v1 and v2 (v2 higher in 5 of 5 folds too)](../outputs/figures/f2_per_fold_auroc.png)
+![Figure 2: per-fold AUROC, raw against the personal intercept, v1 and v2 (v2 higher in 5 of 5 folds too)](../outputs/figures/fig2_per_fold_auroc.png)
 
 | risk (answered meals) | AUROC (95% person-clustered) | AUPRC (base rate) | Brier (constant forecast) | log-loss | ECE, 15 bins: equal-width / equal-mass |
 |---|---|---|---|---|---|
@@ -168,7 +169,7 @@ products (19 of 22 people worse in v1, 20 of 22 in v2), because the offset drift
 learns each person's base rate, 0.063 better than a plain running spike rate. Removing the CGM costs
 0.033 with an interval above zero (exploratory, post hoc); removing the profile costs 0.122 (Figure 6).
 
-![Figure 3: reliability in the registered binning, v1 development, v1 locked and v2 development (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals, bars the 95% Wilson interval of each shipped bin)](../outputs/figures/f3_reliability.png)
+![Figure 3: reliability in the registered binning, v1 development, v1 locked and v2 development (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals, bars the 95% Wilson interval of each shipped bin)](../outputs/figures/fig3_reliability.png)
 
 | calibration | v1 dev | v1 locked | v2 dev | without history: v1 dev / v1 locked / v2 dev (per-fold Platt) |
 |---|---|---|---|---|
@@ -227,12 +228,12 @@ under 10% only when fewer than 16% of meals are cleared, and with this few clear
 confirm the cap (even zero misses needs about 35 clears). Its 15 false clears (§5) sit on 8 people, 6 on people with
 prediabetes. A what-if that withholds clears for a prediabetic profile until 20 labelled meals (post hoc,
 not shipped) cuts their misses from 6 to 2 and their clears from 30 to 3, with the overall saving at
-10.4%; withholding them always gives 10.2% misses and a 12.1% saving. Either rule would need its own
-registration and a test before serving.
+10.4%; withholding them always gives 10.2% misses and a 12.1% saving. The served v2 does not withhold
+them and so breaks the cap: the rule was chosen on the development data it would be scored on.
 
-![Figure 4: v2 on development: spikes among cleared meals as the low-risk cut moves, with the frozen cut in-sample; exact linear SHAP of the frozen v2 fusion; one false clear split into fusion terms, the fold refit and Platt, and the per-person intercept (meal 847, chosen by the registered rule as the lowest-risk confident false clear; its one labelled meal spiked, so its intercept raises the logit, as for meal 864, unlike 6 of the 9 where it lowered it); SHAP in-sample on the frozen fusion, not the fold model that answered](../outputs/figures/f8_v2.png)
+![Figure 4: v2 on development: spikes among cleared meals as the low-risk cut moves, with the frozen cut in-sample; exact linear SHAP of the frozen v2 fusion; one false clear split into fusion terms, the fold refit and Platt, and the per-person intercept (meal 847, chosen by the registered rule as the lowest-risk confident false clear; its one labelled meal spiked, so its intercept raises the logit, as for meal 864, unlike 6 of the 9 where it lowered it); SHAP in-sample on the frozen fusion, not the fold model that answered](../outputs/figures/fig4_v2.png)
 
-![Figure 5: coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, v1 and v2; v1 locked at 0.15), descriptive](../outputs/figures/f7_coverage.png)
+![Figure 5: coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, v1 and v2; v1 locked at 0.15), descriptive](../outputs/figures/fig5_coverage.png)
 
 | stress at the evaluated operating point (with history) | v2: AUROC, spikes among cleared | v2: caution → low risk | v1: AUROC | v1: caution → low risk |
 |---|---|---|---|---|
@@ -240,7 +241,7 @@ registration and a test before serving.
 | CGM dropout 10 / 30 / 50 / 70% | 0.754 / 0.753 / 0.754; at 70%, 0.765 on the 461 still answered (their clean 0.764); 12.7% → 11.7% | 0 at every level | 0.762 / 0.762 / 0.762; at 70%, 0.767 on 441 (clean 0.766) | 0 / 0 / 0 / 1 |
 | readings removed for 10 / 15 / 18 min before the meal | 0.753 at each; 12.6–12.7% | 0 / 1 / 1 | 0.762 / 0.761 / 0.761 | 1 / 1 / 1 |
 | removed for 20 min or more (a gap over the rule's 20) | every meal refused | – | every meal refused | – |
-| heart rate removed / half its readings dropped | 0.745 / 0.753; 11.6% / 12.6% | 17 (9 the other way) / 0 | – | – |
+| heart rate removed / half its readings dropped | 0.745 / 0.753; 11.6% / 12.7% | 17 (9 the other way) / 0 | – | – |
 | onboarding priors removed (history kept) | 0.701; 14.6% | 7 (35 the other way) | – | – |
 | history cut to the last 3 / last 10 meals | 0.740 / 0.745; 13.0% / 11.8% | 13 / 7 | – | – |
 | 10% / 25% of history labels flipped | 0.735 / 0.699; 16.9% / 11.7% | 2 / 2 (23 / 50 the other way) | – | – |
@@ -249,7 +250,7 @@ registration and a test before serving.
 
 *Registered in docs/stress_quality.md and (heart rate, priors, history) docs/v2_explain.md before their runs; every development meal, clean and perturbed, history from the clean answers. v1's photo stress compares the frozen photo model with itself (in-sample photos). outputs/robustness/stress_quality.json and v2_input_stress.json; the 22 Nov three-level study (Figure A1) is in the appendix.*
 
-![Figure 6: effect sizes with 95% person-clustered intervals; removals against the fusion study's photo arm (0.719); green rows: the intercept (evaluation) and the CGM contrast](../outputs/figures/f4_effects.png)
+![Figure 6: effect sizes with 95% person-clustered intervals; removals against the fusion study's photo arm (0.719); green rows: the intercept (evaluation) and the CGM contrast](../outputs/figures/fig6_effects.png)
 
 Quality holds until a rule refuses. CGM dropout up to 50% moves AUROC by at most 0.001 in either product,
 and at 70% only meals with too few recent readings are refused (20 in v2). Gaps change nothing up to 18
@@ -289,7 +290,7 @@ Every class below was observed.
 
 | failure class | count: v1 / v2 | corpus | root cause | action |
 |---|---|---|---|---|
-| rule refusal | 8 of 13, 25 of 25 / 5 of 13, 16 of 25; no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps), a low, out of scope | named refusal; rules R1–R15 (R6 preventive, R7 a recorded limitation) |
+| rule refusal | 8 of 13, 25 of 25 / 5 of 13, 16 of 25; no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps), a low, out of scope | named refusal; rules R1–R16 (R6 preventive, R7 a recorded limitation) |
 | missing-photo refusal | 21 of 481 / none | development meals | input | v2 answers them |
 | near-cut false clear (within 0.031 of the fold's cut) | 4 of 109 / 6 of 118 | cleared development meals | threshold; v2: 4 of 6 on people with prediabetes | the frozen band would refer 4 of v2's 6; the price of a hard cut |
 | confident false clear | 4 of 109 / 9 of 118 | cleared development meals | v2: in 6 of 9 the person's intercept lowered the logit by 0.7 to 1.1, a low base rate clearing a meal that spiked; 2 cold starts | the prediabetes what-if (§4), not shipped |
@@ -319,7 +320,7 @@ of v1's decisions unchanged. Moving one of HbA1c, fasting glucose or the two pri
 percentile changes 11–17% of v1's decisions; in v2, age and the two priors move the most (35–39%), and
 HbA1c only 24%, so the registered expectation (priors and HbA1c lead) was half met.
 
-![Figure 7: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/f6_shap.png)
+![Figure 7: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/fig7_shap.png)
 
 The errors fall on different people. A false clear, the costliest error, tells someone a spiking meal is
 safe; 7 of v1's 8 development false clears fell on healthy people, while people with prediabetes, the
@@ -336,12 +337,10 @@ interval; selection pressure and the harder cohort (42.0% of 150 scored meals sp
 inseparable at n=8. D7 also registered the photo gate on the locked eight as the primary test; that run
 scored only v1, so the endpoint was never computed and cannot be now. v2 is evaluated on development only.
 
-`just evaluate` reruns both development evaluations, v2's metrics and explanation, and re-derives every
-other table from committed outputs; `just evaluate-all` also recomputes the stress, probe, timing and
-int8 studies (about 45 minutes); `just report-numbers` re-derives every descriptive number, replay and
-figure without data or weights, and `just verify-outputs` fails if any number drifts beyond 1e-9;
-`just reproduce-all` chains every compute study. Tests check the
-report's cells against the evidence files. The folder, stress and demo runs were regenerated on 26 Nov
+`just evaluate` reruns the development evaluations and re-derives every other table from committed
+outputs; `just evaluate-all` also recomputes the stress, timing and int8 studies (about 45 minutes);
+`just verify-outputs` re-derives every number without data or weights and fails on drift beyond 1e-9. The folder,
+stress and demo runs were regenerated on 26 Nov
 under the final code with the pinned weights and data; every v1 decision matched the committed one.
 
 **AI-assisted development.** Code and documents were built with an LLM assistant, and the commits say
@@ -360,7 +359,7 @@ more meals; v1 is more accurate on development by a margin the data cannot confi
 and is the only one with a clean test, which failed the usefulness targets. Our recommendation for any
 use: let v2 flag and refer, and withhold low-risk answers for people with prediabetes until a rule like
 §4's what-if has been registered and tested on new people; history alone does not make clears safer (§3).
-The served configuration does not do this: it is the frozen v2 as registered. Heart rate has a consistent
+The served v2 does not do this. Heart rate has a consistent
 within-person sign but no proven value; a next version should test it with more people. This is an advisory
 prototype with no clinical validation,
 end-user test or regulatory review, built so that a clinical study could evaluate it.
@@ -370,7 +369,7 @@ end-user test or regulatory review, built so that a clinical study could evaluat
 | v1, v2 | v1: photo fusion, frozen 6 Nov, locked-tested; v2: sensor first, frozen 26 Nov, served |
 | intercept, m | the per-person offset learned from earlier labelled meals; its shrinkage toward zero |
 | Platt | population recalibration of the fusion logit |
-| R1–R15 | the rules in docs/rule_ledger.md, each with the failure that prompted it (R6 and R15 preventive, R7 a recorded limitation) |
+| R1–R16 | the rules in docs/rule_ledger.md, each with the failure that prompted it (R6 and R15 preventive, R7 a recorded limitation) |
 | partition v2 | the final split: 23 development people in 5 outer folds, 14 T2D training only, 8 locked; outputs/evaluation_v2/ is v1 on partition v2, product v2 lives in outputs/evaluation_sensor_first/ |
 | D7 | the design decision registering the photo gate's endpoints |
 

@@ -199,6 +199,7 @@ class PrototypeCfg(_Strict):
     product: Literal["photo_fusion", "sensor_first"] = "photo_fusion"
     sensor_first_bundle: str = "checkpoints/sensor_first/fusion.joblib"
     sensor_first_thresholds: str = "checkpoints/sensor_first/thresholds.json"
+    v2_input_ranges: str = "configs/v2_input_ranges.json"  # rule R16 (26 Nov): v2's training input ranges
 
     @model_validator(mode="after")
     def _cutoffs_ordered(self) -> PrototypeCfg:

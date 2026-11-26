@@ -202,3 +202,15 @@ locked 6.1%). Sample: samples/stress/25. Tests: tests/test_hardening_r14.py.
 - Dexcom Clarity and Libre column names are mapped; a window refused for sparse readings names the
   sampling interval; a non-numeric profile value names its field; a missing meal time is flagged
   `meal_time_inferred`.
+
+## R16 - sensor inputs beyond the training range (26 Nov, docs/v2_hardening.md Part C; v2 only)
+Observed: in round-14 grading a flat glucose trace with heart rate 120 to 180 bpm got "low risk" from v2,
+for a prediabetic profile too; the training windows never exceed 119.7 bpm. Rule: any of v2's 7 sensor
+inputs (glucose trend features and heart rate) beyond the minimum or maximum of the frozen v2 fusion's
+training meals, on the side where an extreme value lowers the risk (configs/v2_input_ranges.json), gives
+can't judge, naming the input, referred to a person; imputed inputs are not checked. The author approved it
+before the run and amended it twice after the first counts: from 15 inputs to the 7 sensor inputs (70 of 153
+locked meals lay outside the training ages or BMI), and to the risk-lowering side only (9 smooth synthetic
+stress traces were refused although smoothness raises the risk). Before/after: no development, locked or
+sample decision changes; the heart-rate sweep (outputs/probes/v2_hr_sweep.json) answers caution up to
+110 bpm and refuses 120 bpm and above, where it had cleared from 160 bpm. Tests: tests/test_hardening_r14.py.

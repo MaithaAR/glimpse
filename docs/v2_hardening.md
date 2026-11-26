@@ -43,3 +43,16 @@ Predicted before the run: no development or evaluated decision changes (every de
 the training range); on the locked eight the rule is counted, not rescored. A heart-rate sweep from 40 to 200
 bpm on a prediabetic profile is refused below 54 and above 120 bpm, and inside that range the risk falls as
 heart rate rises (the within-person sign).
+
+Amendment after the first run (26 Nov, the author's decision): the first count found no development meal
+outside the range, as predicted, but 70 of 153 locked meals, almost all by age (4 of the 8 locked people are
+younger than 24 or older than 64) and BMI. Refusing every user outside the training ages was not the intent,
+so R16 checks only the 7 sensor inputs (glucose trend and heart rate); profile inputs keep rule R5's ranges.
+The first sweep used a perfectly flat trace, whose window spread of 0 is itself outside the training range,
+so every heart rate was refused; the sweep now uses a calm trace that varies by 6 mg/dL.
+
+Second amendment after the rerun (26 Nov, the author's decision): with both sides checked, 9 of the 25
+synthetic stress samples were refused because their traces are smoother than any training window (window
+spread 0.81 against a minimum of 0.84), although a smooth trace raises the risk. R16 now refuses only on the
+side where an extreme value lowers the frozen fusion's risk (the false-clear direction), read from the sign
+of each coefficient and stored in configs/v2_input_ranges.json. Development and locked: 0 meals refused.

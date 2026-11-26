@@ -199,6 +199,15 @@ def _v2_probes(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _v2_input_ranges(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Rule R16: v2's training input ranges (written once), counts and the heart-rate sweep."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.studies.v2_ranges import run_v2_ranges
+
+    run_v2_ranges(cfg, MealDataset.load(Path("data/dataset")))
+    return 0
+
+
 def _verify_outputs(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Data-free outputs against the committed ones, numbers to 1e-9."""
     from glimpse.verify import verify_outputs
@@ -527,6 +536,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("v2-metrics", help="v2 beside v1 on development: registered endpoints and descriptive cuts")
     vp = sub.add_parser("v2-probes", help="v2 probes B and C and input monitors (probe B needs the data)")
     vp.add_argument("--data-free", action="store_true", help="keep the committed probe B; redo C and monitors")
+    sub.add_parser("v2-input-ranges", help="rule R16: v2 training input ranges, counts and the heart-rate sweep")
     sub.add_parser("verify-outputs", help="data-free outputs against the committed ones (numbers to 1e-9)")
     sub.add_parser("v2-explain", help="v2 calibration, failure taxonomy and exact SHAP (descriptive)")
     sub.add_parser("v2-input-stress", help="v2 under missing heart rate, missing priors and noisy history")
@@ -605,6 +615,7 @@ def main(argv: list[str] | None = None) -> int:
         "v2-metrics": _v2_metrics,
         "v2-explain": _v2_explain,
         "verify-outputs": _verify_outputs,
+        "v2-input-ranges": _v2_input_ranges,
         "v2-probes": _v2_probes,
         "v2-input-stress": _v2_input_stress,
         "recalibrate": _recalibrate,

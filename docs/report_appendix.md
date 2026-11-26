@@ -190,7 +190,7 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 
 *"Same decision" includes meals already refused before the perturbation; degraded photos also turn up to 2.6% of earlier refusals into answers (`recovered_answers`, blur r=10); low risk↔caution flips are `dangerous_flips` in the evidence files. Pre-registered 22 Nov; outputs/robustness/levels.json, the run Figure A1 draws with timing.json and promised.json (outputs/robustness/robustness.json is the earlier 2 Nov single-level run under pre-freeze pipelines, kept for the record).*
 
-![Figure A1: the 22 Nov registered perturbations through v1's per-fold pipelines without history; "unchanged" includes meals already refused when clean, and the red share counts low risk and caution flips in both directions, so it differs from the report's stress table (with history, caution to low risk only)](../outputs/figures/f5_robustness.png)
+![Figure A1: the 22 Nov registered perturbations through v1's per-fold pipelines without history; "unchanged" includes meals already refused when clean, and the red share counts low risk and caution flips in both directions, so it differs from the report's stress table (with history, caution to low risk only)](../outputs/figures/figA1_robustness.png)
 
 | unfamiliar-photo check at the 0.614 cut | photos | median kNN distance | refused by it |
 |---|---|---|---|

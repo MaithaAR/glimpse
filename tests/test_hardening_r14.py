@@ -102,3 +102,29 @@ def test_r14_message_never_rounds_up_to_the_threshold():
     vals = [100.0] * 18 + [80, 70, 62, 58, 55, 53.7]
     a = bare_pipeline(risk=0.31, table={}).answer(_meal(vals), key=0)
     assert a.decision == "can't judge" and "53.7 mg/dL" in a.reason
+
+
+def test_r16_refuses_sensor_inputs_outside_the_training_range():
+    """Rule R16 (docs/v2_hardening.md Part C): heart rate 150 bpm is outside training (54-120); age is not checked."""
+    import json
+
+    import numpy as np
+
+    from glimpse.serve.rules import outside_training_range
+
+    rj = json.load(open("configs/v2_input_ranges.json"))
+    ranges, sides = rj["ranges"], rj["risk_lowering_side"]
+    x = np.array([110, 0, 0, 110, 5, 0, 80, 40, 28, 5.8, 100, 0, 1, 0.3, 40], float)
+    assert outside_training_range(x, ranges, sides) is None
+    hot = x.copy()
+    hot[6] = 150
+    assert "heart rate 150" in outside_training_range(hot, ranges, sides)
+    old = x.copy()
+    old[7] = 70  # age outside the training ages: left to rule R5
+    assert outside_training_range(old, ranges, sides) is None
+    missing = hot.copy()
+    missing[6] = np.nan  # an imputed input is not checked
+    assert outside_training_range(missing, ranges, sides) is None
+    calm = x.copy()
+    calm[4] = 0.5  # smoother than any training window: raises the risk, so it is answered
+    assert outside_training_range(calm, ranges, sides) is None

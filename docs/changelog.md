@@ -260,6 +260,14 @@ Registration-to-results times since the tag (commit order is the only evidence o
 c783ce3 to d7bfc6e, 26 min; v2 explanation 10679f9 to a0e11ef, 20 min; hardening 131bd8e to 24d601e, 11 min.
 Code was sometimes drafted before its registration was committed.
 
-Author sign-off on the tenth to fourteenth passes (v2, R13 to R15 and every registration since the tag):
+## 26 Nov 2026, fifteenth pass (after a council review of the last day's options)
+
+| Change | Why | Evidence |
+|---|---|---|
+| Rule R16: v2 refuses a CGM or heart-rate input beyond the training range in the risk-lowering direction; registered b9c2654 and approved by the author before the run, then narrowed by her twice after the first counts: to the 7 sensor inputs (70 of 153 locked meals lay outside the training ages or BMI) and to the risk-lowering side (9 smooth synthetic stress traces were refused) | a heart rate of 160 bpm alone turned a prediabetic caution into low risk (round 14) | docs/v2_hardening.md Part C; outputs/probes/v2_hr_sweep.json |
+| The prediabetes withholding rule stays undeployed by the author's decision; the report states that the served v2 breaks the cap and why | the report recommended a rule the served product does not apply | docs/final_report.md §4 |
+| Figure files renamed to their report numbers (fig1 to fig7, figA1 in the appendix) | file names did not match (3 of 3) | outputs/figures/ |
+
+Author sign-off on the tenth to fifteenth passes (v2, R13 to R16 and every registration since the tag):
 to be added here by the author, dated, in her words.
 

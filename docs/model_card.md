@@ -20,8 +20,8 @@ those participants were used for training only.
 - **v1, photo fusion (frozen 6 Nov; the model the locked eight measured).** Adds the photo model's grams and
   carb range as 4 of 19 inputs; Platt (0.96, −0.20), m = 1.0, cut-offs 0.15 and 0.16; refuses a meal
   without a usable photo. Its files are unchanged since the tag.
-- Rules R1-R12, R14 (glucose below 54 mg/dL: treat the low first) and R15 (HbA1c 6.5% or above: out of
-  scope) run first and refuse with a named reason; output rule R13 withholds low risk when there is
+- Rules R1-R12, R14 (glucose below 54 mg/dL: treat the low first), R15 (HbA1c 6.5% or above: out of
+  scope) and R16 (v2: a CGM or heart-rate input outside the training range) run first and refuse with a named reason; output rule R13 withholds low risk when there is
   neither history nor both onboarding priors (docs/rule_ledger.md).
 - Photo model: ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned; pinned revision and SHA-256), last
   stage fine-tuned, two heads; 27.8M parameters, 15.5M fine-tuned. It failed its pre-registered risk gate

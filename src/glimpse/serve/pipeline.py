@@ -8,6 +8,7 @@ the parity test in tests/test_serve.py is the evaluation-equals-deployment proof
 
 from __future__ import annotations
 
+import json
 import math
 import time
 from pathlib import Path
@@ -32,6 +33,7 @@ from glimpse.serve.rules import (
     low_glucose,
     no_basis_to_clear,
     out_of_scope,
+    outside_training_range,
     photo_problem,
     profile_vector,
     sentence,
@@ -95,6 +97,9 @@ class Pipeline:
                 m_personal = float(bundle["m_personal"])
         else:
             self.fusion = fusion
+        rp = Path(getattr(pc, "v2_input_ranges", ""))
+        rj = json.loads(rp.read_text()) if self.sensor_first and rp.is_file() else {}
+        self.input_ranges, self.input_sides = rj.get("ranges"), rj.get("risk_lowering_side")
         if self.sensor_first and fusion is None:
             frozen_all = load_thresholds(Path(pc.sensor_first_thresholds))
             frozen = frozen_all["main"]
@@ -200,7 +205,13 @@ class Pipeline:
             flags.append("carbs_from_user_shown_not_used")
         ns = SimpleNamespace(glucose=g.values[None], heart_rate=h.values[None],
                              profile=profile_vector(m.profile, m.meal_time)[None])  # fmt: skip
-        raw = float(self.fusion.predict_proba(trend_features(ns, np.array([0])))[0, 1])
+        x = trend_features(ns, np.array([0]))
+        far = outside_training_range(x, getattr(self, "input_ranges", None), getattr(self, "input_sides", None))
+        if far:  # rule R16: extrapolation is not a forecast
+            return cant_judge(far, checks_passed=passed, checks_failed=["input_range"], escalate_to="human",
+                              **base, **carb)  # fmt: skip
+        passed.append("input_range")
+        raw = float(self.fusion.predict_proba(x)[0, 1])
         risk_raw, risk_platt, risk = self._risk(raw, history)
         base |= {"fusion_logit": float(np.log(max(raw, 1e-6) / max(1.0 - raw, 1e-6))),
                  "risk_raw": risk_raw, "risk_platt": risk_platt}  # fmt: skip

@@ -75,7 +75,7 @@ def f1_system(plt) -> None:
             ha="center", fontsize=8.0, style="italic", color=GREY)  # fmt: skip
     ax.set_xlim(-0.2, 16.3)
     ax.set_ylim(-0.2, 5.0)
-    fig.savefig(OUT / "f1_system.png")
+    fig.savefig(OUT / "fig1_system.png")
     plt.close(fig)
 
 
@@ -115,7 +115,7 @@ def f2_per_fold(plt, ev: dict) -> None:
         f"{g['point']:+.3f} ({g['ci95'][0]:+.3f}, {g['ci95'][1]:+.3f})".replace("-", "\u2212"),
         fontsize=9,
     )
-    fig.savefig(OUT / "f2_per_fold_auroc.png")
+    fig.savefig(OUT / "fig2_per_fold_auroc.png")
     plt.close(fig)
 
 
@@ -170,7 +170,7 @@ def f3_reliability(plt, da: pd.DataFrame) -> dict:
         ax.set_title(f"Reliability, {name}", fontsize=9)
     axes[0].set_ylabel("observed spike rate (blue numbers = meals per bin)")
     fig.tight_layout()
-    fig.savefig(OUT / "f3_reliability.png")
+    fig.savefig(OUT / "fig3_reliability.png")
     plt.close(fig)
     return out
 
@@ -208,7 +208,7 @@ def f4_effects(plt, fu: dict, ch: dict, d8: dict) -> None:
     ax.set_yticks(ys, [r[0] for r in rows], fontsize=8)
     ax.set_xlabel("AUROC change (95% person-clustered); removals: negative = the input helped")
     ax.set_title("Effect sizes (blue: gate; orange: removals; green: contributions; grey: controls)", fontsize=9)
-    fig.savefig(OUT / "f4_effects.png")
+    fig.savefig(OUT / "fig6_effects.png")
     plt.close(fig)
 
 
@@ -245,7 +245,7 @@ def f5_robustness(plt, lv: dict) -> None:
     ax.legend(frameon=False, fontsize=7.5, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.14))
     ax.set_title("Graded change while input stays usable, refusal at the designed thresholds (no history)",
                  fontsize=9)  # fmt: skip
-    fig.savefig(OUT / "f5_robustness.png")
+    fig.savefig(OUT / "figA1_robustness.png")
     plt.close(fig)
 
 
@@ -282,7 +282,7 @@ def f7_coverage(plt) -> None:
     axes[2].set_ylabel("mean cost per answered meal (declared prices)")
     axes[2].set_title("Cost per answered meal at the declared prices", fontsize=9)
     fig.tight_layout()
-    fig.savefig(OUT / "f7_coverage.png")
+    fig.savefig(OUT / "fig5_coverage.png")
     plt.close(fig)
 
 
@@ -337,7 +337,7 @@ def f8_v2(plt) -> None:
     axes[2].set_title(f"v2 false clear, meal {loc['row']}: risk {loc['risk']:.0%}, {loc['n_history']} labelled meal",
                       fontsize=9)  # fmt: skip
     fig.tight_layout()
-    fig.savefig(OUT / "f8_v2.png")
+    fig.savefig(OUT / "fig4_v2.png")
     plt.close(fig)
 
 
@@ -394,7 +394,7 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     axes[1].set_title(f"False clear (row 847, raw fusion): base {base_logit:+.2f} + terms = logit {logit_i:+.2f} (risk "
                       f"{1 / (1 + np.exp(-logit_i)):.2f}); top 8 of 19 terms", fontsize=8.5)  # fmt: skip
     fig.tight_layout()
-    fig.savefig(OUT / "f6_shap.png")
+    fig.savefig(OUT / "fig7_shap.png")
     plt.close(fig)
     return {"base_logit": base_logit, "local_logit": logit_i, "sum_check_abs_err": abs(recon - logit_i),
             "coefs": dict(zip(FEATURE_NAMES, (float(c) for c in coefs), strict=True)),
