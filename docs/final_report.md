@@ -230,7 +230,7 @@ not shipped) cuts their misses from 6 to 2 and their clears from 30 to 3, with t
 10.4%; withholding them always gives 10.2% misses and a 12.1% saving. Either rule would need its own
 registration and a test before serving.
 
-![Figure 4: v2 on development: spikes among cleared meals as the low-risk cut moves, with the frozen cut in-sample; exact linear SHAP of the frozen v2 fusion; one false clear split into fusion terms, the fold refit and Platt, and the per-person intercept (meal 847, chosen by the registered rule as the lowest-risk confident false clear; a cold start, so its intercept raises the logit, unlike 6 of the 9 where it lowered it); SHAP in-sample on the frozen fusion, not the fold model that answered](../outputs/figures/f8_v2.png)
+![Figure 4: v2 on development: spikes among cleared meals as the low-risk cut moves, with the frozen cut in-sample; exact linear SHAP of the frozen v2 fusion; one false clear split into fusion terms, the fold refit and Platt, and the per-person intercept (meal 847, chosen by the registered rule as the lowest-risk confident false clear; its one labelled meal spiked, so its intercept raises the logit, as for meal 864, unlike 6 of the 9 where it lowered it); SHAP in-sample on the frozen fusion, not the fold model that answered](../outputs/figures/f8_v2.png)
 
 ![Figure 5: coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, v1 and v2; v1 locked at 0.15), descriptive](../outputs/figures/f7_coverage.png)
 
@@ -256,7 +256,8 @@ and at 70% only meals with too few recent readings are refused (20 in v2). Gaps 
 minutes and refuse every meal past the 20-minute rule, a step by design. The photo cannot move v2's
 risk. In v1, heavy blur lets 6 cautions become low risk and lifts the spike rate among clears from 8% to
 11%. v2's weak points are its personal inputs. A watch left off gives the largest dangerous flip, 17 cautions
-turned low risk, yet misses among clears fall to 11.6%, so heart rate's value to v2 is unproven. A quarter
+turned low risk, yet misses among clears fall to 11.6% and the saving rises to 12.8%: at the served cut,
+heart rate does not help v2's decisions. A quarter
 of history labels flipped costs 0.055 AUROC. The unfamiliar-photo check (appendix) flags 1.1% of training
 photos and none of 14 real phone photos; no detection AUROC is claimed.
 
