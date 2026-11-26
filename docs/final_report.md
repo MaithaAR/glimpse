@@ -345,9 +345,8 @@ clear when glucose is already high or rising. The other harm is alert fatigue: o
 locked people v1 said caution for 91% of meals, and a warning that is always on gets ignored. A
 caution-first tool only helps if it clears often enough to be believed.
 
-The policy we would set for a pilot: clear only with personal history or priors; refer every low to a
-person; review each person's missed clears monthly and stop clearing for anyone above 10%; and never
-present an answer as dosing or medical advice.
+For a pilot we would propose clearing only with personal history or priors, and a clinician reviewing
+each person's missed clears. This is not dosing or medical advice.
 
 ## 6. Reproducibility
 The 8 locked people were scored once, on 25 Nov, with v1 (10 low risk, 139 caution, 4 can't judge). The

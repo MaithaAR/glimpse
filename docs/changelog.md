@@ -349,3 +349,4 @@ registrations at my instruction. The choices and the conclusions are mine. Maith
 | Section 1 names the adopter and the scope; section 4 says what 5:1 means and how feedback rows are used; section 5 gives v1's root cause for confident false clears and a pilot policy | rubric items on context, feedback and policy | docs/final_report.md |
 | Figure 1 lists rules R14 to R22; rule list in README and model card through R22 | stale labels | src/glimpse/figures.py, README.md, docs/model_card.md |
 | Sign-off date corrected from 27 Nov to 26 Nov, the day it was committed | date mismatch | docs/changelog.md |
+| Pilot policy in section 5 shortened to a proposal with no monthly rule and no 10% figure; approved by the author | the longer draft named a review that is not in the code | docs/final_report.md |
