@@ -136,3 +136,16 @@ Two older lines are stale (26 Nov): "nothing else in the pipeline is above 30 ms
 contradicted by outputs/efficiency/stage_timing.json, where the ConvNeXt pass alone takes 47 ms on a 2-CPU
 machine; and the folder command now accepts an optional history.csv, so "answer without history" in the
 replay-2 correction holds only when that file is absent.
+
+### Replay 4: detection power under a realistic cohort shift (registered 26 Nov, before its run)
+
+Written by the assistant after the graders asked whether any rule can catch a real shift. Data-free, on
+the committed v2 development answers (the served product). 500 simulated streams. Each stream: people in
+a random order, their answers in time order, in blocks of 20; the first 12 blocks draw from all 23
+development people, then the stream switches to the 12 people with prediabetes only (spike rate 43%
+against 33% overall, close to the locked cohort's 42%). Rules, fixed now: the calibration CUSUM of
+replay 3 (block spike rate minus block mean risk) and the caution-share CUSUM, both one-sided, k = 0.5,
+h = 4, standardised on the stream's own first 8 blocks (a deployment's burn-in). Reported: the share of
+streams with a false alarm before the switch, the share detecting within 6 blocks (120 answers) after
+it, and the median delay. Expectation: the calibration rule detects in most streams within 6 blocks; the
+caution-share rule detects more slowly. Output: outputs/monitoring/power.json.
