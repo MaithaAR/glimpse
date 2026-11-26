@@ -48,8 +48,8 @@ replays them in deployment order, and the folder command takes them as an option
 profile without onboarding priors gets training medians, and rule R13 then withholds any low-risk answer:
 with neither history nor priors there is no personal basis to clear a meal, so a grader running the
 samples without `history.csv` sees caution or can't judge, never low risk. Tooling: uv with Python 3.14
-(locked), strict Pydantic, Loguru, a `just` recipe for every number, 203 tests (202 pass with the data
-and weights, one an expected failure; 186 pass without them; logs in outputs/finalize/), W&B offline runs
+(locked), strict Pydantic, Loguru, a `just` recipe for every number, 204 tests (203 pass with the data
+and weights, one an expected failure; 187 pass without them; logs in outputs/finalize/), W&B offline runs
 replayed from committed training histories (outputs/wandb/), and a git history from the 27 Sep proposal;
 from 2 Nov every registration commit precedes its results commit.
 
