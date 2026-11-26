@@ -235,3 +235,7 @@ columns are present; a photo named IMG_0412.JPEG or photo.webp gave "no meal pho
 Predicted before the change: no development, locked or evaluated decision changes (the evaluation passes
 arrays, not files); the instructor folder is unchanged; stress cases 01 (semicolon) and 04 ("high"/"low")
 change from refusals to the behaviour above, and their manifest rows are updated.
+Result (27 Nov): as predicted. The instructor folder's decisions are unchanged; stress case 01 is now read
+(v1 then refuses its unreadable placeholder photo, v2 answers caution), case 04 is refused for too few
+readings; the grader's semicolon, decimal-comma, IMG_0412.JPEG and photo.webp folders are answered, and a
+last reading of "Low" gets rule R14's guidance. Tests: tests/test_input_rules_r17_r19.py.

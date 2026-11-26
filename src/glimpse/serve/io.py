@@ -32,10 +32,14 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
     Returns the readings plus the repairs made (rule R2: out-of-order rows are sorted and the fix is flagged)."""
     import pandas as pd
 
-    d = pd.read_csv(path)
+    flags: list[str] = []
+    opts = _csv_options(path)  # rule R17: a semicolon export (European Excel) is read, not refused
+    if opts:
+        flags.append("csv_semicolon")
+    d = pd.read_csv(path, **opts)
     d.columns = d.columns.str.strip()  # a header like "timestamp " is visually identical to the real one
     if not ({"timestamp", "glucose_mgdl"} | set(EXPORT_COLUMNS)) & set(d.columns):  # LibreView: a title line first
-        d = pd.read_csv(path, skiprows=1)
+        d = pd.read_csv(path, skiprows=1, **opts)
         d.columns = d.columns.str.strip()
     d = d.rename(columns={k: v for k, v in EXPORT_COLUMNS.items() if k in d.columns and v not in d.columns})
     missing = {"timestamp", "glucose_mgdl"} - set(d.columns)
@@ -49,11 +53,16 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
         raise ValueError("the timestamps look like epoch numbers, not dates; export readable dates")
     if d["timestamp"].dtype == object:  # rows disagree on the UTC offset; converting could misplace the window
         raise ValueError("the timestamps mix different UTC offsets; export the file in one timezone")
-    flags: list[str] = []
     if getattr(d["timestamp"].dt, "tz", None) is not None:  # rule R8: offsets dropped, local clock kept
         d["timestamp"] = d["timestamp"].dt.tz_localize(None)
         flags.append("timezone_dropped")
         logger.bind(stage="predict").warning("CGM timestamps carried a UTC offset; dropped before use (rule R8)")
+    if not pd.api.types.is_numeric_dtype(d["glucose_mgdl"]):  # rule R19: "Low"/"High" past the sensor limits
+        text = d["glucose_mgdl"].astype(str).str.strip().str.lower()
+        limits = {"low": 40.0, "lo": 40.0, "high": 400.0, "hi": 400.0}
+        if text.isin(limits).any():
+            d["glucose_mgdl"] = d["glucose_mgdl"].where(~text.isin(limits), text.map(limits))
+            flags.append("cgm_low_high_text")
     if "hr_bpm" in d:  # rule R11: a heart rate outside 25-250 bpm is sensor noise, dropped and flagged
         bad = d["hr_bpm"].notna() & ~d["hr_bpm"].between(25, 250)
         if bad.any():
@@ -67,6 +76,26 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
     h = d.dropna(subset=["hr_bpm"]) if "hr_bpm" in d else d.iloc[0:0]
     return (list(g.timestamp.dt.to_pydatetime()), g.glucose_mgdl.astype(float).tolist(),
             list(h.timestamp.dt.to_pydatetime()), h.hr_bpm.astype(float).tolist() if len(h) else [], flags)  # fmt: skip
+
+
+def _csv_options(path: str | Path) -> dict:
+    """Rule R17: separator and decimal mark from the first lines (more ';' than ',' in the header -> ';', and a
+    digit-comma-digit value then means decimal commas). Empty for an ordinary comma file or unreadable bytes."""
+    try:
+        with open(path, encoding="utf-8-sig", errors="strict") as f:
+            head = [f.readline() for _ in range(3)]
+    except OSError, UnicodeDecodeError:
+        return {}
+    import re
+
+    lines = [ln for ln in head if ln.strip()]
+    header = next(
+        (ln for ln in lines if "timestamp" in ln.lower() or "glucose" in ln.lower()), lines[0] if lines else ""
+    )
+    if header.count(";") <= header.count(","):
+        return {}
+    body = "".join(lines[1:])
+    return {"sep": ";", "decimal": ","} if re.search(r"\d,\d", body) else {"sep": ";"}
 
 
 def _plain(e: Exception) -> str:

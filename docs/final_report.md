@@ -291,7 +291,7 @@ dietitian consultation did not complete, so the cost matrix stays a declared ass
 
 | failure class | count: v1 / v2 | corpus | root cause | action |
 |---|---|---|---|---|
-| rule refusal | 8 of 13, 25 of 25 / 5 of 13, 16 of 25; no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps, unreadable photo), a low, out of scope | named refusal; rules R1–R16 (R6 preventive, R7 a recorded limitation); before the rules, the 5 Nov naive run gave 2 raw errors and 1 whole-file rejection on 23 hostile inputs, now 0 of 25 |
+| rule refusal | 8 of 13, 25 of 25 / 5 of 13, 15 of 25; no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps, unreadable photo), a low, out of scope | named refusal; rules R1–R19 (R6 preventive, R7 a recorded limitation); before the rules, the 5 Nov naive run gave 2 raw errors and 1 whole-file rejection on 23 hostile inputs, now 0 of 25 |
 | missing-photo refusal | 21 of 481 / none | development meals | input | v1 asks the user for a photo; v2 answers them |
 | near-cut false clear (within 0.031 of the fold's cut) | 4 of 109 / 6 of 118 | cleared development meals | threshold; v2: 4 of 6 on people with prediabetes | the frozen band would refer 4 of v2's 6; the price of a hard cut |
 | confident false clear | 4 of 109 / 9 of 118 | cleared development meals | v2: in 6 of 9 the person's intercept lowered the logit by 0.7 to 1.1, a low base rate clearing a meal that spiked; 2 cold starts | the prediabetes what-if (§4), not shipped |

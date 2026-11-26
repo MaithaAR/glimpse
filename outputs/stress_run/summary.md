@@ -4,10 +4,10 @@
 
 | meal | decision | reason | carbs from the photo |
 |---|---|---|---|
-| 01_semicolon_csv | can't judge | unsupported input (the CSV needs the columns timestamp and glucose_mgdl (missing: ['glucose_mgdl', 'timestamp'])) | – |
+| 01_semicolon_csv | can't judge | the photo cannot be used (cannot read photo samples/stress/01_semicolon_csv/photo.jpg: cannot identify image file 'samples/stress/01_semicolon_csv/photo.jpg') | – |
 | 02_tz_aware_timestamps | can't judge | the photo cannot be used (cannot read photo samples/stress/02_tz_aware_timestamps/photo.jpg: cannot identify image file 'samples/stress/02_tz_aware_timestamps/photo.jpg') | – |
 | 03_ampm_meal_time | can't judge | unsupported input (the meal time '06/01/2024 12:00 PM' is not an understood format (use e.g. 2024-06-01T12:00)) | – |
-| 04_strings_in_glucose | can't judge | unsupported input (a glucose or heart-rate value is not a number ('high')) | – |
+| 04_strings_in_glucose | can't judge | glucose data incomplete: 0 readings in the last 30 min (need 3), 4% of the 2 h covered (need 70%), a gap of 115 min (max 20) | – |
 | 05_negative_glucose | can't judge | a glucose reading is zero or negative; the export is broken, check the file | – |
 | 06_absurd_glucose | can't judge | a glucose reading is outside the sensor's range (40.0-400.0 mg/dL) | – |
 | 07_one_reading | can't judge | glucose data incomplete: 1 readings in the last 30 min (need 3), 4% of the 2 h covered (need 70%), a gap of 115 min (max 20) | – |

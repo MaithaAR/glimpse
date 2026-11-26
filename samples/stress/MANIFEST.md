@@ -12,10 +12,10 @@ tests/test_stress.py on every commit and visible in the rows' flags.
 
 | case | hostile input | expected behaviour |
 |---|---|---|
-| 01_semicolon_csv | semicolon-delimited CSV | can't judge, names the missing columns |
+| 01_semicolon_csv | semicolon-delimited CSV | read (rule R17, flagged `csv_semicolon`); v1 then refuses the unreadable placeholder photo, v2 answers |
 | 02_tz_aware_timestamps | +04:00 offsets on every timestamp | answered; timezone_dropped flag (R8) |
 | 03_ampm_meal_time | meal_time "06/01/2024 12:00 PM" | can't judge, unsupported meal time |
-| 04_strings_in_glucose | glucose values "high"/"low" | can't judge, unsupported input |
+| 04_strings_in_glucose | glucose values "high"/"low" | read as the sensor limits (rule R19); can't judge, two readings are too few |
 | 05_negative_glucose | all readings negative | can't judge (reads as not mg/dL, R1 family) |
 | 06_absurd_glucose | all readings 1e9 | structured answer or refusal, never a crash |
 | 07_one_reading | a single reading 5 min before the meal | can't judge, incomplete window |

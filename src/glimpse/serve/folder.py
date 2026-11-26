@@ -26,7 +26,8 @@ if TYPE_CHECKING:
 PROFILE_KEYS = {"age": "age", "bmi": "bmi", "a1c": "a1c_pct", "fasting_glucose": "fasting_glucose_mgdl",
                 "prior_spike_rate": "prior_spike_rate", "prior_rise": "prior_rise",
                 "a1c_pct": "a1c_pct", "fasting_glucose_mgdl": "fasting_glucose_mgdl"}  # fmt: skip
-PHOTO_NAMES = ("photo.jpg", "photo.jpeg", "photo.png", "photo.heic")
+PHOTO_NAMES = ("photo.jpg", "photo.jpeg", "photo.png", "photo.heic", "photo.webp")
+IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".heic", ".webp")
 
 
 def predict_folder(app: Pipeline, in_dir: str | Path, out_dir: str | Path) -> Path:
@@ -58,16 +59,34 @@ def _one_case(app: Pipeline, case: Path) -> dict:
             return {"meal_id": case.name, **a.model_dump(mode="json")}
         meal_time = raw.pop("meal_time", None)
         profile = {PROFILE_KEYS[k]: v for k, v in raw.items() if k in PROFILE_KEYS}
-        photo = next((f for f in sorted(case.iterdir()) if f.name.lower() in PHOTO_NAMES), None)
+        photo, pflags = find_photo(case)
+        if photo == "several":
+            names = ", ".join(f.name for f in sorted(case.iterdir()) if f.suffix.lower() in IMAGE_SUFFIXES)
+            a = cant_judge(f"several photos and none named photo.jpg ({names}); keep one, or name the meal photo",
+                           checks_failed=["input_valid"])  # fmt: skip
+            return {"meal_id": case.name, **a.model_dump(mode="json")}
         cgm = case / "cgm.csv"
         product = (getattr(app, "model_versions", None) or {}).get("product")
         history, hflags = read_history_flagged(case / "history.csv", product)
         a = answer_from_files(app, cgm if cgm.exists() else None, photo, meal_time, profile, history)
-        a.flags.extend(hflags)
+        a.flags.extend(hflags + pflags)
         return {"meal_id": case.name, "product": product, **a.model_dump(mode="json")}
     except Exception as e:  # a malformed meal is reported in its own row; the run must finish
         logger.bind(stage="predict-folder").warning("{}: error ({})", case.name, e)
         return {"meal_id": case.name, "error": f"{type(e).__name__}: {e}"}
+
+
+def find_photo(case: Path) -> tuple[Path | str | None, list[str]]:
+    """The meal photo: photo.* first; otherwise (rule R18) the folder's only image, flagged; "several" when
+    more than one unnamed image is present, so the caller can name them instead of guessing."""
+    files = sorted(f for f in case.iterdir() if f.is_file())
+    named = next((f for f in files if f.name.lower() in PHOTO_NAMES), None)
+    if named:
+        return named, []
+    images = [f for f in files if f.suffix.lower() in IMAGE_SUFFIXES]
+    if len(images) == 1:
+        return images[0], ["photo_name_nonstandard"]
+    return ("several", []) if images else (None, [])
 
 
 def read_history(path: Path) -> list[tuple[datetime, float, int]] | None:
