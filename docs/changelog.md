@@ -357,3 +357,13 @@ registrations at my instruction. The choices and the conclusions are mine. Maith
 |---|---|---|
 | Spike label defined in section 1; the identity check states the 97.8% for sensor and profile inputs; the non-meal pictures are named as synthetic or generated; the shuffled-label range is stated as wider than predicted; the no-history row carries its locked cost; the abstention error is defined; "a recipe behind every table" excepts the locked run | factual points raised by two cold graders of the uploaded version | docs/final_report.md |
 | Source notes shortened to keep the word count under 3,000 by either way of counting | word limit | docs/final_report.md |
+
+## Twenty-fourth pass, 27 Nov (deadline day; new runs, the served model unchanged)
+
+| change | why | where |
+|---|---|---|
+| External check: the frozen v2 scored on 12 people of a second public dataset (BIG IDEAs, PhysioNet). AUROC 0.628 (0.535–0.704), calibration intact, decisions not useful. Exploratory: plan and run on the same day | the only clean test had 8 people; the author asked for a new dataset | docs/external_bigideas.md, src/glimpse/studies/external_bigideas.py, scripts/prepare_bigideas.py, outputs/external_bigideas/ |
+| Post-freeze checks: JPEG compression, crop augmentation, embedding map, photo estimate ladder, refer-band analysis | lecture tests the submission had not run | docs/post_freeze_checks.md, src/glimpse/studies/post_freeze.py, outputs/post_freeze/ |
+| Report: external row on page one and in the results table, a paragraph in section 3, four rows in the checks table, the refer-band sentence, the Mac p95 and first-answer time | the results above | docs/final_report.md |
+| Figure 2 (per-fold AUROC) moved to the appendix as Figure A4 and the later figures renumbered; the what-if, the v3 sentence and v2 detail moved to the appendix | page limit | docs/final_report.md, docs/report_appendix.md, README.md |
+| Tests: one added for the new cells; 214 pass + 1 expected failure with data, 198 without | new cells | tests/test_report_numbers.py |

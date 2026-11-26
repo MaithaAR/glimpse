@@ -195,26 +195,45 @@ served files (unless `GLIMPSE_OVERWRITE_FROZEN=1`); the served files came from `
 | §1 budget, latency | `just params`, `just efficiency`, `just stage-timing` | `outputs/param_budget.csv`, `outputs/efficiency/` |
 | §1 quality vs cost, §3 baselines | `just cv`; `just report-numbers` | `outputs/cv/cv_summary.json`, `outputs/report_metrics/` |
 | §2 photo recipe, what the photo does | `just photo-cv`, `just fusion`, `just ablate`, `just photo-seeds`, `just promised` | `outputs/photo_cv/`, `outputs/fusion/`, `outputs/ablations/`, `outputs/training/`, `outputs/promised/` |
-| §3 results table, fold cut-offs, Figures 2 and 5 | `just evaluate` (`evaluate-locked` once) | `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` |
+| §3 results table, fold cut-offs, Figures A4 and 4 | `just evaluate` (`evaluate-locked` once) | `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` |
 | §4 cost sweep, usefulness targets | `just evaluate` | `outputs/evaluation_v2/dev_summary.json`, `outputs/report_metrics/` |
 | §1 end-to-end timing, int8 | `just end-to-end-timing`, `just photo-probes` | `outputs/efficiency/end_to_end.json`, `int8.json` |
-| §3-§5 v2 calibration, taxonomy, SHAP, Figures 5 and 6 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
+| §3-§5 v2 calibration, taxonomy, SHAP, Figures 4 and 5 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
 | §3-§5 course checks, OOD AUROC, monitoring power, calibration null | `just final-checks` | `outputs/final_checks/final_checks.json` |
 | §5 debugging table R1-R4, v3 candidate (R5-R7), §6 re-weighted test (R8) | `just robustness-v3` | `outputs/robustness_v3/robustness_v3.json` |
 | §4 stress table | `just stress-quality`, `just v2-input-stress` | `outputs/robustness/stress_quality.json`, `v2_input_stress.json` |
 | appendix stress levels, Figure A1 | `just robustness-levels`, `just timing`, `just promised` | `outputs/robustness/`, `outputs/promised/` |
 | §4 monitoring | `just monitoring`, `just monitoring-replay` | `outputs/monitoring/` |
-| §5 taxonomy, probes, Figure 7 | `just predict-folder`, `just stress`, `just probes`, `just ood`, `just figures` | `outputs/folder_run/`, `outputs/stress_run/`, `outputs/probes/`, `outputs/ood/`, `outputs/figures/` |
+| §5 taxonomy, probes, Figure 6 | `just predict-folder`, `just stress`, `just probes`, `just ood`, `just figures` | `outputs/folder_run/`, `outputs/stress_run/`, `outputs/probes/`, `outputs/ood/`, `outputs/figures/` |
 
 Figure numbers and files (the file names keep their first numbering, so earlier commits still resolve): Figure 1
-`fig1_system.png` · 2 `fig2_per_fold_auroc.png` · 3 `fig_training.png` · 4 `fig6_effects.png` · 5
-`fig3_reliability.png` · 6 `fig4_v2.png` · 7 `fig7_shap.png` · A1 `figA1_robustness.png` · A2 `fig5_coverage.png`.
+`fig1_system.png` · 2 `fig_training.png` · 3 `fig6_effects.png` · 4 `fig3_reliability.png` · 5 `fig4_v2.png` ·
+6 `fig7_shap.png` · A1 `figA1_robustness.png` · A2 `fig5_coverage.png` · A3 `figA3_embedding.png` · A4
+`fig2_per_fold_auroc.png` (the report's Figure 2 until 27 Nov).
 
 Rules added after the tag, all in docs/rule_ledger.md with the commit that registered each: R14 (a low is
 referred; amended on 26 Nov for a falling 54-69 mg/dL), R15, R16, input rules R17-R21 (semicolon CSVs, a
 photo not named photo.*, Dexcom Low/High text, day-first dates, units in the profile) and R22 (no low risk at
 a last reading of 140 mg/dL or more, or a rise above 1.5 mg/dL/min; the answer becomes caution). With R22,
 v1 clears 18.1% of development meals (target 20%) and 6.9% of those spike; cost reduction 10.7%.
+
+Added on 27 Nov, exploratory, with the served model unchanged:
+
+- `just post-freeze` (docs/post_freeze_checks.md, `outputs/post_freeze/`; about 5 minutes once the photo
+  caches exist, inside `just evaluate`): JPEG compression stress, the crop-augmentation check, an embedding
+  map (Figure A3), the photo estimate ladder and a refer-band analysis of the decision layer.
+- `just external-bigideas` (docs/external_bigideas.md, `outputs/external_bigideas/`): the frozen v2 scored on
+  a second public dataset, BIG IDEAs Lab Glycemic Variability and Wearable Device Data (PhysioNet v1.1.2,
+  open access). The data are not in this repository. To fetch and prepare them (about 250 MB):
+
+```bash
+mkdir -p data/bigideas && cd data/bigideas
+B=https://physionet-open.s3.amazonaws.com/big-ideas-glycemic-wearable/1.1.2
+curl -sSO $B/Demographics.csv
+for i in $(seq -w 1 16); do mkdir -p 0$i; for f in Dexcom HR Food_Log; do curl -sS -o 0$i/${f}_0$i.csv $B/0$i/${f}_0$i.csv; done; done
+uv run python ../../scripts/prepare_bigideas.py && cd ../..
+just external-bigideas
+```
 
 `tests/test_report_numbers.py` checks the report's headline numbers against these files on every commit.
 

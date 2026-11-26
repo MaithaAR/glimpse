@@ -1,0 +1,148 @@
+{
+  "what": "External check on a second dataset, 27 Nov (docs/external_bigideas.md): the frozen sensor-first model v2 on",
+  "plan": "docs/external_bigideas.md",
+  "people": 12,
+  "meals_usable": 531,
+  "meals_scored": 201,
+  "spike_rate": 0.2537313432835821,
+  "people_with_onboarding_priors": 12,
+  "heart_rate_missing_share": 0.14427860696517414,
+  "v2_frozen": {
+    "auroc": 0.6275816993464052,
+    "ci95": [
+      0.5347816819817358,
+      0.7040146451793753
+    ],
+    "meals": 201,
+    "within_person": {
+      "mean": 0.473000033240675,
+      "people": 11
+    },
+    "brier": 0.18472282717374225,
+    "brier_constant": 0.1893517487190911,
+    "ece": 0.0533728381960671,
+    "mean_risk_minus_spike_rate": 0.005275125249674217
+  },
+  "v2_without_intercept": {
+    "auroc": 0.6235294117647059,
+    "ci95": [
+      0.5633726071261732,
+      0.676421812220808
+    ],
+    "meals": 201,
+    "within_person": {
+      "mean": 0.6201823666529549,
+      "people": 11
+    }
+  },
+  "running_spike_rate": {
+    "auroc": 0.5530718954248366,
+    "ci95": [
+      0.41530949692569613,
+      0.6516324355131747
+    ],
+    "meals": 201
+  },
+  "logged_carbs_alone": {
+    "auroc": 0.7343790849673202,
+    "ci95": [
+      0.6377177657749717,
+      0.817823588827076
+    ],
+    "meals": 201,
+    "within_person": {
+      "mean": 0.7247169487276438,
+      "people": 11
+    }
+  },
+  "decisions_at_frozen_cutoffs": {
+    "cutoffs": [
+      0.15,
+      0.22
+    ],
+    "cleared_share": 0.1691542288557214,
+    "cleared": 34,
+    "missed": 5,
+    "missed_among_cleared": 0.14705882352941177,
+    "referred_share": 0.20398009950248755,
+    "cost_reduction_vs_always_caution": 0.030000000000000027,
+    "cost_reduction_ci95": [
+      -0.1378324468085106,
+      0.2225787122258014
+    ]
+  },
+  "per_person": [
+    {
+      "person_id": 1,
+      "meals": 18,
+      "spikes": 0,
+      "auroc": null
+    },
+    {
+      "person_id": 2,
+      "meals": 15,
+      "spikes": 2,
+      "auroc": 0.5
+    },
+    {
+      "person_id": 3,
+      "meals": 12,
+      "spikes": 3,
+      "auroc": 0.4444444444444444
+    },
+    {
+      "person_id": 4,
+      "meals": 11,
+      "spikes": 2,
+      "auroc": 0.3888888888888889
+    },
+    {
+      "person_id": 5,
+      "meals": 20,
+      "spikes": 3,
+      "auroc": 0.4313725490196078
+    },
+    {
+      "person_id": 6,
+      "meals": 21,
+      "spikes": 10,
+      "auroc": 0.5
+    },
+    {
+      "person_id": 8,
+      "meals": 17,
+      "spikes": 5,
+      "auroc": 0.43333333333333335
+    },
+    {
+      "person_id": 9,
+      "meals": 16,
+      "spikes": 5,
+      "auroc": 0.5636363636363637
+    },
+    {
+      "person_id": 10,
+      "meals": 20,
+      "spikes": 5,
+      "auroc": 0.5466666666666666
+    },
+    {
+      "person_id": 11,
+      "meals": 22,
+      "spikes": 9,
+      "auroc": 0.452991452991453
+    },
+    {
+      "person_id": 12,
+      "meals": 11,
+      "spikes": 1,
+      "auroc": 0.4
+    },
+    {
+      "person_id": 14,
+      "meals": 18,
+      "spikes": 6,
+      "auroc": 0.5416666666666667
+    }
+  ]
+}

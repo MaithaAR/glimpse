@@ -283,7 +283,7 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 
 ## v2 detail (sensor first; docs/v2_sensor_first.md)
 
-Figure 6's local panel: meal 847 was chosen by the registered rule as the lowest-risk confident false clear; its one labelled meal spiked, so its intercept raises the logit, as for meal 864, unlike 6 of the 9 where it lowered it; SHAP is computed on the frozen fusion, not the fold model that answered.
+Figure 5's local panel: meal 847 was chosen by the registered rule as the lowest-risk confident false clear; its one labelled meal spiked, so its intercept raises the logit, as for meal 864, unlike 6 of the 9 where it lowered it; SHAP is computed on the frozen fusion, not the fold model that answered.
 
 Probes A and C (moved from report §5): Probes A and C move one input at a time through a linear fusion, so their direction is guaranteed; what they show is size. The most extreme photo swap leaves 68.5% of v1's decisions unchanged. Moving one of HbA1c, fasting glucose or the two priors from its 10th to 90th percentile changes 11–17% of v1's decisions; in v2, age and the two priors move the most (35–39%), and HbA1c only 24%, so the registered expectation (priors and HbA1c lead) was half met.
 
@@ -425,3 +425,15 @@ The report's italic source notes were shortened; the full versions are kept here
 - outputs/folder_run and outputs/stress_run (v1, served), outputs/v2_sensor_first/ (v2), report_metrics.json (errors, false_clears_exploratory), v2_explain.json (taxonomy), outputs/probes/. Half of v1's 8 development false clears are in fold 1; v2's 15 spread over all five folds (6 in fold 5).
 
 Moved from report section 5 on 26 Nov: the per-person intercept moves v2's logit by 0.51 on average, against 0.64 for the whole fusion (outputs/v2_explain/v2_explain.json).
+
+## Added on 27 Nov
+
+Figure A4 was Figure 2 of the report until 27 Nov (moved for the page limit; the later figures were renumbered).
+
+![Figure A4: per-fold AUROC, raw against the personal intercept, v1 and v2 (v2 higher in 5 of 5 folds too)](../outputs/figures/fig2_per_fold_auroc.png){width=60%}
+
+![Figure A3: t-SNE of the frozen photo summaries of the 1,221 photos, coloured by carb range and by person (outputs/post_freeze/post_freeze.json, embedding_map)](../outputs/figures/figA3_embedding.png){width=90%}
+
+Moved from report sections 4 and 5 on 27 Nov (page limit): a what-if that withholds clears for a prediabetic profile until 20 labelled meals cuts their misses from 6 to 2 and their clears from 30 to 3 (saving 10.4%); it was chosen on the data it is scored on, so it is not shipped. At 70% CGM dropout only meals with too few recent readings are refused (20 in v2); the photo cannot move v2's risk; with the watch left off, v2's misses among clears fall to 11.6% and the saving rises to 12.8%, so at v2's cut heart rate does not help its decisions. In v2 the same four inputs lead the SHAP ranking (outputs/v2_explain/), and the sign has a reading (exploratory): within a person, a higher heart rate than usual before a meal goes with fewer spikes (−0.51, −0.88 to −0.25, person fixed effects). A regularised photo branch (v3, robustness checks 5 to 7) cut the overfitting gap from 0.35 to 0.13 but raised carb error to 26.0 g; it stays a candidate. With no refer band, referring the 10% of answered meals closest to the cut moves the error on answered meals (a spike after low risk, or none after caution) from 47.0% to 48.1%.
+
+Post-freeze checks of 27 Nov in full: docs/post_freeze_checks.md and outputs/post_freeze/post_freeze.json. External check: docs/external_bigideas.md and outputs/external_bigideas/.

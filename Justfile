@@ -178,6 +178,7 @@ evaluate:
     just final-checks
     just robustness-v3
     just rules-r22
+    just post-freeze
     just report-numbers
 
 # the old name of `evaluate`, kept so earlier notes still work
@@ -325,3 +326,11 @@ wordcount:
 # probe C: profile and onboarding priors counterfactual on the frozen fusion (registered 26 Nov; data-free)
 probe-c:
     uv run glimpse probe-c
+
+# post-freeze exploratory checks, 27 Nov (docs/post_freeze_checks.md; needs data and weights, about 20 min)
+post-freeze:
+    uv run glimpse post-freeze
+
+# external check: the frozen v2 on the BIG IDEAs dataset (docs/external_bigideas.md; needs data/bigideas/, seconds)
+external-bigideas:
+    uv run glimpse external-bigideas

@@ -594,7 +594,7 @@ def test_v2_explain_cells():
     assert (
         f"({hr['within_person_coefficient']:.2f}, {hr['within_person_ci95'][0]:.2f} to "
         f"{hr['within_person_ci95'][1]:.2f}, person fixed effects)"
-    ).replace("-", "−") in " ".join(text.split())
+    ).replace("-", "−") in " ".join(APPENDIX.read_text().split())
     assert f"moves v2's logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in APPENDIX.read_text()
     tp = r["temporal"]["last_third"]
     flat = " ".join(Path("docs/report_appendix.md").read_text().split())  # moved to the appendix (page limit)
@@ -755,3 +755,57 @@ def test_rules_r22_and_holm_cells(text):
     h = _load("outputs/report_metrics/holm.json")["contrasts"]
     survivors = {k for k, v in h.items() if v["survives_holm_0.05"]}
     assert survivors == {"v1 minus a running spike rate", "within-person AUROC, intercept minus raw (v1)"}
+
+
+def test_external_and_post_freeze_cells():
+    """27 Nov additions: the external check of the frozen v2 and the post-freeze checks, against their outputs."""
+    flat = " ".join(REPORT.read_text().split())
+    e = _load("outputs/external_bigideas/external_bigideas.json")
+    v = e["v2_frozen"]
+    cell = f"{v['auroc']:.3f} ({v['ci95'][0]:.3f}–{v['ci95'][1]:.3f})"
+    assert flat.count(cell) >= 3 and e["people"] == 12 and e["meals_scored"] == 201
+    assert f"| {cell} | – | {v['brier']:.3f} ({v['brier_constant']:.3f}) | – | {v['ece']:.3f} / – |" in flat
+    d = e["decisions_at_frozen_cutoffs"]
+    assert (
+        f"ECE {v['ece']:.3f}; {d['cleared_share']:.1%} cleared, {d['missed_among_cleared']:.1%} of them spiked" in flat
+    )
+    assert f"({d['missed']} of {d['cleared']})" in flat and abs(v["mean_risk_minus_spike_rate"]) < 0.005 + 1e-3
+    assert (
+        f"within-person {v['within_person']['mean']:.3f}, against {e['v2_without_intercept']['within_person']['mean']:.3f}"  # noqa: E501
+        in flat
+    )
+    assert f"rank meals better alone ({e['logged_carbs_alone']['auroc']:.3f})" in flat
+    p = _load("outputs/post_freeze/post_freeze.json")
+    j, c, m, a, dl = p["jpeg_stress"], p["crop_ablation"], p["embedding_map"], p["photo_average"], p["decision_layer"]
+    assert (
+        f"quality 50: median shift {j['q50']['median_abs_shift_g']:.1f} g, {j['q50']['same_range_as_clean']:.0%} keep"
+        in flat
+    )
+    assert (
+        f"quality 20: {j['q20']['same_range_as_clean']:.1%}; quality 10: {j['q10']['same_range_as_clean']:.0%}" in flat
+    )
+    crop, nocrop, none = (c[k] for k in ("crop_80pct_flip_jitter", "no_crop_flip_jitter", "no_augmentation"))
+    assert (
+        f"carb MAE {crop['mae_g_mean']:.1f} g with crops keeping 80%, {nocrop['mae_g_mean']:.1f} g without the crop"
+        in flat
+    )
+    assert (
+        f"(seeds {nocrop['mae_g_range'][0]:.1f}–{nocrop['mae_g_range'][1]:.1f}), {none['mae_g_mean']:.1f} g with no augmentation"  # noqa: E501
+        in flat
+    )
+    assert f"{m['share_same_carb_range']:.0%} share its carb range (chance {m['chance_same_carb_range']:.0%})" in flat
+    assert f"{m['share_same_person']:.0%} its person (chance {m['chance_same_person']:.0%})" in flat
+    assert (f"fine-tuned {a['fine_tuned']['mae_g']:.1f} g, ridge on frozen features {a['ridge_frozen']['mae_g']:.1f} g, "  # noqa: E501
+            f"their average {a['average_log_scale']['mae_g']:.1f} g") in flat  # fmt: skip
+    b, n = dl["wider_band"]["refer_within_0.05_of_cut"], dl["no_band"]
+    assert f"refers {b['referred_share']:.0%} of meals and leaves {b['missed_among_cleared']:.1%}" in flat
+    assert f"({b['missed_ci95'][0]:.1%}–{b['missed_ci95'][1]:.1%})".replace("%–", "–") in flat
+    assert (
+        f"against {n['missed_among_cleared']:.1%} ({n['missed_ci95'][0]:.1%}–{n['missed_ci95'][1]:.1%})".replace(
+            "%–", "–"
+        )
+        in flat
+    )
+    assert f"clears fall from {n['cleared_share']:.1%} to {b['cleared_share']:.1%} of answered meals" in flat
+    eff = _load("outputs/efficiency/efficiency.json")["latency_s"]
+    assert f"p95 {eff['warm_p95'] * 1000:.0f}, first answer {eff['cold_first_answer']:.2f} s" in flat

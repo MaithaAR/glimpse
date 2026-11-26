@@ -244,6 +244,27 @@ def _robustness_v3(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _post_freeze(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Post-freeze exploratory checks, 27 Nov (docs/post_freeze_checks.md); served model unchanged."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.post_freeze import run_post_freeze
+
+    run_post_freeze(cfg, MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")))
+    return 0
+
+
+def _external_bigideas(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """External check of the frozen v2 on the BIG IDEAs dataset (docs/external_bigideas.md); needs data/bigideas/."""
+    from glimpse.studies.external_bigideas import ROOT, run_external_bigideas
+
+    if not (ROOT / "bigideas_cgm.csv").is_file():
+        logger.bind(stage="external").error("data/bigideas/ is missing; the README has the download lines")
+        return 1
+    run_external_bigideas(cfg)
+    return 0
+
+
 def _final_checks(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Registered last-day checks O1, O2, M1, C1, S1-S5 (docs/final_switch.md); needs the data and weights."""
     from glimpse.data.dataset import MealDataset
@@ -587,6 +608,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("holm", help="Holm over the report's paired development contrasts (committed outputs only)")
     sub.add_parser("rules-r22", help="rule R22 and the R14 amendment counted on the committed development answers")
     sub.add_parser("robustness-v3", help="the course's remaining tests (R1-R8) and the v3 photo candidate")
+    sub.add_parser("post-freeze", help="post-freeze exploratory checks: JPEG, crops, embedding map, decision layer")
+    sub.add_parser("external-bigideas", help="frozen v2 on the BIG IDEAs dataset (16 new people); needs data/bigideas/")
     sub.add_parser("final-checks", help="registered last-day checks: OOD, monitoring power, calibration, course checks")
     sub.add_parser("verify-outputs", help="data-free outputs against the committed ones (numbers to 1e-9)")
     sub.add_parser("v2-explain", help="v2 calibration, failure taxonomy and exact SHAP (descriptive)")
@@ -669,6 +692,8 @@ def main(argv: list[str] | None = None) -> int:
         "final-checks": _final_checks,
         "robustness-v3": _robustness_v3,
         "rules-r22": _rules_r22,
+        "external-bigideas": _external_bigideas,
+        "post-freeze": _post_freeze,
         "holm": _holm,
         "v1-input-ranges": _v1_input_ranges,
         "v2-input-ranges": _v2_input_ranges,
