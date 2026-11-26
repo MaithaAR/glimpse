@@ -71,6 +71,58 @@
       0.2225787122258014
     ]
   },
+  "matching_checks": {
+    "peak_minute_after_logged_time_per_person": {
+      "1": 30,
+      "2": 60,
+      "3": 50,
+      "4": 70,
+      "5": 55,
+      "6": 55,
+      "8": 55,
+      "9": 55,
+      "10": 40,
+      "11": 55,
+      "12": 40,
+      "14": 40
+    },
+    "pooled_mean_change_mgdl": {
+      "-60": 0.7017724867724868,
+      "-30": 0.13674484719260843,
+      "0": -0.45857142857142846,
+      "15": 3.718834399431415,
+      "30": 13.661714285714286,
+      "45": 20.285998578535892,
+      "60": 19.465103056147832,
+      "90": 13.504904051172709,
+      "120": 9.28061776061776
+    },
+    "share_outside_v2_training_range": {
+      "last glucose": 0.0,
+      "slope 30 min": 0.0,
+      "slope 60 min": 0.0,
+      "window mean": 0.004975124378109453,
+      "window spread": 0.004975124378109453,
+      "window rise": 0.0,
+      "heart rate": 0.0,
+      "age": null,
+      "BMI": null,
+      "HbA1c": 0.0,
+      "fasting glucose": null,
+      "hour (sin)": 0.009950248756218905,
+      "hour (cos)": 0.0,
+      "prior spike rate": 0.0,
+      "prior rise": 0.2537313432835821
+    },
+    "mean_heart_rate": {
+      "bigideas": 81.27914504870152,
+      "cgmacros": 82.36757307921152
+    },
+    "mean_last_glucose": {
+      "bigideas": 109.73134328358209,
+      "cgmacros": 124.59209698558323
+    }
+  },
   "per_person": [
     {
       "person_id": 1,

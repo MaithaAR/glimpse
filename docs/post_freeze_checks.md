@@ -1,6 +1,7 @@
 # Post-freeze exploratory checks, 27 Nov 2026
 
-Written on the day of the deadline, before the runs below. These are not pre-registered studies: the plan and
+Written on the day of the deadline, before the runs below; plan, code and results share one commit, so the
+history cannot show the order. These are not pre-registered studies: the plan and
 the runs are the same day, so they are reported as exploratory. The served model (v1), its cut-offs, the
 frozen files and every locked number are unchanged. `just post-freeze` reruns all of it (about 20 minutes with
 the data and weights); results go to outputs/post_freeze/post_freeze.json.

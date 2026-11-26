@@ -1,4 +1,4 @@
-# GLIMPSE report appendix: secondary tables (26 Nov 2026)
+# GLIMPSE report appendix: secondary tables (26 Nov 2026, extended on 27 Nov)
 
 Supporting tables only; not part of the graded report's length. Every row is cited from the report.
 
@@ -226,7 +226,7 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 | T1 rule refusal | 7 of 13 (an 8th is the unfamiliar-photo check); 25 of 25 | instructor cases; stress suite | input (format, units, gaps) | named refusal; rules R1-R21, before/after in the rule ledger |
 | T2 missing-photo abstention | 21 of 481 | development meals | input | refuse; typed carbs not wired |
 | T3 borderline abstention | 45 of 481 | development meals (folds 2–4 only) | threshold band | dietitian review |
-| T4 near-cut false clear | 4 of 109 | cleared development meals | threshold: the closer half, 0.005–0.030 below the cut | none; the price of a hard cut (Figure 7) |
+| T4 near-cut false clear | 4 of 109 | cleared development meals | threshold: the closer half, 0.005–0.030 below the cut | none; the price of a hard cut (report Figure 5) |
 | T5 confident false clear | 4 of 109 | cleared development meals | model: the farther half, 0.047–0.138 below; two cold starts after steep falls, two with 10 and 20 labels | "falling now" check proposed, not shipped |
 | locked false clear | 2 of 10 | cleared locked meals | threshold and cohort shift; 8 of 10 clears from one person | outcome monitor (too few clears to fire) |
 | false caution (caution, no spike) | 175 of 306; 78 of 139 | development; locked cautions | one-point band, 33–42% base rate | none; cost-optimal at the declared prices |
@@ -413,7 +413,7 @@ The report's italic source notes were shortened; the full versions are kept here
 
 - Every cell is traced below and tested against outputs/report_metrics/ (report_metrics.json for v1, v2_metrics.json for v2) and the other evidence files. Secondary tables are in docs/report_appendix.md.
 - Parameter counts: outputs/param_budget.csv (`just params`); memory: outputs/efficiency/efficiency.json. Timing: outputs/efficiency/end_to_end.json, whole folder-command answers (profile, CSV parsing at 4 ms, rules, models) with the pinned weights on a 2-CPU cloud machine, 50 runs; the author's Mac measured v1 at 265 ms warm median on 7 Nov. int8: outputs/efficiency/int8.json; registered on 1,221 photos, run on the 460 development photos that carry a v1 decision so agreement is per decision (a deviation, disclosed in docs/photo_probes_int8.md). AUROCs: outputs/evaluation_v2/, outputs/evaluation_sensor_first/, outputs/cv/.
-- Figure 3 shows the training curves of the inner folds of the intermediate run (outputs/training/). outputs/cv/, outputs/photo_cv/, outputs/robustness_v3/robustness_v3.json.
+- Figure 3 (now Figure 2) shows the training curves of the inner folds of the intermediate run (outputs/training/). outputs/cv/, outputs/photo_cv/, outputs/robustness_v3/robustness_v3.json.
 - outputs/fusion/, outputs/photo_cv/, outputs/promised/, outputs/probes/photo_probes.json, outputs/training/photo_convnext_seeds.json, outputs/v2_explain/v2_explain.json (carb_value); probes D and E registered in docs/photo_probes_int8.md before they ran.
 - All AUROCs pooled over out-of-fold predictions; a constant per fold scores below 0.5 when pooled because training and test prevalence move in opposite directions across folds. v1 answers 460 development meals (21 had no photo); v2 answers all 481. outputs/report_metrics/, outputs/evaluation_v2/, outputs/evaluation_sensor_first/, outputs/locked_eval/.
 - Paired person bootstrap, 2,000 draws. Holm over the 7 v1 and v2-minus-v1 development contrasts (p from each interval by a normal approximation; outputs/report_metrics/holm.json): only the running-spike-rate and v1 within-person contrasts survive; the other five do not. Every intercept baseline uses the shipped replay on its own out-of-fold logits (it reproduces the shipped risk to 1e-16). report_metrics.json (paired_personal_minus_raw, fair_baselines, within_person), v2_metrics.json (paired_v2_minus_v1, within_person).
@@ -430,10 +430,25 @@ Moved from report section 5 on 26 Nov: the per-person intercept moves v2's logit
 
 Figure A4 was Figure 2 of the report until 27 Nov (moved for the page limit; the later figures were renumbered).
 
-![Figure A4: per-fold AUROC, raw against the personal intercept, v1 and v2 (v2 higher in 5 of 5 folds too)](../outputs/figures/fig2_per_fold_auroc.png){width=60%}
-
 ![Figure A3: t-SNE of the frozen photo summaries of the 1,221 photos, coloured by carb range and by person (outputs/post_freeze/post_freeze.json, embedding_map)](../outputs/figures/figA3_embedding.png){width=90%}
+
+![Figure A4: per-fold AUROC, raw against the personal intercept, v1 and v2 (v2 higher in 5 of 5 folds too)](../outputs/figures/fig2_per_fold_auroc.png){width=60%}
 
 Moved from report sections 4 and 5 on 27 Nov (page limit): a what-if that withholds clears for a prediabetic profile until 20 labelled meals cuts their misses from 6 to 2 and their clears from 30 to 3 (saving 10.4%); it was chosen on the data it is scored on, so it is not shipped. At 70% CGM dropout only meals with too few recent readings are refused (20 in v2); the photo cannot move v2's risk; with the watch left off, v2's misses among clears fall to 11.6% and the saving rises to 12.8%, so at v2's cut heart rate does not help its decisions. In v2 the same four inputs lead the SHAP ranking (outputs/v2_explain/), and the sign has a reading (exploratory): within a person, a higher heart rate than usual before a meal goes with fewer spikes (−0.51, −0.88 to −0.25, person fixed effects). A regularised photo branch (v3, robustness checks 5 to 7) cut the overfitting gap from 0.35 to 0.13 but raised carb error to 26.0 g; it stays a candidate. With no refer band, referring the 10% of answered meals closest to the cut moves the error on answered meals (a spike after low risk, or none after caution) from 47.0% to 48.1%.
 
 Post-freeze checks of 27 Nov in full: docs/post_freeze_checks.md and outputs/post_freeze/post_freeze.json. External check: docs/external_bigideas.md and outputs/external_bigideas/.
+
+Moved from report sections 1, 3 and 4 on 27 Nov (word limit): input rules R17 to R21 cover semicolon CSVs, a photo not named photo.*, Dexcom "Low"/"High" text, day-first Libre dates and units in the profile. Study C1 lets the intercept learn from labels drawn from the model itself; the registered prediction (v2 typical) was not met. For the risk inputs, a distance to the development people separates the 14 type-2 diabetes people's meals with AUROC 0.89; HbA1c alone does it perfectly and fasting glucose reaches 0.92.
+
+Moved from report sections 2 and 4 on 27 Nov (page limit). Training table row:
+
+| what was trained | starts from | trained parameters | loss; optimiser and schedule | epochs (inner folds) | validation result |
+|---|---|---|---|---|---|
+| v3 candidate: the photo heads alone, regularised (appendix) | frozen summaries | 3,845 | as the photo model; weight decay 0.1, dropout 0.5, 2 augmented views (chosen) | 7–12 | out-of-fold carb MAE 26.0 g |
+
+Monitoring rows:
+
+| monitoring (docs/monitoring.md) | demonstration | result |
+|---|---|---|
+| CUSUM on calibration, v1 development then locked (registered) | blocks of 20 answers | no alarm (2.4 of 4), against a registered expectation of one |
+| CUSUM on the caution share (registered) | same | one alarm in the 7th locked block at the per-fold cut-offs; none at the deployed or served cut-offs |

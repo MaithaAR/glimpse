@@ -1,4 +1,4 @@
-# External check on a second dataset, 27 Nov 2026 (plan written before any scoring)
+# External check on a second dataset, 27 Nov 2026 (plan written before scoring; plan, code and results share one commit, so the history cannot show the order)
 
 Exploratory, planned and run on the day of the deadline; not a pre-registered study. The served model (v1)
 is unchanged and cannot be scored here: the second dataset has no meal photos, and v1 refuses a meal without
@@ -38,7 +38,9 @@ profile fields, the different devices and free-living meals; usefulness targets 
 ## Result (27 Nov, run once on loading the data; outputs/external_bigideas/external_bigideas.json)
 
 Found on loading, before any score: for 4 of the 16 people (7, 13, 15, 16) the food-log dates in the public
-files do not overlap their CGM dates, so they have no usable meal. No date shift was guessed. 12 people
+files do not overlap their CGM dates, so they have no usable meal (food log against CGM: person 7, 16 to 24 Oct
+2019 against 14 to 22 Mar 2020; 13, 30 Dec 2019 to 6 Jan 2020 against 28 May to 4 Jun 2020; 15, 17 to 25 Feb
+against 19 to 27 Jul 2020; 16, 21 to 28 Feb against 16 to 24 Jul 2020). No date shift was guessed. 12 people
 remain, with 531 usable meals and 201 scored ones (after onboarding, isolated, pre-meal checks passed). Spike
 rate 25.4%. All 12 have onboarding priors. Heart rate is missing in 14% of scored windows.
 
@@ -59,16 +61,37 @@ Reading.
 - The expectation written before scoring (0.60 to 0.70, targets not met) held. The interval excludes 0.5.
 - The external AUROC, 0.628 on 12 new people, is close to the locked test's 0.645 on 8 (that was v1; v2 has
   no locked number). Two independent small tests now put the honest discrimination of this family of models
-  in the low 0.60s, well under the development 0.75 to 0.76.
-- Calibration carried over to a different study, device and food log: the mean risk is within half a point
-  of the spike rate.
+  between 0.62 and 0.65, well under the development 0.75 to 0.76. They are different models (v1 and v2).
+- The mean risk carried over to a different study, device and food log: it is 0.5 points above the spike
+  rate. ECE is 0.053, just above the 0.05 target, and no noise floor was computed for this set.
 - The intercept did not help ranking here (0.628 against 0.624) and again scrambled the order of a person's
   own meals (0.473 against 0.620).
-- The carbs the person logged, alone, rank meals better than the whole model (0.734). Meal content is the
-  missing signal, as the label audit on CGMacros found.
+- The carbs the person logged, alone, rank meals better than the whole model (0.734). Free-living logs
+  include many low-carb entries, which CGMacros' standardised meals do not, so carbs separate meals far more
+  here than the +0.03 they add on CGMacros.
 - At the frozen cut-offs the model is not useful on these people: it misses 14.7% of what it clears and its
   cost saving is not distinguishable from zero.
 
 Limits: 12 people; age, BMI and fasting glucose imputed; another wrist device; a self-kept food log with
 timing errors; only the model is scored, not the product with its refusal rules; v1, the served model,
 cannot be scored without photos.
+
+## How the two datasets are kept apart, and how they are matched
+
+Nothing is combined. No model was trained, tuned or calibrated on BIG IDEAs data. The fusion weights, Platt
+map, intercept strength and cut-offs are the files frozen on 26 Nov from CGMacros alone, and BIG IDEAs appears
+in no CGMacros table of the report.
+
+| aspect | CGMacros (training) | BIG IDEAs (external) | risk | how it is handled |
+|---|---|---|---|---|
+| glucose sensor | Dexcom G6 Pro | Dexcom G6 | small | same resampling to 5-minute means, same code |
+| heart rate | Fitbit, per minute | Empatica E4, 1 Hz reduced to 5-minute means | device bias | mean of the scored windows 81.3 bpm against 82.4; no window outside the training range |
+| meal times | logged in the study app with a photo | self-kept food log | a clock or logging offset would corrupt windows and labels | checked: for each of the 12 people the mean glucose curve is flat before the logged time (+0.7, +0.1, −0.5 mg/dL at −60, −30, 0 min) and peaks 30 to 70 minutes after it (pooled +20 mg/dL at 45 min) |
+| what counts as a meal | a logged meal with calories | every distinct food-log time with calories, snacks included | more small meals, lower spike rate (25.4% against 32.8%) | stated; the label rule and the "isolated" rule are the same code |
+| label | rise of at least 50 mg/dL over the 30-minute pre-meal mean within 2 hours | the same | none | same function and config |
+| age, BMI, fasting glucose | measured | absent | the model loses three profile inputs | left missing; the frozen imputer fills CGMacros medians; stated as a handicap |
+| HbA1c | lab | given, 5.3 to 6.4 | none | used as given |
+| onboarding priors | first 72 hours | first 72 hours, same rule | 25% of scored meals have a prior rise outside the CGMacros range (24 to 115 mg/dL) | stated; the sensor inputs are inside the training ranges (under 1% of meals outside) |
+| people in the cohort | 45, of whom v2 trained on 37 | 16, of whom 12 usable | 4 people lost to a date mismatch in the public files | their date ranges are listed above; no shift was guessed |
+
+These checks are in outputs/external_bigideas/external_bigideas.json under `matching_checks`.

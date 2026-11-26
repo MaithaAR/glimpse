@@ -91,6 +91,42 @@ def build(cfg) -> tuple[pd.DataFrame, np.ndarray]:
     return M, X
 
 
+def matching_checks(M: pd.DataFrame, X: np.ndarray) -> dict:
+    """Is the second dataset lined up with the first? (1) Food-log times against the CGM: the mean glucose curve
+    around the scored meals should be flat before the logged time and peak after it, for every person.
+    (2) Share of each input outside the range v2 was trained on (configs/v2_input_ranges.json).
+    (3) Mean heart rate and last glucose beside CGMacros' own."""
+    cgm = pd.read_csv(ROOT / "bigideas_cgm.csv", parse_dates=["t"])
+    curves = []
+    for pid, c in cgm.groupby("id"):
+        g = c.set_index("t").glucose.sort_index().groupby(level=0).mean().resample("5min").mean()
+        for t in M[(M.person_id == pid) & M.scored].t:
+            w = g[t - pd.Timedelta("60min") : t + pd.Timedelta("120min")]
+            if len(w) < 30:
+                continue
+            rel = (np.round((w.index - t).total_seconds() / 300) * 5).astype(int)
+            base = g[t - pd.Timedelta("30min") : t].mean()
+            curves.append(pd.Series((w - base).to_numpy(), index=rel).groupby(level=0).mean().rename(int(pid)))
+    A = pd.DataFrame(curves)
+    per = A.groupby(level=0).mean()
+    pooled = A.mean()
+    rj = json.loads(Path("configs/v2_input_ranges.json").read_text())
+    Xs = X[M.scored.to_numpy()]
+    outside = {}
+    for j, (name, r) in enumerate(rj["ranges"].items()):
+        v = Xs[:, j]
+        ok = np.isfinite(v)
+        outside[name] = float(((v[ok] < r[0]) | (v[ok] > r[1])).mean()) if ok.any() else None
+    cg = np.load("data/dataset.npz") if Path("data/dataset.npz").is_file() else None
+    return {"peak_minute_after_logged_time_per_person": {int(p): int(per.loc[p].idxmax()) for p in per.index},
+            "pooled_mean_change_mgdl": {int(k): float(pooled[k]) for k in (-60, -30, 0, 15, 30, 45, 60, 90, 120)},
+            "share_outside_v2_training_range": outside,
+            "mean_heart_rate": {"bigideas": float(np.nanmean(Xs[:, 6])),
+                                "cgmacros": float(np.nanmean(cg["heart_rate"])) if cg is not None else None},
+            "mean_last_glucose": {"bigideas": float(np.nanmean(Xs[:, 0])),
+                                  "cgmacros": float(np.nanmean(cg["glucose"][:, -1])) if cg is not None else None}}  # fmt: skip
+
+
 def _ece(y: np.ndarray, p: np.ndarray, bins: int = 15) -> float:
     b = np.minimum((p * bins).astype(int), bins - 1)
     return float(sum(abs(y[b == i].mean() - p[b == i].mean()) * (b == i).mean() for i in np.unique(b)))
@@ -161,6 +197,7 @@ def run_external_bigideas(cfg) -> dict:
             "missed_among_cleared": float(y[cl].mean()) if cl.any() else None,
             "referred_share": float((dec == "can't judge").mean()),
             "cost_reduction_vs_always_caution": cr[0], "cost_reduction_ci95": [cr[1], cr[2]]},
+        "matching_checks": matching_checks(M, X),
         "per_person": [{"person_id": int(p), "meals": len(g), "spikes": int(g.spike.sum()),
                         "auroc": float(roc_auc_score(g.spike, g.risk)) if g.spike.nunique() == 2 else None}
                        for p, g in s.groupby("person_id")],

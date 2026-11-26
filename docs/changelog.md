@@ -351,7 +351,7 @@ registrations at my instruction. The choices and the conclusions are mine. Maith
 | Sign-off date corrected from 27 Nov to 26 Nov, the day it was committed | date mismatch | docs/changelog.md |
 | Pilot policy in section 5 shortened to a proposal with no monthly rule and no 10% figure; approved by the author | the longer draft named a review that is not in the code | docs/final_report.md |
 
-## Twenty-third pass, 26 Nov (after the first upload; wording only, no number changed)
+## Twenty-third pass, night of 26 to 27 Nov (after the first upload; wording only, no number changed)
 
 | change | why | where |
 |---|---|---|
@@ -362,7 +362,7 @@ registrations at my instruction. The choices and the conclusions are mine. Maith
 
 | change | why | where |
 |---|---|---|
-| External check: the frozen v2 scored on 12 people of a second public dataset (BIG IDEAs, PhysioNet). AUROC 0.628 (0.535–0.704), calibration intact, decisions not useful. Exploratory: plan and run on the same day | the only clean test had 8 people; the author asked for a new dataset | docs/external_bigideas.md, src/glimpse/studies/external_bigideas.py, scripts/prepare_bigideas.py, outputs/external_bigideas/ |
+| External check: the frozen v2 scored on 12 people of a second public dataset (BIG IDEAs, PhysioNet). AUROC 0.628 (0.535–0.704), mean risk matching the spike rate (ECE 0.053), decisions not useful. Exploratory: plan, run and results in one commit | the only clean test had 8 people; the author asked for a new dataset | docs/external_bigideas.md, src/glimpse/studies/external_bigideas.py, scripts/prepare_bigideas.py, outputs/external_bigideas/ |
 | Post-freeze checks: JPEG compression, crop augmentation, embedding map, photo estimate ladder, refer-band analysis | lecture tests the submission had not run | docs/post_freeze_checks.md, src/glimpse/studies/post_freeze.py, outputs/post_freeze/ |
 | Report: external row on page one and in the results table, a paragraph in section 3, four rows in the checks table, the refer-band sentence, the Mac p95 and first-answer time | the results above | docs/final_report.md |
 | Figure 2 (per-fold AUROC) moved to the appendix as Figure A4 and the later figures renumbered; the what-if, the v3 sentence and v2 detail moved to the appendix | page limit | docs/final_report.md, docs/report_appendix.md, README.md |

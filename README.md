@@ -62,7 +62,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
 just check       # ruff + the test suite (some tests skip until the dataset and weights are downloaded)
 just demo        # worked cases (in-sample), two can't-judge cases, timing -> outputs/demo/, then the UI at :7860
-just evaluate    # every report table and figure (needs data and weights; about 45 min; evaluate-fast: 15) -> outputs/
+just evaluate    # every report table and figure (needs data and weights; about an hour; evaluate-fast: 15) -> outputs/
 just report-numbers   # the same tables and figures from committed outputs only (no data, no weights, about 5 min on a 2-CPU machine)
 just predict-folder samples/instructor outputs/folder_run   # the grader's entry point: a folder of meals in, structured answers out
 just app         # local screen at http://127.0.0.1:7860 (optional extra: Gradio)
@@ -209,7 +209,8 @@ served files (unless `GLIMPSE_OVERWRITE_FROZEN=1`); the served files came from `
 Figure numbers and files (the file names keep their first numbering, so earlier commits still resolve): Figure 1
 `fig1_system.png` · 2 `fig_training.png` · 3 `fig6_effects.png` · 4 `fig3_reliability.png` · 5 `fig4_v2.png` ·
 6 `fig7_shap.png` · A1 `figA1_robustness.png` · A2 `fig5_coverage.png` · A3 `figA3_embedding.png` · A4
-`fig2_per_fold_auroc.png` (the report's Figure 2 until 27 Nov).
+`fig2_per_fold_auroc.png` (the report's Figure 2 until 27 Nov). Documents written before 27 Nov use the
+figure numbers of their date.
 
 Rules added after the tag, all in docs/rule_ledger.md with the commit that registered each: R14 (a low is
 referred; amended on 26 Nov for a falling 54-69 mg/dL), R15, R16, input rules R17-R21 (semicolon CSVs, a
@@ -219,8 +220,8 @@ v1 clears 18.1% of development meals (target 20%) and 6.9% of those spike; cost 
 
 Added on 27 Nov, exploratory, with the served model unchanged:
 
-- `just post-freeze` (docs/post_freeze_checks.md, `outputs/post_freeze/`; about 5 minutes once the photo
-  caches exist, inside `just evaluate`): JPEG compression stress, the crop-augmentation check, an embedding
+- `just post-freeze` (docs/post_freeze_checks.md, `outputs/post_freeze/`; about 20 minutes, 5 once the photo
+  caches exist; inside `just evaluate`): JPEG compression stress, the crop-augmentation check, an embedding
   map (Figure A3), the photo estimate ladder and a refer-band analysis of the decision layer.
 - `just external-bigideas` (docs/external_bigideas.md, `outputs/external_bigideas/`): the frozen v2 scored on
   a second public dataset, BIG IDEAs Lab Glycemic Variability and Wearable Device Data (PhysioNet v1.1.2,

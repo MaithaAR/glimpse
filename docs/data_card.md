@@ -74,3 +74,7 @@ are the intermediate's fixed split, kept for the record (26 Nov note).
 45 people from one study; served macros assume proportional eating; no local dishes; small validation and test groups give wide confidence intervals.
 
 Participants: ages 18 to 69, 64% female (bio.csv, all 45 people).
+
+Second dataset, used once for an external check on 27 Nov (docs/external_bigideas.md): BIG IDEAs Lab Glycemic
+Variability and Wearable Device Data, PhysioNet v1.1.2, open access; 16 adults, of whom 12 have food logs that
+overlap their CGM. Not redistributed here; no model was trained on it.

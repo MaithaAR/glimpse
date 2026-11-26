@@ -691,7 +691,7 @@ def test_final_checks_and_d8_cells():
     assert f"{s4['photo_inputs_accuracy']:.1%} of meals against {s4['majority_rate']:.1%}" in text
     o1, o2 = f["o1"], f["o2"]
     assert f"AUROC {o1['auroc']:.3f}" in text and o1["real_photos_max"] < o1["cut"]
-    assert f"AUROC {o2['auroc']:.2f}" in text and o2["auroc_single_input"]["HbA1c"] == 1.0
+    assert f"AUROC {o2['auroc']:.2f}" in APPENDIX.read_text() and o2["auroc_single_input"]["HbA1c"] == 1.0
     m = f["m1"]["v1"]
     assert " / ".join(f"{m[k]['detected']:.0%}" for k in ("120", "240", "480", "960")) + " detected" in text
     c1 = f["c1"]
@@ -800,12 +800,7 @@ def test_external_and_post_freeze_cells():
     b, n = dl["wider_band"]["refer_within_0.05_of_cut"], dl["no_band"]
     assert f"refers {b['referred_share']:.0%} of meals and leaves {b['missed_among_cleared']:.1%}" in flat
     assert f"({b['missed_ci95'][0]:.1%}–{b['missed_ci95'][1]:.1%})".replace("%–", "–") in flat
-    assert (
-        f"against {n['missed_among_cleared']:.1%} ({n['missed_ci95'][0]:.1%}–{n['missed_ci95'][1]:.1%})".replace(
-            "%–", "–"
-        )
-        in flat
-    )
-    assert f"clears fall from {n['cleared_share']:.1%} to {b['cleared_share']:.1%} of answered meals" in flat
+    assert f"against {n['missed_among_cleared']:.1%} with no band (intervals overlap)" in flat
+    assert f"clears fall from {n['cleared_share']:.1%} to {b['cleared_share']:.1%} of the {dl['meals']} meals" in flat
     eff = _load("outputs/efficiency/efficiency.json")["latency_s"]
     assert f"p95 {eff['warm_p95'] * 1000:.0f}, first answer {eff['cold_first_answer']:.2f} s" in flat

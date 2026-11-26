@@ -34,7 +34,7 @@ those participants were used for training only.
   (counted only; outcomes not read).
 - External check, 27 Nov, exploratory (docs/external_bigideas.md): v2 exactly as frozen, on 201 meals of 12
   people from a second public dataset (BIG IDEAs; age, BMI and fasting glucose missing and imputed): AUROC
-  0.628 (0.535-0.704), ECE 0.053, mean risk within half a point of the spike rate; at the frozen cut-offs
+  0.628 (0.535-0.704), ECE 0.053, mean risk 0.5 points above the spike rate; at the frozen cut-offs
   16.9% of meals cleared and 14.7% of those spiked. v1 cannot be scored there (no photos).
 - Photo model: ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned; pinned revision and SHA-256), last
   stage fine-tuned, two heads; 27.8M parameters, 15.5M fine-tuned. It failed its pre-registered risk gate

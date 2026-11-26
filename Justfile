@@ -164,7 +164,7 @@ evaluate-fast:
     uv run glimpse probes
     just report-numbers
 
-# every evaluation and study behind the report's tables (~45 min with data and weights)
+# every evaluation and study behind the report's tables (about an hour with data and weights)
 evaluate:
     just fusion
     just ablate
