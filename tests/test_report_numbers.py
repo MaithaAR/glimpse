@@ -595,7 +595,7 @@ def test_v2_explain_cells():
         f"({hr['within_person_coefficient']:.2f}, {hr['within_person_ci95'][0]:.2f} to "
         f"{hr['within_person_ci95'][1]:.2f}, person fixed effects)"
     ).replace("-", "−") in " ".join(text.split())
-    assert f"moves v2's logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in APPENDIX.read_text()  # moved (page limit)
+    assert f"moves v2's logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in APPENDIX.read_text()
     tp = r["temporal"]["last_third"]
     flat = " ".join(Path("docs/report_appendix.md").read_text().split())  # moved to the appendix (page limit)
     assert f"last third of meals v2 scores {tp['auroc']:.3f} ({tp['ci95'][0]:.3f}–{tp['ci95'][1]:.3f})" in flat
