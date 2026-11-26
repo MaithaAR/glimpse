@@ -179,9 +179,9 @@ per-fold Platt map plus a penalised per-person intercept fitted only on that per
 
 | course checks on v1 (registered in docs/final_switch.md before they ran) | prediction | result |
 |---|---|---|
-| shuffled-label control: fusion refitted with labels shuffled within each training fold, 20 shuffles | AUROC 0.45 to 0.55 | 0.475 (range 0.359–0.599), against 0.750 unshuffled: the mean is met, single shuffles range wider than predicted |
+| shuffled-label control: fusion refitted with labels shuffled within each training fold, 20 shuffles | AUROC 0.45 to 0.55 | 0.475 (range 0.359–0.599), against 0.750 unshuffled: mean met, no leak through the inputs; single shuffles range wider than predicted |
 | learning curve: fusion refitted on 4 / 8 / 12 / all training people per fold | rising, all people within 0.03 of 12 | 0.640 / 0.715 / 0.733 / 0.750: met (+0.017); still creeping up |
-| identity shortcut: do the 4 photo inputs name the person? | above chance, far from perfect | 8.0% of meals against 6.1% for the commonest person: met for the photo. The sensor and profile inputs name the person in 97.8% of meals, as a profile must; that is the base-rate edge of §7 |
+| identity shortcut: do the 4 photo inputs name the person? | above chance, far from perfect | 8.0% of meals against 6.1% for the commonest person: met for the photo (it may still name the meal, §2). The sensor and profile inputs name the person in 97.8% of meals, as a profile must; that is the base-rate edge of §7 |
 | worst slices (served answers) | worst person below 0.6 | women 0.71 (6 of 66 clears spiked) against men 0.86; the worst three people 0.22 to 0.28, on 11 to 25 meals: met |
 | train against validation loss at the best validation epoch | small gap | not met for the photo model, 0.35 (9 runs; Figure 3 shows the 8 inner-fold ones): it overfits its 1,221 photos; met for SensorCNN, 0.02 (5 runs) |
 
