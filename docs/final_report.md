@@ -39,8 +39,8 @@ frozen files are byte-identical to the tag. The per-person intercept needs label
 replays them in deployment order, and the folder command takes them as an optional `history.csv`. A
 profile without onboarding priors gets training medians, and rule R13 then withholds any low-risk answer:
 with neither history nor priors there is no personal basis to clear a meal. Tooling: uv with Python 3.14
-(locked), strict Pydantic, Loguru, a `just` recipe for every number, 181 tests (176 run without the data
-or weights), W&B offline runs replayed from committed training histories, and a git history from 2 Nov in
+(locked), strict Pydantic, Loguru, a `just` recipe for every number, 186 tests (all pass with the data and
+weights, one an expected failure; 170 run without them), W&B offline runs replayed from committed training histories, and a git history from 2 Nov in
 which every pre-registration precedes its run.
 
 ![Figure 1: the one scoring path, its refusal exits and the labelling loop](../outputs/figures/f1_system.png)
@@ -200,6 +200,8 @@ at 15%, below the 20% at which referring beats a caution at the declared prices.
 products are worse; without priors as well, v2 would clear 7% of meals with 7 of 34 spiking and cost more
 than always flagging. Rule R13 refers those meals instead: no misses, 21% referred, cost −5.3%.
 
+![Figure 7: v1 coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, locked at 0.15), descriptive](../outputs/figures/f7_coverage.png)
+
 | stress at the evaluated operating point (with history) | v2: AUROC, spikes among cleared | v2: caution → low risk | v1: AUROC | v1: caution → low risk |
 |---|---|---|---|---|
 | clean | 0.754, 12.7% | – | 0.762 (live photo model: 0.773) | – |
@@ -255,7 +257,7 @@ Every class below was observed; the taxonomy is v1's unless named (v2 rows: appe
 
 | failure class | count | corpus | root cause | action |
 |---|---|---|---|---|
-| rule refusal | 7 of 13; 23 of 23, zero crashes | instructor cases; hostile inputs | input (format, units, gaps) | named refusal; rules R1–R13 (R6 preventive, R7 a recorded limitation) |
+| rule refusal | v2: 5 of 13 and 14 of 23 (v1: 8 of 13, 23 of 23); no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps) | named refusal; rules R1–R13 (R6 preventive, R7 a recorded limitation) |
 | missing-photo refusal (v1) | 21 of 481 | development meals | input | v2 answers them |
 | near-cut false clear | 4 of 109 | cleared development meals | threshold: 0.005–0.030 below the cut | none; the price of a hard cut (Figure 7) |
 | confident false clear | 4 of 109 | cleared development meals | model: 0.047–0.138 below; two cold starts after steep falls | exploratory rules, not shipped (appendix) |
@@ -264,7 +266,7 @@ Every class below was observed; the taxonomy is v1's unless named (v2 rows: appe
 | confident wrong carb range | 1 dish | instructor case 11, 14 real phone photos | the embedding measures look, not nutrition | v2 shows it as an estimate to confirm |
 | label-definition surprise | 1 probe | probe B | baseline-relative label | wording; dietitian question |
 
-*outputs/folder_run, outputs/stress_run, report_metrics.json (errors, false_clears_exploratory), outputs/probes/. Half of the 8 development false clears are in fold 1.*
+*outputs/folder_run and outputs/stress_run (v2), outputs/v1_photo_fusion/ (v1), report_metrics.json (errors, false_clears_exploratory), outputs/probes/. Half of the 8 development false clears are in fold 1.*
 
 Probe B was registered as an expected pass (a rising pre-meal trace raises risk on at least 90% of meals)
 and failed: risk rose on only 8%. The label is baseline-relative, so a meal eaten on a rising trace has a
