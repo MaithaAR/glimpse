@@ -262,6 +262,22 @@ def _stress_quality(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _photo_probes(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Photo probes D and E and the int8 study (registered 26 Nov)."""
+    from glimpse.studies.photo_probes import run_photo_probes
+
+    run_photo_probes(cfg)
+    return 0
+
+
+def _monitoring_power(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Monitoring replay 4: detection power under a cohort shift (registered 26 Nov; data-free)."""
+    from glimpse.studies.monitoring_power import run_monitoring_power
+
+    run_monitoring_power(cfg)
+    return 0
+
+
 def _robustness_levels(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Rubric 4d: the four perturbations at three magnitudes each (pre-registered 22 Nov)."""
     from pathlib import Path
@@ -492,6 +508,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("promised", help="the intermediate's promised comparisons, run once (pre-registered 8 Nov)")
     sub.add_parser("evaluate-locked", help="S16: score the 8 locked people ONCE against the frozen artifacts")
     sub.add_parser("stress-quality", help="AUROC, misses and flips by direction under stress, v2 and v1")
+    sub.add_parser("photo-probes", help="where the photo model looks, portion size, and int8 against fp32")
+    sub.add_parser("monitoring-power", help="replay 4: CUSUM detection power under a simulated cohort shift")
     sub.add_parser("robustness-levels", help="the four perturbations at three magnitudes each (rubric 4d)")
     sub.add_parser("probes", help="photo-swap and flat-vs-rising CGM counterfactual probes (S13)")
     sub.add_parser("efficiency", help="parameters vs caps, serving latency, artifact sizes (S12)")
@@ -549,6 +567,8 @@ def main(argv: list[str] | None = None) -> int:
         "promised": _promised,
         "evaluate-locked": _evaluate_locked,
         "robustness-levels": _robustness_levels,
+        "monitoring-power": _monitoring_power,
+        "photo-probes": _photo_probes,
         "stress-quality": _stress_quality,
         "probes": _probes,
         "efficiency": _efficiency,
