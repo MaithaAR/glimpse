@@ -179,6 +179,7 @@ reproduce-all:
     just evaluate
     just selftest
     just predict-folder samples/instructor outputs/folder_run
+    just predict-folder samples/returning_user outputs/returning_user_run
     just stress
     just demo-cli
 

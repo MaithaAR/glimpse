@@ -2,7 +2,7 @@
 
 A before-meal photo, the last 2 hours of CGM (continuous glucose monitor) and heart rate, and a short profile give
 one of three answers: **low risk**, **caution**, or **can't judge** (always with the reason). The answer comes in
-about 0.3 s on a laptop CPU and runs offline on local weights. It is a research prototype for adults with
+well under 0.3 s on a laptop CPU and runs offline on local weights. It is a research prototype for adults with
 prediabetes: a second look before eating, not a medical device. MAAI7103 course project (Maitha Alhosani).
 
 **Final submission (report: [`docs/final_report.md`](docs/final_report.md)):**
@@ -14,17 +14,30 @@ prediabetes: a second look before eating, not a medical device. MAAI7103 course 
 
 The final report is [`docs/final_report.md`](docs/final_report.md); the intermediate milestone report is kept at [`docs/intermediate_report.md`](docs/intermediate_report.md).
 
-## Architecture
+**Two products, one code path.** v2 (served, frozen 26 Nov) is the sensor-first product the photo gate's
+pre-written verdict called for: the risk comes from the CGM/heart-rate trend and the profile, and the photo model
+gives a carb estimate to confirm, never blocking an answer. v1 (frozen 6 Nov) also feeds the photo estimate into
+the risk; it is the model the 8 locked people measured once. `prototype.product` in `configs/default.yaml`
+switches between them; see [`docs/v2_sensor_first.md`](docs/v2_sensor_first.md).
+
+| development, 481 meals | v2 (served) | v1 | v1 on the locked eight (scored once) |
+|---|---|---|---|
+| AUROC (95% person-clustered) | 0.754 (0.673–0.815) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) |
+| ECE (target ≤ 0.05) | 0.029 | 0.052 | 0.061 |
+| spikes among cleared meals (cap 10%) | 12.7% | 7.3% | 2 of 10 |
+
+## Architecture (v2, served)
 ```
 raw CGM/HR readings ─┐                                  (rules run before any model)
-before-meal photo ───┼─> checks: CGM complete & in range? photo readable, not blank, familiar? ──no──> CAN'T JUDGE + reason
-profile ─────────────┘          │ yes
-                                ├─ 2-h window (24 × 5 min, same code as training) + profile ─┐
-                                └─ ConvNeXt-Tiny photo model → carb range (4 bins) + grams ──┴─> logistic-regression
-                                                                                                fusion → spike risk
-                    + per-person intercept from earlier labelled meals (history.csv), when there are any
-                    risk < 0.15 → LOW RISK · ≥ 0.16 → CAUTION · in between → CAN'T JUDGE (borderline)
-                    R13: no LOW RISK without history or both onboarding priors → CAN'T JUDGE + reason
+profile ─────────────┼─> checks: CGM complete & in range? profile valid? ──no──> CAN'T JUDGE + reason
+                     │          │ yes
+                     │          └─ 2-h window (24 × 5 min, same code as training) + profile ─> logistic regression
+                     │                                                                          → spike risk
+                     │   + per-person intercept from earlier labelled meals (history.csv), when there are any
+                     │   risk < 0.15 → LOW RISK · ≥ 0.22 → CAUTION · in between → CAN'T JUDGE (borderline)
+                     │   R13: no LOW RISK without history or both onboarding priors → CAN'T JUDGE + reason
+before-meal photo ───┴─> readable, not blank, familiar? ─yes─> ConvNeXt-Tiny → carb range + grams, shown to confirm
+                                                        └no──> carb estimate withheld, flag names why (risk still given)
 ```
 The from-scratch SensorCNN (5k parameters) is trained and evaluated as the required scratch model. It ties
 hand-made trend features, so the deployed fusion uses those features (see the report).

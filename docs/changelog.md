@@ -189,3 +189,24 @@ helps between people (report §3; report_metrics.json `within_person`).
 Also at the close: signal 2b (rolling AUROC below the locked value) added to the monitoring table, labelled
 circular because its threshold is the locked AUROC itself (outputs/monitoring/replay.json `summary`).
 Figure 3 shows a 95% Wilson interval for each shipped bin, so small bins are not over-read.
+
+## 26 Nov 2026, tenth pass: v2, the sensor-first product (the author chose it after the ninth pass)
+
+The author chose to ship the product the gate's Paragraph B called for. Everything below was pre-registered in
+a commit before it ran; the assistant wrote the registrations under her instruction. The data and pinned
+weights were copied from her Mac into the cloud workspace for this round (read only on her side).
+
+| Change | Why | Evidence |
+|---|---|---|
+| Folder, stress and demo runs regenerated under the current serving code with the weights and data; every v1 decision equals the committed one (risks within 4e-7) | committed runs predated R11-R13 (3 of 3) | outputs/v1_photo_fusion/; commit d54ded7 |
+| v2 registered (6874698), built, evaluated on development (AUROC 0.754, 0.673-0.815, all 481 meals; ECE 0.029; spikes among cleared 12.7%), frozen (Platt 0.98, -0.17; m 1; cut-offs 0.15, 0.22) and served by a config switch; v1's files byte-identical | the gate's Paragraph B was never built; the budget sat in a branch that failed its gate (3 of 3) | docs/v2_sensor_first.md; outputs/evaluation_sensor_first/; checkpoints/sensor_first/ |
+| v2 minus v1 on the 460 meals both answer: -0.017 (-0.045, +0.010), not non-inferior at 0.03; reported in the opening as the registration requires | registered endpoint | outputs/report_metrics/v2_metrics.json |
+| Stress quality at the evaluated operating point, both products, 19 levels each including 15, 18, 20 and 22-minute gaps (registered 61b0c2e). The first run compared live perturbed photo answers with precomputed clean ones; it was discarded before commit, the code fixed (374c178) and rerun | quality, not flips, under stress; gap levels around the rule (3 of 3) | outputs/robustness/stress_quality.json; docs/stress_quality.md |
+| Photo probes D (centre vs border occlusion: hypothesis holds, 84%) and E (zoom: grams rise on only 40%), and int8 against fp32 (97.0% of v1 decisions kept, 55 against 77 ms) (registered c783ce3) | the photo model was never probed; int8 had no quality side (3 of 3) | outputs/probes/photo_probes.json; outputs/efficiency/int8.json |
+| Monitoring replay 4: detection power under a simulated cohort shift (registered ec630a8): calibration CUSUM 23% within 120 answers, 5% false alarms; expectation not met | no evidence any rule can catch a realistic shift (3 of 3) | outputs/monitoring/power.json |
+| End-to-end timing with the pinned weights: a whole folder-command meal takes 115 ms (v2) and 116 ms (v1), 6.4 ms for v2 without a photo; CSV parsing 4 ms | 265 ms against a 59 ms stage table never reconciled (3 of 3) | outputs/efficiency/end_to_end.json |
+| samples/returning_user: the same meal at three stages (new user caution, with priors caution, with priors and history low risk) | the grader could never see a low-risk answer (3 of 3) | outputs/returning_user_run/ |
+| Report rewritten around v1 and v2 (2,193 prose words); secondary tables and the previous prose moved to docs/report_appendix.md, tested the same way; model card, README, rule ledger and Figure 1 updated | readability and the product change (3 of 3) | docs/ |
+| `just evaluate` runs both evaluations and v2's metrics; `evaluate-all`, `stress-quality`, `photo-probes`, `monitoring-power`, `finalize-sensor-first` recipes; outputs/ tracked; CI re-derives the data-free outputs | `evaluate` did not rebuild every table (3 of 3) | Justfile; .github/workflows/ci.yml |
+
+Author sign-off on this round's registrations and on R13: to be added here by the author, dated, in her words.

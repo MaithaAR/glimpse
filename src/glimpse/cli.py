@@ -410,9 +410,12 @@ def _splits_v2(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
 
 def _stage_timing(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Serving time per stage on this machine (random-weight backbone; descriptive, 26 Nov)."""
-    from glimpse.studies.stage_timing import run_stage_timing
+    from glimpse.studies.stage_timing import run_end_to_end, run_stage_timing
 
-    run_stage_timing(cfg)
+    if getattr(args, "end_to_end", False):
+        run_end_to_end(cfg)
+    else:
+        run_stage_timing(cfg)
     return 0
 
 
@@ -520,7 +523,8 @@ def main(argv: list[str] | None = None) -> int:
     od = sub.add_parser("ood", help="unfamiliar-photo check vs real phone photos; re-choose the cut (R7)")
     od.add_argument("--apply", action="store_true", help="write the chosen cut into the reference file")
     sub.add_parser("splits-v2", help="write partition v2 (dev folds, T2D train-only) + asserted reconciliation")
-    sub.add_parser("stage-timing", help="serving time per stage on this machine, incl. the no-photo path")
+    stt = sub.add_parser("stage-timing", help="serving time per stage on this machine, incl. the no-photo path")
+    stt.add_argument("--end-to-end", action="store_true", help="whole real answers with the pinned weights")
     sub.add_parser("probe-c", help="profile and onboarding-priors counterfactual on the frozen fusion (data-free)")
     sub.add_parser("monitoring-replay", help="outcome and behaviour monitoring rules replayed on the logged answers")
     sub.add_parser(

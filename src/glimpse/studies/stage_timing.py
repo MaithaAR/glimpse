@@ -78,3 +78,41 @@ def run_stage_timing(cfg) -> dict:
     logger.bind(stage="efficiency").info("photo path {:.1f} ms (backbone {:.0%}); no-photo path {:.2f} ms",
                                          photo_path, res["backbone_share_of_photo_path"], no_photo)  # fmt: skip
     return res
+
+
+def run_end_to_end(cfg) -> dict:
+    """Where one real answer's time goes, with the pinned weights (`glimpse stage-timing --end-to-end`, 26 Nov):
+    the folder command's whole per-meal path (profile JSON, CSV parsing and validation, rules, models,
+    answer) on samples/instructor/00_clean, with and without its photo, for v2 (served) and v1; and the CSV
+    parse alone. Descriptive; this machine, not the author's Mac."""
+    import json as _json
+    import shutil
+    import tempfile
+
+    import torch
+
+    from glimpse.serve import Pipeline
+    from glimpse.serve.folder import _one_case
+    from glimpse.serve.io import read_cgm_csv
+
+    torch.set_num_threads(min(cfg.training.num_threads, os.cpu_count() or 1))
+    case = Path("samples/instructor/00_clean")
+    res = {"machine": f"{platform.system()} {platform.machine()}, {os.cpu_count()} CPUs, "
+           f"{torch.get_num_threads()} threads (this run)", "reps": REPS,
+           "parse_and_validate_csv": _time(lambda: read_cgm_csv(case / "cgm.csv"))}  # fmt: skip
+    with tempfile.TemporaryDirectory() as td:
+        nophoto = Path(td) / "00_no_photo"
+        nophoto.mkdir()
+        for f in ("cgm.csv", "profile.json"):
+            shutil.copy(case / f, nophoto / f)
+        for name, sf in (("v2_sensor_first", True), ("v1_photo_fusion", False)):
+            app = Pipeline(cfg, sensor_first=sf)
+            res[name] = {"whole_meal_with_photo": _time(lambda a=app: _one_case(a, case)),
+                         "whole_meal_without_photo": _time(lambda a=app: _one_case(a, nophoto))}  # fmt: skip
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "end_to_end.json").write_text(_json.dumps(res, indent=2))
+    logger.bind(stage="efficiency").info("end to end: v2 {:.0f} ms (no photo {:.1f}), v1 {:.0f} ms",
+                                         res["v2_sensor_first"]["whole_meal_with_photo"]["median_ms"],
+                                         res["v2_sensor_first"]["whole_meal_without_photo"]["median_ms"],
+                                         res["v1_photo_fusion"]["whole_meal_with_photo"]["median_ms"])  # fmt: skip
+    return res

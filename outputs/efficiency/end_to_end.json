@@ -1,0 +1,33 @@
+{
+  "machine": "Linux x86_64, 2 CPUs, 2 threads (this run)",
+  "reps": 50,
+  "parse_and_validate_csv": {
+    "median_ms": 4.03831599987825,
+    "p95_ms": 4.410748400232478,
+    "reps": 50
+  },
+  "v2_sensor_first": {
+    "whole_meal_with_photo": {
+      "median_ms": 114.76365650014486,
+      "p95_ms": 147.42689054969557,
+      "reps": 50
+    },
+    "whole_meal_without_photo": {
+      "median_ms": 6.381677000263153,
+      "p95_ms": 7.495994399823757,
+      "reps": 50
+    }
+  },
+  "v1_photo_fusion": {
+    "whole_meal_with_photo": {
+      "median_ms": 115.63822799962509,
+      "p95_ms": 141.64506164997871,
+      "reps": 50
+    },
+    "whole_meal_without_photo": {
+      "median_ms": 3.784865499710577,
+      "p95_ms": 4.318901350234228,
+      "reps": 50
+    }
+  }
+}

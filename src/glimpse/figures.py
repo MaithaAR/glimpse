@@ -36,49 +36,45 @@ def f1_system(plt) -> None:
         ax.annotate("", xy=(x1, y1), xytext=(x0, y0),
                     arrowprops={"arrowstyle": "->", "color": c, "lw": 1.1, "linestyle": ls})  # fmt: skip
 
-    box(0.0, 3.0, 1.9, 0.9, "meal photo")
+    box(0.0, 3.0, 1.9, 0.9, "meal photo\n(optional in v2)")
     box(0.0, 1.7, 1.9, 0.9, "CGM + heart rate\n(2 h before)")
     box(0.0, 0.4, 1.9, 0.9, "profile: 4 fields +\n2 optional priors")
     box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12")
-    box(4.9, 3.0, 2.5, 0.9, "ConvNeXt-Tiny, last stage\ntuned; grams + bin heads")
+    box(4.9, 3.0, 2.5, 0.9, "ConvNeXt-Tiny (last stage\ntuned): grams + range")
     box(4.9, 1.7, 2.5, 0.9, "trend features\n+ profile inputs")
     box(7.9, 3.2, 2.4, 0.9, "kNN unfamiliar-photo\ncheck (cut 0.614)")
-    box(7.9, 1.7, 2.4, 1.2, "logistic fusion\n(20 parameters)\nPlatt (0.96, \u22120.20)")
+    box(10.8, 3.2, 2.6, 0.9, "carb estimate shown to\nconfirm (v2: not a risk input)", fc="#f3f0fa")
+    box(7.9, 1.7, 2.4, 1.2, "logistic fusion\nv2: 16 parameters\nPlatt (0.98, \u22120.17)")
     box(10.8, 1.7, 2.4, 1.2, "personal intercept\nfrom earlier labelled\nmeals (m = 1.0)")
-    box(
-        13.7,
-        1.7,
-        2.3,
-        1.2,
-        "cut-offs 0.15 / 0.16\nlow risk | caution\n+ reason (R13: no clear without\nhistory or both priors)",
-        fc="#e6f0fa",
-    )
-    box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 new photo\nor dietitian", fc="#fdf0e6")
-    box(10.8, 3.4, 2.4, 0.9, "CGM label at +2 h\n(replay; or history.csv)", fc="#eef7ee")
+    box(13.7, 1.7, 2.4, 1.2,
+        "v2 cut-offs 0.15 / 0.22\nlow risk | caution + reason\nR13: no clear without\nhistory or both priors",
+        fc="#e6f0fa")  # fmt: skip
+    box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 a person reviews\n(dietitian)", fc="#fdf0e6")
+    box(13.7, 3.4, 2.4, 0.9, "CGM label at +2 h\n(replay; or history.csv)", fc="#eef7ee")
     ax.text(12.4, 0.75, "borderline risk", fontsize=6.8, color=ORANGE)
-    ax.text(3.9, 0.45, "failed input rule, blank or\nunreadable photo", fontsize=6.8, color=ORANGE)
-    ax.text(10.55, 1.45, "unfamiliar\nphoto", fontsize=6.8, color=ORANGE)
+    ax.text(3.9, 0.45, "failed CGM or\nprofile rule", fontsize=6.8, color=ORANGE)
+    ax.text(10.85, 4.17, "bad or unfamiliar photo:\nestimate withheld, risk kept", fontsize=6.4, color=ORANGE)
     for y0 in (3.45, 2.15, 0.85):
         arrow(1.9, y0, 2.4, 2.15)
     arrow(4.4, 2.15, 4.9, 2.15)
     arrow(4.4, 2.5, 4.9, 3.45)
     arrow(7.4, 3.6, 7.9, 3.6)  # the photo embedding feeds the unfamiliar-photo check
-    arrow(9.1, 3.2, 9.1, 2.9)  # familiar photo: its carb inputs reach the fusion
-    ax.text(9.2, 3.0, "familiar: 4 carb inputs", fontsize=6.4, color=GREY)
+    arrow(10.3, 3.65, 10.8, 3.65)  # familiar photo: carb estimate shown
+    arrow(9.1, 3.2, 9.1, 2.9, ls="--")  # v1 only: the carb inputs reach the fusion
+    ax.text(9.2, 2.98, "v1 only: 4 carb inputs", fontsize=6.4, color=GREY)
     arrow(7.4, 2.15, 7.9, 2.15)
     arrow(10.3, 2.3, 10.8, 2.3)
     arrow(13.2, 2.3, 13.7, 2.3)
-    arrow(10.3, 3.3, 10.45, 1.0, c=ORANGE)  # unfamiliar photo: no carb guess, refusal
-    arrow(14.85, 1.7, 10.55, 0.6, c=ORANGE)  # borderline risk between the cut-offs
+    arrow(14.9, 1.7, 10.55, 0.6, c=ORANGE)  # borderline risk between the cut-offs
     arrow(3.4, 1.6, 8.2, 0.45, c=ORANGE)  # failed input rule: refusal
-    arrow(14.85, 2.9, 13.2, 3.85, c=GREEN, ls="--")  # the answered meal is labelled later
-    arrow(12.0, 3.4, 12.0, 2.9, c=GREEN, ls="--")  # ... and joins the person's history
-    ax.text(7.2, 4.45, "one scoring path (Pipeline.answer) for the evaluation, demo, app and folder command; "
-            "served, baseline and what-if rows are arithmetic on its logged answers\n"
+    arrow(14.9, 2.9, 14.9, 3.4, c=GREEN, ls="--")  # the answered meal is labelled later
+    arrow(13.7, 3.6, 12.0, 2.9, c=GREEN, ls="--")  # ... and joins the person's history
+    ax.text(8.0, 4.62, "one scoring path (Pipeline.answer) for the evaluation, demo, app and folder command; "
+            "v2 served, v1 (photo fusion, locked-tested) by a config switch\n"
             "(the app, and the folder command without history.csv, answer at the population calibration)",
-            ha="center", fontsize=8.2, style="italic", color=GREY)  # fmt: skip
-    ax.set_xlim(-0.2, 16.2)
-    ax.set_ylim(-0.2, 4.85)
+            ha="center", fontsize=8.0, style="italic", color=GREY)  # fmt: skip
+    ax.set_xlim(-0.2, 16.3)
+    ax.set_ylim(-0.2, 5.0)
     fig.savefig(OUT / "f1_system.png")
     plt.close(fig)
 
@@ -295,7 +291,7 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
     rows = answered.row.astype(int).to_numpy()
     pipe = joblib.load(FINAL)["models"]["photo"]
     lr = pipe[-1]
-    if Path("data/dataset.json").exists():
+    if Path("data/dataset.json").exists() and not (OUT / "shap_features_z.csv").exists():
         from glimpse.data.dataset import MealDataset
         from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
 
@@ -304,7 +300,7 @@ def f6_shap(plt, da: pd.DataFrame) -> dict:
         nested = pd.read_csv("outputs/photo_cv/photo_nested.csv")
         fx = with_table(photo_table(nested[nested.fold == 1]) | photo_table(oof), len(PHOTO_COLS))
         z = pipe[:-1].transform(fx(ds, rows))
-    else:  # no dataset (a grader's clean checkout): the committed standardised features, same rows and order
+    else:  # the committed standardised features (a clean checkout, or kept stable across platforms), same rows
         zc = pd.read_csv(OUT / "shap_features_z.csv")
         assert (zc.row.to_numpy() == rows).all(), "shap_features_z.csv rows differ from the answered dev meals"
         z = zc[FEATURE_NAMES].to_numpy()

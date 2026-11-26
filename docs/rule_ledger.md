@@ -160,5 +160,14 @@ Before (a no-prior, no-history meal at risk 0.12): "low risk". After: "can't jud
 labelled meals and no onboarding priors ... (rule R13)". Unit test: tests/test_hardening.py. Not run end
 to end with the weights on this machine; the committed folder, stress and demo runs predate it.
 
+## v2 and the photo rules (26 Nov, docs/v2_sensor_first.md)
+In v2 (sensor first, served) the photo rules R6 and R7, the contrast rule and the unfamiliar-photo check no
+longer refuse a meal: the photo is not a risk input, so a missing, unreadable, blank or unfamiliar photo
+withholds only the carb estimate, and a flag names why (`carbs_unavailable_photo_present`, `_readable`,
+`_not_blank`, `_familiar`). Before (v1): the instructor's screenshot, dark photo and zero-byte photo answered
+can't judge. After (v2): each gets a risk and a decision, with the carb estimate withheld and the reason shown
+in the folder summary. All CGM and profile rules, and R13, are unchanged. v1 keeps the refusing behaviour.
+Tests: tests/test_sensor_first.py; outputs/folder_run (v2) against outputs/v1_photo_fusion/folder_run.
+
 Provenance note (26 Nov): commit hashes cited above for R1-R7 (4c72a62, 5e01186, 71abb13) predate the 2 Nov squash
 and do not resolve in this repository; the dated ledger text is the record for those rules.

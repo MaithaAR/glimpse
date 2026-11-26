@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 REPORT = Path("docs/final_report.md")
+APPENDIX = Path("docs/report_appendix.md")  # secondary tables moved out of the report (26 Nov); checked the same
 RM = Path("outputs/report_metrics/report_metrics.json")
 
 
@@ -19,7 +20,7 @@ def _load(path: str) -> dict:
 
 @pytest.fixture(scope="module")
 def text() -> str:
-    return REPORT.read_text()
+    return REPORT.read_text() + ("\n" + APPENDIX.read_text() if APPENDIX.exists() else "")
 
 
 @pytest.fixture(scope="module")
@@ -31,9 +32,9 @@ def _f3(x: float) -> str:
     return f"{x:.3f}"
 
 
-def test_word_cap_under_the_rubric_rule(text):
+def test_word_cap_under_the_rubric_rule():
     """<= 3,000 words, tables, figures and their captions excluded (the `just wordcount` rule)."""
-    kept = [ln for ln in text.splitlines()
+    kept = [ln for ln in REPORT.read_text().splitlines()
             if not (ln.lstrip().startswith(("|", "![")) or (ln.lstrip().startswith("*")
                                                            and not ln.lstrip().startswith("**")))]  # fmt: skip
     assert len(" ".join(kept).split()) <= 3000
@@ -425,3 +426,105 @@ def test_signal_2b_row(text):
         f"{sm['locked']['auroc_below_locked_value']} of {sm['locked']['windows']} locked"
     )
     assert row[1].startswith(want)
+
+
+def _pc(x: float) -> str:
+    return f"{x * 100:.1f}%".replace("-", "−")
+
+
+def _iv(ci: list[float], pct: bool = False) -> str:
+    if pct:
+        return f"{ci[0] * 100:.1f}–{ci[1] * 100:.1f}%"
+    return f"({ci[0]:+.3f}, {ci[1]:+.3f})".replace("-", "−")
+
+
+def test_v2_cells_in_the_report():
+    """v2 (docs/v2_sensor_first.md) cells against outputs/report_metrics/v2_metrics.json, report tables only."""
+    t = _tables(REPORT.read_text())
+    v2 = _load("outputs/report_metrics/v2_metrics.json")
+    a = v2["auroc"]
+    assert t["AUROC (95% person-clustered)"][2] == f"{a['point']:.3f} ({a['ci95'][0]:.3f}–{a['ci95'][1]:.3f})"
+    assert t["meals answered with a risk"][2] == str(v2["answered_with_risk"])
+    assert t["ECE, registered 15 bins (target ≤ 0.05)"][2] == f"{v2['shipped']['ece_equal_width_15']:.3f}: met"
+    d = v2["decisions"]
+    assert t["spikes among cleared meals (cap 10%)"][2] == (
+        f"{_pc(d['missed_among_cleared'])} ({_iv(d['missed_ci']['ci95'], pct=True)})"
+    )
+    u = t["cost reduction vs always caution"]
+    assert u[3] == f"{_pc(d['cost_reduction'])} ({d['cost_reduction_ci']['ci95'][0] * 100:+.1f}, " \
+                   f"{d['cost_reduction_ci']['ci95'][1] * 100:+.1f})".replace("-", "−")  # fmt: skip
+    assert t["cleared as low risk"][3] == f"{_pc(d['share_low_risk'])} ({_iv(d['cleared_ci']['ci95'], pct=True)})"
+    assert t["can't judge"][3] == f"{_pc(d['share_abstain'])} ({_iv(d['cant_judge_ci']['ci95'], pct=True)})"
+    miss = f"{_pc(d['missed_among_cleared'])} ({_iv(d['missed_ci']['ci95'], pct=True)})"
+    assert t["missed among cleared"][3] == f"{miss}, {d['missed_n']} of {d['cleared_n']}"
+    s = v2["served_no_history"]
+    assert t["missed among cleared"][4] == f"{_pc(s['missed_among_cleared'])} ({s['n_missed']} of {s['n_cleared']})"
+    p = v2["paired_v2_minus_v1"]
+    row = t["v2 minus v1, AUROC on the 460 meals both answer (margin 0.03)"][0]
+    assert (
+        row.startswith(f"{p['v2_minus_v1']:+.3f} {_iv(p['ci95'])}".replace("-", "−")) and not p["noninferior_at_0.03"]
+    )
+    w = v2["within_person"]
+    assert t["mean within-person AUROC, intercept minus raw: v1 / v2"][0].endswith(
+        f"/ {w['shipped_minus_raw']:+.3f} {_iv(w['ci95'])}".replace("-", "−")
+    )
+    r13 = v2["samples_path"]["with_r13"]
+    assert (
+        t["the samples' path (no history, no priors), with rule R13"][2]
+        == f"0 cleared; cost {_pc(r13['cost_reduction'])}"
+    )
+    sp = v2["shipped"]
+    assert t["v2 dev + personal intercept (served)"][1:4] == [
+        f"{sp['auprc']['point']:.3f} ({sp['auprc']['ci95'][0]:.3f}–{sp['auprc']['ci95'][1]:.3f})",
+        f"{sp['brier']['point']:.3f} ({sp['brier']['ci95'][0]:.3f}–{sp['brier']['ci95'][1]:.3f})",
+        f"{sp['log_loss']:.3f}",
+    ]
+    for g in ("healthy", "prediabetes"):
+        r = v2["subgroups"][g]
+        assert t[g][3:] == [f"{r['auroc']:.3f}", f"{r['cleared_share'] * 100:.1f}% ({r['cleared']}), {r['missed']}"], g
+
+
+def test_photo_probe_and_int8_cells():
+    text = REPORT.read_text()
+    pr, i8 = _load("outputs/probes/photo_probes.json"), _load("outputs/efficiency/int8.json")
+    assert (f"more on {pr['dev_in_sample']['share_centre_moves_more']:.0%} of development photos and "
+            f"{pr['local_unseen']['share_centre_moves_more']:.0%} of 14 unseen") in text  # fmt: skip
+    assert pr["dev_in_sample"]["hypothesis_D_holds"]
+    assert (f"grams rise on only {pr['dev_in_sample']['zoom_share_grams_rise']:.0%} of photos "
+            f"({pr['local_unseen']['zoom_share_grams_rise']:.0%} of the 14 unseen)") in text  # fmt: skip
+    assert f"{i8['v1_decision_agreement']:.1%} of v1's decisions kept" in text
+    assert f"{i8['median_ms_int8']:.0f} ms against {i8['median_ms_fp32']:.0f} ms per photo" in text
+
+
+def test_monitoring_power_row():
+    pw = _load("outputs/monitoring/power.json")
+    c, s = pw["calibration"], pw["caution_share"]
+    want = (f"calibration CUSUM: {c['detected_within_6_blocks']:.0%} detect within 120 answers, "
+            f"{c['false_alarm_before_switch']:.0%} false alarms before the switch; caution share: "
+            f"{s['detected_within_6_blocks']:.0%}, {s['false_alarm_before_switch']:.0%}")  # fmt: skip
+    assert want in REPORT.read_text()
+
+
+def test_stress_quality_cells():
+    """docs/stress_quality.md study, against outputs/robustness/stress_quality.json."""
+    t = _tables(REPORT.read_text())
+    sq = _load("outputs/robustness/stress_quality.json")
+    v2, v1 = sq["v2_sensor_first"], sq["v1_photo_fusion"]
+    lv = sq["levels"]
+    row = t["CGM dropout 10 / 30 / 50 / 70%"]
+    assert row[0].startswith(
+        " / ".join(f"{v2['cgm_dropout'][str(x)]['auroc_perturbed']:.3f}" for x in lv["cgm_dropout"])
+    )
+    assert row[2] == " / ".join(f"{v1['cgm_dropout'][str(x)]['auroc_perturbed']:.3f}" for x in lv["cgm_dropout"])
+    assert row[3] == " / ".join(str(v1["cgm_dropout"][str(x)]["caution_to_low_risk"]) for x in lv["cgm_dropout"])
+    assert all(v2[k][str(x)]["caution_to_low_risk"] == 0 for k in ("cgm_dropout", "photo_blur", "photo_dark")
+               for x in lv[k])  # fmt: skip
+    for g in (20, 22, 25, 40):
+        assert v2["cgm_gap"][str(g)]["answered_perturbed"] == 0 and v1["cgm_gap"][str(g)]["answered_perturbed"] == 0
+    blur = t["photo blur radius 2 / 6 / 10"]
+    assert blur[2].startswith(
+        " / ".join(f"{v1['photo_blur'][str(x)]['auroc_perturbed']:.3f}" for x in lv["photo_blur"])
+    )
+    assert blur[3] == " / ".join(str(v1["photo_blur"][str(x)]["caution_to_low_risk"]) for x in lv["photo_blur"])
+    worst = max(r["caution_to_low_risk"] for p in (v1, v2) for k in lv for r in p[k].values())
+    assert f"never exceeds {worst} of 460 meals" in REPORT.read_text()

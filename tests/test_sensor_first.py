@@ -73,3 +73,12 @@ def test_v2_freeze_refuses_a_second_run():
 
     with pytest.raises(RuntimeError, match="written once"):
         finalize_sensor_first(None, None, load_config())
+
+
+def test_returning_user_samples_show_the_personal_path():
+    """samples/returning_user: the same meal goes from caution to low risk as priors and history arrive."""
+    rows = {json.loads(ln)["meal_id"]: json.loads(ln) for ln in Path("outputs/returning_user_run/results.jsonl").open()}
+    assert rows["00_new_user"]["decision"] == "caution"
+    assert rows["02_with_priors_and_history"]["decision"] == "low risk"
+    assert rows["00_new_user"]["risk"] > rows["01_with_priors"]["risk"] > rows["02_with_priors_and_history"]["risk"]
+    assert "history_10_meals" in rows["02_with_priors_and_history"]["flags"]
