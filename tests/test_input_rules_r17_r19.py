@@ -66,3 +66,29 @@ def test_folder_names_several_unnamed_photos(tmp_path: Path):
     predict_folder(bare_pipeline(risk=0.45, table={}), tmp_path / "in", tmp_path / "out")
     r = json.loads((tmp_path / "out" / "results.jsonl").read_text().splitlines()[0])
     assert r["decision"] == "can't judge" and "a.jpg, b.jpg" in r["reason"]
+
+
+def test_r20_day_month_resolved_by_meal_time(tmp_path: Path):
+    """01-06-2024 read both ways: the meal time decides; without one, or when both fit, it is refused."""
+    import pytest
+
+    t0 = datetime(2024, 6, 1, 10, 0)
+    rows = ["timestamp,glucose_mgdl"] + [f"{(t0 + timedelta(minutes=5 * i)):%d-%m-%Y %H:%M},100" for i in range(24)]
+    p = tmp_path / "c.csv"
+    p.write_text("\n".join(rows))
+    gt, _, _, _, flags = read_cgm_csv(p, datetime(2024, 6, 1, 12, 0))
+    assert gt[0] == t0 and "dates_day_first" in flags
+    with pytest.raises(ValueError, match="ambiguous"):
+        read_cgm_csv(p)
+    with pytest.raises(ValueError, match="ambiguous"):
+        read_cgm_csv(p, datetime(2025, 1, 1))
+
+
+def test_r21_profile_units(tmp_path: Path):
+    from glimpse.serve.io import answer_from_files
+
+    p = tmp_path / "c.csv"
+    p.write_text(_lines())
+    prof = {"age": 42, "bmi": 27.5, "a1c_pct": "5.9 %", "fasting_glucose_mgdl": "104 mg/dL"}
+    a = answer_from_files(bare_pipeline(risk=0.45, table={}), p, None, MEAL, prof)
+    assert "not a number" not in (a.reason or "")  # read as 5.9 and 104, not refused

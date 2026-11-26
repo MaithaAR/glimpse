@@ -38,17 +38,17 @@ evaluated decision: below 54 mg/dL the answer is "treat the
 low first", not a walk (R14); HbA1c in the diabetes range is out of scope (R15); and a CGM or
 heart-rate input beyond the training range in the risk-lowering direction is refused (R16), since a heart
 rate of 140 bpm in v1, or 160 bpm in v2, alone turned a prediabetic caution into low risk (no development
-or locked meal is affected). Input rules R17 to R19 came from an AI grading round's unseen files (semicolon
-CSVs, a photo not named photo.*, Dexcom "Low"/"High" text). `prototype.product` selects v1 (served) or v2;
-v1's frozen files are byte-identical to the tag. The per-person intercept needs labelled meals: the evaluation
-replays them in deployment order, and the folder command takes them as an optional `history.csv`. A
+or locked meal is affected). Input rules R17 to R21 came from AI grading rounds' unseen files (semicolon
+CSVs, a photo not named photo.*, Dexcom "Low"/"High" text, day-first Libre dates, units in the profile).
+`prototype.product` selects v1 (served) or v2; v1's frozen files are byte-identical to the tag. The
+per-person intercept needs labelled meals: the evaluation replays them in deployment order, and the folder command takes them as an optional `history.csv`. A
 profile without onboarding priors gets training medians, and rule R13 then withholds any low-risk answer:
 with neither history nor priors there is no personal basis to clear a meal, so a grader running the
 samples without `history.csv` sees caution or can't judge, never low risk.
 
 Tooling: uv with Python 3.14
-(locked), strict Pydantic, Loguru, a `just` recipe for every number, 208 tests (207 pass with the data
-and weights, one an expected failure; 191 pass without them; logs in outputs/finalize/), W&B offline runs
+(locked), strict Pydantic, Loguru, a `just` recipe for every number, 210 tests (209 pass with the data
+and weights, one an expected failure; 193 pass without them; logs in outputs/finalize/), W&B offline runs
 replayed from committed training histories (outputs/wandb/), and a git history from the 27 Sep proposal;
 from 2 Nov every registration commit precedes its results commit.
 
@@ -282,7 +282,7 @@ dietitian consultation did not complete, so the cost matrix stays a declared ass
 
 | failure class | count: v1 / v2 | corpus | root cause | action |
 |---|---|---|---|---|
-| rule refusal | 8 of 13, 25 of 25 / 5 of 13, 15 of 25; no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps, unreadable photo), a low, out of scope | named refusal; rules R1–R19 (R6 preventive, R7 a recorded limitation); before the rules, the 5 Nov naive run gave 2 raw errors and 1 whole-file rejection on 23 hostile inputs, now 0 of 25 |
+| rule refusal | 8 of 13, 25 of 25 / 5 of 13, 15 of 25; no crash or raw error | instructor cases; hostile inputs | input (format, units, gaps, unreadable photo), a low, out of scope | named refusal; rules R1–R21 (R6 preventive, R7 a recorded limitation); before the rules, the 5 Nov naive run gave 2 raw errors and 1 whole-file rejection on 23 hostile inputs, now 0 of 25 |
 | missing-photo refusal | 21 of 481 / none | development meals | input | v1 asks the user for a photo; v2 answers them |
 | near-cut false clear (within 0.031 of the fold's cut) | 4 of 109 / 6 of 118 | cleared development meals | threshold; v2: 4 of 6 on people with prediabetes | the frozen band would refer 4 of v2's 6; the price of a hard cut |
 | confident false clear | 4 of 109 / 9 of 118 | cleared development meals | v2: in 6 of 9 the person's intercept lowered the logit by 0.7 to 1.1, a low base rate clearing a meal that spiked; 2 cold starts | the prediabetes what-if (§4), not shipped |

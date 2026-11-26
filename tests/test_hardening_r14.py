@@ -83,9 +83,9 @@ def test_bad_profile_field_is_named_and_inferred_meal_time_flagged(tmp_path):
     f.write_text("timestamp,glucose_mgdl\n" + "".join(f"2024-06-01T{10 + i // 12:02d}:{5 * (i % 12):02d},100\n"
                                                     for i in range(24)))  # fmt: skip
     a = answer_from_files(
-        bare_pipeline(risk=0.3, table={}), f, None, "2024-06-01T12:00", {**PROFILE, "a1c_pct": "5.2%"}
+        bare_pipeline(risk=0.3, table={}), f, None, "2024-06-01T12:00", {**PROFILE, "a1c_pct": "5.2 percent"}
     )
-    assert a.decision == "can't judge" and "a1c_pct" in a.reason
+    assert a.decision == "can't judge" and "a1c_pct" in a.reason  # rule R21 strips only the field's own unit
     b = answer_from_files(bare_pipeline(risk=0.3, table={}), f, None, None, {**PROFILE, **PRIORS})
     assert "meal_time_inferred" in b.flags
 

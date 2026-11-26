@@ -252,3 +252,6 @@ silent misparse; a profile value "5.9 %" for HbA1c was refused although its mean
   as the number, flagged `profile_units_stripped`; any other text still names the field and refuses.
 Predicted before the change: no development, locked or evaluated decision changes (the evaluation passes
 arrays, not files); the instructor and stress folders are unchanged (none uses these date or unit forms).
+Result (26 Nov): as predicted. Instructor, stress and returning-user decisions unchanged. The grader's Libre
+export is now read day-first (flag `dates_day_first`) and refused for the right reason, 15-minute readings;
+"5.9 %" and "104 mg/dL" are read as numbers. Tests: tests/test_input_rules_r17_r19.py.

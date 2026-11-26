@@ -223,7 +223,7 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 
 | failure class | count | corpus | root cause | action |
 |---|---|---|---|---|
-| T1 rule refusal | 7 of 13 (an 8th is the unfamiliar-photo check); 25 of 25 | instructor cases; stress suite | input (format, units, gaps) | named refusal; rules R1-R19, before/after in the rule ledger |
+| T1 rule refusal | 7 of 13 (an 8th is the unfamiliar-photo check); 25 of 25 | instructor cases; stress suite | input (format, units, gaps) | named refusal; rules R1-R21, before/after in the rule ledger |
 | T2 missing-photo abstention | 21 of 481 | development meals | input | refuse; typed carbs not wired |
 | T3 borderline abstention | 45 of 481 | development meals (folds 2–4 only) | threshold band | dietitian review |
 | T4 near-cut false clear | 4 of 109 | cleared development meals | threshold: the closer half, 0.005–0.030 below the cut | none; the price of a hard cut (Figure 7) |
@@ -375,7 +375,7 @@ Decisions per 100 meals (moved from report §4): Of every 100 development meals 
 | v1, v2 | v1: photo fusion, frozen 6 Nov, locked-tested, served; v2: sensor first, frozen 26 Nov, the tested alternative |
 | intercept, m | the per-person offset learned from earlier labelled meals; its shrinkage toward zero |
 | Platt | population recalibration of the fusion logit |
-| R1–R19 | the rules in docs/rule_ledger.md, each with the failure that prompted it (R6 and R15 preventive, R7 a recorded limitation) |
+| R1–R21 | the rules in docs/rule_ledger.md, each with the failure that prompted it (R6 and R15 preventive, R7 a recorded limitation) |
 | partition v2 | the final split: 23 development people in 5 outer folds, 14 T2D training only, 8 locked; outputs/evaluation_v2/ is v1 on partition v2, product v2 lives in outputs/evaluation_sensor_first/ |
 | D7, D8 | design decisions: the photo gate's endpoints; the repeated-meal test |
 

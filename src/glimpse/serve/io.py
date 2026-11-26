@@ -27,7 +27,8 @@ EXPORT_COLUMNS = {"Timestamp (YYYY-MM-DDThh:mm:ss)": "timestamp", "Glucose Value
                   "Glucose Value (mmol/L)": "glucose_mgdl"}  # fmt: skip
 
 
-def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[datetime], list[float], list[str]]:
+def read_cgm_csv(path: str | Path, meal_time: datetime | None = None,
+                 ) -> tuple[list[datetime], list[float], list[datetime], list[float], list[str]]:  # fmt: skip
     """A sensor export as the app accepts it: columns `timestamp`, `glucose_mgdl` and optionally `hr_bpm`.
     Returns the readings plus the repairs made (rule R2: out-of-order rows are sorted and the fix is flagged)."""
     import pandas as pd
@@ -45,9 +46,12 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
     missing = {"timestamp", "glucose_mgdl"} - set(d.columns)
     if missing:
         raise ValueError(f"the CSV needs the columns timestamp and glucose_mgdl (missing: {sorted(missing)})")
-    if d["timestamp"].astype(str).str.contains("/").any():  # rule R11: 06/01/2024 is ambiguous (day/month)
-        raise ValueError("dates with slashes (06/01/2024) are ambiguous; export ISO dates such as 2024-06-01")
-    d["timestamp"] = pd.to_datetime(d["timestamp"], format="mixed")  # rule R10: mixed ISO precisions are fine
+    ts = d["timestamp"].astype(str).str.strip()
+    if ts.str.match(r"^\d{1,2}[/-]\d{1,2}[/-]\d{4}").any():  # rules R11, R20: 01-06-2024 is day or month first
+        d["timestamp"], how = _resolve_day_month(ts, meal_time)
+        flags.append(how)
+    else:
+        d["timestamp"] = pd.to_datetime(d["timestamp"], format="mixed")  # rule R10: mixed ISO precisions are fine
     years = d["timestamp"].dt.year.dropna()
     if len(years) and int(years.max()) < 2000:  # rule R11: epoch numbers parse as 1970 nanoseconds
         raise ValueError("the timestamps look like epoch numbers, not dates; export readable dates")
@@ -76,6 +80,30 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
     h = d.dropna(subset=["hr_bpm"]) if "hr_bpm" in d else d.iloc[0:0]
     return (list(g.timestamp.dt.to_pydatetime()), g.glucose_mgdl.astype(float).tolist(),
             list(h.timestamp.dt.to_pydatetime()), h.hr_bpm.astype(float).tolist() if len(h) else [], flags)  # fmt: skip
+
+
+def _resolve_day_month(ts, meal_time: datetime | None):
+    """Rule R20: read NN-NN-YYYY (or with slashes) both ways; keep the one reading whose last timestamp lies
+    within 24 h of the meal time. Refuse when there is no meal time, or when both or neither reading fit."""
+    import pandas as pd
+
+    msg = "dates like 01-06-2024 are ambiguous (day or month first); export ISO dates such as 2024-06-01"
+    if meal_time is None:
+        raise ValueError(msg)
+    fits = {}
+    for how, dayfirst in (("dates_day_first", True), ("dates_month_first", False)):
+        try:
+            t = pd.to_datetime(ts.str.replace("/", "-", regex=False), dayfirst=dayfirst, format="mixed")
+        except ValueError, TypeError:
+            continue
+        if t.notna().all() and abs((meal_time - t.max()).total_seconds()) <= 24 * 3600:
+            fits[how] = t
+    if len(fits) == 2 and fits["dates_day_first"].equals(fits["dates_month_first"]):
+        return fits["dates_day_first"], "dates_day_and_month_agree"
+    if len(fits) != 1:
+        raise ValueError(msg)
+    ((how, t),) = fits.items()
+    return t, how
 
 
 def _csv_options(path: str | Path) -> dict:
@@ -126,7 +154,8 @@ def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path |
     try:
         if cgm is None:
             raise ValueError("no CGM export was given")
-        gt, gv, ht, hv, fl = read_cgm_csv(cgm)
+        hint = datetime.fromisoformat(str(meal_time)).replace(tzinfo=None) if meal_time else None
+        gt, gv, ht, hv, fl = read_cgm_csv(cgm, hint)
         if not gt:
             raise ValueError("the CGM export has no glucose readings")
         when = datetime.fromisoformat(str(meal_time)) if meal_time else max(gt)
@@ -136,7 +165,11 @@ def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path |
             when = when.replace(tzinfo=None)
             fl.append("timezone_dropped")
         prof = {}
+        units = {"a1c_pct": "%", "fasting_glucose_mgdl": "mg/dl"}  # rule R21: the field's own unit is fine
         for k, v in profile.items():  # 26 Nov: name the field that is not a number ("5.2%")
+            if isinstance(v, str) and k in units and v.strip().lower().endswith(units[k]):
+                v = v.strip()[: -len(units[k])].strip()
+                fl += [] if "profile_units_stripped" in fl else ["profile_units_stripped"]
             try:
                 prof[k] = float("nan") if v is None else float(v)
             except TypeError, ValueError:
