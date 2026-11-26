@@ -91,6 +91,7 @@ in no CGMacros table of the report.
 | label | rise of at least 50 mg/dL over the 30-minute pre-meal mean within 2 hours | the same | none | same function and config |
 | age, BMI, fasting glucose | measured | absent | the model loses three profile inputs | left missing; the frozen imputer fills CGMacros medians; stated as a handicap |
 | HbA1c | lab | given, 5.3 to 6.4 | none | used as given |
+| pre-meal glucose | last reading before the meal 124.6 mg/dL on average (cohort includes type-2 people) | 109.7 mg/dL | a lower, narrower range | inside the training range; stated |
 | onboarding priors | first 72 hours | first 72 hours, same rule | 25% of scored meals have a prior rise outside the CGMacros range (24 to 115 mg/dL) | stated; the sensor inputs are inside the training ranges (under 1% of meals outside) |
 | people in the cohort | 45, of whom v2 trained on 37 | 16, of whom 12 usable | 4 people lost to a date mismatch in the public files | their date ranges are listed above; no shift was guessed |
 
@@ -134,9 +135,14 @@ Reading.
 - On free-living meals the carb input adds +0.126 AUROC, with an interval well above zero, to a model that
   never saw these people or this dataset. On CGMacros the same input adds about +0.03 at most. The
   expectation (+0.03 to +0.10) was exceeded.
-- Meal content is therefore worth far more outside CGMacros' standardised meals than inside them. The photo
-  gate's low ceiling describes the training data.
-- The simulation says carbs with photo-sized errors would keep most of the gain. It is a simulation: BIG
+- On this one external dataset meal content is worth far more than on CGMacros. Cautions: 12 people and one
+  run; every food-log entry with calories counts as a meal, so carbs partly separate snacks from meals; Part 2
+  was planned after Part 1 had shown carbs alone at 0.734; the CGMacros +0.03 is a cross-validated figure, so
+  the two gains are not measured the same way; and the model with carbs (0.749) adds only 0.015 to the carbs
+  alone (0.734).
+- The simulation says carbs with photo-sized errors would keep most of the gain. It draws those errors
+  independently of the meal, which real photo errors are not, and its range is a spread across draws, not an
+  interval over people. It is a simulation: BIG
   IDEAs has no photos, the errors are borrowed from CGMacros photos, and photos of free-living meals may be
   harder to read. It is not evidence that the photo model works.
 - The intercept again costs ranking: with it the carb model scores 0.720, without it 0.749.
