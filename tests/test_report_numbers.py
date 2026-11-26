@@ -452,7 +452,11 @@ def test_v2_cells_in_the_report():
     c = _load("outputs/v2_explain/v2_explain.json")["calibration"]
     lo, hi = c["observed_ci95_biased_upward"]
     assert abs(c["observed"] - v2["shipped"]["ece_equal_width_15"]) < 1e-12
-    assert t["ECE, registered 15 bins (target ≤ 0.05)"][2] == f"{c['observed']:.3f} ({lo:.3f}–{hi:.3f}): {c['verdict']}"
+    assert lo > c["observed"] and hi > 0.05 and c["verdict"] == "on track"  # the bootstrap is biased upward
+    assert t["ECE, registered 15 bins (target ≤ 0.05)"][2] == (
+        f"{c['observed']:.3f}, below a perfect model's median {c['perfectly_calibrated_median']:.3f}: {c['verdict']}"
+    )
+    assert c["share_of_perfectly_calibrated_draws_at_or_above_observed"] > 0.98  # "lower than 99% of draws"
     d = v2["decisions"]
     assert t["spikes among cleared meals (cap 10%)"][2] == (
         f"{_pc(d['missed_among_cleared'])} ({_iv(d['missed_ci']['ci95'], pct=True)})"
@@ -593,6 +597,11 @@ def test_v2_explain_cells():
     assert f"moves the served logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in text
     tp = r["temporal"]["last_third"]
     assert f"last third of meals {tp['auroc']:.3f} ({tp['ci95'][0]:.3f}–{tp['ci95'][1]:.3f})" in text
+    f2 = r["temporal"]["first_two_thirds"]
+    assert (
+        f"rise from {_pc(f2['missed_among_cleared'])} (7 of {f2['cleared']}) to {_pc(tp['missed_among_cleared'])} (8 of"
+        in text
+    )
     cv = r["carb_value"]
     assert t["the carb estimate's own value, 817 out-of-fold photos: MAE; carb range right"][0] == (
         f"{cv['mae_photo_g']:.1f} g against {cv['mae_median_g']:.1f} g for typing the training median; "

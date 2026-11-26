@@ -98,7 +98,7 @@ monitoring:
 finalize:
     uv run glimpse finalize
 
-# the seven report figures, rendered from committed evidence only (pre-commitment: nothing retuned from their look)
+# the eight figures (seven in the report, Figure A1 in the appendix), rendered from committed evidence only (pre-commitment: nothing retuned from their look)
 figures:
     uv run glimpse figures
 

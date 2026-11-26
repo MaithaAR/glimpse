@@ -297,6 +297,9 @@ def f8_v2(plt) -> None:
     fb = r["frozen_band_in_sample"]
     axes[0].plot([fb["cleared"] / 481], [fb["missed_among_cleared"]], "s", color=ORANGE, ms=7,
                  label="frozen cut 0.15 (in-sample)")  # fmt: skip
+    ev = json.loads(Path("outputs/report_metrics/v2_metrics.json").read_text())["decisions"]
+    axes[0].plot([ev["share_low_risk"]], [ev["missed_among_cleared"]], "D", color=GREEN, ms=6,
+                 label="evaluated: each fold's own cut")  # fmt: skip
     axes[0].set_xlabel("share of development meals cleared (cut 0.05 to 0.30)")
     axes[0].set_ylabel("spikes among cleared meals (95% Wilson)")
     axes[0].set_title("v2: at no cut does the interval stay under the 10% cap", fontsize=9)
@@ -314,12 +317,13 @@ def f8_v2(plt) -> None:
                       fontsize=9)  # fmt: skip
     loc = sh["local"]
     terms = sorted(loc["terms"].items(), key=lambda kv: -abs(kv[1]))[:7]
-    labels = [k for k, _ in terms] + ["fold refit and Platt", "per-person intercept"]
+    labels = [k.replace("window sd", "window spread") for k, _ in terms] + ["fold refit and Platt",
+                                                                           "per-person intercept"]  # fmt: skip
     vs = [v for _, v in terms] + [loc["fold_platt_logit"] - loc["frozen_logit"], loc["intercept_shift"]]
     axes[2].barh(np.arange(len(vs))[::-1], vs, color=[BLUE if v > 0 else ORANGE for v in vs])
     axes[2].set_yticks(np.arange(len(vs))[::-1], labels, fontsize=6.8)
     axes[2].axvline(0, color=GREY, lw=0.6)
-    axes[2].set_xlabel("logit contribution (fusion terms in-sample, frozen model)")
+    axes[2].set_xlabel(f"logit contribution; orange lowers risk (top 7 terms; base {sh['base_logit']:.2f})")
     axes[2].set_title(f"v2 false clear, meal {loc['row']}: risk {loc['risk']:.0%}, {loc['n_history']} labelled meal",
                       fontsize=9)  # fmt: skip
     fig.tight_layout()

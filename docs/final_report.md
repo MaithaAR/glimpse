@@ -10,8 +10,8 @@ the usefulness targets are not met. The photo failed its pre-registered gate, wh
 said the answer should rest on sensors and profile with the photo only as a carb aid. v2 is that product,
 pre-registered and built on 26 Nov, the day after v1's locked result was known, and now served: risk from
 15 sensor and profile inputs, with the photo as a separate carb estimate that never blocks an answer. On
-development v2 answers every meal with usable glucose data and its ECE point (0.029) meets the target,
-though the interval (0.03 to 0.09) cannot confirm it. It is not shown to be as accurate as v1 (paired
+development v2 answers every meal with usable glucose data and its ECE (0.029) meets the target, though at
+this size that cannot be told apart from noise; v1 remains the more accurate model. It is not shown to be as accurate as v1 (paired
 −0.017, −0.045 to +0.010) and lets more spikes through its clears (12.7%), worst for the intended users:
 6 of 30 clears for people with prediabetes spiked, against 1 of 25 in v1. In both, a per-person intercept
 learned from earlier meals carries most of the edge; it separates people well but ranks a person's own
@@ -21,8 +21,8 @@ meals worse. v2 has no clean test: the locked eight are spent on v1.
 |---|---|---|---|
 | AUROC (95% person-clustered) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) | 0.754 (0.673–0.815); 0.748 on v1's 460 |
 | meals answered with a risk | 460 | 150 | 481 |
-| ECE, registered 15 bins (target ≤ 0.05) | 0.052, at the noise floor | 0.061 | 0.029 (0.032–0.091): on track |
-| usefulness targets (protocol labels: met / on track / at risk) | 1 met, 3 on track | 1 met, 3 at risk | 1 met, 2 on track, 1 at risk (spikes among cleared) |
+| ECE, registered 15 bins (target ≤ 0.05) | 0.052, at the noise floor | 0.061 | 0.029, below a perfect model's median 0.051: on track |
+| usefulness targets (protocol labels: met / on track / at risk) | 1 met, 3 on track | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk (spikes among cleared) |
 | spikes among cleared meals (cap 10%) | 7.3% (2.9–14.2%) | 2 of 10 | 12.7% (5.9–22.6%) |
 | the same, people with prediabetes | 1 of 25 | not split | 6 of 30 |
 | the samples' path (no history, no priors), with rule R13 | – | – | 0 cleared; cost −5.3% |
@@ -45,7 +45,7 @@ with neither history nor priors there is no personal basis to clear a meal, so a
 samples without `history.csv` sees caution or can't judge, never low risk. Tooling: uv with Python 3.14
 (locked), strict Pydantic, Loguru, a `just` recipe for every number, 187 tests (all pass with the data and
 weights, one an expected failure; 171 run without them; logs in outputs/finalize/), W&B offline runs replayed from committed training histories, and a git history from 2 Nov in
-which every pre-registration precedes its run.
+which every registration commit precedes its results commit.
 
 ![Figure 1: the one scoring path, its refusal exits and the labelling loop](../outputs/figures/f1_system.png)
 
@@ -76,7 +76,7 @@ has eight inputs: age, BMI, HbA1c, fasting glucose, meal hour (sine and cosine) 
 each person's spike rate and mean rise over their first meals. Seven hand-made trend features summarise
 the 2-h CGM and heart-rate window. SensorCNN, the from-scratch sequence model, ties the trend features
 (+0.002, −0.016 to +0.022) and stays a baseline. Fusion is logistic regression, the capacity 23
-development people support; gradient boosting on the same inputs is no better (non-inferior, +0.016,
+development people support; gradient boosting on the same inputs is not shown better (+0.016,
 −0.024 to +0.062, fusion study without the intercept). In v2 the served risk uses two modalities, sensors
 and profile; the photo is a third, separate output, the carb estimate the user confirms.
 
@@ -125,7 +125,9 @@ One caveat: fold 1 holds the five people the intermediate evaluation scored, and
 designed after a diagnosis on them, so development carries selection pressure the locked eight do not.
 v2 adds more: it was chosen after v1's locked result, and its development number is optimistic in the same
 way v1's was (0.762 on development, 0.645 locked). Two checks: without fold 1 v2 scores 0.749; on each
-person's last third of meals 0.774 (0.681–0.841), against 0.740 on the first two thirds.
+person's last third of meals 0.774 (0.681–0.841), against 0.740 on the first two thirds. More history does
+not make clears safer: spikes among cleared meals rise from 9.6% (7 of 73) to 17.8% (8 of 45) in the last
+third, and only 3 of v2's 15 false clears are cold starts.
 
 Postprandial response is person-specific (Zeevi et al. 2015; Berry et al. 2020). The calibration fix is a
 per-fold Platt map plus a penalised per-person intercept fitted only on that person's earlier meals whose
@@ -165,22 +167,24 @@ the intercept's own: with it, gradient boosting comes within 0.013 of v1, and th
 v2. It works between people, not within them. Averaged per person, AUROC falls by about 0.08 in both
 products (19 of 22 people worse in v1, 20 of 22 in v2), because the offset drifts as each new label arrives. The system
 learns each person's base rate, 0.063 better than a plain running spike rate. Removing the CGM costs
-0.033 with an interval above zero (exploratory, post hoc); removing the profile costs 0.122 (Figure 4).
+0.033 with an interval above zero (exploratory, post hoc); removing the profile costs 0.122 (Figure 6).
 
 ![Figure 3: reliability in the registered binning, v1 development, v1 locked and v2 development (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals, bars the 95% Wilson interval of each shipped bin)](../outputs/figures/f3_reliability.png)
 
 | calibration | v1 dev | v1 locked | v2 dev | without history: v1 dev / v1 locked / v2 dev (per-fold Platt) |
 |---|---|---|---|---|
-| ECE, registered 15 equal-width bins (target ≤ 0.05) | 0.052 | 0.061 | 0.029 (0.032–0.091) | 0.023 / 0.162 / 0.052 |
+| ECE, registered 15 equal-width bins (target ≤ 0.05) | 0.052 | 0.061 | 0.029 | 0.023 / 0.162 / 0.052 |
 | ECE a perfectly calibrated model shows at this size (median; 95th centile) | 0.052 | 0.094 | 0.051; 0.071 | – |
 | calibration-in-the-large (mean risk − spike rate) | −0.015 | −0.010 | −0.015 | +0.002 / −0.108 / −0.001 |
 
 *Floor: labels drawn as Bernoulli(risk), 2,000 draws; ECE intervals are person-bootstrap and biased upward. v2's equal-mass ECE is 0.076. report_metrics.json, v2_metrics.json, outputs/v2_explain/v2_explain.json (calibration).*
 
-At this sample size the ECE target cannot separate either product from a perfectly calibrated model: v2's
-0.029 sits below the median a perfect model would show, its interval reaches 0.091, and equal-mass bins
-give 0.076. By the protocol's rule (met only if the whole interval meets the target) v2 is on track, not
-met. Figure 3's v2 panel shows no bin outside its Wilson interval. Without history, v1's risk under-predicts
+At this sample size the ECE target cannot separate either product from a perfectly calibrated model. v2's
+0.029 is lower than 99% of draws from a perfect model of this size (median 0.051), an unusually smooth fit,
+likely because each fold's Platt map and the intercepts were fitted on overlapping development meals; its
+person-bootstrap interval (biased upward) runs 0.03 to 0.09, and equal-mass bins give 0.076. By the
+protocol's rule (met only if the whole interval meets the target) v2 is on track, not met. In Figure 3's
+v2 panel every bin's 95% Wilson interval contains its mean risk. Without history, v1's risk under-predicts
 the harder locked cohort by 11 points, the clearest calibration failure. Discrimination is even across
 glycaemic status; usefulness is not (table).
 
@@ -203,7 +207,7 @@ only near the declared prices.
 | cleared as low risk | ≥20% | 22.7% (13.2–34.0%) | 6.5% (0.6–15.9%) | 24.5% (13.5–37.5%) | 11.0% |
 | can't judge | ≤20% | 13.7% (8.7–19.2%) | 2.6% (0.6–5.0%) | 8.3% (2.5–15.2%) | 18.5% |
 | missed among cleared | ≤10% | 7.3% (2.9–14.2%) | 20% (2 of 10; exact 2.5–55.6%) | 12.7% (5.9–22.6%), 15 of 118 | 15.1% (8 of 53) |
-| verdict (met / on track / at risk) | – | 1 met, 3 on track | 1 met, 3 at risk | 1 met, 2 on track, 1 at risk | 3 of 4 at risk |
+| verdict (met / on track / at risk) | – | 1 met, 3 on track | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk | 3 of 4 at risk |
 
 *v1's served point (no history) clears 15.2% with 9.6% spiking on development and 21.9% on the locked eight (report_metrics.json served_operating_point). report_metrics.json, v2_metrics.json (decisions, served_no_history), outputs/locked_eval/locked_summary.json.*
 
@@ -219,16 +223,16 @@ R13 refers those meals instead: no misses, 21% referred, 5.3% more costly than a
 
 v2 is served on the strength of the gate's pre-written verdict and a registration that said it ships
 whatever the development result; there was no safety gate, and on the numbers it is the riskier product.
-No low-risk cut keeps the interval on its misses under 10% (Figure 8, left); the point dips under 10% only
+No low-risk cut keeps the interval on its misses under 10% (Figure 4, left); the point dips under 10% only
 when fewer than 16% of meals are cleared. Its 15 false clears (§5) sit on 8 people, 6 on people with
 prediabetes. A what-if that withholds clears for a prediabetic profile until 20 labelled meals (post hoc,
 not shipped) cuts their misses from 6 to 2 and their clears from 30 to 3, with the overall saving at
 10.4%; withholding them always gives 10.2% misses and a 12.1% saving. Either rule would need its own
 registration and a test before serving.
 
-![Figure 8: v2 on development: spikes among cleared meals as the low-risk cut moves, with the frozen cut in-sample; exact linear SHAP of the frozen v2 fusion; one false clear split into fusion terms, the fold refit and Platt, and the per-person intercept](../outputs/figures/f8_v2.png)
+![Figure 4: v2 on development: spikes among cleared meals as the low-risk cut moves, with the frozen cut in-sample; exact linear SHAP of the frozen v2 fusion; one false clear split into fusion terms, the fold refit and Platt, and the per-person intercept](../outputs/figures/f8_v2.png)
 
-![Figure 7: v1 coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, locked at 0.15), descriptive](../outputs/figures/f7_coverage.png)
+![Figure 5: v1 coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, locked at 0.15), descriptive](../outputs/figures/f7_coverage.png)
 
 | stress at the evaluated operating point (with history) | v2: AUROC, spikes among cleared | v2: caution → low risk | v1: AUROC | v1: caution → low risk |
 |---|---|---|---|---|
@@ -243,9 +247,9 @@ registration and a test before serving.
 | photo blur radius 2 / 6 / 10 | 0.754, unchanged: the photo is not a risk input | 0 | 0.776 / 0.775 / 0.766 (co-answered clean 0.774) | 0 / 3 / 6 |
 | photo brightness ×0.5 / 0.25 / 0.2 / 0.15 | unchanged | 0 | within 0.002 on the meals still answered: 460 / 453 / 418 / 228 (×0.1: 3 answered) | 1 / 1 / 0 / 0 |
 
-*Registered in docs/stress_quality.md and (heart rate, priors, history) docs/v2_explain.md before their runs; every development meal, clean and perturbed, history from the clean answers. v1's photo stress compares the frozen photo model with itself (in-sample photos). outputs/robustness/stress_quality.json and v2_input_stress.json; the 22 Nov three-level study (Figure 5) is in the appendix.*
+*Registered in docs/stress_quality.md and (heart rate, priors, history) docs/v2_explain.md before their runs; every development meal, clean and perturbed, history from the clean answers. v1's photo stress compares the frozen photo model with itself (in-sample photos). outputs/robustness/stress_quality.json and v2_input_stress.json; the 22 Nov three-level study (Figure A1) is in the appendix.*
 
-![Figure 4: effect sizes with 95% person-clustered intervals; removals against the fusion study's photo arm (0.719); green rows: the intercept (evaluation) and the CGM contrast](../outputs/figures/f4_effects.png)
+![Figure 6: effect sizes with 95% person-clustered intervals; removals against the fusion study's photo arm (0.719); green rows: the intercept (evaluation) and the CGM contrast](../outputs/figures/f4_effects.png)
 
 Quality holds until a rule refuses. CGM dropout up to 50% moves AUROC by at most 0.001 in either product,
 and at 70% only the meals left with too few recent readings are refused (20 in v2). Gaps change nothing up
@@ -253,8 +257,9 @@ to 18 minutes and refuse every meal from 20, the rule's threshold, so the curve 
 photo cannot move v2's risk. In v1, heavy blur lets 6 cautions become low risk and lifts the spike rate
 among clears from 8% to 11%, and darkness ends in refusals by the contrast rule. v2's own weak points are
 its personal inputs. A watch left off (heart rate missing) is the largest dangerous flip in any condition,
-17 cautions turned low risk, though not on average lower risk as we expected; the folder answer is flagged
-`hr_missing`. Wrong history labels hurt most: a quarter flipped costs 0.055 AUROC, more than cutting the
+17 cautions turned low risk, though not on average lower risk as we expected, and with misses among clears
+falling to 11.6% and the saving rising to 12.8%, so heart rate's value to v2 is unproven; the folder answer
+is flagged `hr_missing`. Wrong history labels hurt most: a quarter flipped costs 0.055 AUROC, more than cutting the
 history to three meals.
 
 | unfamiliar-photo check at the 0.614 cut | photos | median kNN distance | flagged |
@@ -307,18 +312,19 @@ Every class below was observed.
 Probe B was registered as an expected pass (a rising pre-meal trace raises risk on at least 90% of meals)
 and failed: risk rose on only 8%. The label is baseline-relative, so a meal eaten on a rising trace has a
 higher baseline and a smaller measured rise; our registration encoded naive physiology. Exact SHAP for the
-frozen v1 fusion (Figure 6) ranks prior rise first, then age, heart rate and prior spike rate. Attribution
+frozen v1 fusion (Figure 7) ranks prior rise first, then age, heart rate and prior spike rate. Attribution
 and ablation disagree for heart rate (−0.21 coefficient, +0.007 when removed): attribution measures
-in-sample use, ablation out-of-sample loss. In v2 (Figure 8) the same four lead, and the sign has a
+in-sample use, ablation out-of-sample loss. In v2 (Figure 4) the same four lead, and the sign has a
 reading: within a person, a higher heart rate than usual before a meal goes with fewer spikes (−0.51,
 −0.88 to −0.25, person fixed effects), while between people mean heart rate and spike rate are unrelated
-(Spearman 0.00), so it is not a fitness confound; recent activity is the likely cause. The per-person
+(Spearman 0.00), so fitness is an unlikely explanation; the cause is untested (recent activity is one
+candidate). The per-person
 intercept moves the served logit by 0.51 on average, against 0.64 for the whole fusion. Probes A and C move one input at a time through a linear
 fusion, so their direction is guaranteed; what they show is size. The most extreme photo swap leaves 68.5%
-of v1's decisions unchanged, and moving any one profile input from its 10th to 90th percentile changes
+of v1's decisions unchanged, and moving any one of HbA1c, fasting glucose or the two priors from its 10th to 90th percentile changes
 11–17% of decisions.
 
-![Figure 6: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/f6_shap.png)
+![Figure 7: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/f6_shap.png)
 
 The errors fall on different people. A false clear, the costliest error, tells someone a spiking meal is
 safe; 7 of v1's 8 development false clears fell on healthy people, while people with prediabetes, the
@@ -347,7 +353,7 @@ under the final code with the pinned weights and data; every v1 decision matched
 so. The author set the goals and approved each pre-registration, freeze and verdict up to the tag. After
 it, cold grades by AI agents led to the dated round in docs/changelog.md, including v2, which she chose
 on 26 Nov knowing the locked result; the assistant wrote that round's registrations under her
-instruction, and the changelog lists each one with her sign-off.
+instruction, and the changelog lists each one; her dated sign-off on them is the changelog's last entry.
 No v1 artifact or locked number changed.
 
 ## 7. Limitations and conclusion
@@ -356,10 +362,10 @@ data. Forty-five people from one study, repeated standardised meals, no local cu
 only train, so no claim is made for them. v2 is the product the pre-registration points to and answers
 more meals; v1 is more accurate on development by a margin the data cannot confirm, misses fewer spikes,
 and is the only one with a clean test, which failed the usefulness targets. Our recommendation for any
-use: let v2 flag and refer from the first meal, but give a low-risk answer only once a person has
-history, and for people with prediabetes only after a rule like §4's what-if has been registered and
-tested. Heart rate earns its place by its within-person sign, not its ablation; a next version should
-test it with more people. This is an advisory prototype with no clinical validation,
+use: let v2 flag and refer, and withhold low-risk answers for people with prediabetes until a rule like
+§4's what-if has been registered and tested on new people; history alone does not make clears safer (§3).
+The served configuration does not do this: it is the frozen v2 as registered. Heart rate has a consistent
+within-person sign but no proven value; a next version should test it with more people. This is an advisory prototype with no clinical validation,
 end-user test or regulatory review, built so that a clinical study could evaluate it.
 
 | Glossary | meaning |

@@ -226,5 +226,15 @@ All three strict graders and the holistic one found the report explaining and ch
 | `just evaluate` adds the v2 explanation; `evaluate-all` adds v2 input stress, end-to-end timing and the 22 Nov levels; `just end-to-end-timing`; `verify-outputs` compares numbers to 1e-9 instead of bytes; `evaluation_v2/dev_answers.csv` regenerated under the final reason wording (decisions unchanged) | 1e-16 noise failed the byte check; recipes missing (2 of 3) | Justfile; src/glimpse/verify.py |
 | README, samples README, instructor manifest, rule ledger and model card brought up to v2 | stale statements (3 of 3) | – |
 
+## 26 Nov 2026, twelfth pass (round-12 grades: 78.0, 77.75, 79.2; holistic 86)
+
+| Change | Why | Evidence |
+|---|---|---|
+| The last-third check now reports misses among clears (9.6% to 17.8%), and the §7 recommendation no longer claims history makes clears safer | selective reporting (3 of 3) | v2_explain.json temporal |
+| ECE shown against the perfect-model floor (0.029 is lower than 99% of draws, median 0.051) instead of an interval that excluded its point; the Wilson sentence corrected | the point lay outside its interval (4 of 4) | v2_explain.json calibration |
+| Heart-rate removal's lower misses and higher saving reported; "recent activity" reworded as an untested candidate; probe C's scope named; GB wording; registration-order claim narrowed to commit order; locked verdict "not met"; v1 named the more accurate model in the opening | overstatements (2 of 3) | docs/final_report.md |
+| Figures renumbered in reading order (the 22 Nov levels figure is A1 in the appendix); Figure 4 marks the evaluated point and uses one feature name | figure order and labels (3 of 3) | outputs/figures/ |
+| The sentence on the author's sign-off now points to the entry below, which she writes | the report claimed a sign-off that was not yet there (3 of 3) | – |
+
 Author sign-off on the tenth and eleventh passes (v2, R13 and every registration since the tag): to be
 added here by the author, dated, in her words.

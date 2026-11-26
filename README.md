@@ -94,7 +94,7 @@ only, and they carry disclosed selection pressure (fold 1 was scored at the inte
 after the locked result). "v2" in `outputs/evaluation_v2/` and "partition v2" name the split, not the product:
 that folder is v1; product v2 lives in `outputs/evaluation_sensor_first/`.
 
-| Risk model | **locked test (8 people, 153 meals)** | development (23 people; v1 460, v2 481 meals) |
+| Risk model | **locked test (8 people, 153 meals; 150 with a risk)** | development (23 people; v1 460, v2 481 meals) |
 |---|---|---|
 | v1 raw fusion | 0.611 (0.510–0.743) | 0.726 (0.659–0.797) |
 | **v1 + per-person calibration (locked-tested)** | **0.645 (0.540–0.736)** | 0.762 (0.682–0.829) |
@@ -113,7 +113,7 @@ that folder is v1; product v2 lives in `outputs/evaluation_sensor_first/`.
   estimate as 4 of its 19 inputs; v2, built on 26 Nov to the gate's pre-written verdict, uses it only as a carb estimate.
 - v2 is not shown non-inferior to v1 (−0.017, −0.045 to +0.010) and lets 12.7% of its clears spike (6 of 30 for people
   with prediabetes, against 1 of 25 in v1).
-- Usefulness targets hold at the point on development (23% cleared, 14% cost saving, 7.3% missed vs a 10% cap) and FAIL on
+- v1: usefulness targets hold at the point on development (23% cleared, 14% cost saving, 7.3% missed vs a 10% cap) and FAIL on
   the locked test (10 of 153 cleared, 2 spiked, cost reduction −5.7%), reported unadjusted, per the pre-registration.
 - The 8 locked people were scored exactly once, on 25 Nov, from the frozen artifacts (`just evaluate-locked` refuses a rerun).
 - Monitoring: the photo-drift rule fires on the drifted (synthetic) week of a simulated stream, but real phone
@@ -167,11 +167,11 @@ version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 | §3 results table, fold cut-offs, Figures 2-3 | `just evaluate` (`evaluate-locked` once) | `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` |
 | §4 cost sweep, usefulness targets | `just evaluate` | `outputs/evaluation_v2/dev_summary.json`, `outputs/report_metrics/` |
 | §1 end-to-end timing, int8 | `just end-to-end-timing`, `just photo-probes` | `outputs/efficiency/end_to_end.json`, `int8.json` |
-| §3-§5 v2 calibration, taxonomy, SHAP, Figures 3 and 8 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
+| §3-§5 v2 calibration, taxonomy, SHAP, Figures 3 and 4 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
 | §4 stress table | `just stress-quality`, `just v2-input-stress` | `outputs/robustness/stress_quality.json`, `v2_input_stress.json` |
-| appendix stress levels, Figure 5 | `just robustness-levels`, `just timing`, `just promised` | `outputs/robustness/`, `outputs/promised/` |
+| appendix stress levels, Figure A1 | `just robustness-levels`, `just timing`, `just promised` | `outputs/robustness/`, `outputs/promised/` |
 | §4 monitoring | `just monitoring`, `just monitoring-replay` | `outputs/monitoring/` |
-| §5 taxonomy, probes, Figure 6 | `just predict-folder`, `just stress`, `just probes`, `just ood`, `just figures` | `outputs/folder_run/`, `outputs/stress_run/`, `outputs/probes/`, `outputs/ood/`, `outputs/figures/` |
+| §5 taxonomy, probes, Figure 7 | `just predict-folder`, `just stress`, `just probes`, `just ood`, `just figures` | `outputs/folder_run/`, `outputs/stress_run/`, `outputs/probes/`, `outputs/ood/`, `outputs/figures/` |
 
 `tests/test_report_numbers.py` checks the report's headline numbers against these files on every commit.
 
