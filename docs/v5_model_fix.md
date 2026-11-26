@@ -314,3 +314,28 @@ intervals are above zero and the permuted control is clearly worse. On the desig
 control does as well as the real photo, so there the gain is not tied to the meal. Mixed evidence: the photo
 is not shown to help on the primary group, and it is the first sign in this project of a meal-level signal
 from the photo. The original gate stands as reported.
+
+## Part 5, registered 27 Nov before any run: five more tests of v5 (photo only)
+
+The author asked for more tests. Each has a fixed definition and prediction here; each is run once.
+People as before: 15 design, 8 confirmation, 14 type-2 (recipes refitted). The confirmation and type-2
+people have been scored before for v5, so these are further looks at the same predictions or refits of the
+same frozen recipe, not new clean tests. No recipe choice is made from them.
+
+- T1, shuffled labels. Training labels permuted within each fold's training set, 10 times, test labels kept.
+  Prediction: mean pooled AUROC between 0.45 and 0.55 on the 23 development people. A higher value would
+  mean the history input leaks the answer.
+- T2, selective answering. Drop the 0, 10, 20, 30% of meals whose risk is closest to 0.5 and score the error
+  of "spike if risk is 0.5 or more" on the rest, v5 and v1, on the confirmation and type-2 people.
+  Prediction: v5's error falls at every step on both groups.
+- T3, usefulness at cut-offs chosen elsewhere. v5's low-risk and caution cut-offs are chosen on the design
+  people only (lowest declared cost, grid 0.05 to 0.60 in steps of 0.01, low at or below high) and applied
+  to the confirmation people. Reported with v1's shipped decisions on the same meals: cost reduction against
+  always caution, share cleared, share referred, missed among cleared, and clears for people with
+  prediabetes. Prediction: v5 clears more than v1 and misses more than 10% of its clears.
+- T4, the from-scratch SensorCNN as one more input to v5. Its out-of-person spike score (same network,
+  epochs and seed 0 as the committed cross-validation; training people get scores from fits that excluded
+  them) is added as a 28th input. One variant, no tuning. Reported on the design and confirmation people.
+  Prediction: no gain (within 0.01 on both numbers).
+- T5, slices. v5 against v1 by sex and by glycaemic status on the 23 development people: pooled AUROC per
+  slice. Prediction: v5 is not lower than v1 by more than 0.03 in any slice.
