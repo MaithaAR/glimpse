@@ -74,3 +74,4 @@ select = ["E", "F", "W", "I", "B", "UP", "T20"]   # T20 = no print(); logging is
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+pythonpath = [".", "tests"]  # `pytest` and `uv run pytest` find tests.test_serve and test_serve alike

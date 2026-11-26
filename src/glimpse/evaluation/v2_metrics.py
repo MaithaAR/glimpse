@@ -70,7 +70,9 @@ def paired(v1: pd.DataFrame, v2: pd.DataFrame) -> dict:
         ),
     )
     return {"meals": int(len(m)), "auroc_v1": float(roc_auc_score(y, m.risk_v1)),
-            "auroc_v2": float(roc_auc_score(y, m.risk_v2)), "v2_minus_v1": d, "ci95": [lo, hi],
+            "auroc_v2": float(roc_auc_score(y, m.risk_v2)),
+            "v2_minus_v1": float(roc_auc_score(y, m.risk_v2) - roc_auc_score(y, m.risk_v1)),
+            "bootstrap_mean": d, "ci95": [lo, hi],  # 26 Nov fix: observed point, as v1's paired rows report
             "noninferior_at_0.03": bool(lo > -0.03),
             "log_loss_v1_minus_v2": {"point": ll[0], "ci95": [ll[1], ll[2]]}}  # fmt: skip
 

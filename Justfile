@@ -106,7 +106,7 @@ figures:
 timing:
     uv run glimpse timing
 
-# the 23 hostile input folders through the instructor command (outputs/stress_run)
+# the 25 hostile input folders through the instructor command (outputs/stress_run)
 stress:
     uv run glimpse predict-folder samples/stress outputs/stress_run
 
@@ -147,7 +147,7 @@ evaluate:
     uv run glimpse probes
     just report-numbers
 
-# `evaluate` plus the cheaper compute studies behind the report's other tables (~40 min with data and weights)
+# `evaluate` plus the cheaper compute studies behind the report's other tables (~45 min with data and weights)
 evaluate-all:
     just fusion
     just ablate

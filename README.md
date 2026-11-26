@@ -86,7 +86,7 @@ evaluation's two-hour gate. Only `samples/returning_user/02_with_priors_and_hist
 `prior_rise` gets training medians from all 37 non-locked people, type 2 diabetes included (0.455, 48 mg/dL).
 That no-history served point fails three of four usefulness targets on development (report §4), and with no
 history and no priors rule R13 never answers low risk. `history.csv` holds the logit of the product that wrote
-it; the command does not yet check which product that was.
+it; rows tagged with the other product are skipped and counted in the answer's flags.
 
 ## Results (AUROC, 95% ranges clustered by person)
 The locked test measured v1 once and is the only clean measurement; v2 (served) has development numbers
@@ -111,7 +111,7 @@ that folder is v1; product v2 lives in `outputs/evaluation_sensor_first/`.
   Brier and log-loss at the point estimate, with intervals that include zero.
 - The photo is NOT established as a risk signal: pre-registered gate +0.025 (−0.010, +0.061). v1 still takes the photo
   estimate as 4 of its 19 inputs; v2, built on 26 Nov to the gate's pre-written verdict, uses it only as a carb estimate.
-- v2 is not shown non-inferior to v1 (−0.017, −0.045 to +0.010) and lets 12.7% of its clears spike (6 of 30 for people
+- v2 is not shown non-inferior to v1 (−0.015, −0.045 to +0.010) and lets 12.7% of its clears spike (6 of 30 for people
   with prediabetes, against 1 of 25 in v1).
 - v1: usefulness targets hold at the point on development (23% cleared, 14% cost saving, 7.3% missed vs a 10% cap) and FAIL on
   the locked test (10 of 153 cleared, 2 spiked, cost reduction −5.7%), reported unadjusted, per the pre-registration.
@@ -134,7 +134,7 @@ src/glimpse/           data/ · models/ · training/ (incl. finalize.py, the pre
 checkpoints/           trained models, frozen cut-offs (hashed), unfamiliar-photo reference
 outputs/               evaluation tables and figures, learning curves, cross-validated predictions, demo cases
 docs/                  final report, model card, data card, evaluation protocol, design doc, changelog, monitoring
-samples/               instructor suite (13 meals), stress suite (23 hostile meals), returning_user/ (3 cases with
+samples/               instructor suite (13 meals), stress suite (25 hostile meals), returning_user/ (3 cases with
                        priors and history), local_photos/ (14 unseen phone photos), example CSV
 ```
 

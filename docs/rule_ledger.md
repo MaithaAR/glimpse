@@ -178,7 +178,7 @@ note above was true for v1's frozen run then and is not true of the 26 Nov run.
 Provenance note (26 Nov): commit hashes cited above for R1-R7 (4c72a62, 5e01186, 71abb13) predate the 2 Nov squash
 and do not resolve in this repository; the dated ledger text is the record for those rules.
 
-## R14 - low glucose (27 Nov, docs/v2_hardening.md; an input rule)
+## R14 - low glucose (26 Nov, docs/v2_hardening.md; an input rule)
 Observed: an unseen meal whose CGM fell from 60 to 48.5 mg/dL got "Caution ... A smaller carb portion or a
 short walk afterwards may help" (round-12 grader B), advice that is wrong for someone having a low. Rule:
 last reading below 54 mg/dL (level-2 hypoglycaemia) gives can't judge, "treat the low first and follow your
@@ -187,13 +187,13 @@ the low, flag `glucose_low`. Before/after on evaluated meals: no decision change
 development 67 mg/dL, locked 73); one development caution changes wording. Sample: samples/stress/24.
 Tests: tests/test_hardening_r14.py.
 
-## R15 - out of scope (27 Nov, docs/v2_hardening.md)
+## R15 - out of scope (26 Nov, docs/v2_hardening.md)
 Observed: a profile with HbA1c 7.4% was answered although the report makes no claim for type 2 diabetes.
 Rule: HbA1c 6.5% or above gives can't judge, "outside what GLIMPSE was built and tested for; ask your care
 team", referred to a person. Before/after: no evaluated decision changes (highest HbA1c: development 6.4%,
 locked 6.1%). Sample: samples/stress/25. Tests: tests/test_hardening_r14.py.
 
-## Output and input changes, 27 Nov (no decision changes)
+## Output and input changes, 26 Nov (no decision changes)
 - `escalate_to` on input refusals is now `fix_input` (it was `none`, which contradicted Figure 1).
 - Grams outside the shown carb range (47% of 817 out-of-fold photos) are flagged `carb_heads_disagree`
   and shown as "about N g; range unsure (A or B), please confirm"; instructor cases 10 and 11 now read so.

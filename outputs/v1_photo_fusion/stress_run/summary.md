@@ -27,5 +27,5 @@
 | 21_cmyk_photo | can't judge | the photo looks unlike the meal photos the model learned from | – |
 | 22_alpha_png | can't judge | the photo looks unlike the meal photos the model learned from | – |
 | 23_gif_renamed_jpg | can't judge | the photo looks unlike the meal photos the model learned from | – |
-| 24_low_glucose_falling | can't judge | glucose is very low now (48 mg/dL); treat the low first and follow your care plan, this tool is not for that (rule R14) | – |
+| 24_low_glucose_falling | can't judge | glucose is very low now (48.5 mg/dL); treat the low first and follow your care plan, this tool is not for that (rule R14) | – |
 | 25_diabetes_range_a1c | can't judge | HbA1c 7.4% is in the diabetes range, outside what GLIMPSE was built and tested for; ask your care team (rule R15) | – |

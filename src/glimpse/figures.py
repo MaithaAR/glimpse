@@ -39,7 +39,7 @@ def f1_system(plt) -> None:
     box(0.0, 3.0, 1.9, 0.9, "meal photo\n(optional in v2)")
     box(0.0, 1.7, 1.9, 0.9, "CGM + heart rate\n(2 h before)")
     box(0.0, 0.4, 1.9, 0.9, "profile: 4 fields +\n2 optional priors")
-    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12")
+    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12, R14, R15")
     box(4.9, 3.0, 2.5, 0.9, "ConvNeXt-Tiny (last stage\ntuned): grams + range")
     box(4.9, 1.7, 2.5, 0.9, "trend features\n+ profile inputs")
     box(7.9, 3.2, 2.4, 0.9, "kNN unfamiliar-photo\ncheck (cut 0.614)")
@@ -88,7 +88,7 @@ def f2_per_fold(plt, ev: dict) -> None:
         ax.plot([i, i], [f["auroc_raw"], f["auroc_personal"]], color=GREY, lw=1, zorder=1)
     ax.scatter(xs, [f["auroc_raw"] for f in folds], color=GREY, label="v1 raw", zorder=2)
     ax.scatter(xs, [f["auroc_personal"] for f in folds], color=BLUE, label="v1 personalised", zorder=2)
-    v2f = json.loads(Path("outputs/report_metrics/v2_metrics.json").read_text())["per_fold"]  # 27 Nov: v2 beside v1
+    v2f = json.loads(Path("outputs/report_metrics/v2_metrics.json").read_text())["per_fold"]  # 26 Nov: v2 beside v1
     for i, f in enumerate(v2f):
         ax.plot([i + 0.22, i + 0.22], [f["auroc_raw"], f["auroc_personal"]], color=GREEN, lw=1, alpha=0.6, zorder=1)
     ax.scatter(xs + 0.22, [f["auroc_raw"] for f in v2f], color=GREEN, marker="x", s=18, label="v2 raw", zorder=2)
@@ -312,7 +312,7 @@ def f8_v2(plt) -> None:
                  label="evaluated: each fold's own cut")  # fmt: skip
     axes[0].set_xlabel("share of development meals cleared (cut 0.05 to 0.30)")
     axes[0].set_ylabel("spikes among cleared meals (95% Wilson)")
-    axes[0].set_title("v2: at no cut does the interval stay under the 10% cap", fontsize=9)
+    axes[0].set_title("v2: misses near or above 10% at every cut", fontsize=9)
     axes[0].legend(frameon=False, fontsize=7.5, loc="upper left")
     sh = r["shap"]
     names = list(sh["mean_abs_shap"])

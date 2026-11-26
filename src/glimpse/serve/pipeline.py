@@ -50,7 +50,7 @@ def _bin_onehot(grams: float) -> list[float]:
 
 
 def heads_disagree(grams: float, probs: np.ndarray) -> bool:
-    """The grams head lands outside the range the range head shows (27 Nov; e.g. 36.5 g shown as under 30 g)."""
+    """The grams head lands outside the range the range head shows (26 Nov; e.g. 36.5 g shown as under 30 g)."""
     return int(np.digitize(grams, [30, 60, 90])) != int(np.argmax(probs))
 
 

@@ -20,8 +20,8 @@ the photo no longer refuses a meal; it only withholds the carb estimate, with th
 | 07_profile_blank | all profile fields null | can't judge, no defaults filled | same |
 | 08_dark_photo | near-black photo | can't judge or caution; never low risk | caution; carbs withheld (blank) |
 | 09_screenshot | app screenshot, not food | unfamiliar photo -> can't judge (the confirm-carbs tier has no input surface) | caution; carbs withheld (unlike a meal) |
-| 10_exif_rotated | 00's photo stored rotated with EXIF orientation | identical decision to 00_clean | same decision and risk; carb range differs (under 30 g), a known limit |
-| 11_local_dish | unfamiliar local dish | ideally confirm-carbs; the shipped check passes it (documented limitation, report §5) | caution; 32.5 g shown as under 30 g |
+| 10_exif_rotated | 00's photo stored rotated with EXIF orientation | identical decision to 00_clean | same decision and risk; carb heads disagree, shown as "about 36 g; range unsure" |
+| 11_local_dish | unfamiliar local dish | ideally confirm-carbs; the shipped check passes it (documented limitation, report §5) | caution; shown as "about 33 g; range unsure" |
 | 12_zero_byte | empty photo.jpg | structured can't judge; the run continues | caution; carbs withheld (unreadable) |
 
 Real phone photos (EXIF-stripped, resized): 00_clean (tuna rice bowl), 10_exif_rotated (the same

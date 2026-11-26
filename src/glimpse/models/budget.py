@@ -14,7 +14,7 @@ PER_MODEL_LIMIT = 200_000_000
 PRETRAINED_TOTAL_LIMIT = 1_000_000_000
 SCRATCH_LIMIT = 50_000_000
 
-# 27 Nov: the never-built DINOv2-S row was dropped; the cut is recorded in docs/final_design.md.
+# 26 Nov: the never-built DINOv2-S row was dropped; the cut is recorded in docs/final_design.md.
 
 
 class BudgetRow(BaseModel):

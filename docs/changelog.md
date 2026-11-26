@@ -236,7 +236,7 @@ All three strict graders and the holistic one found the report explaining and ch
 | Figures renumbered in reading order (the 22 Nov levels figure is A1 in the appendix); Figure 4 marks the evaluated point and uses one feature name | figure order and labels (3 of 3) | outputs/figures/ |
 | The sentence on the author's sign-off now points to the entry below, which she writes | the report claimed a sign-off that was not yet there (3 of 3) | – |
 
-## 27 Nov 2026, thirteenth pass (registered 131bd8e before any change)
+## 26 Nov 2026, thirteenth pass (registered 131bd8e before any change)
 
 | Change | Why | Evidence |
 |---|---|---|
@@ -245,5 +245,20 @@ All three strict graders and the holistic one found the report explaining and ch
 | v1 studies (probes, promised, robustness) pin `sensor_first=False`; under the v2 default config they crashed | found while making `just evaluate` cover every table | src/glimpse/studies/ |
 | `just evaluate` adds the budget, v2 probes, OOD, monitoring and probes A and B; the budget CSV has a v2 row and no never-built model; recipe times corrected | `evaluate` did not rebuild every table (3 of 3) | Justfile; outputs/param_budget.csv |
 
-Author sign-off on the tenth and eleventh passes (v2, R13 and every registration since the tag): to be
-added here by the author, dated, in her words.
+## 26 Nov 2026, fourteenth pass (round-13 grades: 81.9, 81.0, 80.75; holistic 86)
+
+| Change | Why | Evidence |
+|---|---|---|
+| `pytest` and `uv run pytest` (so `just test`, `just check` and CI) failed at collection since ebb2878: tests imported `tests.test_serve` with no path set; the logs had used `python -m pytest`. `pythonpath` added; logs regenerated with `just test` | broken documented command (1 of 3, the most serious finding) | pyproject.toml; outputs/finalize/ |
+| v2 minus v1 now the observed difference (−0.015), as v1's paired rows are; the bootstrap mean (−0.017) is kept in v2_metrics.json | mixed conventions in one table (1 of 3) | outputs/report_metrics/v2_metrics.json |
+| Bottom line: calibration "on track", v1 "scores higher by a difference the data cannot establish"; within-person AUROC levels (0.60, 0.54); baselines on 481 meals; photo gain like for like (+0.021); v2 false cautions and the missing-heart-rate failure in the taxonomy; registered misses labelled (probe C half met, B4 expectation not met); Figure 4 left reframed, 847 explained; R1-R15 everywhere, R15 preventive; dates corrected to 26 Nov (all commits are 26 Nov, +0400) | inconsistencies and unlabelled misses (3 of 3) | docs/final_report.md |
+| LibreView exports with a title line and mmol/L columns now reach rule R1's x18 guidance; R14's message prints one decimal (53.7, not 54) | unseen device exports (1 of 3) | tests/test_hardening_r14.py |
+
+Registration-to-results times since the tag (commit order is the only evidence of order): v2 6874698 to
+3a7e72f, 4 min; replay 4 ec630a8 to 7fd3e8f, 1 min; stress quality 61b0c2e to 374c178, 23 min; probes and int8
+c783ce3 to d7bfc6e, 26 min; v2 explanation 10679f9 to a0e11ef, 20 min; hardening 131bd8e to 24d601e, 11 min.
+Code was sometimes drafted before its registration was committed.
+
+Author sign-off on the tenth to fourteenth passes (v2, R13 to R15 and every registration since the tag):
+to be added here by the author, dated, in her words.
+

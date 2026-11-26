@@ -88,7 +88,7 @@ class Answer(BaseModel):
     model_versions: dict[str, str] = Field(default_factory=dict)
     carb_source: Literal["photo", "user", "none"] = "none"
     # where a refusal points the user; "confirm_carbs" is advice only: no input surface sets typed carbs yet
-    escalate_to: Literal["none", "confirm_carbs", "fix_input", "human"] = "none"  # fix_input: 27 Nov, rule refusals
+    escalate_to: Literal["none", "confirm_carbs", "fix_input", "human"] = "none"  # fix_input: 26 Nov, rule refusals
     # point estimate from the regression head; kept in results, not shown (the two heads share one training loss
     # but agree on the bin for only 51% of meals, report §2, so the user sees the bin head's range only)
     carbs_g: float | None = Field(default=None, ge=0)

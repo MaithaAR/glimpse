@@ -69,7 +69,7 @@ def test_same_decision_code_for_table_and_live_estimates():
         "profile",
         "in_scope",
         "photo_present",
-    ]  # R14 and R15 (27 Nov)
+    ]  # R14 and R15 (26 Nov)
     assert a.checks_failed == []
 
 

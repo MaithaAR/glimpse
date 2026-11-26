@@ -28,5 +28,5 @@
 | 21_cmyk_photo | caution | risk 46.2% is at or above the caution cut-off 22% | withheld: photo unlike a meal |
 | 22_alpha_png | caution | risk 46.2% is at or above the caution cut-off 22% | withheld: photo unlike a meal |
 | 23_gif_renamed_jpg | caution | risk 46.2% is at or above the caution cut-off 22% | withheld: photo unlike a meal |
-| 24_low_glucose_falling | can't judge | glucose is very low now (48 mg/dL); treat the low first and follow your care plan, this tool is not for that (rule R14) | – |
+| 24_low_glucose_falling | can't judge | glucose is very low now (48.5 mg/dL); treat the low first and follow your care plan, this tool is not for that (rule R14) | – |
 | 25_diabetes_range_a1c | can't judge | HbA1c 7.4% is in the diabetes range, outside what GLIMPSE was built and tested for; ask your care team (rule R15) | – |

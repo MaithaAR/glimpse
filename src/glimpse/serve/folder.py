@@ -78,7 +78,7 @@ def read_history(path: Path) -> list[tuple[datetime, float, int]] | None:
 
 
 def read_history_flagged(path: Path, product: str | None) -> tuple[list[tuple[datetime, float, int]] | None, list]:
-    """read_history plus what it skipped (27 Nov): an optional `product` column (as results.jsonl writes it)
+    """read_history plus what it skipped (26 Nov): an optional `product` column (as results.jsonl writes it)
     must match the served product, since a logit from the other product would set the intercept wrong;
     rows from another product and rows that do not parse are skipped and counted in the flags."""
     if not path.exists():
@@ -124,7 +124,7 @@ def _summary(rows: list[dict]) -> str:
 def _carbs(r: dict) -> str:
     """The carb assist as the user would see it, or why it was withheld (v2 answers the risk regardless)."""
     if r.get("carb_bin"):
-        if "carb_heads_disagree" in r.get("flags", []):  # 27 Nov: never show 36 g as "under 30 g"
+        if "carb_heads_disagree" in r.get("flags", []):  # 26 Nov: never show 36 g as "under 30 g"
             from glimpse.serve.schemas import CARB_BINS
 
             other = CARB_BINS[sum(r["carbs_g"] >= e for e in (30, 60, 90))]

@@ -1,4 +1,4 @@
-"""Serving hardening round 3 (27 Nov, docs/v2_hardening.md Part A): each test is one observed failure."""
+"""Serving hardening round 3 (26 Nov, docs/v2_hardening.md Part A): each test is one observed failure."""
 
 from datetime import timedelta
 
@@ -88,3 +88,17 @@ def test_bad_profile_field_is_named_and_inferred_meal_time_flagged(tmp_path):
     assert a.decision == "can't judge" and "a1c_pct" in a.reason
     b = answer_from_files(bare_pipeline(risk=0.3, table={}), f, None, None, {**PROFILE, **PRIORS})
     assert "meal_time_inferred" in b.flags
+
+
+def test_libreview_title_line_and_mmol_columns(tmp_path):
+    f = tmp_path / "cgm.csv"
+    f.write_text("Glucose Data,Generated on,2024-06-02\nDevice Timestamp,Historic Glucose mmol/L\n"
+                 "2024-06-01 10:00,5.6\n2024-06-01 10:05,5.7\n")  # fmt: skip
+    t, g, _, _, _ = read_cgm_csv(f)
+    assert len(g) == 2 and max(g) < 30  # mmol/L values reach rule R1, which names the x18 fix
+
+
+def test_r14_message_never_rounds_up_to_the_threshold():
+    vals = [100.0] * 18 + [80, 70, 62, 58, 55, 53.7]
+    a = bare_pipeline(risk=0.31, table={}).answer(_meal(vals), key=0)
+    assert a.decision == "can't judge" and "53.7 mg/dL" in a.reason

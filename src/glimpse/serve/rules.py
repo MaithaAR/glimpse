@@ -16,7 +16,7 @@ from glimpse.serve.schemas import Answer
 
 
 def cant_judge(reason: str, **extra) -> Answer:
-    """The structured 'can't judge' result. Input refusals default to escalate_to='fix_input' (27 Nov: the
+    """The structured 'can't judge' result. Input refusals default to escalate_to='fix_input' (26 Nov: the
     user fixes the file); the model-side refusals (borderline, R13-R15) pass 'human' explicitly."""
     extra.setdefault("escalate_to", "fix_input")
     return Answer(decision="can't judge", sentence=sentence("can't judge", None, reason), reason=reason, **extra)
@@ -26,17 +26,17 @@ LOW_GLUCOSE_REFUSE, LOW_GLUCOSE_WARN, DIABETES_A1C = 54.0, 70.0, 6.5  # R14 (lev
 
 
 def low_glucose(last_mgdl: float) -> str | None:
-    """Rule R14 (27 Nov): below 54 mg/dL the person needs to treat a low, not a meal forecast."""
+    """Rule R14 (26 Nov): below 54 mg/dL the person needs to treat a low, not a meal forecast."""
     if last_mgdl < LOW_GLUCOSE_REFUSE:
         return (
-            f"glucose is very low now ({last_mgdl:.0f} mg/dL); treat the low first and follow your care "
+            f"glucose is very low now ({last_mgdl:.1f} mg/dL); treat the low first and follow your care "
             "plan, this tool is not for that (rule R14)"
         )
     return None
 
 
 def out_of_scope(profile: dict[str, float]) -> str | None:
-    """Rule R15 (27 Nov): HbA1c in the diabetes range is outside the population GLIMPSE makes claims for."""
+    """Rule R15 (26 Nov): HbA1c in the diabetes range is outside the population GLIMPSE makes claims for."""
     a1c = float(profile.get("a1c_pct", float("nan")))
     if math.isfinite(a1c) and a1c >= DIABETES_A1C:
         return (

@@ -1,6 +1,6 @@
 # GLIMPSE final submission — design document
 
-Written 1 November 2026, **before** any new result, as the gate for the final stage. Deadline 27 November 2026.
+Written 1 November 2026, **before** any new result, as the gate for the final stage. Deadline 26 November 2026.
 Nothing is built that does not fill a row in the evidence table below.
 
 ## 0. Standard of work

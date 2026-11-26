@@ -9,7 +9,7 @@
 - `instructor/`: 13 meal folders in the grader's format (`photo.*`, `cgm.csv`, `profile.json`), described in
   `instructor/MANIFEST.md`; `just predict-folder samples/instructor outputs/folder_run` answers them without the
   dataset (v2: 5 refuse with a named reason, 8 answer caution; v1: 8 refuse, 5 answer).
-- `stress/`: 23 hostile folders (timezones, malformed JSON, binary CSVs, broken photos, empty folders), described in
+- `stress/`: 25 hostile folders (timezones, malformed JSON, binary CSVs, broken photos, empty folders), described in
   `stress/MANIFEST.md`; `just stress` runs them; none may crash or produce a raw error row.
 - `local_photos/`: the real phone photos behind the unfamiliar-photo study (R7, `just ood`).
 - Real CGMacros meals (photos + sensor data) are downloaded by `just install` (PhysioNet, CC BY-NC-SA 4.0) and are
@@ -18,7 +18,7 @@
   (`fusion_logit` from an earlier `results.jsonl`, `spiked` the CGM's 0/1 label at +2 h). Meals labelled at
   least two hours before the current meal feed the personal intercept; without the file the answer uses the
   population calibration. Only `returning_user/02_with_priors_and_history` carries one: an illustrative history
-  written for v2 (the file holds no product tag, so a v1 history must not be reused with v2).
+  written for v2; its rows carry `product`, and rows from the other product are skipped and flagged.
 - `returning_user/`: one meal at three stages (new user, with onboarding priors, with priors and history),
   described in its MANIFEST; `outputs/returning_user_run/` holds the answers (caution 35.7%, caution 22.7%,
   low risk 14.8%, just under the 15% cut).

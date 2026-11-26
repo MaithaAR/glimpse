@@ -549,7 +549,7 @@ def test_stress_quality_cells():
     worst = max(r["caution_to_low_risk"] for p in (v1, v2) for k in lv for r in p[k].values())
     worst_v2_inputs = max(vs[c]["caution_to_low_risk"] for c in vs if c not in ("what", "clean"))
     assert vs["hr_removed"]["caution_to_low_risk"] == worst_v2_inputs > worst
-    assert f"{worst_v2_inputs} cautions turned low risk" in REPORT.read_text()
+    assert f"{worst_v2_inputs} cautions\nturned low risk" in REPORT.read_text()
     hr = t["heart rate removed / half its readings dropped"]
     assert hr[0] == (
         f"{vs['hr_removed']['auroc_perturbed']:.3f} / {vs['hr_half']['auroc_perturbed']:.3f}; "
@@ -591,9 +591,9 @@ def test_v2_explain_cells():
     assert f"{_pc(nv['missed_among_cleared'])} misses and a {_pc(nv['cost_reduction'])} saving" in text
     hr = r["heart_rate"]
     assert (
-        f"({hr['within_person_coefficient']:.2f},\n{hr['within_person_ci95'][0]:.2f} to "
+        f"({hr['within_person_coefficient']:.2f}, {hr['within_person_ci95'][0]:.2f} to "
         f"{hr['within_person_ci95'][1]:.2f}, person fixed effects)"
-    ).replace("-", "−") in text
+    ).replace("-", "−") in " ".join(text.split())
     assert f"moves the served logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in text
     tp = r["temporal"]["last_third"]
     assert f"last third of meals {tp['auroc']:.3f} ({tp['ci95'][0]:.3f}–{tp['ci95'][1]:.3f})" in text
@@ -610,7 +610,7 @@ def test_v2_explain_cells():
 
 
 def test_v2_probes_monitors_and_budget_cells():
-    """docs/v2_hardening.md Part B and the budget CSV against the report (27 Nov)."""
+    """docs/v2_hardening.md Part B and the budget CSV against the report (26 Nov)."""
     import csv
 
     text = REPORT.read_text()
@@ -622,12 +622,12 @@ def test_v2_probes_monitors_and_budget_cells():
     assert set(pc["top_three"]) == {"age", "prior spike rate", "prior rise"}
     assert f"age and the two priors move the most ({lo * 100:.0f}–{hi:.0%})" in text
     mo = vp["monitors"]
-    row = t["v2 inputs (registered 27 Nov): share of answers without heart rate; Brier of the last 20 answers"]
-    assert row[1] == (
-        f"no clean alarm, the watch-off block fires; Brier: {mo['clean_false_alarms_brier']} clean "
-        f"alarms in {mo['clean_blocks']}, label errors caught in "
-        f"{mo['label_error_block_fire_rate']:.0%} of blocks"
-    ).replace("no clean", "heart rate: no clean", 1)
+    row = t["v2 inputs (registered 26 Nov): share of answers without heart rate; Brier of the last 20 answers"]
+    assert row[1].startswith(
+        f"heart rate: no clean alarm, the watch-off block fires; Brier: {mo['clean_false_alarms_brier']} clean "
+        f"alarms in {mo['clean_blocks']}, label errors caught in {mo['label_error_block_fire_rate']:.0%} of blocks; "
+        "expectation not met"
+    )
     assert mo["clean_false_alarms_hr"] == 0 and mo["watch_off_block_fires"]
     ch = _load("outputs/v2_explain/v2_explain.json")["carb_heads"]
     assert f"{ch['disagree_share']:.0%} of {ch['photos']} out-of-fold photos" in text
@@ -635,3 +635,25 @@ def test_v2_probes_monitors_and_budget_cells():
     assert rows["v2 fusion, served (logistic regression: 15 profile/trend inputs)"] == 16
     assert rows["SensorCNN (1-D CNN)"] == 5217
     assert t["SensorCNN, trained from scratch, evaluated only (not in either product)"][:2] == ["5,217", "5,217"]
+
+
+def test_round13_cells():
+    """Within-person levels, the 481-meal baselines and the like-for-like photo gain (26 Nov, fourteenth pass)."""
+    text = REPORT.read_text()
+    t = _tables(text)
+    rm, v2 = _load("outputs/report_metrics/report_metrics.json"), _load("outputs/report_metrics/v2_metrics.json")
+    w1, w2 = rm["within_person"]["mean_within_person_auroc"], v2["within_person"]
+    assert t["mean within-person AUROC (a person's own meals)"] == [
+        f"{w1['risk']:.2f} (raw {w1['risk_raw']:.2f})",
+        "–",
+        f"{w2['shipped']:.2f} (raw {w2['raw']:.2f})",
+    ]
+    b = rm["baselines"]["all_481"]
+    keys = ("prevalence", "profile_lr", "trend_lr", "trend_gbm", "sensor_cnn_3seed_mean")
+    assert t["the same baselines on v2's 481 meals"][0] == " / ".join(f"{b[k]['auroc']:.3f}" for k in keys)
+    p = v2["paired_v2_minus_v1"]
+    assert abs(p["v2_minus_v1"] - (p["auroc_v2"] - p["auroc_v1"])) < 1e-12  # the observed point, not the bootstrap mean
+    f = rm["fair_baselines"]["no-photo fusion (the gate's no-meal arm)"]
+    assert (
+        f"the photo adds {f['shipped_minus_this']:.3f}\n({f['ci95'][0]:+.3f}, {f['ci95'][1]:+.3f})".replace("-", "−")
+    ) in text
