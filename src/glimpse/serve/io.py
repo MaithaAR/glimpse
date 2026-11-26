@@ -18,6 +18,12 @@ if TYPE_CHECKING:
     from glimpse.serve.pipeline import Pipeline
 
 
+# common device-export column names (27 Nov) -> the app's names; anything else must use the app's own
+EXPORT_COLUMNS = {"Timestamp (YYYY-MM-DDThh:mm:ss)": "timestamp", "Glucose Value (mg/dL)": "glucose_mgdl",
+                  "Device Timestamp": "timestamp", "Historic Glucose mg/dL": "glucose_mgdl",
+                  "Historic Glucose (mg/dL)": "glucose_mgdl", "Heart Rate (bpm)": "hr_bpm"}  # fmt: skip
+
+
 def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[datetime], list[float], list[str]]:
     """A sensor export as the app accepts it: columns `timestamp`, `glucose_mgdl` and optionally `hr_bpm`.
     Returns the readings plus the repairs made (rule R2: out-of-order rows are sorted and the fix is flagged)."""
@@ -25,6 +31,7 @@ def read_cgm_csv(path: str | Path) -> tuple[list[datetime], list[float], list[da
 
     d = pd.read_csv(path)
     d.columns = d.columns.str.strip()  # a header like "timestamp " is visually identical to the real one
+    d = d.rename(columns={k: v for k, v in EXPORT_COLUMNS.items() if k in d.columns and v not in d.columns})
     missing = {"timestamp", "glucose_mgdl"} - set(d.columns)
     if missing:
         raise ValueError(f"the CSV needs the columns timestamp and glucose_mgdl (missing: {sorted(missing)})")
@@ -88,10 +95,17 @@ def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path |
         if not gt:
             raise ValueError("the CGM export has no glucose readings")
         when = datetime.fromisoformat(str(meal_time)) if meal_time else max(gt)
+        if not meal_time:  # 27 Nov: the meal is taken to be now, at the last reading; say so
+            fl.append("meal_time_inferred")
         if when.tzinfo is not None:  # rule R8, same treatment as the readings
             when = when.replace(tzinfo=None)
             fl.append("timezone_dropped")
-        prof = {k: float("nan") if v is None else float(v) for k, v in profile.items()}
+        prof = {}
+        for k, v in profile.items():  # 27 Nov: name the field that is not a number ("5.2%")
+            try:
+                prof[k] = float("nan") if v is None else float(v)
+            except TypeError, ValueError:
+                raise ValueError(f"the profile value {k} = {v!r} is not a number") from None
         m = MealInput(meal_time=when, glucose_times=gt, glucose_mgdl=gv, hr_times=ht, hr_bpm=hv, profile=prof,
                       photo=Path(photo) if photo else None, input_flags=fl)  # fmt: skip
     except ValidationError as e:  # rule R4: one plain sentence per problem, never a validator stack dump

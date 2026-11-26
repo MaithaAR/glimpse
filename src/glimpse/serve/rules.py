@@ -16,8 +16,34 @@ from glimpse.serve.schemas import Answer
 
 
 def cant_judge(reason: str, **extra) -> Answer:
-    """The structured 'can't judge' result (escalation: the user decides, or asks their care team)."""
+    """The structured 'can't judge' result. Input refusals default to escalate_to='fix_input' (27 Nov: the
+    user fixes the file); the model-side refusals (borderline, R13-R15) pass 'human' explicitly."""
+    extra.setdefault("escalate_to", "fix_input")
     return Answer(decision="can't judge", sentence=sentence("can't judge", None, reason), reason=reason, **extra)
+
+
+LOW_GLUCOSE_REFUSE, LOW_GLUCOSE_WARN, DIABETES_A1C = 54.0, 70.0, 6.5  # R14 (level-2 / level-1), R15
+
+
+def low_glucose(last_mgdl: float) -> str | None:
+    """Rule R14 (27 Nov): below 54 mg/dL the person needs to treat a low, not a meal forecast."""
+    if last_mgdl < LOW_GLUCOSE_REFUSE:
+        return (
+            f"glucose is very low now ({last_mgdl:.0f} mg/dL); treat the low first and follow your care "
+            "plan, this tool is not for that (rule R14)"
+        )
+    return None
+
+
+def out_of_scope(profile: dict[str, float]) -> str | None:
+    """Rule R15 (27 Nov): HbA1c in the diabetes range is outside the population GLIMPSE makes claims for."""
+    a1c = float(profile.get("a1c_pct", float("nan")))
+    if math.isfinite(a1c) and a1c >= DIABETES_A1C:
+        return (
+            f"HbA1c {a1c:.1f}% is in the diabetes range, outside what GLIMPSE was built and tested for; "
+            "ask your care team (rule R15)"
+        )
+    return None
 
 
 def profile_vector(profile: dict[str, float], meal_time: datetime) -> np.ndarray:
@@ -90,8 +116,13 @@ def no_basis_to_clear(dec: str, history, profile: dict[str, float]) -> str | Non
     )
 
 
-def sentence(dec: str, risk: float | None, reason: str) -> str:
-    """Plain words for the user."""
+def sentence(dec: str, risk: float | None, reason: str, low_mgdl: float | None = None) -> str:
+    """Plain words for the user. low_mgdl (rule R14, 54-69 mg/dL): no walk advice, treat the low first."""
+    if low_mgdl is not None and dec in ("low risk", "caution"):
+        return (
+            f"Your glucose is low now ({low_mgdl:.0f} mg/dL): treat that first and do not walk it off. "
+            f"About {risk:.0%} chance this meal raises your glucose by 50+ mg/dL within 2 h."
+        )
     if dec == "low risk":
         return f"Unlikely to spike: about {risk:.0%} chance this meal raises your glucose by 50+ mg/dL within 2 h."
     if dec == "caution":

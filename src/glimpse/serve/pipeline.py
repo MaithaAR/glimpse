@@ -23,11 +23,15 @@ from glimpse.config import GlimpseConfig
 from glimpse.data.photos import PhotoError, eval_transform, open_photo
 from glimpse.data.preprocess import resample_window
 from glimpse.serve.rules import (
+    LOW_GLUCOSE_REFUSE,
+    LOW_GLUCOSE_WARN,
     cant_judge,
     decision,
     decision_reason,
     knn_distance,
+    low_glucose,
     no_basis_to_clear,
+    out_of_scope,
     photo_problem,
     profile_vector,
     sentence,
@@ -43,6 +47,22 @@ def _bin_onehot(grams: float) -> list[float]:
     """The carb range a gram amount falls in, as one-hot probabilities over the four ranges."""
     idx = 0 if grams < 30 else 1 if grams < 60 else 2 if grams < 90 else 3
     return [1.0 if i == idx else 0.0 for i in range(4)]
+
+
+def heads_disagree(grams: float, probs: np.ndarray) -> bool:
+    """The grams head lands outside the range the range head shows (27 Nov; e.g. 36.5 g shown as under 30 g)."""
+    return int(np.digitize(grams, [30, 60, 90])) != int(np.argmax(probs))
+
+
+def _interval_hint(m: MealInput) -> str:
+    """When the readings arrive less often than every 5 minutes, say so: the usual cause of a refused window."""
+    t = sorted(m.glucose_times)
+    if len(t) < 3:
+        return ""
+    step = float(np.median(np.diff(np.array(t, dtype="datetime64[s]")).astype(float))) / 60
+    return (
+        f" (readings arrive every {step:.0f} min; GLIMPSE needs a sensor that reads every 5 min)" if step > 7.5 else ""
+    )
 
 
 class Pipeline:
@@ -150,6 +170,11 @@ class Pipeline:
         gets this for free because labels only exist once the window closes)."""
         t0 = time.perf_counter()
         a = self._answer(m, key, history)
+        if a.decision != "can't judge" and m.glucose_mgdl:  # rule R14, 54-69 mg/dL: wording only
+            last = m.glucose_mgdl[max(range(len(m.glucose_times)), key=m.glucose_times.__getitem__)]
+            if LOW_GLUCOSE_REFUSE <= last < LOW_GLUCOSE_WARN:
+                a.sentence = sentence(a.decision, a.risk, a.reason, low_mgdl=last)
+                a.flags.append("glucose_low")
         a.latency_ms = (time.perf_counter() - t0) * 1000
         msg = "{} ({:.0f} ms): {}"
         (self.log.info if a.decision == "can't judge" else self.log.debug)(msg, a.decision, a.latency_ms, a.reason)
@@ -169,6 +194,8 @@ class Pipeline:
             carb = {"carbs_g": est.grams, "carb_bin": CARB_BINS[int(probs.argmax())],
                     "carb_bin_prob": float(probs.max()), "unfamiliar_photo_score": est.unfamiliar_score,
                     "carb_source": "photo"}  # fmt: skip
+            if heads_disagree(est.grams, probs):
+                flags.append("carb_heads_disagree")
         if m.user_carbs_g is not None:
             flags.append("carbs_from_user_shown_not_used")
         ns = SimpleNamespace(glucose=g.values[None], heart_rate=h.values[None],
@@ -229,13 +256,24 @@ class Pipeline:
         h = resample_window(m.hr_times, m.hr_bpm, m.meal_time, pc.cgm_lookback_min)
         problem = window_problem(g, self.cfg)
         if problem:
-            return cant_judge(problem, checks_failed=["cgm_window"], **base)
+            return cant_judge(problem + _interval_hint(m), checks_failed=["cgm_window"], **base)
         passed.append("cgm_window")
+        last = m.glucose_mgdl[max(range(len(m.glucose_times)), key=m.glucose_times.__getitem__)]
+        low = low_glucose(last)
+        if low:  # rule R14: a low now needs treating, not a forecast
+            return cant_judge(low, checks_passed=passed.copy(), checks_failed=["glucose_low"], escalate_to="human",
+                              **base)  # fmt: skip
+        passed.append("glucose_not_low")
         blank = [k for k in REQUIRED_PROFILE if not math.isfinite(m.profile.get(k, float("nan")))]
         if blank:  # rule R5: a missing profile is named, never silently filled with defaults
             return cant_judge("profile fields missing or blank: " + ", ".join(blank),
                               checks_passed=passed.copy(), checks_failed=["profile"], **base)  # fmt: skip
         passed.append("profile")
+        scope = out_of_scope(m.profile)
+        if scope:  # rule R15: no claim is made for the diabetes range
+            return cant_judge(scope, checks_passed=passed.copy(), checks_failed=["in_scope"], escalate_to="human",
+                              **base)  # fmt: skip
+        passed.append("in_scope")
         est = self.photo_estimate(m, key)
         if getattr(self, "sensor_first", False):  # v2: the photo never blocks the answer; it only feeds the carb assist
             return self._answer_sensor_first(m, est, g, h, history, passed, flags, base)
@@ -252,6 +290,8 @@ class Pipeline:
             carb_source = "photo"
             passed += ["photo_present", "photo_readable", "photo_not_blank", "photo_familiar"]
         probs = np.array(est.bin_probs)
+        if carb_source == "photo" and heads_disagree(est.grams, probs):
+            flags.append("carb_heads_disagree")
         carb = {"carbs_g": est.grams, "carb_bin": CARB_BINS[int(probs.argmax())], "carb_bin_prob": float(probs.max()),
                 "unfamiliar_photo_score": est.unfamiliar_score, "carb_source": carb_source}  # fmt: skip
         ns = SimpleNamespace(glucose=g.values[None], heart_rate=h.values[None],

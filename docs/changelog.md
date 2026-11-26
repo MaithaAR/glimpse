@@ -236,5 +236,14 @@ All three strict graders and the holistic one found the report explaining and ch
 | Figures renumbered in reading order (the 22 Nov levels figure is A1 in the appendix); Figure 4 marks the evaluated point and uses one feature name | figure order and labels (3 of 3) | outputs/figures/ |
 | The sentence on the author's sign-off now points to the entry below, which she writes | the report claimed a sign-off that was not yet there (3 of 3) | – |
 
+## 27 Nov 2026, thirteenth pass (registered 131bd8e before any change)
+
+| Change | Why | Evidence |
+|---|---|---|
+| R14 low glucose and R15 out of scope; refusals name who acts next (`fix_input` or `human`); carb heads' disagreement flagged and shown as unsure; history rows tagged by product; device-export columns, sampling interval, profile field names and inferred meal time handled | an unseen hypoglycaemic meal got walk advice; T2D profiles were served; Figure 1 contradicted the code; 36.5 g shown as under 30 g; a v1 history could set v2's intercept (3 of 3) | docs/rule_ledger.md; tests/test_hardening_r14.py; samples/stress/24, 25 |
+| v2 probes B and C, v2 input monitors, false-clear decomposition, history-length table, carb-head disagreement rate; v2 in Figures 2 and 5 | v2 had no controlled probes or monitors of its own inputs (3 of 3) | outputs/probes/v2_probes.json; outputs/v2_explain/ |
+| v1 studies (probes, promised, robustness) pin `sensor_first=False`; under the v2 default config they crashed | found while making `just evaluate` cover every table | src/glimpse/studies/ |
+| `just evaluate` adds the budget, v2 probes, OOD, monitoring and probes A and B; the budget CSV has a v2 row and no never-built model; recipe times corrected | `evaluate` did not rebuild every table (3 of 3) | Justfile; outputs/param_budget.csv |
+
 Author sign-off on the tenth and eleventh passes (v2, R13 and every registration since the tag): to be
 added here by the author, dated, in her words.

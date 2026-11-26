@@ -1,0 +1,74 @@
+{
+  "what": "v2 probes and input monitors (`glimpse v2-probes`; registered in docs/v2_hardening.md, Part B).",
+  "probe_b": {
+    "meals": 481,
+    "share_rising_raises_risk": 0.08523908523908524,
+    "median_move": -0.0492960430679254,
+    "expectation_under_half": true
+  },
+  "probe_c": {
+    "meals": 481,
+    "cutoffs": [
+      0.15,
+      0.22
+    ],
+    "inputs": {
+      "age": {
+        "coefficient_per_sd": 0.17265880692822333,
+        "median_risk_change": 0.09721498074391272,
+        "share_decision_differs": 0.3887733887733888
+      },
+      "BMI": {
+        "coefficient_per_sd": 0.03804534906020616,
+        "median_risk_change": 0.021126729001410216,
+        "share_decision_differs": 0.09563409563409564
+      },
+      "HbA1c": {
+        "coefficient_per_sd": 0.2505642203627332,
+        "median_risk_change": 0.06380069794287274,
+        "share_decision_differs": 0.23700623700623702
+      },
+      "fasting glucose": {
+        "coefficient_per_sd": 0.21505209945074605,
+        "median_risk_change": 0.06961175322349189,
+        "share_decision_differs": 0.23700623700623702
+      },
+      "hour (sin)": {
+        "coefficient_per_sd": 0.12598196857382724,
+        "median_risk_change": 0.06996242707286093,
+        "share_decision_differs": 0.23284823284823286
+      },
+      "hour (cos)": {
+        "coefficient_per_sd": -0.055847164332139196,
+        "median_risk_change": -0.030653909477998176,
+        "share_decision_differs": 0.11226611226611227
+      },
+      "prior spike rate": {
+        "coefficient_per_sd": 0.17164159598712564,
+        "median_risk_change": 0.1032649430666634,
+        "share_decision_differs": 0.35135135135135137
+      },
+      "prior rise": {
+        "coefficient_per_sd": 0.2639145876535026,
+        "median_risk_change": 0.12541849399897548,
+        "share_decision_differs": 0.35343035343035345
+      }
+    },
+    "top_three": [
+      "age",
+      "prior rise",
+      "prior spike rate"
+    ]
+  },
+  "monitors": {
+    "block": 20,
+    "clean_blocks": 24,
+    "hr_missing_line": 0.0,
+    "brier_line": 0.28410793951174335,
+    "clean_false_alarms_hr": 0,
+    "clean_false_alarms_brier": 2,
+    "watch_off_block_fires": true,
+    "label_error_block_fire_rate": 0.255,
+    "clean_hr_missing_share": 0.0
+  }
+}

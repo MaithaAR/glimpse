@@ -61,7 +61,15 @@ def test_same_decision_code_for_table_and_live_estimates():
     m = MealInput(meal_time=MEAL, profile=PROFILE, **flat_cgm())
     a = p.answer(m, key=7)
     assert a.decision == "caution" and a.carb_source == "photo" and a.carb_bin == "60-89 g"
-    assert a.checks_passed[:5] == ["cgm_units", "cgm_times", "cgm_window", "profile", "photo_present"]
+    assert a.checks_passed[:7] == [
+        "cgm_units",
+        "cgm_times",
+        "cgm_window",
+        "glucose_not_low",
+        "profile",
+        "in_scope",
+        "photo_present",
+    ]  # R14 and R15 (27 Nov)
     assert a.checks_failed == []
 
 

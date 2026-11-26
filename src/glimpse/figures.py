@@ -49,7 +49,7 @@ def f1_system(plt) -> None:
     box(13.7, 1.7, 2.4, 1.2,
         "v2 cut-offs 0.15 / 0.22\nlow risk | caution + reason\nR13: no clear without\nhistory or both priors",
         fc="#e6f0fa")  # fmt: skip
-    box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 a person reviews\n(dietitian)", fc="#fdf0e6")
+    box(8.2, -0.1, 2.35, 1.1, "can't judge + reason\n\u2192 fix the input, or\na person reviews", fc="#fdf0e6")
     box(13.7, 3.4, 2.4, 0.9, "CGM label at +2 h\n(replay; or history.csv)", fc="#eef7ee")
     ax.text(12.4, 0.75, "borderline risk", fontsize=6.8, color=ORANGE)
     ax.text(3.9, 0.45, "failed CGM or\nprofile rule", fontsize=6.8, color=ORANGE)
@@ -86,25 +86,32 @@ def f2_per_fold(plt, ev: dict) -> None:
     xs = np.arange(len(folds))
     for i, f in enumerate(folds):
         ax.plot([i, i], [f["auroc_raw"], f["auroc_personal"]], color=GREY, lw=1, zorder=1)
-    ax.scatter(xs, [f["auroc_raw"] for f in folds], color=GREY, label="raw fusion", zorder=2)
-    ax.scatter(xs, [f["auroc_personal"] for f in folds], color=BLUE, label="personalised (shipped)", zorder=2)
-    for name, key, x, c in (("pooled", "risk_personal", 5.0, BLUE),
-                            ("pooled\nexcl. fold 1", "risk_personal_excluding_fold1", 5.8, ORANGE)):  # fmt: skip
+    ax.scatter(xs, [f["auroc_raw"] for f in folds], color=GREY, label="v1 raw", zorder=2)
+    ax.scatter(xs, [f["auroc_personal"] for f in folds], color=BLUE, label="v1 personalised", zorder=2)
+    v2f = json.loads(Path("outputs/report_metrics/v2_metrics.json").read_text())["per_fold"]  # 27 Nov: v2 beside v1
+    for i, f in enumerate(v2f):
+        ax.plot([i + 0.22, i + 0.22], [f["auroc_raw"], f["auroc_personal"]], color=GREEN, lw=1, alpha=0.6, zorder=1)
+    ax.scatter(xs + 0.22, [f["auroc_raw"] for f in v2f], color=GREEN, marker="x", s=18, label="v2 raw", zorder=2)
+    ax.scatter(xs + 0.22, [f["auroc_personal"] for f in v2f], color=GREEN, marker="^", s=22,
+               label="v2 personalised (served)", zorder=2)  # fmt: skip
+    for name, key, x, c in (("v1 pooled", "risk_personal", 5.0, BLUE),
+                            ("v1 pooled\nexcl. fold 1", "risk_personal_excluding_fold1", 5.8, ORANGE)):  # fmt: skip
         a = ev[key]["auroc"]
         ax.errorbar([x], [a["point"]], yerr=[[a["point"] - a["ci95"][0]], [a["ci95"][1] - a["point"]]],
                     fmt="o", color=c, capsize=3)  # fmt: skip
         ax.text(x, a["ci95"][1] + 0.012, name, ha="center", fontsize=7.2, color=c)
     ax.axhline(ev["risk_raw"]["auroc"]["point"], color=GREY, lw=0.8, ls=":")
-    ax.text(5.4, ev["risk_raw"]["auroc"]["point"] + 0.004, "pooled raw 0.726", fontsize=7.5, color=GREY)
-    ax.set_xticks(xs, [f"fold {f['fold']}\nn={f['n']}" for f in folds], fontsize=7.5)
-    ax.set_xlabel("n = answered meals per fold", fontsize=7.5)
+    ax.text(5.4, ev["risk_raw"]["auroc"]["point"] + 0.004, "v1 pooled raw 0.726", fontsize=7.5, color=GREY)
+    ax.set_xticks(xs, [f"fold {f['fold']}\nn={f['n']}/{g['n']}" for f, g in zip(folds, v2f, strict=True)],
+                  fontsize=7.5)  # fmt: skip
+    ax.set_xlabel("n = answered meals per fold, v1/v2", fontsize=7.5)
     ax.set_ylabel("AUROC (held-out people)")
     ax.set_ylim(0.58, 0.9)
-    ax.legend(frameon=False, fontsize=8, loc="upper left")
+    ax.legend(frameon=False, fontsize=6.8, loc="upper left", ncol=2)
     pg = json.loads(Path("outputs/report_metrics/report_metrics.json").read_text())["paired_personal_minus_raw"]
     g = pg["dev"]["auroc"]
     ax.set_title(
-        f"Raw vs personal intercept per fold: higher in {pg['dev']['folds_improved']} of 5; pooled gain "
+        f"Raw vs personal intercept per fold: v1 higher in {pg['dev']['folds_improved']} of 5; v1 pooled gain "
         f"{g['point']:+.3f} ({g['ci95'][0]:+.3f}, {g['ci95'][1]:+.3f})".replace("-", "\u2212"),
         fontsize=9,
     )
@@ -247,14 +254,17 @@ def f7_coverage(plt) -> None:
     decide the rest; development at each fold's cut, locked at the deployed 0.15. From report_metrics.json."""
     cr = json.loads(Path("outputs/report_metrics/report_metrics.json").read_text())["coverage_risk"]
     fig, axes = plt.subplots(1, 3, figsize=(12.0, 3.2))
-    for name, c in (("development", BLUE), ("locked eight", ORANGE)):
-        rows = cr["dev" if name == "development" else "locked"]
+    v2cr = json.loads(Path("outputs/v2_explain/v2_explain.json").read_text()).get("coverage_risk")
+    for name, c in (("v1 development", BLUE), ("v1 locked eight", ORANGE), ("v2 development", GREEN)):
+        if name == "v2 development" and not v2cr:
+            continue
+        rows = v2cr if name == "v2 development" else cr["dev" if name == "v1 development" else "locked"]
         axes[2].plot([r["abstain_share"] for r in rows], [r["cost"] for r in rows], "o-", color=c, ms=3.5, label=name)
         xs = [r["abstain_share"] for r in rows]
         axes[0].plot(xs, [r["cleared_share"] for r in rows], "o-", color=c, ms=3.5, label=name)
         pts = [(r["abstain_share"], r["missed_among_cleared"]) for r in rows if r["missed_among_cleared"] is not None]
         axes[1].plot([q[0] for q in pts], [q[1] for q in pts], "o-", color=c, ms=3.5, label=name)
-        n_ans = 460 if name == "development" else 150
+        n_ans = {"v1 development": 460, "v1 locked eight": 150, "v2 development": 481}[name]
         for r in rows:
             if r["missed_among_cleared"] is not None:
                 n = round(r["cleared_share"] * n_ans)

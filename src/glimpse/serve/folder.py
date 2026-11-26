@@ -60,9 +60,11 @@ def _one_case(app: Pipeline, case: Path) -> dict:
         profile = {PROFILE_KEYS[k]: v for k, v in raw.items() if k in PROFILE_KEYS}
         photo = next((f for f in sorted(case.iterdir()) if f.name.lower() in PHOTO_NAMES), None)
         cgm = case / "cgm.csv"
-        history = read_history(case / "history.csv")
+        product = (getattr(app, "model_versions", None) or {}).get("product")
+        history, hflags = read_history_flagged(case / "history.csv", product)
         a = answer_from_files(app, cgm if cgm.exists() else None, photo, meal_time, profile, history)
-        return {"meal_id": case.name, **a.model_dump(mode="json")}
+        a.flags.extend(hflags)
+        return {"meal_id": case.name, "product": product, **a.model_dump(mode="json")}
     except Exception as e:  # a malformed meal is reported in its own row; the run must finish
         logger.bind(stage="predict-folder").warning("{}: error ({})", case.name, e)
         return {"meal_id": case.name, "error": f"{type(e).__name__}: {e}"}
@@ -72,22 +74,38 @@ def read_history(path: Path) -> list[tuple[datetime, float, int]] | None:
     """Optional history.csv (26 Nov): the person's earlier answers as meal_time, fusion_logit (from an
     earlier results.jsonl) and spiked (0/1, the CGM's label at +2 h). Rows that do not parse are skipped;
     a missing file means no history, the population calibration the samples are scored at."""
+    return read_history_flagged(path, None)[0]
+
+
+def read_history_flagged(path: Path, product: str | None) -> tuple[list[tuple[datetime, float, int]] | None, list]:
+    """read_history plus what it skipped (27 Nov): an optional `product` column (as results.jsonl writes it)
+    must match the served product, since a logit from the other product would set the intercept wrong;
+    rows from another product and rows that do not parse are skipped and counted in the flags."""
     if not path.exists():
-        return None
-    rows = []
+        return None, []
+    rows, bad, other, tagged = [], 0, 0, False
     try:
         with open(path, newline="", encoding="utf-8-sig") as f:
             for r in csv.DictReader(f):
+                tag = (r.get("product") or "").strip()
+                tagged = tagged or bool(tag)
+                if product and tag and tag != product:
+                    other += 1
+                    continue
                 try:
                     t = datetime.fromisoformat(str(r["meal_time"]).strip()).replace(tzinfo=None)
                     z, y = float(r["fusion_logit"]), int(float(r["spiked"]))
                 except KeyError, TypeError, ValueError:
+                    bad += 1
                     continue
                 if math.isfinite(z) and y in (0, 1):
                     rows.append((t, z, y))
+                else:
+                    bad += 1
     except OSError, UnicodeDecodeError, csv.Error:
-        return None
-    return rows
+        return None, ["history_unreadable"]
+    flags = ([] if tagged else ["history_untagged"]) + ([f"history_other_product_skipped_{other}"] if other else [])
+    return rows, flags + ([f"history_rows_skipped_{bad}"] if bad else [])
 
 
 def _summary(rows: list[dict]) -> str:
@@ -106,6 +124,11 @@ def _summary(rows: list[dict]) -> str:
 def _carbs(r: dict) -> str:
     """The carb assist as the user would see it, or why it was withheld (v2 answers the risk regardless)."""
     if r.get("carb_bin"):
+        if "carb_heads_disagree" in r.get("flags", []):  # 27 Nov: never show 36 g as "under 30 g"
+            from glimpse.serve.schemas import CARB_BINS
+
+            other = CARB_BINS[sum(r["carbs_g"] >= e for e in (30, 60, 90))]
+            return f"about {r['carbs_g']:.0f} g; range unsure ({r['carb_bin']} or {other}), please confirm"
         return f"{r['carb_bin']} ({r.get('carb_bin_prob', 0):.0%} sure)"
     plain = {"present": "no photo", "readable": "photo unreadable", "not_blank": "photo blank",
              "familiar": "photo unlike a meal"}  # fmt: skip

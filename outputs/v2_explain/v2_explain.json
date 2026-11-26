@@ -794,5 +794,295 @@
     "range_accuracy_photo": 0.5960832313341493,
     "range_accuracy_median": 0.1799265605875153
   },
+  "false_clear_decomposition": [
+    {
+      "row": 699,
+      "class": "T5 confident",
+      "group": "healthy",
+      "n_history": 11,
+      "frozen_fusion": -1.2385736294837009,
+      "refit_and_platt": -0.16002401896085017,
+      "intercept": -1.0916444495101825,
+      "risk": 0.07654508267753433
+    },
+    {
+      "row": 705,
+      "class": "T5 confident",
+      "group": "healthy",
+      "n_history": 16,
+      "frozen_fusion": -0.7711045726063988,
+      "refit_and_platt": -0.1494675989836406,
+      "intercept": -0.8865516488781578,
+      "risk": 0.1409860974607379
+    },
+    {
+      "row": 988,
+      "class": "T5 confident",
+      "group": "healthy",
+      "n_history": 17,
+      "frozen_fusion": -0.8044505857061015,
+      "refit_and_platt": -0.00866948462130368,
+      "intercept": -1.0329155854879106,
+      "risk": 0.13633902868180567
+    },
+    {
+      "row": 335,
+      "class": "T5 confident",
+      "group": "prediabetes",
+      "n_history": 20,
+      "frozen_fusion": -1.300702248132835,
+      "refit_and_platt": -0.23432505426824068,
+      "intercept": -1.0075775269408633,
+      "risk": 0.07292487312527751
+    },
+    {
+      "row": 339,
+      "class": "T5 confident",
+      "group": "prediabetes",
+      "n_history": 24,
+      "frozen_fusion": -1.1992238031778706,
+      "refit_and_platt": -0.19438670630201926,
+      "intercept": -0.8710780629572452,
+      "risk": 0.09408996760177793
+    },
+    {
+      "row": 1059,
+      "class": "T4 near-cut",
+      "group": "healthy",
+      "n_history": 0,
+      "frozen_fusion": -1.7565381367497752,
+      "refit_and_platt": -0.11462548382367466,
+      "intercept": 0.0,
+      "risk": 0.13340713934281861
+    },
+    {
+      "row": 404,
+      "class": "T4 near-cut",
+      "group": "prediabetes",
+      "n_history": 7,
+      "frozen_fusion": -0.3606103125229629,
+      "refit_and_platt": -0.4846684136219837,
+      "intercept": -0.908391154467111,
+      "risk": 0.14758491644674115
+    },
+    {
+      "row": 408,
+      "class": "T4 near-cut",
+      "group": "prediabetes",
+      "n_history": 11,
+      "frozen_fusion": -0.9214993767696058,
+      "refit_and_platt": -0.4666954770049465,
+      "intercept": -0.287604953224885,
+      "risk": 0.15765244504313458
+    },
+    {
+      "row": 1010,
+      "class": "T5 confident",
+      "group": "healthy",
+      "n_history": 10,
+      "frozen_fusion": -1.4663516853147083,
+      "refit_and_platt": -0.22324044697610956,
+      "intercept": -0.6995664363566465,
+      "risk": 0.08400315454107557
+    },
+    {
+      "row": 469,
+      "class": "T4 near-cut",
+      "group": "prediabetes",
+      "n_history": 6,
+      "frozen_fusion": -1.1204093562681359,
+      "refit_and_platt": -0.4968065452279604,
+      "intercept": 0.016750132594135714,
+      "risk": 0.16791652730474002
+    },
+    {
+      "row": 474,
+      "class": "T4 near-cut",
+      "group": "prediabetes",
+      "n_history": 9,
+      "frozen_fusion": -1.329030041791362,
+      "refit_and_platt": -0.6849821966319627,
+      "intercept": 0.2893336582709829,
+      "risk": 0.15126951402921968
+    },
+    {
+      "row": 846,
+      "class": "T5 confident",
+      "group": "healthy",
+      "n_history": 0,
+      "frozen_fusion": -1.6882752443652913,
+      "refit_and_platt": -0.26338480200867886,
+      "intercept": 0.0,
+      "risk": 0.12437245981906454
+    },
+    {
+      "row": 847,
+      "class": "T5 confident",
+      "group": "healthy",
+      "n_history": 1,
+      "frozen_fusion": -2.625283167505402,
+      "refit_and_platt": -0.7760924133856011,
+      "intercept": 0.41172746235382407,
+      "risk": 0.04789573370168559
+    },
+    {
+      "row": 864,
+      "class": "T5 confident",
+      "group": "healthy",
+      "n_history": 17,
+      "frozen_fusion": -2.1472572661863936,
+      "refit_and_platt": -0.3823673975293618,
+      "intercept": 0.3959470744573257,
+      "risk": 0.1058663710018587
+    },
+    {
+      "row": 866,
+      "class": "T4 near-cut",
+      "group": "healthy",
+      "n_history": 19,
+      "frozen_fusion": -1.8221604882496143,
+      "refit_and_platt": -0.32459934671651647,
+      "intercept": 0.5419504837587716,
+      "risk": 0.16731051460634594
+    }
+  ],
+  "history_length": {
+    "healthy 0-4": {
+      "meals": 55,
+      "cleared": 15,
+      "cleared_share": 0.2727272727272727,
+      "missed": 3
+    },
+    "healthy 5-9": {
+      "meals": 55,
+      "cleared": 19,
+      "cleared_share": 0.34545454545454546,
+      "missed": 0
+    },
+    "healthy 10-19": {
+      "meals": 93,
+      "cleared": 43,
+      "cleared_share": 0.46236559139784944,
+      "missed": 6
+    },
+    "healthy 20+": {
+      "meals": 21,
+      "cleared": 11,
+      "cleared_share": 0.5238095238095238,
+      "missed": 0
+    },
+    "prediabetes 0-4": {
+      "meals": 60,
+      "cleared": 5,
+      "cleared_share": 0.08333333333333333,
+      "missed": 0
+    },
+    "prediabetes 5-9": {
+      "meals": 60,
+      "cleared": 8,
+      "cleared_share": 0.13333333333333333,
+      "missed": 3
+    },
+    "prediabetes 10-19": {
+      "meals": 106,
+      "cleared": 14,
+      "cleared_share": 0.1320754716981132,
+      "missed": 1
+    },
+    "prediabetes 20+": {
+      "meals": 31,
+      "cleared": 3,
+      "cleared_share": 0.0967741935483871,
+      "missed": 2
+    },
+    "all 0-4": {
+      "meals": 115,
+      "cleared": 20,
+      "cleared_share": 0.17391304347826086,
+      "missed": 3
+    },
+    "all 5-9": {
+      "meals": 115,
+      "cleared": 27,
+      "cleared_share": 0.23478260869565218,
+      "missed": 3
+    },
+    "all 10-19": {
+      "meals": 199,
+      "cleared": 57,
+      "cleared_share": 0.2864321608040201,
+      "missed": 7
+    },
+    "all 20+": {
+      "meals": 52,
+      "cleared": 14,
+      "cleared_share": 0.2692307692307692,
+      "missed": 2
+    }
+  },
+  "carb_heads": {
+    "photos": 817,
+    "disagree_share": 0.4700122399020808,
+    "range_right_when_agree": 0.6304849884526559,
+    "range_right_when_disagree": 0.5572916666666666
+  },
+  "coverage_risk": [
+    {
+      "abstain_share": 0.0,
+      "cleared_share": 0.24532224532224534,
+      "missed_among_cleared": 0.1271186440677966,
+      "error_rate_answered": 0.4885654885654886,
+      "cost": 0.6133056133056133
+    },
+    {
+      "abstain_share": 0.05,
+      "cleared_share": 0.23076923076923078,
+      "missed_among_cleared": 0.13513513513513514,
+      "error_rate_answered": 0.4814004376367615,
+      "cost": 0.6133056133056133
+    },
+    {
+      "abstain_share": 0.1,
+      "cleared_share": 0.20582120582120583,
+      "missed_among_cleared": 0.12121212121212122,
+      "error_rate_answered": 0.47575057736720555,
+      "cost": 0.5966735966735967
+    },
+    {
+      "abstain_share": 0.15,
+      "cleared_share": 0.1787941787941788,
+      "missed_among_cleared": 0.10465116279069768,
+      "error_rate_answered": 0.4718826405867971,
+      "cost": 0.5821205821205822
+    },
+    {
+      "abstain_share": 0.2,
+      "cleared_share": 0.15176715176715178,
+      "missed_among_cleared": 0.1095890410958904,
+      "error_rate_answered": 0.4779220779220779,
+      "cost": 0.5925155925155925
+    },
+    {
+      "abstain_share": 0.3,
+      "cleared_share": 0.1101871101871102,
+      "missed_among_cleared": 0.11320754716981132,
+      "error_rate_answered": 0.47181008902077154,
+      "cost": 0.5956340956340956
+    },
+    {
+      "abstain_share": 0.4,
+      "cleared_share": 0.06652806652806653,
+      "missed_among_cleared": 0.125,
+      "error_rate_answered": 0.4844290657439446,
+      "cost": 0.6268191268191268
+    },
+    {
+      "abstain_share": 0.5,
+      "cleared_share": 0.02079002079002079,
+      "missed_among_cleared": 0.1,
+      "error_rate_answered": 0.4854771784232365,
+      "cost": 0.632016632016632
+    }
+  ],
   "cost_shipped": 0.6029106029106029
 }

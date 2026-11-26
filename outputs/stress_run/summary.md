@@ -1,6 +1,6 @@
-# Folder run: 23 meals
+# Folder run: 25 meals
 
-- can't judge: 14
+- can't judge: 16
 - caution: 9
 
 | meal | decision | reason | carbs from the photo |
@@ -19,7 +19,7 @@
 | 12_wrong_columns | can't judge | unsupported input (the CSV needs the columns timestamp and glucose_mgdl (missing: ['glucose_mgdl', 'timestamp'])) | – |
 | 13_profile_strings | caution | risk 46.2% is at or above the caution cut-off 22% | withheld: photo unreadable |
 | 14_profile_not_json | can't judge | profile.json is not valid JSON (Expecting value at line 1) | – |
-| 15_profile_nested | can't judge | unsupported input (a profile value is not a number) | – |
+| 15_profile_nested | can't judge | unsupported input (the profile value age = {'value': 42} is not a number) | – |
 | 16_no_cgm_at_all | can't judge | unsupported input (no CGM export was given) | – |
 | 17_empty_folder | can't judge | unsupported input (no CGM export was given) | – |
 | 18_future_meal_time | can't judge | 24 glucose readings are timestamped after the meal time (latest 2024-06-01 11:55); check the export and the meal time | – |
@@ -28,3 +28,5 @@
 | 21_cmyk_photo | caution | risk 46.2% is at or above the caution cut-off 22% | withheld: photo unlike a meal |
 | 22_alpha_png | caution | risk 46.2% is at or above the caution cut-off 22% | withheld: photo unlike a meal |
 | 23_gif_renamed_jpg | caution | risk 46.2% is at or above the caution cut-off 22% | withheld: photo unlike a meal |
+| 24_low_glucose_falling | can't judge | glucose is very low now (48 mg/dL); treat the low first and follow your care plan, this tool is not for that (rule R14) | – |
+| 25_diabetes_range_a1c | can't judge | HbA1c 7.4% is in the diabetes range, outside what GLIMPSE was built and tested for; ask your care team (rule R15) | – |

@@ -126,15 +126,25 @@ end-to-end-timing:
 v2-input-stress:
     uv run glimpse v2-input-stress
 
+# v2 probes B and C and input monitors (docs/v2_hardening.md, Part B; probe B needs the data, ~2 min)
+v2-probes:
+    uv run glimpse v2-probes
+
 # v2 calibration, failure taxonomy and exact SHAP (docs/v2_explain.md; data-free once the features are committed)
 v2-explain:
     uv run glimpse v2-explain
 
-# dev evaluation on partition v2 (every risk from Pipeline.answer, one Pipeline per fold), then `report-numbers`
+# every report table: budget, both dev evaluations, v2 metrics and probes, OOD, monitoring, probes A and B, then
+# `report-numbers` (needs data and weights; about 15 min on a laptop CPU). evaluate-all adds the slow studies.
 evaluate:
+    uv run glimpse params
     uv run glimpse evaluate
     uv run glimpse evaluate --sensor-first
     uv run glimpse v2-metrics
+    uv run glimpse v2-probes
+    uv run glimpse ood
+    uv run glimpse monitoring
+    uv run glimpse probes
     just report-numbers
 
 # `evaluate` plus the cheaper compute studies behind the report's other tables (~40 min with data and weights)
@@ -206,13 +216,14 @@ verify-outputs:
     just report-numbers
     uv run glimpse verify-outputs
 
-# re-derive every report table and figure from committed outputs (no dataset or weights needed, ~1 min)
+# re-derive every report table and figure from committed outputs (no dataset or weights needed, about 5 min on a 2-CPU machine)
 report-numbers:
     uv run glimpse report-metrics
     uv run glimpse monitoring-replay
     uv run glimpse monitoring-power
     uv run glimpse probe-c
     uv run glimpse v2-explain
+    uv run glimpse v2-probes --data-free
     uv run glimpse figures
     just wordcount
 

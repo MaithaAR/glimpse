@@ -607,3 +607,31 @@ def test_v2_explain_cells():
         f"{cv['mae_photo_g']:.1f} g against {cv['mae_median_g']:.1f} g for typing the training median; "
         f"{cv['range_accuracy_photo']:.0%} against {cv['range_accuracy_median']:.0%}"
     )
+
+
+def test_v2_probes_monitors_and_budget_cells():
+    """docs/v2_hardening.md Part B and the budget CSV against the report (27 Nov)."""
+    import csv
+
+    text = REPORT.read_text()
+    t = _tables(text)
+    vp = _load("outputs/probes/v2_probes.json")
+    assert f"on only 8%, and on {vp['probe_b']['share_rising_raises_risk']:.0%} in v2" in text
+    pc = vp["probe_c"]
+    lo, hi = sorted(pc["inputs"][n]["share_decision_differs"] for n in ("age", "prior spike rate", "prior rise"))[::2]
+    assert set(pc["top_three"]) == {"age", "prior spike rate", "prior rise"}
+    assert f"age and the two priors move the most ({lo * 100:.0f}–{hi:.0%})" in text
+    mo = vp["monitors"]
+    row = t["v2 inputs (registered 27 Nov): share of answers without heart rate; Brier of the last 20 answers"]
+    assert row[1] == (
+        f"no clean alarm, the watch-off block fires; Brier: {mo['clean_false_alarms_brier']} clean "
+        f"alarms in {mo['clean_blocks']}, label errors caught in "
+        f"{mo['label_error_block_fire_rate']:.0%} of blocks"
+    ).replace("no clean", "heart rate: no clean", 1)
+    assert mo["clean_false_alarms_hr"] == 0 and mo["watch_off_block_fires"]
+    ch = _load("outputs/v2_explain/v2_explain.json")["carb_heads"]
+    assert f"{ch['disagree_share']:.0%} of {ch['photos']} out-of-fold photos" in text
+    rows = {r["model"]: int(r["parameters"]) for r in csv.DictReader(open("outputs/param_budget.csv"))}
+    assert rows["v2 fusion, served (logistic regression: 15 profile/trend inputs)"] == 16
+    assert rows["SensorCNN (1-D CNN)"] == 5217
+    assert t["SensorCNN, trained from scratch, evaluated only (not in either product)"][:2] == ["5,217", "5,217"]

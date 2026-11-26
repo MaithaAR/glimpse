@@ -226,6 +226,58 @@ def carb_value() -> dict:
             "range_accuracy_median": float((rng(o.median_g) == truth).mean())}  # fmt: skip
 
 
+def decomposition(cfg, v2: pd.DataFrame, z: pd.DataFrame, tax: dict) -> list[dict]:
+    """B3 (docs/v2_hardening.md): each v2 false clear's served logit split into the frozen fusion (in-sample),
+    the fold refit and Platt (fold Platt logit minus frozen logit), and the per-person intercept."""
+    lr = joblib.load(cfg.prototype.sensor_first_bundle)["models"]["sensor"][-1]
+    zz = z.set_index("row")[NAMES]
+    out = []
+    for m in tax["meals"]:
+        r = v2.set_index("row").loc[m["row"]]
+        frozen = float(zz.loc[m["row"]].to_numpy() @ lr.coef_[0] + lr.intercept_[0])
+        out.append({"row": int(m["row"]), "class": m["class"], "group": m["group"], "n_history": int(r.n_history),
+                    "frozen_fusion": frozen, "refit_and_platt": float(_logit(r.risk_platt)) - frozen,
+                    "intercept": float(_logit(r.risk) - _logit(r.risk_platt)), "risk": float(r.risk)})  # fmt: skip
+    return out
+
+
+def history_length(v2: pd.DataFrame, group: pd.Series) -> dict:
+    """B6: clears and spikes among them by labelled meals so far and glycaemic group."""
+    d = v2.assign(group=v2.person_id.map(group),
+                  band=pd.cut(v2.n_history, [-1, 4, 9, 19, 10_000], labels=["0-4", "5-9", "10-19", "20+"]))  # fmt: skip
+    out = {}
+    for (g, b), q in d.groupby(["group", "band"], observed=True):
+        cl = q.decision == "low risk"
+        out[f"{g} {b}"] = {"meals": int(len(q)), "cleared": int(cl.sum()), "cleared_share": float(cl.mean()),
+                           "missed": int(q.spike[cl].sum())}  # fmt: skip
+    for b, q in d.groupby("band", observed=True):
+        cl = q.decision == "low risk"
+        out[f"all {b}"] = {"meals": int(len(q)), "cleared": int(cl.sum()), "cleared_share": float(cl.mean()),
+                           "missed": int(q.spike[cl].sum())}  # fmt: skip
+    return out
+
+
+def _coverage(v2: pd.DataFrame, costs: dict) -> list[dict]:
+    """B5: Figure 5's abstain-near-the-cut curve for v2 at each fold's low-risk cut (as v1's development line)."""
+    from glimpse.evaluation.report_metrics import coverage_risk
+
+    cut = {f["fold"]: f["low_risk_below"] for f in json.loads((V2 / "dev_summary.json").read_text())["folds"]}
+    a = v2[v2.risk.notna()].reset_index(drop=True)
+    return coverage_risk(a, a.fold.map(cut).to_numpy(float), costs)
+
+
+def carb_heads() -> dict:
+    """Part A (docs/v2_hardening.md): how often the grams head falls outside the range head's choice."""
+    o = pd.read_csv("outputs/photo_cv/photo_oof.csv")
+    gbin = np.digitize(o.photo_g, [30, 60, 90])
+    cbin = o[["p_bin0", "p_bin1", "p_bin2", "p_bin3"]].to_numpy().argmax(axis=1)
+    truth = np.digitize(o.carbs_g, [30, 60, 90])
+    dis = gbin != cbin
+    return {"photos": int(len(o)), "disagree_share": float(dis.mean()),
+            "range_right_when_agree": float((cbin[~dis] == truth[~dis]).mean()),
+            "range_right_when_disagree": float((cbin[dis] == truth[dis]).mean())}  # fmt: skip
+
+
 def run_v2_explain(cfg) -> dict:
     costs, targets = cost_dict(cfg), cfg.targets.model_dump()
     v2 = pd.read_csv(V2 / "dev_answers.csv")
@@ -239,7 +291,9 @@ def run_v2_explain(cfg) -> dict:
            frozen_band(v2, th, costs, targets), "miss_curve": miss_curve(a), "taxonomy": tax, "shap": sh,
            "heart_rate": heart_rate_sign(v2, z, sh["coefficients"]["heart rate"]),
            "prediabetes_whatif": prediabetes_whatif(v2, group, costs, targets), "temporal": temporal(v2, z),
-           "carb_value": carb_value(),
+           "carb_value": carb_value(), "false_clear_decomposition": decomposition(cfg, v2, z, tax),
+           "history_length": history_length(v2, group), "carb_heads": carb_heads(),
+           "coverage_risk": _coverage(v2, costs),
            "cost_shipped": expected_cost(v2.decision.map(ACTION).to_numpy(), v2.spike.to_numpy().astype(int),
                                          costs)}  # fmt: skip
     OUT.mkdir(parents=True, exist_ok=True)

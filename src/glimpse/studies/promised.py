@@ -151,7 +151,8 @@ def run_missing_inputs(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dic
         person_i = np.array([ds.samples[i].person_id for i in rows_i])
         sel = choose_m_and_cutoffs(apply_platt(p_i, a_k, b_k), y[rows_i], person_i, times_i, cost_dict(cfg))
         tab = Pipeline(cfg, photo_table=fold_estimates(oof[oof.fold == kk]), fusion=lr,
-                       calibration=(a_k, b_k), cutoffs=(sel["low_risk_below"], sel["caution_from"]))  # fmt: skip
+                       calibration=(a_k, b_k), cutoffs=(sel["low_risk_below"], sel["caution_from"]),
+                       sensor_first=False)  # fmt: skip
         for row in meal_rows(ds, set(held), scored_only=True):
             m = meal_input(cfg, ds, int(row))
             base.append(tab.answer(m, key=int(row)))

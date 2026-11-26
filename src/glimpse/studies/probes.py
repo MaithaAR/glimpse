@@ -71,7 +71,7 @@ def run_probes(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
         cuts, est = (sel["low_risk_below"], sel["caution_from"]), fold_estimates(of)
         ref_lo, ref_hi = reference_estimates(of)
         pipes = {"base": est, "photo_low": {r: ref_lo for r in est}, "photo_high": {r: ref_hi for r in est}}
-        pipes = {name: Pipeline(cfg, photo_table=t, fusion=lr, calibration=(a_k, b_k), cutoffs=cuts)
+        pipes = {name: Pipeline(cfg, photo_table=t, fusion=lr, calibration=(a_k, b_k), cutoffs=cuts, sensor_first=False)
                  for name, t in pipes.items()}  # fmt: skip
         for row in meal_rows(ds, set(held), scored_only=True):
             m = meal_input(cfg, ds, int(row))

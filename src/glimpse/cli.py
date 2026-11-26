@@ -185,6 +185,20 @@ def _v2_metrics(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _v2_probes(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """v2 probes B and C and input monitors (docs/v2_hardening.md, Part B); probe B needs the data."""
+    from glimpse.studies.v2_probes import run_v2_probes
+
+    if Path("data/dataset.json").exists() and not args.data_free:
+        from glimpse.data.dataset import MealDataset
+        from glimpse.data.splits import SplitsV2
+
+        run_v2_probes(cfg, MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")))
+    else:
+        run_v2_probes(cfg)
+    return 0
+
+
 def _verify_outputs(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Data-free outputs against the committed ones, numbers to 1e-9."""
     from glimpse.verify import verify_outputs
@@ -511,6 +525,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
     sub.add_parser("v2-metrics", help="v2 beside v1 on development: registered endpoints and descriptive cuts")
+    vp = sub.add_parser("v2-probes", help="v2 probes B and C and input monitors (probe B needs the data)")
+    vp.add_argument("--data-free", action="store_true", help="keep the committed probe B; redo C and monitors")
     sub.add_parser("verify-outputs", help="data-free outputs against the committed ones (numbers to 1e-9)")
     sub.add_parser("v2-explain", help="v2 calibration, failure taxonomy and exact SHAP (descriptive)")
     sub.add_parser("v2-input-stress", help="v2 under missing heart rate, missing priors and noisy history")
@@ -589,6 +605,7 @@ def main(argv: list[str] | None = None) -> int:
         "v2-metrics": _v2_metrics,
         "v2-explain": _v2_explain,
         "verify-outputs": _verify_outputs,
+        "v2-probes": _v2_probes,
         "v2-input-stress": _v2_input_stress,
         "recalibrate": _recalibrate,
         "photo-seeds": _photo_seeds,

@@ -14,10 +14,7 @@ PER_MODEL_LIMIT = 200_000_000
 PRETRAINED_TOTAL_LIMIT = 1_000_000_000
 SCRATCH_LIMIT = 50_000_000
 
-# models once planned and since superseded: (name, role, estimated parameters). Kept so the budget
-# table records the decision: the shipped unfamiliar-photo check is kNN in the photo model's own
-# features, so no extra model was added (docs/final_design.md cut list).
-PLANNED = [("photo out-of-distribution check (DINOv2-S)", "superseded by the kNN check; never added", 22_000_000)]
+# 27 Nov: the never-built DINOv2-S row was dropped; the cut is recorded in docs/final_design.md.
 
 
 class BudgetRow(BaseModel):
@@ -43,14 +40,14 @@ def budget_table() -> list[BudgetRow]:
     name = "PhotoCarbModel (ConvNeXt-Tiny + 2 heads)"
     rows.append(BudgetRow(model=name, role="pretrained, fine-tuned", status="built", parameters=n,
                           limit=PER_MODEL_LIMIT, within_limit=n <= PER_MODEL_LIMIT))  # fmt: skip
-    rows.append(BudgetRow(model="Fusion (logistic regression: 15 profile/trend + 4 photo inputs)",
+    rows.append(BudgetRow(model="v1 fusion (logistic regression: 15 profile/trend + 4 photo inputs)",
                           role="trained (classical, on top of the networks)", status="built", parameters=20,
                           limit=SCRATCH_LIMIT, within_limit=True))  # fmt: skip
+    rows.append(BudgetRow(model="v2 fusion, served (logistic regression: 15 profile/trend inputs)",
+                          role="trained (classical)", status="built", parameters=16, limit=SCRATCH_LIMIT,
+                          within_limit=True))  # fmt: skip
     rows.append(BudgetRow(model="Unfamiliar-photo check (5 nearest training photos)", role="no weights (reference set)",
                           status="built", parameters=0, limit=PER_MODEL_LIMIT, within_limit=True))  # fmt: skip
-    for name, role, est in PLANNED:
-        rows.append(BudgetRow(model=name, role=role, status="planned (estimate)", parameters=est,
-                              limit=PER_MODEL_LIMIT, within_limit=est <= PER_MODEL_LIMIT))  # fmt: skip
     return rows
 
 

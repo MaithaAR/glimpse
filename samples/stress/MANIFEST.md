@@ -35,6 +35,8 @@ tests/test_stress.py on every commit and visible in the rows' flags.
 | 21_cmyk_photo | CMYK-mode JPEG | handled: answered or structured refusal |
 | 22_alpha_png | RGBA PNG with transparency | handled: answered or structured refusal |
 | 23_gif_renamed_jpg | GIF bytes under photo.jpg | handled: answered or structured refusal |
+| 24_low_glucose_falling | glucose falling to 48.5 mg/dL at the meal (27 Nov) | can't judge: treat the low first (rule R14), referred to a person |
+| 25_diabetes_range_a1c | HbA1c 7.4% (27 Nov) | can't judge: outside the scope (rule R15), referred to a person |
 
 A stray_file.txt at the top level checks that non-folders are skipped. Cases 20-23 carry a clean CGM
 and profile so only the photo path is under test; they are exercised by the live pipeline
