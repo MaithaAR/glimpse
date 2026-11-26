@@ -1,0 +1,250 @@
+{
+  "what": "R1-R8 (docs/robustness_v3.md, registered before any run): the course's remaining tests on development",
+  "photos": 1221,
+  "harness_meals": 460,
+  "r1_lr_range": {
+    "photo_heads": {
+      "lr_at_min_loss": 0.027049597304631315,
+      "suggested": 0.0027049597304631317,
+      "used": 0.001,
+      "used_within_10x": true
+    },
+    "sensor_cnn": {
+      "lr_at_min_loss": 0.07663410868007446,
+      "suggested": 0.007663410868007446,
+      "used": 0.001,
+      "used_within_10x": true
+    }
+  },
+  "r2_one_batch": {
+    "photo_heads": {
+      "start_loss": 3.871821880340576,
+      "end_loss": 0.004895413760095835,
+      "fits": true,
+      "grad_norm_first": 13.452242851257324,
+      "grad_norm_last": 1.4739477634429932,
+      "grad_norm_max": 13.452242851257324
+    },
+    "sensor_cnn": {
+      "start_loss": 0.7038156390190125,
+      "end_loss": 0.0078053162433207035,
+      "fits": true,
+      "grad_norm_first": 0.26041004061698914,
+      "grad_norm_last": 0.13612781465053558,
+      "grad_norm_max": 0.502004086971283
+    }
+  },
+  "r3_label_audit": {
+    "meals": 460,
+    "flags": {
+      "boundary_rise": {
+        "worst_20": 0.2,
+        "all_development": 0.09347826086956522,
+        "enrichment": 2.1395348837209305
+      },
+      "poor_coverage": {
+        "worst_20": 0.0,
+        "all_development": 0.0,
+        "enrichment": null
+      },
+      "partial_eating": {
+        "worst_20": 0.0,
+        "all_development": 0.013043478260869565,
+        "enrichment": 0.0
+      },
+      "high_baseline": {
+        "worst_20": 0.05,
+        "all_development": 0.15,
+        "enrichment": 0.33333333333333337
+      }
+    },
+    "worst_examples": [
+      {
+        "row": 335,
+        "person_id": 9,
+        "risk": 0.033705480065479305,
+        "spike": 1
+      },
+      {
+        "row": 847,
+        "person_id": 27,
+        "risk": 0.06150377270793797,
+        "spike": 1
+      },
+      {
+        "row": 699,
+        "person_id": 19,
+        "risk": 0.07192967164409413,
+        "spike": 1
+      },
+      {
+        "row": 864,
+        "person_id": 27,
+        "risk": 0.10986628648616735,
+        "spike": 1
+      },
+      {
+        "row": 1010,
+        "person_id": 32,
+        "risk": 0.13058274434305117,
+        "spike": 1
+      }
+    ],
+    "worst_20_spiked": 20
+  },
+  "r4_classical": {
+    "classical_colour_ridge": {
+      "mae_g": 27.47029958684247,
+      "spearman": 0.11235529960399034,
+      "bin_f1": 0.14223596883201103
+    },
+    "frozen_summaries_ridge_mae_g": 20.40772724122076,
+    "v1_fine_tuned": {
+      "mae_g": 22.598190500935893,
+      "spearman": 0.5301401799227843,
+      "bin_f1": 0.6060035300212092
+    },
+    "zero_shot": "not run: no network to fetch CLIP weights in this environment"
+  },
+  "r5_v3": {
+    "chosen_per_fold": [
+      {
+        "wd": 0.1,
+        "dropout": 0.5,
+        "views": 2,
+        "mae": 27.768600940704346,
+        "epochs": 10,
+        "gap": 0.17442916122916619
+      },
+      {
+        "wd": 0.1,
+        "dropout": 0.5,
+        "views": 2,
+        "mae": 28.4711275100708,
+        "epochs": 7,
+        "gap": 0.07258872278941078
+      },
+      {
+        "wd": 0.1,
+        "dropout": 0.5,
+        "views": 2,
+        "mae": 25.961084365844727,
+        "epochs": 12,
+        "gap": 0.09928403693943266
+      },
+      {
+        "wd": 0.1,
+        "dropout": 0.5,
+        "views": 2,
+        "mae": 26.421436309814453,
+        "epochs": 8,
+        "gap": 0.1422125596654933
+      },
+      {
+        "wd": 0.1,
+        "dropout": 0.5,
+        "views": 2,
+        "mae": 26.68781566619873,
+        "epochs": 10,
+        "gap": 0.15733461407424815
+      }
+    ],
+    "carb_v3": {
+      "mae_g": 25.995546340942383,
+      "spearman": 0.4555444843834706,
+      "bin_f1": 0.6182879492253295
+    },
+    "carb_v1": {
+      "mae_g": 22.598190500935893,
+      "spearman": 0.5301401799227843,
+      "bin_f1": 0.6060035300212092
+    },
+    "gap_v3_mean": 0.1291698189395502,
+    "gap_v1": 0.35,
+    "harness_auroc": {
+      "v1": 0.7500160740693114,
+      "v3": 0.7431149403116226,
+      "no_photo": 0.7136029490559163
+    },
+    "v3_minus_v1": {
+      "point": -0.006901133757688749,
+      "ci95": [
+        -0.019419545037207542,
+        0.005969777674568141
+      ]
+    },
+    "v1_photo_gain": {
+      "point": 0.03641312501339511,
+      "ci95": [
+        0.01023920640873981,
+        0.0731077426209194
+      ]
+    },
+    "v3_photo_gain": {
+      "point": 0.02951199125570636,
+      "ci95": [
+        0.0017742996290527697,
+        0.06628340529566602
+      ]
+    }
+  },
+  "r6_d8": {
+    "photo_training_dropped_per_fold": {
+      "1": 715,
+      "2": 731,
+      "3": 763,
+      "4": 679,
+      "5": 741
+    },
+    "fusion_training_dropped_per_fold": {
+      "1": 294,
+      "2": 313,
+      "3": 308,
+      "4": 289,
+      "5": 316
+    },
+    "carb_v3_d8": {
+      "mae_g": 31.781436920166016,
+      "spearman": 0.3185779668049531,
+      "bin_f1": 0.41423444785279134
+    },
+    "photo_gain_v3_d8": {
+      "point": 0.009130071368867787,
+      "ci95": [
+        -0.010265259643082492,
+        0.031036477438514214
+      ]
+    },
+    "photo_gain_v1_photo_d8_fusion": {
+      "point": -0.004286418483036458,
+      "ci95": [
+        -0.034099161368379344,
+        0.033767514138721685
+      ]
+    }
+  },
+  "r7_seeds": {
+    "harness_auroc": [
+      0.7456224951241989,
+      0.7429220514798861,
+      0.7406716817762917,
+      0.7414003729184081,
+      0.7459654086028418
+    ],
+    "range": 0.005293726826550049,
+    "photo_gain": 0.02951199125570636,
+    "range_at_least_half_gain": false
+  },
+  "r8_reweighted": {
+    "locked_mix": {
+      "F/healthy": 0.375,
+      "F/prediabetes": 0.375,
+      "M/healthy": 0.125,
+      "M/prediabetes": 0.125
+    },
+    "auroc_unweighted": 0.7623395272080413,
+    "auroc_reweighted": 0.7487751378085511,
+    "spikes_among_clears_reweighted": 0.07909433907079451,
+    "cells_missing": []
+  }
+}

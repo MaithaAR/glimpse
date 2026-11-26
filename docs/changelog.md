@@ -288,6 +288,15 @@ Code was sometimes drafted before its registration was committed.
 | Failure table states before/after for the rules (naive run 3ee062b: 2 raw errors, 1 whole-file rejection; now 0 of 25) | rubric 5b | docs/final_report.md §5 |
 | README grader path with the three answers and the no-history rule; history note corrected (GitHub history runs from 27 Sep); W&B offline runs committed; memory and parameter-budget sources in §1 | rubric 6b, 6c | README.md, outputs/wandb/ |
 
-Author sign-off on the tenth to seventeenth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
+## 26 Nov 2026, eighteenth pass (registered b99375c, docs/robustness_v3.md, before any run)
+
+| Change | Why | Evidence |
+|---|---|---|
+| R1-R4 run: LR range test (used rates within 10x of the suggestion), one-batch overfit (both models fit), label audit (worst 20 meals: 20% boundary rises against 9%), classical photo baseline (27.5 g, worse than frozen summaries + ridge); zero-shot not run (no network for CLIP weights) | the report listed these as gaps; the professor's week 3, 7 and 11 tests | outputs/robustness_v3/robustness_v3.json |
+| v3 photo candidate (R5-R7): regularised heads chosen on inner folds (the strongest setting won in every fold); gap 0.35 to 0.13, carb MAE 22.6 to 26.0 g (prediction not met), AUROC −0.007; without repeated meals the photo gain is +0.009 (−0.010, +0.031); seed spread 0.005 against a 0.030 gain (prediction not met). Not recommended by the registered rule; v1 stays served | the 0.35 overfit gap and D8 | docs/final_report.md §5 |
+| R8: development re-weighted to the locked mix: AUROC 0.762 to 0.749 | is the locked drop just cohort mix? | docs/final_report.md §6 |
+| Probes A and C detail, the glossary and two v2 paragraphs moved to the appendix | page limit | docs/report_appendix.md |
+
+Author sign-off on the tenth to eighteenth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
 to be added here by the author, dated, in her words.
 

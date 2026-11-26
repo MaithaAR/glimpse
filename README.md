@@ -184,6 +184,7 @@ version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 | §1 end-to-end timing, int8 | `just end-to-end-timing`, `just photo-probes` | `outputs/efficiency/end_to_end.json`, `int8.json` |
 | §3-§5 v2 calibration, taxonomy, SHAP, Figures 3 and 4 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
 | §3-§5 course checks, OOD AUROC, monitoring power, calibration null | `just final-checks` | `outputs/final_checks/final_checks.json` |
+| §5 debugging table R1-R4, v3 candidate (R5-R7), §6 re-weighted test (R8) | `just robustness-v3` | `outputs/robustness_v3/robustness_v3.json` |
 | §4 stress table | `just stress-quality`, `just v2-input-stress` | `outputs/robustness/stress_quality.json`, `v2_input_stress.json` |
 | appendix stress levels, Figure A1 | `just robustness-levels`, `just timing`, `just promised` | `outputs/robustness/`, `outputs/promised/` |
 | §4 monitoring | `just monitoring`, `just monitoring-replay` | `outputs/monitoring/` |

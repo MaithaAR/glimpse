@@ -619,7 +619,8 @@ def test_v2_probes_monitors_and_budget_cells():
     pc = vp["probe_c"]
     lo, hi = sorted(pc["inputs"][n]["share_decision_differs"] for n in ("age", "prior spike rate", "prior rise"))[::2]
     assert set(pc["top_three"]) == {"age", "prior spike rate", "prior rise"}
-    assert f"age and the two priors move the most ({lo * 100:.0f}–{hi:.0%})" in text
+    appendix = Path("docs/report_appendix.md").read_text()  # probes A and C moved there (page limit)
+    assert f"age and the two priors move the most ({lo * 100:.0f}–{hi:.0%})" in appendix
     mo = vp["monitors"]
     row = t["v2 inputs (registered 26 Nov): share of answers without heart rate; Brier of the last 20 answers"]
     assert row[1].startswith(
@@ -701,3 +702,35 @@ def test_final_checks_and_d8_cells():
             "-", "−"
         )
     ) in text
+
+
+def test_robustness_v3_cells(text):
+    """R1-R8 (docs/robustness_v3.md) against outputs/robustness_v3/robustness_v3.json."""
+    r = _load("outputs/robustness_v3/robustness_v3.json")
+    flat = " ".join(text.split())
+    lr = r["r1_lr_range"]
+    assert f"{lr['photo_heads']['suggested']:.1e}".replace("e-03", "e-3") in flat
+    assert f"{lr['sensor_cnn']['suggested']:.1e}".replace("e-03", "e-3") in flat
+    assert all(v["used_within_10x"] for v in lr.values())
+    ob = r["r2_one_batch"]
+    assert all(v["fits"] for v in ob.values())
+    assert f"loss {ob['photo_heads']['start_loss']:.2f} → {ob['photo_heads']['end_loss']:.3f}" in flat
+    fl = r["r3_label_audit"]["flags"]["boundary_rise"]
+    assert f"{fl['worst_20']:.0%} have a rise within 5 mg/dL" in flat and f"against {fl['all_development']:.0%}" in flat
+    c4 = r["r4_classical"]
+    assert (
+        f"ridge {c4['classical_colour_ridge']['mae_g']:.1f} g, against {c4['frozen_summaries_ridge_mae_g']:.1f} g"
+        in flat
+    )
+    v3 = r["r5_v3"]
+    assert {(c["wd"], c["dropout"], c["views"]) for c in v3["chosen_per_fold"]} == {(0.1, 0.5, 2)}
+    assert f"from 0.35 to {v3['gap_v3_mean']:.2f}" in flat
+    assert f"from {v3['carb_v1']['mae_g']:.1f} to {v3['carb_v3']['mae_g']:.1f} g" in flat
+    d = v3["v3_minus_v1"]
+    assert f"{d['point']:.3f} ({d['ci95'][0]:.3f}, {d['ci95'][1]:+.3f})".replace("-", "−") in flat
+    g6 = r["r6_d8"]["photo_gain_v3_d8"]
+    assert f"{g6['point']:+.3f} ({g6['ci95'][0]:.3f}, {g6['ci95'][1]:+.3f})".replace("-", "−") in flat
+    s7 = r["r7_seeds"]
+    assert f"seed spread ({s7['range']:.3f})" in flat and f"ordinary gain ({s7['photo_gain']:.3f})" in flat
+    r8 = r["r8_reweighted"]
+    assert f"from {r8['auroc_unweighted']:.3f} to {r8['auroc_reweighted']:.3f}" in flat

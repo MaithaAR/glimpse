@@ -217,6 +217,16 @@ def _v1_input_ranges(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _robustness_v3(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """R1-R8 (docs/robustness_v3.md): the course's remaining tests and the v3 photo candidate."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.robustness_v3 import run_robustness_v3
+
+    run_robustness_v3(cfg, MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")))
+    return 0
+
+
 def _final_checks(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Registered last-day checks O1, O2, M1, C1, S1-S5 (docs/final_switch.md); needs the data and weights."""
     from glimpse.data.dataset import MealDataset
@@ -557,6 +567,7 @@ def main(argv: list[str] | None = None) -> int:
     vp.add_argument("--data-free", action="store_true", help="keep the committed probe B; redo C and monitors")
     sub.add_parser("v2-input-ranges", help="rule R16: v2 training input ranges, counts and the heart-rate sweep")
     sub.add_parser("v1-input-ranges", help="rule R16 for v1: ranges, counts and the heart-rate sweep")
+    sub.add_parser("robustness-v3", help="the course's remaining tests (R1-R8) and the v3 photo candidate")
     sub.add_parser("final-checks", help="registered last-day checks: OOD, monitoring power, calibration, course checks")
     sub.add_parser("verify-outputs", help="data-free outputs against the committed ones (numbers to 1e-9)")
     sub.add_parser("v2-explain", help="v2 calibration, failure taxonomy and exact SHAP (descriptive)")
@@ -637,6 +648,7 @@ def main(argv: list[str] | None = None) -> int:
         "v2-explain": _v2_explain,
         "verify-outputs": _verify_outputs,
         "final-checks": _final_checks,
+        "robustness-v3": _robustness_v3,
         "v1-input-ranges": _v1_input_ranges,
         "v2-input-ranges": _v2_input_ranges,
         "v2-probes": _v2_probes,

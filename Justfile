@@ -134,6 +134,11 @@ v2-probes:
 final-checks:
     uv run glimpse final-checks
 
+# R1-R8 (docs/robustness_v3.md): LR range test, one-batch overfit, label audit, classical photo baseline, v3 photo
+# candidate, its repeated-meal test, seed spread, re-weighted test (~20 min)
+robustness-v3:
+    uv run glimpse robustness-v3
+
 # rule R16 for v1: training ranges (written once), counts and the heart-rate sweep
 v1-input-ranges:
     uv run glimpse v1-input-ranges
