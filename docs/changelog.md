@@ -317,6 +317,7 @@ Code was sometimes drafted before its registration was committed.
 | Codes replaced with names (repeated-meal check, robustness checks 1 to 8, the final split); the "trained from scratch in the product" row removed and SensorCNN named as the from-scratch network | 22 undefined codes; the row read as dodging the rule | §1 to §6 |
 | Figure 5 shows v1's and v2's misses as the cut moves (v2's SHAP panel dropped); Figure 3's loss axis made readable; Figure 1 wider | v1's curve was missing; Figure 5 repeated Figure 7 | src/glimpse/figures.py |
 | §7 ends with the three weakest points and what the evidence supports | the week 13 habit; rubric 5c | §7 |
+| Rules R20, R21 (registered 2376328): day/month dates resolved by the meal time, refused when both or neither fit (a Libre export had been misread silently); units in profile values | a fresh grader's unseen inputs (grade 85 after the pass) | docs/rule_ledger.md |
 | v2-only stress rows, decisions per 100 meals, probe E and one quality row moved to the appendix | page limit | docs/report_appendix.md |
 
 Author sign-off on the tenth to twentieth passes (v2, the return to v1, R13 to R16 and every registration since the tag):

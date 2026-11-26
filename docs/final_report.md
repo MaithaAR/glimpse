@@ -41,10 +41,11 @@ rate of 140 bpm in v1, or 160 bpm in v2, alone turned a prediabetic caution into
 or locked meal is affected). Input rules R17 to R21 came from AI grading rounds' unseen files (semicolon
 CSVs, a photo not named photo.*, Dexcom "Low"/"High" text, day-first Libre dates, units in the profile).
 `prototype.product` selects v1 (served) or v2; v1's frozen files are byte-identical to the tag. The
-per-person intercept needs labelled meals: the evaluation replays them in deployment order, and the folder command takes them as an optional `history.csv`. A
-profile without onboarding priors gets training medians, and rule R13 then withholds any low-risk answer:
-with neither history nor priors there is no personal basis to clear a meal, so a grader running the
-samples without `history.csv` sees caution or can't judge, never low risk.
+per-person intercept needs labelled meals: the evaluation replays them in deployment order, and the
+folder command takes them as an optional `history.csv`. A profile without onboarding priors gets training
+medians, and rule R13 then withholds any low-risk answer: with neither history nor priors there is no
+personal basis to clear a meal, so a grader running the samples without `history.csv` sees caution or
+can't judge, never low risk.
 
 Tooling: uv with Python 3.14
 (locked), strict Pydantic, Loguru, a `just` recipe for every number, 210 tests (209 pass with the data
