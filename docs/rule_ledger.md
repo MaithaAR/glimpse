@@ -239,3 +239,16 @@ Result (26 Nov): as predicted. The instructor folder's decisions are unchanged; 
 (v1 then refuses its unreadable placeholder photo, v2 answers caution), case 04 is refused for too few
 readings; the grader's semicolon, decimal-comma, IMG_0412.JPEG and photo.webp folders are answered, and a
 last reading of "Low" gets rule R14's guidance. Tests: tests/test_input_rules_r17_r19.py.
+
+## Input changes R20-R21 (registered 26 Nov, before the change; from the round-20 grader's unseen inputs)
+Observed: a FreeStyle LibreLink export with day-first dashed dates (01-06-2024 10:00, meaning 1 June) was
+read month-first without warning, placed five months away from the meal and refused as "0% covered", a
+silent misparse; a profile value "5.9 %" for HbA1c was refused although its meaning is plain.
+- R20: dates written NN-NN-YYYY or NN/NN/YYYY are ambiguous. Both readings (day-first, month-first) are
+  tried; if exactly one puts the last reading within 24 h before the meal time, it is used and flagged
+  `dates_day_first` or `dates_month_first`; otherwise (both, neither, or no meal time) the export is
+  refused as ambiguous, as before.
+- R21: a profile value with its expected unit ("5.9 %" for HbA1c, "104 mg/dL" for fasting glucose) is read
+  as the number, flagged `profile_units_stripped`; any other text still names the field and refuses.
+Predicted before the change: no development, locked or evaluated decision changes (the evaluation passes
+arrays, not files); the instructor and stress folders are unchanged (none uses these date or unit forms).
