@@ -92,3 +92,36 @@ When the user confirms nothing, the first model is not used; the second answers.
 confirmed carbs is answered by the second model with its photo inputs imputed (v1 refuses those meals).
 
 These numbers are selected on the design people and are optimistic. The confirmation below is the estimate.
+
+## Confirmation (26 Nov, after the freeze commit c74d69c; scored once)
+
+outputs/v5_model_fix/confirmation.json. 8 people, 161 meals v1 answers (166 scored). The first attempt was
+killed by a time limit inside the bootstrap, before any number was printed or saved; the bootstrap code was
+made faster and the run repeated. The code refuses a second scoring.
+
+| on the 161 meals v1 answers | pooled AUROC | within-person AUROC (7 people) | Brier | ECE | cleared at v1's fold cut-offs: missed |
+|---|---|---|---|---|---|
+| v1 as shipped | 0.804 | 0.636 | 0.186 | 0.084 | 32: 3 |
+| v5, photo only | 0.806 | 0.701 | 0.192 | 0.117 | 48: 6 |
+| v5, carbs confirmed | 0.793 | 0.693 | 0.194 | 0.144 | 43: 7 |
+
+| v5 minus v1 (95% over people) | pooled | within-person | verdict by the registered rule |
+|---|---|---|---|
+| photo only | +0.003 (−0.059, +0.056) | +0.065 (−0.020, +0.142); 4 of 7 people better | direction only |
+| carbs confirmed | −0.010 (−0.061, +0.040) | +0.056 (−0.032, +0.160); 5 of 7 better | not confirmed |
+
+What this says, plainly:
+- Ranking meals within a person improved in direction on people the design never saw: 0.636 to about 0.70.
+  The interval includes zero, as predicted for 8 people.
+- Pooled AUROC did not improve. The design part's pooled gain (0.737 to 0.76) did not carry over.
+- Calibration got worse. Without the per-person offset the risk is less well centred on each person: ECE
+  rises from 0.084 to 0.12 or more, and at v1's cut-offs v5 clears more meals and misses more of them
+  (6 of 48 against 3 of 32).
+- Confirmed carbs did not beat the photo-only model on these people, against the design part and against
+  the prediction.
+
+So v5 is not a better served model than v1. It ranks a person's own meals better and calibrates worse. The
+piece worth keeping is the mechanism: history as a model input (`prev_rise`) and person-centred trend inputs
+recover the within-person ranking that the post-hoc intercept destroys. A served version would need the
+offset's calibration and v5's ranking together, and a new set of people to test it on. No further variant is
+scored on the confirmation people.

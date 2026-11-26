@@ -271,3 +271,77 @@ def load():
 
     cfg = load_config(Path("configs/default.yaml"))
     return Data(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+
+
+FROZEN = {
+    "confirmed_carbs": Variant("v5, carbs confirmed", photo=False, centred=True, carbs="confirmed", intercept="none",
+                               drop_near=5.0, extra={"features": ["carb_centred", "prev_rise"]}),
+    "photo_only": Variant("v5, photo only", centred=True, intercept="none", drop_near=5.0,
+                          extra={"features": ["prev_rise"]}),
+}  # fmt: skip
+
+
+def _ece(y: np.ndarray, p: np.ndarray, bins: int = 15) -> float:
+    b = np.minimum((p * bins).astype(int), bins - 1)
+    return float(sum(abs(y[b == i].mean() - p[b == i].mean()) * (b == i).mean() for i in np.unique(b)))
+
+
+def _paired(d: pd.DataFrame) -> tuple[dict, dict]:
+    """v5 minus v1, pooled AUROC and mean within-person AUROC; bootstrap over people, 2,000 draws, seed 0."""
+    rng, ppl = np.random.default_rng(0), d.person_id.unique()
+    g = {p: (x.spike.to_numpy(), x.risk.to_numpy(), x.v1.to_numpy()) for p, x in d.groupby("person_id")}
+    wd = {p: roc_auc_score(y, a) - roc_auc_score(y, b) for p, (y, a, b) in g.items() if len(set(y)) == 2}
+
+    def pooled(people) -> float:
+        y, a, b = (np.concatenate([g[p][i] for p in people]) for i in range(3))
+        return float(roc_auc_score(y, a) - roc_auc_score(y, b))
+
+    def inside(people) -> float:
+        v = [wd[p] for p in people if p in wd]
+        return float(np.mean(v)) if v else float("nan")
+
+    pd_, wd_ = [], []
+    for _ in range(2000):
+        s = rng.choice(ppl, len(ppl))
+        if len(set(np.concatenate([g[p][0] for p in s]))) == 2:
+            pd_.append(pooled(s))
+        wd_.append(inside(s))
+    ci = lambda v: [float(x) for x in np.nanpercentile(v, [2.5, 97.5])]  # noqa: E731
+    return ({"point": pooled(ppl), "ci95": ci(pd_)},
+            {"point": inside(ppl), "ci95": ci(wd_), "people": len(wd),
+             "people_better": int(sum(x > 0 for x in wd.values()))})  # fmt: skip
+
+
+def confirm(D: Data) -> dict:
+    """The one registered scoring of the frozen design on the confirmation people (folds 4 and 5)."""
+    out_file = OUT / "confirmation.json"
+    if out_file.is_file():
+        raise SystemExit("the confirmation has been run; it is scored once (docs/v5_model_fix.md)")
+    ev = json.loads(Path("outputs/evaluation_v2/dev_summary.json").read_text())
+    cut = {f["fold"]: f["low_risk_below"] for f in ev["folds"]}
+    b = v1_baseline(D, CONFIRM_FOLDS).rename(columns={"risk": "v1"})
+    res = {"what": "v5 frozen design, confirmation people (outer folds 4 and 5), scored once",
+           "people": int(b.person_id.nunique()),
+           "v1_shipped": score(b, "v1") | {"ece": _ece(b.spike.to_numpy(), b.v1.to_numpy())}}  # fmt: skip
+    for name, v in FROZEN.items():
+        d = predict(v, D, CONFIRM_FOLDS)
+        d.to_csv(OUT / f"confirm_{name}.csv", index=False)
+        j = d.merge(b[["row", "v1"]], on="row")
+        clear = j.risk < j.fold.map(cut)
+        clear1 = j.v1 < j.fold.map(cut)
+        pw = _paired(j)
+        res[name] = {
+            "all_meals": score(d) | {"ece": _ece(d.spike.to_numpy(), d.risk.to_numpy())},
+            "on_v1_answered": score(j) | {"ece": _ece(j.spike.to_numpy(), j.risk.to_numpy())},
+            "pooled_auroc_v5_minus_v1": pw[0],
+            "within_person_auroc_v5_minus_v1": pw[1],
+            "at_v1_fold_cutoffs": {"v5_cleared": int(clear.sum()), "v5_missed": int(j.spike[clear].sum()),
+                                   "v1_cleared": int(clear1.sum()), "v1_missed": int(j.spike[clear1].sum())},
+            "C_per_fold": d.groupby("fold").C.first().tolist(),
+        }  # fmt: skip
+        p, w = res[name]["pooled_auroc_v5_minus_v1"], res[name]["within_person_auroc_v5_minus_v1"]
+        both = p["point"] > 0 and w["point"] > 0
+        res[name]["verdict"] = ("confirmed" if both and (p["ci95"][0] > 0 or w["ci95"][0] > 0)
+                                else "direction only" if both else "not confirmed")  # fmt: skip
+    out_file.write_text(json.dumps(res, indent=2))
+    return res

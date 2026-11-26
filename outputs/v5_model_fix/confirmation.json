@@ -1,0 +1,102 @@
+{
+  "what": "v5 frozen design, confirmation people (outer folds 4 and 5), scored once",
+  "people": 8,
+  "v1_shipped": {
+    "pooled": 0.8038277511961722,
+    "within": 0.6361619861619862,
+    "sum": 1.4399897373581583,
+    "brier": 0.18584794691797482,
+    "meals": 161,
+    "ece": 0.08447775579277304
+  },
+  "confirmed_carbs": {
+    "all_meals": {
+      "pooled": 0.7870909905871807,
+      "within": 0.6885971171685457,
+      "sum": 1.4756881077557265,
+      "brier": 0.19955405137280816,
+      "meals": 166,
+      "ece": 0.1509129772560544
+    },
+    "on_v1_answered": {
+      "pooled": 0.7934609250398724,
+      "within": 0.6926594569451713,
+      "sum": 1.4861203819850437,
+      "brier": 0.1943258570060582,
+      "meals": 161,
+      "ece": 0.14387887503680874
+    },
+    "pooled_auroc_v5_minus_v1": {
+      "point": -0.010366826156299802,
+      "ci95": [
+        -0.061115075783511164,
+        0.040246252084966044
+      ]
+    },
+    "within_person_auroc_v5_minus_v1": {
+      "point": 0.056497470783185066,
+      "ci95": [
+        -0.03202094780219785,
+        0.1598648177219604
+      ],
+      "people": 7,
+      "people_better": 5
+    },
+    "at_v1_fold_cutoffs": {
+      "v5_cleared": 43,
+      "v5_missed": 7,
+      "v1_cleared": 32,
+      "v1_missed": 3
+    },
+    "C_per_fold": [
+      0.01,
+      0.03
+    ],
+    "verdict": "not confirmed"
+  },
+  "photo_only": {
+    "all_meals": {
+      "pooled": 0.8023307933662034,
+      "within": 0.70154131582703,
+      "sum": 1.5038721091932334,
+      "brier": 0.19666793095121368,
+      "meals": 166,
+      "ece": 0.12517999935521465
+    },
+    "on_v1_answered": {
+      "pooled": 0.8063795853269538,
+      "within": 0.7011861154718296,
+      "sum": 1.5075657007987835,
+      "brier": 0.19151881944342536,
+      "meals": 161,
+      "ece": 0.11687282793693478
+    },
+    "pooled_auroc_v5_minus_v1": {
+      "point": 0.0025518341307815273,
+      "ci95": [
+        -0.05909931548411523,
+        0.05555836707152487
+      ]
+    },
+    "within_person_auroc_v5_minus_v1": {
+      "point": 0.06502412930984361,
+      "ci95": [
+        -0.020251286412000694,
+        0.14225340136054415
+      ],
+      "people": 7,
+      "people_better": 4
+    },
+    "at_v1_fold_cutoffs": {
+      "v5_cleared": 48,
+      "v5_missed": 6,
+      "v1_cleared": 32,
+      "v1_missed": 3
+    },
+    "C_per_fold": [
+      0.01,
+      0.03
+    ],
+    "verdict": "direction only"
+  }
+}
