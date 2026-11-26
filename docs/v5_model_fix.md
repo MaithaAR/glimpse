@@ -339,3 +339,20 @@ same frozen recipe, not new clean tests. No recipe choice is made from them.
   Prediction: no gain (within 0.01 on both numbers).
 - T5, slices. v5 against v1 by sex and by glycaemic status on the 23 development people: pooled AUROC per
   slice. Prediction: v5 is not lower than v1 by more than 0.03 in any slice.
+
+## Part 5 results (27 Nov, after the registration commit 6f5557c; run once)
+
+outputs/v5_model_fix/more_tests.json.
+
+| test | prediction | result |
+|---|---|---|
+| T1 shuffled labels | mean 0.45 to 0.55 | mean 0.438 (0.367 to 0.534) against 0.759 unshuffled. Below the band, not above it: no leak through the history input. Pooled over folds a no-signal model scores under 0.5, as the prevalence baseline does in the report. Prediction not met on the low side |
+| T2 selective answering | v5's error falls at every step | met on both groups: 27.3, 26.9, 24.8, 23.9% on the 8; 28.7, 26.8, 23.4, 21.3% on the 14. v1 falls too and ends lower (19.5% and 20.2% at 30%), so v5 has no advantage here |
+| T3 usefulness on the 8 confirmation people, cut-offs 0.15 and 0.25 chosen on the design people | v5 clears more and misses more than 10% | met: v5 clears 51 of 161 meals and 7 spike (13.7%); v1 clears 32 and 3 spike (9.4%). Cost reduction 4.2% for v5 against 13.7% for v1. People with prediabetes: 17 of 107 meals cleared (1 missed) against 5 (0 missed) |
+| T4 SensorCNN score as a 28th input | no gain | met: 0.759 / 0.682 against 0.761 / 0.680 on the design people; 0.801 / 0.689 against 0.802 / 0.702 on the 8 |
+| T5 slices, v5 against v1, 23 development people | none lower by more than 0.03 | met: women 0.724 against 0.707, men 0.850 against 0.858, prediabetes 0.732 against 0.736, healthy 0.733 against 0.738 |
+
+Reading. v5's better ranking within a person has not become a better decision. At cut-offs chosen away from
+the test people it is more permissive than v1, misses more of what it clears and saves less cost. The
+from-scratch network still adds nothing. The history input does not leak. This is why v1 stays served and
+v5 is reported as a candidate: it fixes the ranking weakness and not the product.

@@ -350,3 +350,13 @@ registrations at my instruction. The choices and the conclusions are mine. Maith
 | Figure 1 lists rules R14 to R22; rule list in README and model card through R22 | stale labels | src/glimpse/figures.py, README.md, docs/model_card.md |
 | Sign-off date corrected from 27 Nov to 26 Nov, the day it was committed | date mismatch | docs/changelog.md |
 | Pilot policy in section 5 shortened to a proposal with no monthly rule and no 10% figure; approved by the author | the longer draft named a review that is not in the code | docs/final_report.md |
+
+## Twenty-third pass, 27 Nov (after the first upload; new registered work and the last graders' factual points)
+
+| change | why | where |
+|---|---|---|
+| Candidate v5 and v7: label audit, design on 15 people, one confirmation on 8, one transfer check on the 14 type-2 people, the photo within a person, five more tests; each registered before it ran | the report's third weakest point (ranking within a person); the author asked for the model to be improved | docs/v4_within_person.md, docs/v5_model_fix.md, src/glimpse/studies/, outputs/v4_within_person/, outputs/v5_model_fix/ |
+| Report section 5: candidate paragraph and table; v1 stays served | the result of that work | docs/final_report.md |
+| Spike label defined in section 1; the identity check states the 97.8% for sensor and profile inputs; the non-meal pictures are named as synthetic; the shuffled-label range is stated as wider than predicted; the no-history row carries its locked cost; the label audit row uses all 460 meals | points raised by two cold graders on 26 Nov | docs/final_report.md |
+| Rows and sentences moved to the appendix to stay within 8 pages | page limit | docs/report_appendix.md |
+| Test added for the candidate table; counts 214 pass + 1 expected failure with data, 198 without | new cells | tests/test_report_numbers.py |

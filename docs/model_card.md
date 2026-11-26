@@ -32,6 +32,10 @@ those participants were used for training only.
   the cleared meals spike (6 of 87) and the cost reduction is 10.7%; v2 clears 20.2% with 14.4% spiking.
   The tables below were scored before R22. On the locked eight 2 of 10 clears would become caution
   (counted only; outcomes not read).
+- Candidate after the tag, not served (docs/v5_model_fix.md): v5 puts the person's history into the model
+  as an input, with no post-hoc intercept. On 14 never-scored type-2 people it ranks a person's own meals
+  better than the v1 recipe (within-person AUROC +0.048, 95% +0.021 to +0.082); pooled AUROC is unchanged
+  and at cut-offs chosen on other people it misses more of the meals it clears than v1. No locked test.
 - Photo model: ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned; pinned revision and SHA-256), last
   stage fine-tuned, two heads; 27.8M parameters, 15.5M fine-tuned. It failed its pre-registered risk gate
   (+0.025 AUROC, −0.010 to +0.061), which is why v2 exists. It reads the plate, not the background, but does

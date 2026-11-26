@@ -216,6 +216,15 @@ photo not named photo.*, Dexcom Low/High text, day-first dates, units in the pro
 a last reading of 140 mg/dL or more, or a rise above 1.5 mg/dL/min; the answer becomes caution). With R22,
 v1 clears 18.1% of development meals (target 20%) and 6.9% of those spike; cost reduction 10.7%.
 
+After the tag (27 Nov): a candidate model, v5, and a variant with the meal confirmed, v7. v1 is still the
+served model. The work is registered step by step in docs/v5_model_fix.md (design on 15 development people,
+one scoring on the other 8, one on the 14 type-2 people who had never been scored) and its outputs are in
+`outputs/v5_model_fix/` (104 logged design variants, confirmation.json, transfer_check.json,
+photo_within_person.json, more_tests.json). `just v5-model-fix` prints the verdicts; the code is
+`src/glimpse/studies/v5_model_fix.py`, `v7_features.py` and `v4_within_person.py` (`just v4-within-person`
+reruns the label audit). v5 ranks a person's own meals better on unseen people and is not a better product:
+at cut-offs chosen on other people it misses more of the meals it clears.
+
 `tests/test_report_numbers.py` checks the report's headline numbers against these files on every commit.
 
 History note: the GitHub history runs from the proposal (27 Sep) to the final commit. Proposal-era pilot

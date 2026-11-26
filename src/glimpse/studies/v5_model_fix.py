@@ -550,3 +550,140 @@ def photo_within_person(D: Data) -> dict:
         d.to_csv(OUT / f"photo_within_{g}.csv", index=False)
     out_file.write_text(json.dumps(res, indent=2))
     return res
+
+
+# ------------------------------------------------------------------ Part 5: five more tests of v5 (photo only)
+def _cost(dec: np.ndarray, y: np.ndarray, costs: dict) -> float:
+    tab = {"low risk": costs["low_risk"], "caution": costs["caution"], "can't judge": costs["abstain"]}
+    return float(sum(tab[d][0] if s else tab[d][1] for d, s in zip(dec, y, strict=True)))
+
+
+def _decide(p: np.ndarray, lo: float, hi: float) -> np.ndarray:
+    return np.where(p < lo, "low risk", np.where(p >= hi, "caution", "can't judge"))
+
+
+def _useful(dec: np.ndarray, y: np.ndarray, costs: dict, pre: np.ndarray) -> dict:
+    cl = dec == "low risk"
+    always = _cost(np.full(len(y), "caution"), y, costs)
+    return {"cost_reduction": 1 - _cost(dec, y, costs) / always, "cleared_share": float(cl.mean()),
+            "cant_judge_share": float((dec == "can't judge").mean()), "cleared": int(cl.sum()),
+            "missed": int(y[cl].sum()), "prediabetes_cleared": int((cl & pre).sum()),
+            "prediabetes_meals": int(pre.sum()), "prediabetes_missed": int(y[cl & pre].sum())}  # fmt: skip
+
+
+def _selective(y: np.ndarray, p: np.ndarray) -> dict:
+    order = np.argsort(-np.abs(p - 0.5))
+    out = {}
+    for drop in (0.0, 0.1, 0.2, 0.3):
+        keep = order[: int(round(len(y) * (1 - drop)))]
+        out[f"{int(drop * 100)}%"] = float(np.mean((p[keep] >= 0.5) != y[keep].astype(bool)))
+    return out
+
+
+def _cnn_scores(D: Data) -> np.ndarray:
+    """[fold 1..5][sample]: SensorCNN logit, out of person (held people: fit on the fold's training people;
+    training people: nested fits that excluded them)."""
+    import torch
+
+    from glimpse.data.normalise import Normaliser
+    from glimpse.training.photo_cv import fold_plan_v2
+    from glimpse.training.scratch import _inputs, fit, predict_proba
+
+    torch.set_num_threads(2)
+    ds, cfg = D.ds, D.cfg
+    epochs = {t["fold"]: t["cnn_epochs"] for t in json.loads(Path("outputs/cv/cv_summary.json").read_text())["tuning"]}
+    out = np.full((5, len(D.y)), np.nan)
+
+    def score_rows(train_people, rows, ep):
+        tr = meal_rows(ds, set(train_people), scored_only=False)
+        norm = Normaliser.fit(ds.glucose[tr], ds.heart_rate[tr], ds.profile[tr], ds.profile_names)
+        model, _ = fit(ds, tr, norm, cfg.training.scratch, cfg, ep, 0, "v5-t4")
+        p = np.clip(predict_proba(model, _inputs(ds, rows, norm)), 1e-6, 1 - 1e-6)
+        return np.log(p / (1 - p))
+
+    for f in fold_plan_v2(D.sp, cfg):
+        k, ep = f["fold"] - 1, epochs[f["fold"]]
+        held = np.where(np.isin(D.pid, f["held"]))[0]
+        out[k, held] = score_rows(f["train"], held, ep)
+        for i in f["inner"]:
+            rows = np.where(np.isin(D.pid, i["exclude"]))[0]
+            out[k, rows] = score_rows([p for p in f["train"] if p not in i["exclude"]], rows, ep)
+    return out
+
+
+def more_tests(D: Data) -> dict:
+    from dataclasses import replace
+
+    from glimpse.training.final import cost_dict
+
+    out_file = OUT / "more_tests.json"
+    if out_file.is_file():
+        raise SystemExit("Part 5 has been run; it is scored once (docs/v5_model_fix.md)")
+    v, costs, res = FROZEN["photo_only"], cost_dict(D.cfg), {"what": "Part 5: five more tests of v5 (photo only)"}
+    pre = np.array([s.group for s in D.ds.samples]) == "prediabetes"
+    male = D.static["male"].to_numpy() == 1
+    dev = predict(v, D, DESIGN_FOLDS + CONFIRM_FOLDS)
+    v1 = v1_baseline(D, DESIGN_FOLDS + CONFIRM_FOLDS).rename(columns={"risk": "v1"})
+
+    # T1 shuffled labels
+    true_y, aucs = D.y.copy(), []
+    for s in range(10):
+        rng, parts = np.random.default_rng(s), []
+        for fold in DESIGN_FOLDS + CONFIRM_FOLDS:
+            tr = meal_rows(D.ds, set(D.sp.training_people(fold - 1)), scored_only=False)
+            D.y = true_y.copy()
+            D.y[tr] = rng.permutation(true_y[tr])
+            te, f, _ = fold_logits(v, D, fold - 1)
+            parts.append((true_y[te], f))
+        D.y = true_y
+        aucs.append(float(roc_auc_score(np.concatenate([p[0] for p in parts]), np.concatenate([p[1] for p in parts]))))
+    res["T1_shuffled_labels"] = {"mean": float(np.mean(aucs)), "min": min(aucs), "max": max(aucs),
+                                 "unshuffled": float(roc_auc_score(dev.spike, dev.raw)),
+                                 "met": bool(0.45 <= np.mean(aucs) <= 0.55)}  # fmt: skip
+
+    # T2 selective answering
+    conf = pd.read_csv(OUT / "confirm_photo_only.csv").merge(v1[["row", "v1"]], on="row")
+    t2 = pd.read_csv(OUT / "transfer_check.csv")
+    res["T2_selective_answering_error"] = {
+        "confirmation": {"v5": _selective(conf.spike.to_numpy(), conf.risk.to_numpy()),
+                         "v1": _selective(conf.spike.to_numpy(), conf.v1.to_numpy())},
+        "type2": {"v5": _selective(t2.spike.to_numpy(), t2.v5_photo_only.to_numpy()),
+                  "v1_recipe": _selective(t2.spike.to_numpy(), t2.v1_recipe.to_numpy())}}  # fmt: skip
+    for g in res["T2_selective_answering_error"].values():
+        e = list(g["v5"].values())
+        g["v5_falls_at_every_step"] = bool(all(b < a for a, b in zip(e, e[1:], strict=False)))
+
+    # T3 usefulness at cut-offs chosen on the design people
+    des = dev[dev.fold.isin(DESIGN_FOLDS)]
+    grid = np.round(np.arange(0.05, 0.601, 0.01), 2)
+    best = min(((lo, hi) for lo in grid for hi in grid if lo <= hi),
+               key=lambda c: _cost(_decide(des.risk.to_numpy(), *c), des.spike.to_numpy(), costs))  # fmt: skip
+    c8 = dev[dev.fold.isin(CONFIRM_FOLDS)].merge(D.v1[["row", "decision"]], on="row")
+    c8 = c8[c8.decision.notna() & c8.row.isin(v1.row)]
+    y8, p8 = c8.spike.to_numpy(), pre[c8.row.to_numpy()]
+    res["T3_usefulness_confirmation"] = {
+        "cutoffs_from_design_people": [float(best[0]), float(best[1])], "meals": len(c8),
+        "v5": _useful(_decide(c8.risk.to_numpy(), *best), y8, costs, p8),
+        "v1_shipped": _useful(c8.decision.to_numpy(), y8, costs, p8)}  # fmt: skip
+
+    # T4 the from-scratch SensorCNN as a 28th input
+    cnn = _cnn_scores(D)
+    D._hist["fc"] = cnn
+    v_cnn = replace(v, name="v5 + SensorCNN score", extra={**v.extra, "forecast": True})
+    dc = predict(v_cnn, D, DESIGN_FOLDS + CONFIRM_FOLDS)
+    del D._hist["fc"]
+    res["T4_sensor_cnn_input"] = {
+        g: {"v5": score(dev[dev.fold.isin(f)]), "v5_plus_cnn": score(dc[dc.fold.isin(f)])}
+        for g, f in (("design", DESIGN_FOLDS), ("confirmation", CONFIRM_FOLDS))}  # fmt: skip
+
+    # T5 slices
+    j = dev.merge(v1[["row", "v1"]], on="row")
+    r = j.row.to_numpy()
+    slices = {"women": ~male[r], "men": male[r], "prediabetes": pre[r], "healthy": ~pre[r]}
+    res["T5_slices_pooled_auroc"] = {
+        n: {"meals": int(m.sum()), "v5": float(roc_auc_score(j.spike[m], j.risk[m])),
+            "v1": float(roc_auc_score(j.spike[m], j.v1[m]))} for n, m in slices.items()}  # fmt: skip
+    res["T5_slices_pooled_auroc"]["met"] = bool(all(x["v5"] >= x["v1"] - 0.03
+                                                    for x in res["T5_slices_pooled_auroc"].values()))  # fmt: skip
+    out_file.write_text(json.dumps(res, indent=2))
+    return res

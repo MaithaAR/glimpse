@@ -594,7 +594,7 @@ def test_v2_explain_cells():
     assert (
         f"({hr['within_person_coefficient']:.2f}, {hr['within_person_ci95'][0]:.2f} to "
         f"{hr['within_person_ci95'][1]:.2f}, person fixed effects)"
-    ).replace("-", "−") in " ".join(text.split())
+    ).replace("-", "−") in " ".join(APPENDIX.read_text().split())
     assert f"moves v2's logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in APPENDIX.read_text()
     tp = r["temporal"]["last_third"]
     flat = " ".join(Path("docs/report_appendix.md").read_text().split())  # moved to the appendix (page limit)
@@ -691,9 +691,12 @@ def test_final_checks_and_d8_cells():
     assert f"{s4['photo_inputs_accuracy']:.1%} of meals against {s4['majority_rate']:.1%}" in text
     o1, o2 = f["o1"], f["o2"]
     assert f"AUROC {o1['auroc']:.3f}" in text and o1["real_photos_max"] < o1["cut"]
-    assert f"AUROC {o2['auroc']:.2f}" in text and o2["auroc_single_input"]["HbA1c"] == 1.0
+    assert f"AUROC {o2['auroc']:.2f}" in APPENDIX.read_text() and o2["auroc_single_input"]["HbA1c"] == 1.0
     m = f["m1"]["v1"]
-    assert " / ".join(f"{m[k]['detected']:.0%}" for k in ("120", "240", "480", "960")) + " detected" in text
+    assert (
+        " / ".join(f"{m[k]['detected']:.0%}" for k in ("120", "240", "480", "960")) + " detected"
+        in text + APPENDIX.read_text()
+    )
     c1 = f["c1"]
     assert f"({c1['v1']['share_null_at_or_below_observed']:.0%} of draws at or below)" in text
     assert f"all but {c1['v2']['share_null_at_or_below_observed']:.1%}" in text
@@ -755,3 +758,50 @@ def test_rules_r22_and_holm_cells(text):
     h = _load("outputs/report_metrics/holm.json")["contrasts"]
     survivors = {k for k, v in h.items() if v["survives_holm_0.05"]}
     assert survivors == {"v1 minus a running spike rate", "within-person AUROC, intercept minus raw (v1)"}
+
+
+def test_v5_candidate_cells():
+    """The after-the-tag candidate table (report section 5) against outputs/v5_model_fix/."""
+    flat = " ".join(REPORT.read_text().split())
+    c = _load("outputs/v5_model_fix/confirmation.json")
+    t = _load("outputs/v5_model_fix/transfer_check.json")
+    p = _load("outputs/v5_model_fix/photo_within_person.json")["groups"]
+    m = _load("outputs/v5_model_fix/more_tests.json")
+    s = _load("outputs/v5_model_fix/second_look.json")
+
+    def ci(x: dict) -> str:
+        return f"{x['point']:+.3f} ({x['ci95'][0]:+.3f}, {x['ci95'][1]:+.3f})".replace("-", "−")
+
+    v1, v5 = c["v1_shipped"], c["photo_only"]["on_v1_answered"]
+    assert f"| v1 | 0.737 / 0.586 | {v1['pooled']:.3f} / {v1['within']:.3f} |" in flat
+    assert (
+        f"{v5['pooled']:.3f} / {v5['within']:.3f}; within-person "
+        + ci(c["photo_only"]["within_person_auroc_v5_minus_v1"])
+        in flat
+    )
+    sc = t["scores"]
+    assert f"{sc['v1_recipe']['pooled']:.3f} / {sc['v1_recipe']['within']:.3f} |" in flat
+    for name in ("v5_photo_only", "v7_meal_confirmed"):
+        cell = f"{sc[name]['pooled']:.3f} / {sc[name]['within']:.3f}; within-person "
+        assert cell + ci(t[f"{name}_minus_v1_recipe"]["within_person_auroc"]) in flat
+        assert t[f"{name}_minus_v1_recipe"]["verdict"] == "transfers"
+    mc = s["meal_confirmed"]["on_v1_answered"]
+    assert f"{mc['pooled']:.3f} / {mc['within']:.3f} (second look)" in flat
+    for g in ("design_15", "confirmation_8", "type2_14"):
+        assert ci(p[g]["with_minus_without"]["within_person_auroc"]) in flat
+        assert (
+            f"control {p[g]['permuted_minus_without']['within_person_auroc']['point']:+.3f}".replace("-", "−") in flat
+        )
+    u = m["T3_usefulness_confirmation"]
+    assert f"v5 clears {u['v5']['cleared']} of the 8 people's {u['meals']} meals and {u['v5']['missed']} spike" in flat
+    assert f"against {u['v1_shipped']['cleared']} and {u['v1_shipped']['missed']} for v1" in flat
+    assert f"saves {u['v5']['cost_reduction']:.1%} of cost against {u['v1_shipped']['cost_reduction']:.1%}" in flat
+    a = _load("outputs/v4_within_person/v4_within_person.json")["A_label_audit"]
+    n = a["A2_labels_near_cut"]
+    assert f"{n['share_within_5_of_cut']:.1%} of meals" in flat
+    assert f"from {n['within_person_auroc_raw_all']:.3f} to {n['within_person_auroc_raw_without_them']:.3f}" in flat
+    assert f"({n['within_person_auroc_raw_all']:.3f} raw, {n['within_person_auroc_shipped_all']:.3f} shipped)" in flat
+    assert f"rank at {a['A1_single_signals']['carbs']['mean_within_person_auroc']:.3f}" in " ".join(flat.split())
+    assert m["T1_shuffled_labels"]["mean"] < 0.55 and m["T5_slices_pooled_auroc"]["met"]
+    f4 = _load("outputs/final_checks/final_checks.json")["s4"]
+    assert f"{f4['sensor_profile_inputs_accuracy']:.1%} of meals" in flat

@@ -329,3 +329,7 @@ probe-c:
 # v4 candidate study, after the submission (docs/v4_within_person.md; development only, nothing served changes)
 v4-within-person:
     uv run glimpse v4-within-person
+
+# after-the-tag candidate v5/v7 (docs/v5_model_fix.md): prints the committed verdicts; each registered stage ran once
+v5-model-fix:
+    uv run glimpse v5-model-fix
