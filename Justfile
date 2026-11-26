@@ -98,7 +98,7 @@ monitoring:
 finalize:
     uv run glimpse finalize
 
-# the eight figures (seven in the report, Figure A1 in the appendix), rendered from committed evidence only (pre-commitment: nothing retuned from their look)
+# the nine figures (seven in the report, two in the appendix; README maps numbers to files), rendered from committed evidence only (pre-commitment: nothing retuned from their look)
 figures:
     uv run glimpse figures
 
@@ -152,8 +152,8 @@ v2-explain:
     uv run glimpse v2-explain
 
 # every report table: budget, both dev evaluations, v2 metrics and probes, OOD, monitoring, probes A and B, then
-# `report-numbers` (needs data and weights; about 15 min on a laptop CPU). evaluate-all adds the slow studies.
-evaluate:
+# `report-numbers` (needs data and weights; about 15 min on a laptop CPU). `evaluate` adds the slow studies.
+evaluate-fast:
     uv run glimpse params
     uv run glimpse evaluate
     uv run glimpse evaluate --sensor-first
@@ -164,12 +164,12 @@ evaluate:
     uv run glimpse probes
     just report-numbers
 
-# `evaluate` plus the cheaper compute studies behind the report's other tables (~45 min with data and weights)
-evaluate-all:
+# every evaluation and study behind the report's tables (~45 min with data and weights)
+evaluate:
     just fusion
     just ablate
     just promised
-    just evaluate
+    just evaluate-fast
     just stress-quality
     just v2-input-stress
     just photo-probes
@@ -179,6 +179,10 @@ evaluate-all:
     just robustness-v3
     just rules-r22
     just report-numbers
+
+# the old name of `evaluate`, kept so earlier notes still work
+evaluate-all:
+    just evaluate
 
 # v2 (docs/v2_sensor_first.md): the sensor-first freeze, written once to checkpoints/sensor_first/
 finalize-sensor-first:
@@ -224,7 +228,7 @@ reproduce-all:
     just photo-probes
     just end-to-end-timing
     just photo-seeds
-    just evaluate
+    just evaluate-fast
     just selftest
     just predict-folder samples/instructor outputs/folder_run
     just predict-folder samples/returning_user outputs/returning_user_run

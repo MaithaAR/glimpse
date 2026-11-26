@@ -595,7 +595,7 @@ def test_v2_explain_cells():
         f"({hr['within_person_coefficient']:.2f}, {hr['within_person_ci95'][0]:.2f} to "
         f"{hr['within_person_ci95'][1]:.2f}, person fixed effects)"
     ).replace("-", "−") in " ".join(text.split())
-    assert f"moves v2's logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in text
+    assert f"moves v2's logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in APPENDIX.read_text()  # moved (page limit)
     tp = r["temporal"]["last_third"]
     flat = " ".join(Path("docs/report_appendix.md").read_text().split())  # moved to the appendix (page limit)
     assert f"last third of meals v2 scores {tp['auroc']:.3f} ({tp['ci95'][0]:.3f}–{tp['ci95'][1]:.3f})" in flat
@@ -674,7 +674,7 @@ def test_r16_counts_and_sweep():
     r1 = _load("outputs/probes/v1_hr_sweep.json")
     assert r1["outside"]["development"]["outside"] == 0 and r1["outside"]["locked"]["outside"] == 0
     assert r["outside"]["locked"]["outside"] == 0
-    assert "no development\nor locked meal is affected" in REPORT.read_text()
+    assert "changed no development or locked decision" in " ".join(REPORT.read_text().split())
     first_clear = min(x["hr_bpm"] for x in r1["sweep"] if x["rule_off"] == "low risk")
     assert first_clear == 140 and all(x["rule_on"] != "low risk" for x in r1["sweep"])
 

@@ -21,9 +21,17 @@ those participants were used for training only.
 - **v1, photo fusion (served; frozen 6 Nov; the only model the locked eight measured).** Adds the photo model's grams and
   carb range as 4 of 19 inputs; Platt (0.96, −0.20), m = 1.0, cut-offs 0.15 and 0.16; refuses a meal
   without a usable photo. Its files are unchanged since the tag.
-- Rules R1-R12, R14 (glucose below 54 mg/dL: treat the low first), R15 (HbA1c 6.5% or above: out of
-  scope) and R16 (a CGM or heart-rate input beyond the training range, risk-lowering side) run first and refuse with a named reason; output rule R13 withholds low risk when there is
-  neither history nor both onboarding priors (docs/rule_ledger.md).
+- Rules R1-R12, R14 (glucose below 54 mg/dL: treat the low first; since 26 Nov a falling 54-69 mg/dL is
+  referred too), R15 (HbA1c 6.5% or above: out of scope), R16 (a CGM or heart-rate input beyond the
+  training range, risk-lowering side) and input rules R17-R21 (file formats, Low/High text, dates, units)
+  run first and refuse with a named reason. Output rule R13 withholds low risk when there is neither
+  history nor both onboarding priors. Output rule R22 (26 Nov) turns low risk into caution when the last
+  pre-meal reading is 140 mg/dL or more or glucose rises faster than 1.5 mg/dL/min
+  (docs/rule_ledger.md).
+- With R22 and the R14 amendment, v1 on development clears 18.1% of meals (target 20%: not met), 6.9% of
+  the cleared meals spike (6 of 87) and the cost reduction is 10.7%; v2 clears 20.2% with 14.4% spiking.
+  The tables below were scored before R22. On the locked eight 2 of 10 clears would become caution
+  (counted only; outcomes not read).
 - Photo model: ConvNeXt-Tiny (ImageNet-22k pre-trained, 1k fine-tuned; pinned revision and SHA-256), last
   stage fine-tuned, two heads; 27.8M parameters, 15.5M fine-tuned. It failed its pre-registered risk gate
   (+0.025 AUROC, −0.010 to +0.061), which is why v2 exists. It reads the plate, not the background, but does

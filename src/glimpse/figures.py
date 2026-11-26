@@ -39,7 +39,7 @@ def f1_system(plt) -> None:
     box(0.0, 3.0, 1.9, 0.9, "meal photo\n(needed by v1;\noptional in v2)")
     box(0.0, 1.7, 1.9, 0.9, "CGM + heart rate\n(2 h before)")
     box(0.0, 0.4, 1.9, 0.9, "profile: 4 fields +\n2 optional priors")
-    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12, R14\u2013R16")
+    box(2.4, 1.6, 2.0, 1.1, "input rules\nR1\u2013R12, R14\u2013R22")
     box(4.9, 3.0, 2.5, 0.9, "ConvNeXt-Tiny (last stage\ntuned): grams + range")
     box(4.9, 1.7, 2.5, 0.9, "trend features\n+ profile inputs")
     box(7.9, 3.2, 2.4, 0.9, "kNN unfamiliar-photo\ncheck (cut 0.614)")

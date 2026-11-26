@@ -331,8 +331,21 @@ Code was sometimes drafted before its registration was committed.
 | README checkpoint table (served, alternative, baseline, superseded) | rubric 6d | README.md |
 | v3 paragraph and v2's monitoring rows moved to the appendix | page limit | docs/report_appendix.md |
 
-Author sign-off, 27 Nov 2026. I read every pass from the tenth to the twenty-first and agree with what is
+Author sign-off, 26 Nov 2026. I read every pass from the tenth to the twenty-first and agree with what is
 recorded here. These decisions were mine: serving v1 again after v2 was not shown to be as good; limiting R16
 to the sensor inputs and to the risk-lowering side; not labelling the 14 local photos with carbs; keeping v3
 as a candidate only; and adding R22 even though it costs clears on development. The assistant wrote code and
 registrations at my instruction. The choices and the conclusions are mine. Maitha Alhosani
+
+## Twenty-second pass, 26 Nov (after the sign-off above; wording and pointers only, no number changed)
+
+| change | why | where |
+|---|---|---|
+| Italic source notes shortened; the full versions kept in the appendix | word limit under either way of counting | docs/final_report.md, docs/report_appendix.md |
+| Page one and the model card state the result with R22 (18.1% cleared, under the 20% target) | the verdict after R22 was only in section 4 | docs/final_report.md, docs/model_card.md, README.md |
+| Three sentences scoped: the instructor samples and R13; R14 to R16 "as first shipped"; "most of the edge" for the intercept | each was broader than its evidence | docs/final_report.md |
+| Figures renumbered in the order they are cited (effects 4, reliability 5, cut-offs 6); README maps numbers to files | Figure 6 was cited before Figure 5 | docs/final_report.md, README.md |
+| `just evaluate` runs the full chain; the 15-minute version is `just evaluate-fast` | the report said evaluate rebuilds every table | Justfile, README.md |
+| Section 1 names the adopter and the scope; section 4 says what 5:1 means and how feedback rows are used; section 5 gives v1's root cause for confident false clears and a pilot policy | rubric items on context, feedback and policy | docs/final_report.md |
+| Figure 1 lists rules R14 to R22; rule list in README and model card through R22 | stale labels | src/glimpse/figures.py, README.md, docs/model_card.md |
+| Sign-off date corrected from 27 Nov to 26 Nov, the day it was committed | date mismatch | docs/changelog.md |

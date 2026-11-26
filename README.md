@@ -62,7 +62,7 @@ hand-made trend features, so the deployed fusion uses those features (see the re
 just install     # Python 3.14 + locked libraries, CGMacros download (PhysioNet), pinned photo weights, dataset + splits
 just check       # ruff + the test suite (some tests skip until the dataset and weights are downloaded)
 just demo        # worked cases (in-sample), two can't-judge cases, timing -> outputs/demo/, then the UI at :7860
-just evaluate    # every report table and figure (needs data and weights)        -> outputs/
+just evaluate    # every report table and figure (needs data and weights; about 45 min; evaluate-fast: 15) -> outputs/
 just report-numbers   # the same tables and figures from committed outputs only (no data, no weights, about 5 min on a 2-CPU machine)
 just predict-folder samples/instructor outputs/folder_run   # the grader's entry point: a folder of meals in, structured answers out
 just app         # local screen at http://127.0.0.1:7860 (optional extra: Gradio)
@@ -84,16 +84,16 @@ just docker-demo                              # needs `just install` first, for 
 | `just prepare` | meal table, windows, person splits, training-only scaling, quality report | 1 min |
 | `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · the intermediate 28-person fusion (`just train` runs all three; the DEPLOYED artifacts come from `just finalize`, the pre-registered regeneration, so train-photo and train-final refuse to overwrite them unless `GLIMPSE_OVERWRITE_FROZEN=1`) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
-| `just evaluate` | parameter budget, both dev evaluations (v1 and v2), v2's metrics, probes and explanation, the unfamiliar-photo check, monitoring, probes A and B, then `just report-numbers` (every other table and figure re-derived from committed outputs); `just evaluate-all` also recomputes the stress, int8 and timing studies; the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun) | about 15 min on a 2-CPU machine (`evaluate-all` about 45) |
+| `just evaluate-fast` | parameter budget, both dev evaluations (v1 and v2), v2's metrics, probes and explanation, the unfamiliar-photo check, monitoring, probes A and B, then `just report-numbers` (every other table and figure re-derived from committed outputs); `just evaluate` also recomputes the stress, int8, timing and registered-check studies; the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun) | about 15 min on a 2-CPU machine (`evaluate` about 45) |
 | `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10-15 min |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`,
 and `just report-numbers` works on a bare clone. `just reproduce-all` reruns the compute studies in dependency
 order (prepare → splits-v2 → params → cv → carbs-check → photo-cv → fusion → ablate → promised → robustness →
 robustness-levels → timing → probes → ood → monitoring → efficiency → stage-timing → stress-quality →
-v2-input-stress → photo-probes → end-to-end-timing → photo-seeds → evaluate → selftest → instructor and
+v2-input-stress → photo-probes → end-to-end-timing → photo-seeds → evaluate-fast → selftest → instructor and
 returning-user folders → stress → demo; about 3 h). The registered last-day checks (`just final-checks`,
-`just robustness-v3`) run under `just evaluate-all`. It never reruns `just finalize` (the frozen serving artifacts,
+`just robustness-v3`, `just rules-r22`) run under `just evaluate`. It never reruns `just finalize` (the frozen serving artifacts,
 regenerated once under a pre-registered procedure) or `just evaluate-locked` (the locked eight, scored once).
 
 **What the grader's folder command does and does not do.** `just predict-folder` answers each meal folder on
@@ -195,16 +195,26 @@ served files (unless `GLIMPSE_OVERWRITE_FROZEN=1`); the served files came from `
 | §1 budget, latency | `just params`, `just efficiency`, `just stage-timing` | `outputs/param_budget.csv`, `outputs/efficiency/` |
 | §1 quality vs cost, §3 baselines | `just cv`; `just report-numbers` | `outputs/cv/cv_summary.json`, `outputs/report_metrics/` |
 | §2 photo recipe, what the photo does | `just photo-cv`, `just fusion`, `just ablate`, `just photo-seeds`, `just promised` | `outputs/photo_cv/`, `outputs/fusion/`, `outputs/ablations/`, `outputs/training/`, `outputs/promised/` |
-| §3 results table, fold cut-offs, Figures 2 and 4 | `just evaluate` (`evaluate-locked` once) | `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` |
+| §3 results table, fold cut-offs, Figures 2 and 5 | `just evaluate` (`evaluate-locked` once) | `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` |
 | §4 cost sweep, usefulness targets | `just evaluate` | `outputs/evaluation_v2/dev_summary.json`, `outputs/report_metrics/` |
 | §1 end-to-end timing, int8 | `just end-to-end-timing`, `just photo-probes` | `outputs/efficiency/end_to_end.json`, `int8.json` |
-| §3-§5 v2 calibration, taxonomy, SHAP, Figures 4 and 5 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
+| §3-§5 v2 calibration, taxonomy, SHAP, Figures 5 and 6 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
 | §3-§5 course checks, OOD AUROC, monitoring power, calibration null | `just final-checks` | `outputs/final_checks/final_checks.json` |
 | §5 debugging table R1-R4, v3 candidate (R5-R7), §6 re-weighted test (R8) | `just robustness-v3` | `outputs/robustness_v3/robustness_v3.json` |
 | §4 stress table | `just stress-quality`, `just v2-input-stress` | `outputs/robustness/stress_quality.json`, `v2_input_stress.json` |
 | appendix stress levels, Figure A1 | `just robustness-levels`, `just timing`, `just promised` | `outputs/robustness/`, `outputs/promised/` |
 | §4 monitoring | `just monitoring`, `just monitoring-replay` | `outputs/monitoring/` |
 | §5 taxonomy, probes, Figure 7 | `just predict-folder`, `just stress`, `just probes`, `just ood`, `just figures` | `outputs/folder_run/`, `outputs/stress_run/`, `outputs/probes/`, `outputs/ood/`, `outputs/figures/` |
+
+Figure numbers and files (the file names keep their first numbering, so earlier commits still resolve): Figure 1
+`fig1_system.png` · 2 `fig2_per_fold_auroc.png` · 3 `fig_training.png` · 4 `fig6_effects.png` · 5
+`fig3_reliability.png` · 6 `fig4_v2.png` · 7 `fig7_shap.png` · A1 `figA1_robustness.png` · A2 `fig5_coverage.png`.
+
+Rules added after the tag, all in docs/rule_ledger.md with the commit that registered each: R14 (a low is
+referred; amended on 26 Nov for a falling 54-69 mg/dL), R15, R16, input rules R17-R21 (semicolon CSVs, a
+photo not named photo.*, Dexcom Low/High text, day-first dates, units in the profile) and R22 (no low risk at
+a last reading of 140 mg/dL or more, or a rise above 1.5 mg/dL/min; the answer becomes caution). With R22,
+v1 clears 18.1% of development meals (target 20%) and 6.9% of those spike; cost reduction 10.7%.
 
 `tests/test_report_numbers.py` checks the report's headline numbers against these files on every commit.
 
