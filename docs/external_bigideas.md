@@ -149,3 +149,29 @@ Reading.
 
 Limits as in Part 1, plus: the carbs are self-logged; one model pair, one run, no multiplicity correction
 across Parts 1 and 2.
+
+## Part 3, planned on 27 Nov before it was run: do the carb-aware model's decisions work on the external people?
+
+Why. Parts 1 and 2 scored ranking. The product is a decision: clear, caution or refer. v2's decisions were
+not shown useful on the external people (Part 1). Part 2 found that a carb-aware model without the
+intercept ranks them much better. The open question is whether that turns into decisions that meet the
+product's own targets on people it has never seen. This is the third look at the same 12 people, which is
+stated with the result.
+
+Fixed before the run, all from CGMacros only:
+- Model: the Part 2 model with logged carbs (v2's recipe and C, fitted on the 37 non-locked CGMacros people).
+- Platt map: fitted on that recipe's out-of-fold scores for the 23 development people (five outer folds).
+- Cut-offs: the pair (low, high) with the lowest declared cost (5 for a missed spike, 1 for a needless
+  caution, 2 or 0.5 for a referral) on those out-of-fold risks, grid 0.05 to 0.60 in steps of 0.01, low at or
+  below high. No per-person intercept. Nothing is chosen on BIG IDEAs.
+
+Scored once on the 201 external meals, against the product's four targets (fixed in the proposal): cost
+reduction against always caution at least 10%, at least 20% of meals cleared, at most 20% referred, at most
+10% of cleared meals spiking. Person-bootstrap intervals, 2,000 draws. Brier, ECE and mean risk minus spike
+rate are reported too, and the same recipe's out-of-fold numbers on CGMacros for reference.
+
+Protocol labels as in the report: met only if the whole interval meets the target, on track if the point
+does, at risk otherwise.
+
+Expectation: more meals cleared than v2 (16.9%) and a positive cost reduction with an interval that still
+includes zero; at most two targets on track. Reported whatever it shows. The served model does not change.
