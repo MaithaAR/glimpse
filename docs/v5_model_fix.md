@@ -194,3 +194,35 @@ used once for v5, so not clean.
 
 Prediction: meal composition and the longer CGM history give the largest gains; the microbiome does not help
 at 23 people; the design-part gain is at least 0.03 in pooled AUROC, and less than half of it transfers.
+
+## Part 3 design frozen (26 Nov, before the transfer check)
+
+104 variants are now in the design log (48 in Part 3). On the design people, against v5:
+
+| added to v5 photo only (0.761 / 0.680, Brier 0.171) | pooled / within-person | Brier | kept? |
+|---|---|---|---|
+| gut-health principal components (3) | 0.779 / 0.682 | 0.166 | yes, +0.021 |
+| profile: sex, insulin, triglycerides, HDL, HOMA-IR | 0.771 / 0.684 | 0.167 | +0.014 alone; +0.002 on top of the microbiome, so no |
+| 4-hour and 24-hour CGM statistics | 0.768 / 0.679 | 0.168 | no, +0.005 |
+| protein, fat, fibre, calories estimated from the photo | 0.757 / 0.674 | 0.172 | no, worse |
+| context (time since the last meal, activity, meal type) | 0.756 / 0.669 | 0.172 | no, worse |
+| a CNN trained to forecast the next 2 hours on all CGM data (no meal labels), its forecast as an input | 0.763 / 0.684 | 0.171 | no, +0.005 |
+| boosted trees; logistic and trees averaged | 0.735 / 0.651; 0.768 / 0.686 | 0.173; 0.166 | no on top of the microbiome |
+
+| added to v5 carbs confirmed (0.766 / 0.729, Brier 0.168) | pooled / within-person | Brier | kept? |
+|---|---|---|---|
+| logged protein, fat, fibre, calories, carb share | 0.774 / 0.744 | 0.168 | yes, +0.023 |
+| the five profile inputs | 0.787 / 0.745 | 0.162 | yes, +0.014 |
+| logistic and trees averaged | 0.792 / 0.763 | 0.160 | yes, +0.023 |
+| gut-health components | 0.792 / 0.740 | 0.160 | no |
+
+Frozen v7 (no post-hoc intercept, per-fold Platt, near-cut training meals dropped, as v5):
+- photo only: v5's 27 inputs plus 3 gut-health components, logistic. Design people 0.779 / 0.682.
+- meal confirmed: carbs, protein, fat, fibre, calories, carb share, carbs relative to the person's usual, the
+  15 trend and profile inputs, 7 person-centred trend inputs, `prev_rise` and 5 more profile inputs; the
+  average of a logistic model and small boosted trees. Design people 0.792 / 0.763.
+
+v1 as shipped on the same people: 0.737 / 0.586. The microbiome was predicted not to help and did on the
+design people; with 23 people that is the input most likely to be chance, and the transfer check is where
+that shows. The gains are steady and small. Nothing in the data gives a large jump: the published ceiling
+with true macronutrients and the microbiome is a correlation of 0.80 on lunches.

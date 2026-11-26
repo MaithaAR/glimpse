@@ -97,9 +97,49 @@ class Data:
                 miss = np.isnan(c)
                 c[miss] = self.photo[fold][rows, 0][miss]
             cols.append(c[:, None])
+        if v.extra.get("static"):
+            cols.append(self.static[v.extra["static"]].to_numpy(float)[rows])
+        if v.extra.get("photo_macros"):
+            cols.append(self.photo_macros[fold - 1][rows])
+        if v.extra.get("forecast"):
+            cols.append(self.forecast(fold)[rows][:, None])
+        if v.extra.get("micro"):
+            cols.append(self.micro(fold, int(v.extra["micro"]))[rows])
         for name in v.extra.get("features", []):
             cols.append(self.history_features(fold, v.carbs if v.carbs != "none" else "photo", test)[name][rows])
         return np.hstack(cols)
+
+    @property
+    def static(self) -> pd.DataFrame:
+        if "static" not in self._hist:
+            self._hist["static"] = pd.read_csv(OUT / "v7_static.csv")
+        return self._hist["static"]
+
+    @property
+    def photo_macros(self) -> np.ndarray:
+        if "pm" not in self._hist:
+            self._hist["pm"] = np.load(OUT / "v7_photo_macros.npy").astype(float)
+        return self._hist["pm"]
+
+    def forecast(self, fold: int) -> np.ndarray:
+        """The CGM forecaster's 2-hour rise per sample for outer fold `fold` (outputs/v5_model_fix/)."""
+        if "fc" not in self._hist:
+            f = OUT / "v7_forecast.npy"
+            self._hist["fc"] = np.load(f) if f.is_file() else np.tile(np.load(OUT / "v7_forecast_crossfit.npy"), (5, 1))
+        return self._hist["fc"][fold - 1]
+
+    def micro(self, fold: int, n: int) -> np.ndarray:
+        """Gut-health principal components per sample, fitted on the fold's training people only."""
+        from glimpse.studies.v7_features import microbiome_pcs
+
+        key = ("micro", fold, n)
+        if key not in self._hist:
+            pcs = microbiome_pcs(set(self.train_people(fold)), n)
+            self._hist[key] = pcs.reindex(self.pid).to_numpy()
+        return self._hist[key]
+
+    def train_people(self, fold: int) -> list[int]:
+        return self._hist.get(("train", fold)) or self.sp.training_people(fold - 1)
 
     def history_features(self, fold: int, source: str, test: bool) -> dict[str, np.ndarray]:
         """Causal per-person features from earlier meals (labels only from meals whose 2-hour window closed).
@@ -150,6 +190,13 @@ def _fit_score(v: Variant, D: Data, fold: int, tr: np.ndarray, te: np.ndarray, c
     if v.drop_near:
         tr = tr[np.abs(D.rise[tr] - CUT) >= v.drop_near]
     Xtr, Xte = D.X(v, fold, tr, False), D.X(v, fold, te, True)
+    if v.model == "blend":  # logistic and small boosted trees, logits averaged
+        out = []
+        for kind in ("lr", "gbm"):
+            mm = _make(Variant("part", model=kind), c if kind == "lr" else 200, D.cfg.seed).fit(Xtr, D.y[tr])
+            pp = np.clip(mm.predict_proba(Xte)[:, 1], 1e-6, 1 - 1e-6)
+            out.append(np.log(pp / (1 - pp)))
+        return (out[0] + out[1]) / 2
     m = _make(v, c, D.cfg.seed)
     if v.target == "rise":
         r = np.clip(D.rise[tr], -50, 200)
@@ -344,4 +391,111 @@ def confirm(D: Data) -> dict:
         res[name]["verdict"] = ("confirmed" if both and (p["ci95"][0] > 0 or w["ci95"][0] > 0)
                                 else "direction only" if both else "not confirmed")  # fmt: skip
     out_file.write_text(json.dumps(res, indent=2))
+    return res
+
+
+V7 = {
+    "photo_only": Variant("v7, photo only", centred=True, intercept="none", drop_near=5.0,
+                          extra={"features": ["prev_rise"], "micro": 3}),
+    "meal_confirmed": Variant("v7, meal confirmed", photo=False, centred=True, carbs="confirmed", intercept="none",
+                              drop_near=5.0, model="blend",
+                              extra={"features": ["carb_centred", "prev_rise"],
+                                     "static": ["protein", "fat", "fiber", "kcal", "carb_share", "male", "log_insulin",
+                                                "log_trig", "hdl", "log_homa"]}),
+}  # fmt: skip
+V1_RECIPE = Variant("v1 recipe", m=1.0)
+
+
+def predict_custom(v: Variant, D: Data, held: list[int], train: list[int], inner: list[list[int]],
+                   pfold: int) -> pd.DataFrame:  # fmt: skip
+    """predict() for people outside the outer folds: fit on `train`, tune on `inner`, score `held`.
+    `pfold` names the committed photo table to read (its estimates never saw the person)."""
+    ds = D.ds
+    D._hist[("train", pfold)] = list(train)
+    for key in [k for k in D._hist if isinstance(k, tuple) and k[0] == "micro"]:
+        del D._hist[key]
+    tr, te = meal_rows(ds, set(train), scored_only=False), meal_rows(ds, set(held), scored_only=True)
+    parts = [(meal_rows(ds, set(train) - set(h), scored_only=False), meal_rows(ds, set(h), scored_only=True))
+             for h in inner]  # fmt: skip
+    grid = [v.C] if v.C is not None else _grid(v, D)
+    best, best_loss, best_oof = grid[0], np.inf, None
+    for c in grid:
+        oof = [(_fit_score(v, D, pfold, a, b, c), b) for a, b in parts]
+        f, rows = np.concatenate([o[0] for o in oof]), np.concatenate([o[1] for o in oof])
+        loss = log_loss(D.y[rows], 1 / (1 + np.exp(-f)), labels=[0, 1])
+        if loss < best_loss - 1e-12:
+            best, best_loss, best_oof = c, loss, (f, rows)
+    f = _fit_score(v, D, pfold, tr, te, best)
+    if v.platt:
+        pl = LogisticRegression(C=1e6, max_iter=1000).fit(best_oof[0][:, None], D.y[best_oof[1]])
+        f = float(pl.coef_[0, 0]) * f + float(pl.intercept_[0])
+    off = _offsets(v, D, te, f, v.m if v.m is not None else 1.0, float(D.y[tr].mean()))
+    del D._hist[("train", pfold)]
+    return pd.DataFrame({"row": te, "person_id": D.pid[te], "spike": D.y[te], "risk": 1 / (1 + np.exp(-(f + off)))})
+
+
+def _boot(d: pd.DataFrame, a: str, b: str) -> dict:
+    """a minus b for pooled AUROC, within-person AUROC and Brier; bootstrap over people, 2,000 draws, seed 0."""
+    rng, ppl = np.random.default_rng(0), d.person_id.unique()
+    g = {p: (x.spike.to_numpy(), x[a].to_numpy(), x[b].to_numpy()) for p, x in d.groupby("person_id")}
+    wd = {p: roc_auc_score(y, u) - roc_auc_score(y, w) for p, (y, u, w) in g.items() if len(set(y)) == 2}
+
+    def stats(people) -> tuple[float, float, float]:
+        y, u, w = (np.concatenate([g[p][i] for p in people]) for i in range(3))
+        ws = [wd[p] for p in people if p in wd]
+        return (float(roc_auc_score(y, u) - roc_auc_score(y, w)), float(np.mean(ws)) if ws else float("nan"),
+                float(np.mean((u - y) ** 2) - np.mean((w - y) ** 2)))  # fmt: skip
+
+    draws = np.array([stats(rng.choice(ppl, len(ppl))) for _ in range(2000)])
+    pt = stats(ppl)
+    return {n: {"point": pt[i], "ci95": [float(x) for x in np.nanpercentile(draws[:, i], [2.5, 97.5])]}
+            for i, n in enumerate(("pooled_auroc", "within_person_auroc", "brier"))}  # fmt: skip
+
+
+def _verdict(c: dict) -> str:
+    w, p, b = c["within_person_auroc"], c["pooled_auroc"], c["brier"]
+    not_worse = p["ci95"][1] >= 0 and b["ci95"][0] <= 0
+    if w["point"] > 0 and not_worse:
+        return "transfers" if w["ci95"][0] > 0 else "direction only"
+    return "does not transfer"
+
+
+def transfer_check(D: Data) -> dict:
+    """The registered one-time check on the 14 type-2 people (never scored before), two halves."""
+    out_file = OUT / "transfer_check.json"
+    if out_file.is_file():
+        raise SystemExit("the transfer check has been run; it is scored once (docs/v5_model_fix.md)")
+    t2d, dev = sorted(D.sp.t2d), [p for f in D.sp.dev_folds for p in f]
+    halves = [t2d[0::2], t2d[1::2]]
+    recipes = {"v1_recipe": V1_RECIPE, "v5_photo_only": FROZEN["photo_only"], "v7_photo_only": V7["photo_only"],
+               "v7_meal_confirmed": V7["meal_confirmed"]}  # fmt: skip
+    frames = []
+    for h, held in enumerate(halves):
+        d = None
+        for name, v in recipes.items():
+            r = predict_custom(v, D, held, dev + halves[1 - h], [list(f) for f in D.sp.dev_folds], 1)
+            d = r.rename(columns={"risk": name}) if d is None else d.merge(r[["row", "risk"]].rename(
+                columns={"risk": name}), on="row")  # fmt: skip
+        frames.append(d.assign(half=h + 1))
+    d = pd.concat(frames, ignore_index=True)
+    d.to_csv(OUT / "transfer_check.csv", index=False)
+    res = {"what": "v7 transfer check on the 14 type-2 people, scored once", "people": int(d.person_id.nunique()),
+           "meals": len(d), "spike_rate": float(d.spike.mean()),
+           "scores": {n: score(d, n) | {"ece": _ece(d.spike.to_numpy(), d[n].to_numpy())} for n in recipes}}  # fmt: skip
+    for n in ("v5_photo_only", "v7_photo_only", "v7_meal_confirmed"):
+        c = _boot(d, n, "v1_recipe")
+        res[f"{n}_minus_v1_recipe"] = c | {"verdict": _verdict(c)}
+    out_file.write_text(json.dumps(res, indent=2))
+    return res
+
+
+def second_look(D: Data) -> dict:
+    """v7 on the confirmation people (folds 4 and 5): a second look at people v5 already used once, not clean."""
+    b = v1_baseline(D, CONFIRM_FOLDS).rename(columns={"risk": "v1"})
+    res = {"what": "v7 on folds 4 and 5, second look (not clean)", "v1_shipped": score(b, "v1")}
+    for name, v in V7.items():
+        j = predict(v, D, CONFIRM_FOLDS).merge(b[["row", "v1"]], on="row").rename(columns={"risk": name})
+        c = _boot(j, name, "v1")
+        res[name] = {"on_v1_answered": score(j, name) | {"ece": _ece(j.spike.to_numpy(), j[name].to_numpy())}, **c}
+    (OUT / "second_look.json").write_text(json.dumps(res, indent=2))
     return res
