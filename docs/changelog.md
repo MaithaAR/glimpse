@@ -307,7 +307,7 @@ Code was sometimes drafted before its registration was committed.
 | Smaller precision fixes: heart rate 140 bpm (v1) and 160 bpm (v2); memory measured for v1 only; the intercept's gain stated with its interval; noise-floor 95th centiles added; the locked no-history point given as 20.9% cleared, 21.9% spiking; probe B 8.5% in both products; sources added to three captions; the parameter-budget label | imprecise wording or a missing source (about 30 of 770 claims) | docs/final_report.md |
 | Figures 2, 6 and 7 narrower; the glycaemic-status table moved to the appendix | page limit | docs/report_appendix.md |
 
-## 27 Nov 2026, twentieth pass (three fresh grades, 78 to 83; items 1 to 7 of the plan that followed)
+## 26 Nov 2026, twentieth pass (three fresh grades, 78 to 83; items 1 to 7 of the plan that followed)
 
 | Change | Why | Evidence |
 |---|---|---|

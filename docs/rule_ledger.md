@@ -220,7 +220,7 @@ v1's frozen training meals and sides from v1's coefficients (configs/v1_input_ra
 development or locked decision of v1 changes (re-evaluated, byte-identical answers); the heart-rate sweep
 (outputs/probes/v1_hr_sweep.json) refuses 120 bpm and above, where v1 had cleared from 140 bpm.
 
-## Input changes R17-R19 (registered 27 Nov, before the change; from the round-19 grader's unseen inputs)
+## Input changes R17-R19 (registered 26 Nov, before the change; from the round-19 grader's unseen inputs)
 Observed: of 19 unseen inputs a grader built (scratchpad copy, not committed), four were handled badly:
 a semicolon CSV and a semicolon CSV with decimal commas were refused as "missing columns" although both
 columns are present; a photo named IMG_0412.JPEG or photo.webp gave "no meal photo was taken"; Dexcom
@@ -235,7 +235,7 @@ columns are present; a photo named IMG_0412.JPEG or photo.webp gave "no meal pho
 Predicted before the change: no development, locked or evaluated decision changes (the evaluation passes
 arrays, not files); the instructor folder is unchanged; stress cases 01 (semicolon) and 04 ("high"/"low")
 change from refusals to the behaviour above, and their manifest rows are updated.
-Result (27 Nov): as predicted. The instructor folder's decisions are unchanged; stress case 01 is now read
+Result (26 Nov): as predicted. The instructor folder's decisions are unchanged; stress case 01 is now read
 (v1 then refuses its unreadable placeholder photo, v2 answers caution), case 04 is refused for too few
 readings; the grader's semicolon, decimal-comma, IMG_0412.JPEG and photo.webp folders are answered, and a
 last reading of "Low" gets rule R14's guidance. Tests: tests/test_input_rules_r17_r19.py.
