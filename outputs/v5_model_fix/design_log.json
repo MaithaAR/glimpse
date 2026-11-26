@@ -2319,5 +2319,822 @@
    "brier": 0.17812494710841106,
    "meals": 299
   }
+ },
+ {
+  "variant": {
+   "name": "v5 photo only (ref)",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "none",
+   "m": null,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 0.17070041642996306,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7605827377680044,
+   "within": 0.6807877248139135,
+   "sum": 1.441370462581918,
+   "brier": 0.17168178020138916,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen5 m1",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 1.0,
+   "start_after": 0,
+   "freeze_at": 5,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7563885850651287,
+   "within": 0.6237403896872495,
+   "sum": 1.3801289747523784,
+   "brier": 0.16941522166911055,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7483782297965916,
+   "within": 0.6196030017340721,
+   "sum": 1.3679812315306639,
+   "brier": 0.17252571568344865,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen5 m2",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 2.0,
+   "start_after": 0,
+   "freeze_at": 5,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7640449438202247,
+   "within": 0.6408606597374713,
+   "sum": 1.4049056035576961,
+   "brier": 0.16752617437105424,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7575590984057173,
+   "within": 0.638848368909391,
+   "sum": 1.3964074673151083,
+   "brier": 0.16987825005202195,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen5 m4",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 4.0,
+   "start_after": 0,
+   "freeze_at": 5,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7624042955155613,
+   "within": 0.6574899663764399,
+   "sum": 1.4198942618920012,
+   "brier": 0.16773985065905084,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.75761407366685,
+   "within": 0.6556796957503797,
+   "sum": 1.4132937694172296,
+   "brier": 0.16951683427706163,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen5 m8",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 8.0,
+   "start_after": 0,
+   "freeze_at": 5,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7614596798249975,
+   "within": 0.6638782290352339,
+   "sum": 1.4253379088602314,
+   "brier": 0.16866824755091442,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7589884551951622,
+   "within": 0.6624383287795441,
+   "sum": 1.4214267839747063,
+   "brier": 0.17008059717006702,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen10 m1",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 1.0,
+   "start_after": 0,
+   "freeze_at": 10,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7731928010341056,
+   "within": 0.630295102911045,
+   "sum": 1.4034879039451504,
+   "brier": 0.16590238338633645,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7670698185816383,
+   "within": 0.6306183615237771,
+   "sum": 1.3976881801054155,
+   "brier": 0.16851578669762274,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen10 m2",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 2.0,
+   "start_after": 0,
+   "freeze_at": 10,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7746842994928905,
+   "within": 0.6450920052840342,
+   "sum": 1.4197763047769247,
+   "brier": 0.1644804423294032,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7691039032435404,
+   "within": 0.645208711190214,
+   "sum": 1.4143126144337543,
+   "brier": 0.1665914483523617,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen10 m4",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 4.0,
+   "start_after": 0,
+   "freeze_at": 10,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7731430844188126,
+   "within": 0.6486336861832032,
+   "sum": 1.421776770602016,
+   "brier": 0.1650725866360992,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7680593732820232,
+   "within": 0.6482255319592595,
+   "sum": 1.4162849052412827,
+   "brier": 0.1667524036401872,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen10 m8",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 8.0,
+   "start_after": 0,
+   "freeze_at": 10,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7692154718106792,
+   "within": 0.660840623279029,
+   "sum": 1.430056095089708,
+   "brier": 0.16664972823610713,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7663001649257833,
+   "within": 0.6586244768523564,
+   "sum": 1.4249246417781398,
+   "brier": 0.16802448208002702,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen15 m1",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 1.0,
+   "start_after": 0,
+   "freeze_at": 15,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7685194391965795,
+   "within": 0.6226850250751217,
+   "sum": 1.3912044642717012,
+   "brier": 0.16723404217373147,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.762891698735569,
+   "within": 0.6214916521712225,
+   "sum": 1.3843833509067913,
+   "brier": 0.16970547304562675,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen15 m2",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 2.0,
+   "start_after": 0,
+   "freeze_at": 15,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7706075370388783,
+   "within": 0.6382147227883943,
+   "sum": 1.4088222598272726,
+   "brier": 0.16575352659744916,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.765475536008796,
+   "within": 0.6368397722029173,
+   "sum": 1.4023153082117132,
+   "brier": 0.16780370547682077,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen15 m4",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 4.0,
+   "start_after": 0,
+   "freeze_at": 15,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7714030028835637,
+   "within": 0.6423480267272538,
+   "sum": 1.4137510296108173,
+   "brier": 0.1659604629447652,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7668499175371083,
+   "within": 0.6415112270746647,
+   "sum": 1.408361144611773,
+   "brier": 0.1676284812651876,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 frozen15 m8",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual_frozen",
+   "m": 8.0,
+   "start_after": 0,
+   "freeze_at": 15,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7678234065824798,
+   "within": 0.6539551103307143,
+   "sum": 1.4217785169131942,
+   "brier": 0.1671213716833969,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7652006597031337,
+   "within": 0.6516410695956208,
+   "sum": 1.4168417292987545,
+   "brier": 0.16850167249290127,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 residual m2",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 2.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7720493188823705,
+   "within": 0.6352615000851716,
+   "sum": 1.407310818967542,
+   "brier": 0.16569488212617506,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7667399670148434,
+   "within": 0.634676656079275,
+   "sum": 1.4014166230941183,
+   "brier": 0.16787311638261512,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 residual m4",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 4.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7722481853435419,
+   "within": 0.6411906193198463,
+   "sum": 1.4134388046633881,
+   "brier": 0.16568928400099325,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7675096206706982,
+   "within": 0.6399834492968869,
+   "sum": 1.4074930699675852,
+   "brier": 0.1674634975646206,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 residual m8",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 8.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7690663219648006,
+   "within": 0.6522619886375924,
+   "sum": 1.421328310602393,
+   "brier": 0.16675920039832837,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7662451896646509,
+   "within": 0.6521966251511765,
+   "sum": 1.4184418148158273,
+   "brier": 0.16821609200397852,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 residual m16",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 16.0,
+   "start_after": 0,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.765735308740181,
+   "within": 0.6610347648862142,
+   "sum": 1.426770073626395,
+   "brier": 0.16808934016812613,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7643760307861464,
+   "within": 0.6593817444174043,
+   "sum": 1.4237577752035506,
+   "brier": 0.16933472465373653,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 residual m2 start5",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 2.0,
+   "start_after": 5,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7685691558118724,
+   "within": 0.6225448090109926,
+   "sum": 1.391113964822865,
+   "brier": 0.16685126473814407,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7632765255634963,
+   "within": 0.6198117428568739,
+   "sum": 1.3830882684203702,
+   "brier": 0.1689594000860214,
+   "meals": 299
+  }
+ },
+ {
+  "variant": {
+   "name": "v6 residual m8 start5",
+   "photo": true,
+   "centred": true,
+   "carbs": "none",
+   "target": "label",
+   "drop_near": 5.0,
+   "model": "lr",
+   "C": null,
+   "platt": true,
+   "intercept": "residual",
+   "m": 8.0,
+   "start_after": 5,
+   "freeze_at": 0,
+   "extra": {
+    "features": [
+     "prev_rise"
+    ]
+   }
+  },
+  "all_meals": {
+   "pooled": 0.7682708561201154,
+   "within": 0.6546028679229162,
+   "sum": 1.4228737240430316,
+   "brier": 0.16729571918166805,
+   "meals": 315
+  },
+  "raw_all_meals": {
+   "pooled": 0.7606144973650194,
+   "within": 0.6804386586753737,
+   "sum": 1.4410531560403932,
+   "brier": 2.2050474400555244,
+   "meals": 315
+  },
+  "on_v1_answered": {
+   "pooled": 0.7655305112699285,
+   "within": 0.6553783448826037,
+   "sum": 1.4209088561525323,
+   "brier": 0.16873234100446022,
+   "meals": 299
+  }
  }
 ]

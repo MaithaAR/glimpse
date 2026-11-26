@@ -155,3 +155,42 @@ v1's per-fold median m = 1.0 intercept), v5 photo only, and v6.
 
 Prediction: direction only. The type-2 people spike more often and their meals differ, so the size of any
 gain is not expected to match.
+
+## Part 2 result: no v6 (26 Nov)
+
+18 offset variants on top of v5 photo only were scored on the design people (design_log.json). All lowered
+the Brier score (0.1707 to between 0.1645 and 0.1694), and all lowered the sum of pooled and within-person
+AUROC by more than the 0.01 allowed (best: frozen after 10 meals with m = 8, 1.4301 against 1.4411). By the
+registered rule none is kept. The transfer check on the type-2 people was not run and stays unused.
+
+## Part 3, registered 26 Nov before any run: new inputs (v7), then the transfer check
+
+The author asked for every reasonable method and a literature search. Two sources read on 26 Nov:
+Kondratyeva et al. (arXiv 2609.24453) on CGMacros lunches report that meal composition is the dominant
+predictor (correlation with the 2-hour response 0.24 from clinical variables alone, 0.59 with image-estimated
+macronutrients, 0.74 with the gut microbiome added, 0.80 with true macronutrients); a public XGBoost write-up
+on the Hall data uses 24-hour and 4-hour CGM statistics with macronutrients. GLIMPSE uses carbs only, four
+profile fields and a 2-hour window. The data it already has holds much more.
+
+Design on the design people only (folds 1 to 3), every variant logged. Input families that may be added to
+v5, alone or together:
+
+1. Meal composition from the photo: protein, fat, fibre and calories estimated by ridge heads on the frozen
+   photo features, fitted without the person (as the committed carb ridge baseline is).
+2. Meal composition confirmed by the user: the logged protein, fat, fibre and calories next to the carbs.
+3. More of the profile: sex, fasting insulin, triglycerides, HDL, insulin resistance (HOMA-IR).
+4. Context before the meal: minutes since the previous meal, activity in the last hour, heart-rate slope,
+   meal type, and CGM statistics over the last 4 and 24 hours (mean, spread, time above 140 mg/dL).
+5. Gut microbiome summaries (a few principal components fitted on training people only).
+6. Model class: logistic, small boosted trees, and their average.
+
+Selection as in the first design part (sum of pooled and within-person AUROC up by at least 0.01 per kept
+step, neither part down by more than 0.01), with one addition: the Brier score must not be worse than v5's.
+Two frozen models again: photo only (families 1, 3, 4, 5) and meal confirmed (family 2 as well).
+
+Then the transfer check registered in Part 2 runs once, with v7 in the place of v6, on the 14 type-2 people.
+The confirmation people (folds 4 and 5) are also reported for v7, labelled as a second look at people already
+used once for v5, so not clean.
+
+Prediction: meal composition and the longer CGM history give the largest gains; the microbiome does not help
+at 23 people; the design-part gain is at least 0.03 in pooled AUROC, and less than half of it transfers.
