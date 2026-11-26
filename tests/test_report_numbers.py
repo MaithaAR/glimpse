@@ -678,7 +678,7 @@ def test_final_checks_and_d8_cells():
     text = " ".join(REPORT.read_text().split())
     f = _load("outputs/final_checks/final_checks.json")
     s1 = f["s1_s2"]["s1_shuffled"]
-    assert f"{s1['mean']:.3f} ({s1['min']:.3f}–{s1['max']:.3f}), against {s1['real']:.3f} unshuffled" in text
+    assert f"{s1['mean']:.3f} (range {s1['min']:.3f}–{s1['max']:.3f}), against {s1['real']:.3f} unshuffled" in text
     c = f["s1_s2"]["s2_learning_curve"]
     assert " / ".join(f"{c[k]['mean']:.3f}" for k in ("4", "8", "12", "all (about 18)")) in text
     s4 = f["s4"]
