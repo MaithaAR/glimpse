@@ -350,3 +350,10 @@ registrations at my instruction. The choices and the conclusions are mine. Maith
 | Figure 1 lists rules R14 to R22; rule list in README and model card through R22 | stale labels | src/glimpse/figures.py, README.md, docs/model_card.md |
 | Sign-off date corrected from 27 Nov to 26 Nov, the day it was committed | date mismatch | docs/changelog.md |
 | Pilot policy in section 5 shortened to a proposal with no monthly rule and no 10% figure; approved by the author | the longer draft named a review that is not in the code | docs/final_report.md |
+
+## Twenty-third pass, 26 Nov (after the first upload; wording only, no number changed)
+
+| change | why | where |
+|---|---|---|
+| Spike label defined in section 1; the identity check states the 97.8% for sensor and profile inputs; the non-meal pictures are named as synthetic or generated; the shuffled-label range is stated as wider than predicted; the no-history row carries its locked cost; the abstention error is defined; "a recipe behind every table" excepts the locked run | factual points raised by two cold graders of the uploaded version | docs/final_report.md |
+| Source notes shortened to keep the word count under 3,000 by either way of counting | word limit | docs/final_report.md |
