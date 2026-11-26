@@ -59,7 +59,8 @@ personal basis to clear a meal. The instructor samples carry no priors, so witho
 give caution or can't judge, never low risk.
 
 Tooling: uv with Python 3.14
-(locked), strict Pydantic, Loguru, a `just` recipe for every number, 215 tests (214 pass with the data
+(locked), strict Pydantic, Loguru, a `just` recipe behind every table (the locked run is once only), 215
+tests (214 pass with the data
 and weights, one an expected failure; 198 pass without them; logs in outputs/finalize/), W&B offline runs
 replayed from committed training histories (outputs/wandb/), and a git history from the 27 Sep proposal;
 from 2 Nov every registration commit precedes its results commit.
@@ -127,11 +128,9 @@ about 0.03 here, a ceiling the photo matches. D8 (registered 1 Nov, docs/final_d
 from training every meal sharing an exact macro profile with the held-out person: the photo's gain fell to
 −0.005, against +0.037 for a random drop of the same size (difference −0.041, −0.093 to +0.008). The photo
 may be recognising repeated meals rather than reading carbs. Fine-tuning loses to ridge on grams but
-wins on the carb range (F1 0.61 against 0.38), and the range is what the user is shown. The probes say
-what the photo model reads. It
-looks at the plate rather than the background (probe D), and on its
-training photos it does not scale grams with how large the food looks (probe E, appendix; inconclusive on the
-14 unseen), so it reads what kind of meal this is more than how much.
+wins on the carb range (F1 0.61 against 0.38), and the range is what the user is shown. The model looks at the plate,
+not the background (probe D), and does not scale grams with how large the food looks (probe E, appendix),
+so it reads what kind of meal this is more than how much.
 
 ## 3. Evaluation and ablations
 The 45 CGMacros participants (ages 18 to 69, 64% female) wore a CGM for about ten days. 158 of the 481 development
@@ -141,8 +140,7 @@ choosing everything (fusion C, Platt map, intercept shrinkage m, cut-offs); 14 T
 8 people were locked at the proposal. Each development meal is scored once; the primary metric is AUROC.
 One caveat: fold 1 holds the five people the intermediate evaluation scored, and the calibration fix was
 designed after a diagnosis on them, so development carries selection pressure the locked eight do not.
-v2, chosen after v1's locked result, carries more, and its development number is likely optimistic as v1's
-was (0.762 on development, 0.645 locked).
+v2, chosen after v1's locked result, carries more.
 
 Postprandial response is person-specific (Zeevi et al. 2015; Berry et al. 2020). The calibration fix is a
 per-fold Platt map plus a penalised per-person intercept fitted only on that person's earlier meals whose
@@ -229,7 +227,7 @@ settings that re-choose the cut-offs (appendix). The verdict holds
 only near the declared prices. The served cut-offs, 0.15 and 0.16, minimise this cost on the replay of all
 development answers in deployment order (checkpoints/thresholds.json); the evaluated numbers use each
 fold's own inner-fold cut-offs. Referring more meals does not buy accuracy: at 10% abstention the error on
-answered meals rises from 47.0% to 48.1% (report_metrics.json coverage_risk).
+answered meals rises from 47.0% to 48.1%.
 
 Rule R22, added after grading and approved before its count, withholds a clear when the last pre-meal
 reading is 140 mg/dL or more or glucose rises faster than 1.5 mg/dL/min. It turns 22 of v1's 109
@@ -345,7 +343,7 @@ and 7 spike, against 32 and 3 for v1, and saves 4.2% of cost against 13.7%. v1 s
 
 *outputs/v5_model_fix/ (104 design variants logged). Brier without a post-hoc intercept: 0.192 against v1's 0.186 on the 8, 0.182 against 0.186 on the 14.*
 
-![Figure 7: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/fig7_shap.png){width=49%}
+![Figure 7: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/fig7_shap.png){width=60%}
 
 Who gets hurt. A false clear tells a person with prediabetes that a meal is safe when it is not, and we
 priced it as the worst error. In v1 most false clears fell on healthy people, and R22 now holds back a
@@ -376,10 +374,13 @@ docs/changelog.md names her decisions after the tag. No v1 artifact or locked nu
 CGMacros is de-identified public PhysioNet data under the source study's ethics approval; no new human
 data. Forty-five people from one study, repeated standardised meals, no local cuisine; T2D participants
 only train, so no claim is made for them. The three weakest points, as we see them:
+
 1. The only clean test has 8 people, and it failed 3 of 4 usefulness targets.
-2. The photo, the largest network, is not shown to add value; it may only recognise repeated meals.
+2. The photo, the largest network, is not shown to add value; it may only recognise repeated meals. Under
+   v5's recipe its within-person gain is positive in three groups and clear in one (§5).
 3. Most of the edge is a per-person base rate; within a person, v1 ranks meals at AUROC 0.60 (v2 0.54).
-   v5 (§5) raises this on unseen people, without a locked test.
+   v5 raises this on unseen people, without a locked test and without a better decision.
+
 
 What this supports: an advisory research prototype, with no clinical validation, end-user test or
 regulatory review, that clears a meal only with personal history or priors. Next: v5 and the
