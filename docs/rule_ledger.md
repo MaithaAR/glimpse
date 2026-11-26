@@ -274,3 +274,15 @@ clears is counted; their outcomes are not read.
 Predicted before the run: R22 removes some development clears, mostly spiking ones, so misses among clears
 fall and the cleared share falls by under 5 points; the R14 amendment affects no development meal (the
 lowest last reading is 67 mg/dL) or at most a handful.
+Result (26 Nov, outputs/rules_r22/rules_r22.json): R22 turns 22 of v1's 109 development clears into caution,
+and only 2 of the 22 spiked: the label is a rise from the pre-meal baseline, so a meal eaten on a high or
+rising glucose rarely "spikes" by that definition, and the prediction (mostly spiking clears) was not met.
+With both rules v1's development numbers become: cleared 18.1% (target 20%: no longer on track), misses among
+clears 6.9% (6 of 87), cost reduction 10.7%. The R14 amendment refers 1 development meal per product. For v2,
+R22 removes 21 clears with 1 spike, and its misses among clears rise to 14.4%. On the locked eight, R22 would
+turn 2 of v1's 10 clears into caution (outcomes not read). The author kept both rules: an answer of "low
+risk" at 185 mg/dL is wrong for the user whatever the label says. Instructor, stress and returning-user
+answers are unchanged. Tests: tests/test_hardening_r14.py.
+Also 26 Nov (no decision changes): a meal time with a UTC offset next to local CGM times is refused with that
+reason (it had been misread as readings after the meal); other images beside photo.* are flagged
+`extra_photos_ignored`; HbA1c in mmol/mol and fasting glucose in mmol/L get the conversion in the refusal.

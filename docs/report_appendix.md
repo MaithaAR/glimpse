@@ -332,6 +332,16 @@ it is not part of the report.
 
 ## Moved from the report on 26 Nov (page limit)
 
+The v3 candidate (moved from report §5): A regularised photo branch (v3: heads only on frozen summaries; checks 5 to 7) picked the strongest setting in every fold (weight decay 0.1, dropout 0.5, two augmented views). Its train-validation gap is 0.13 against v1's 0.35, carb error rose from 22.6 to 26.0 g (prediction not met) and AUROC moved −0.007 (−0.019, +0.006). Without repeated meals (check 6) its photo gain is +0.009 (−0.010, +0.031). The seed spread (0.005) is well below v3's ordinary gain (0.030; prediction not met), so the gain is not seed noise; with check 6 it points to meal recognition. v3 stays a candidate.
+
+| v2 monitoring rows (moved from report §4) | demonstration | result |
+|---|---|---|
+| detection power, v2 (registered): stream switches to prediabetic people only (spike rate 43%) | 500 simulated streams | calibration CUSUM: 23% detect within 120 answers, 5% false alarms before the switch; caution share: 13%, 1% |
+| v2 inputs (registered 26 Nov): share of answers without heart rate; Brier of the last 20 answers | 24 development blocks of 20, a watch-off block, 200 blocks with a quarter of labels wrong | heart rate: no clean alarm, the watch-off block fires; Brier: 2 clean alarms in 24, label errors caught in 26% of blocks; expectation not met (at most 1 in 20); development never lacked heart rate, so the first is a presence check |
+
+*outputs/probes/v2_probes.json (monitors), registered in docs/v2_hardening.md (Part B); outputs/monitoring/.*
+
+
 | v2-only stress rows (moved from report §4) | v2: AUROC, spikes among cleared | v2: caution → low risk | v1: AUROC | v1: caution → low risk |
 |---|---|---|---|---|
 | heart rate removed / half its readings dropped | 0.745 / 0.753; 11.6% / 12.7% | 17 (9 the other way) / 0 | – | – |

@@ -1,0 +1,49 @@
+{
+  "what": "Rule R22 and the R14 amendment (docs/rule_ledger.md, registered 26 Nov before any run): their effect counted",
+  "v1": {
+    "r14_falling_low_refused": 1,
+    "r22_clears_to_caution": 22,
+    "spiked_among_r22": 2,
+    "before": {
+      "cost_reduction": 0.14396284829721362,
+      "cleared_share": 0.22661122661122662,
+      "cant_judge_share": 0.13721413721413722,
+      "cleared": 109,
+      "missed_among_cleared": 0.07339449541284404,
+      "missed": 8
+    },
+    "after": {
+      "cost_reduction": 0.10681114551083593,
+      "cleared_share": 0.18087318087318088,
+      "cant_judge_share": 0.1392931392931393,
+      "cleared": 87,
+      "missed_among_cleared": 0.06896551724137931,
+      "missed": 6
+    }
+  },
+  "v2": {
+    "r14_falling_low_refused": 1,
+    "r22_clears_to_caution": 21,
+    "spiked_among_r22": 1,
+    "before": {
+      "cost_reduction": 0.10216718266253866,
+      "cleared_share": 0.24532224532224534,
+      "cant_judge_share": 0.08316008316008316,
+      "cleared": 118,
+      "missed_among_cleared": 0.1271186440677966,
+      "missed": 15
+    },
+    "after": {
+      "cost_reduction": 0.049535603715170295,
+      "cleared_share": 0.20166320166320167,
+      "cant_judge_share": 0.08523908523908524,
+      "cleared": 97,
+      "missed_among_cleared": 0.14432989690721648,
+      "missed": 14
+    }
+  },
+  "locked_counted_only": {
+    "r14_falling_low_refused": 0,
+    "r22_clears_to_caution": 2
+  }
+}

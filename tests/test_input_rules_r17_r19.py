@@ -48,7 +48,7 @@ def test_r18_photo_discovery(tmp_path: Path):
     named.mkdir()
     (named / "photo.webp").write_bytes(b"x")
     (named / "other.jpg").write_bytes(b"x")
-    assert find_photo(named) == (named / "photo.webp", [])
+    assert find_photo(named) == (named / "photo.webp", ["extra_photos_ignored"])
     two = tmp_path / "two"
     two.mkdir()
     (two / "a.jpg").write_bytes(b"x")
@@ -92,3 +92,16 @@ def test_r21_profile_units(tmp_path: Path):
     prof = {"age": 42, "bmi": 27.5, "a1c_pct": "5.9 %", "fasting_glucose_mgdl": "104 mg/dL"}
     a = answer_from_files(bare_pipeline(risk=0.45, table={}), p, None, MEAL, prof)
     assert "not a number" not in (a.reason or "")  # read as 5.9 and 104, not refused
+
+
+def test_si_profile_hint_and_offset_meal_time(tmp_path: Path):
+    from glimpse.serve.io import answer_from_files
+
+    p = tmp_path / "c.csv"
+    p.write_text(_lines())
+    app = bare_pipeline(risk=0.45, table={})
+    prof = {"age": 42, "bmi": 27.5, "a1c_pct": 38, "fasting_glucose_mgdl": 5.4}
+    a = answer_from_files(app, p, None, MEAL, prof)
+    assert "mmol/mol" in a.reason
+    a = answer_from_files(app, p, None, "2024-06-01T12:00Z", {**prof, "a1c_pct": 5.8, "fasting_glucose_mgdl": 100})
+    assert "UTC offset" in a.reason

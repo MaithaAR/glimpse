@@ -517,7 +517,7 @@ def test_monitoring_power_row():
     want = (f"calibration CUSUM: {c['detected_within_6_blocks']:.0%} detect within 120 answers, "
             f"{c['false_alarm_before_switch']:.0%} false alarms before the switch; caution share: "
             f"{s['detected_within_6_blocks']:.0%}, {s['false_alarm_before_switch']:.0%}")  # fmt: skip
-    assert want in REPORT.read_text()
+    assert want in REPORT.read_text() + APPENDIX.read_text()  # the v2 row moved to the appendix
 
 
 def test_stress_quality_cells():
@@ -616,7 +616,7 @@ def test_v2_probes_monitors_and_budget_cells():
     import csv
 
     text = REPORT.read_text()
-    t = _tables(text)
+    t = _tables(text + "\n" + APPENDIX.read_text())  # the v2 monitoring rows moved there (page limit)
     vp = _load("outputs/probes/v2_probes.json")
     assert f"on only {vp['probe_b']['share_rising_raises_risk']:.1%} of meals in both products" in text
     pc = vp["probe_c"]

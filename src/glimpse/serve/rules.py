@@ -25,6 +25,31 @@ def cant_judge(reason: str, **extra) -> Answer:
 LOW_GLUCOSE_REFUSE, LOW_GLUCOSE_WARN, DIABETES_A1C = 54.0, 70.0, 6.5  # R14 (level-2 / level-1), R15
 
 
+PREMEAL_HIGH_MGDL, PREMEAL_RISE_MGDL_PER_MIN = 140.0, 1.5  # rule R22
+
+
+def slope_last_30(times: list, values: list) -> float | None:
+    """Least-squares slope (mg/dL per min) of the readings in the 30 min up to the last one; None if under 3."""
+    if not times:
+        return None
+    end = max(times)
+    pts = [(t, v) for t, v in zip(times, values, strict=True) if (end - t).total_seconds() <= 30 * 60]
+    if len(pts) < 3:
+        return None
+    x = np.array([(t - end).total_seconds() / 60 for t, _ in pts])
+    y = np.array([v for _, v in pts], dtype=float)
+    return float(np.polyfit(x, y, 1)[0]) if np.ptp(x) > 0 else None
+
+
+def premeal_rule(last: float, slope: float | None) -> str | None:
+    """Rule R22 (26 Nov): no low-risk answer on a high or fast-rising pre-meal glucose."""
+    if last >= PREMEAL_HIGH_MGDL:
+        return f"pre-meal glucose is already {last:.0f} mg/dL (140 or more); no low-risk answer (rule R22)"
+    if slope is not None and slope > PREMEAL_RISE_MGDL_PER_MIN:
+        return f"glucose is rising {slope:.1f} mg/dL per minute before the meal; no low-risk answer (rule R22)"
+    return None
+
+
 def low_glucose(last_mgdl: float) -> str | None:
     """Rule R14 (26 Nov): below 54 mg/dL the person needs to treat a low, not a meal forecast."""
     if last_mgdl < LOW_GLUCOSE_REFUSE:

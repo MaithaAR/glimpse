@@ -134,6 +134,10 @@ v2-probes:
 final-checks:
     uv run glimpse final-checks
 
+# rule R22 and the R14 amendment counted on the committed development answers (docs/rule_ledger.md)
+rules-r22:
+    uv run glimpse rules-r22
+
 # R1-R8 (docs/robustness_v3.md): LR range test, one-batch overfit, label audit, classical photo baseline, v3 photo
 # candidate, its repeated-meal test, seed spread, re-weighted test (~20 min)
 robustness-v3:
@@ -173,6 +177,7 @@ evaluate-all:
     just robustness-levels
     just final-checks
     just robustness-v3
+    just rules-r22
     just report-numbers
 
 # v2 (docs/v2_sensor_first.md): the sensor-first freeze, written once to checkpoints/sensor_first/
@@ -234,6 +239,7 @@ verify-outputs:
 # re-derive every report table and figure from committed outputs (no dataset or weights needed, about 5 min on a 2-CPU machine)
 report-numbers:
     uv run glimpse report-metrics
+    uv run glimpse holm
     uv run glimpse monitoring-replay
     uv run glimpse monitoring-power
     uv run glimpse probe-c

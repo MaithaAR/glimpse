@@ -162,8 +162,10 @@ def answer_from_files(app: Pipeline, cgm: str | Path | None, photo: str | Path |
         if not meal_time:  # 26 Nov: the meal is taken to be now, at the last reading; say so
             fl.append("meal_time_inferred")
         if when.tzinfo is not None:  # rule R8, same treatment as the readings
+            if "timezone_dropped" not in fl:  # 26 Nov: an offset on the meal time alone cannot be placed
+                raise ValueError("the meal time carries a UTC offset but the CGM times are local; give the meal "
+                                 "time in the CGM's local time, without an offset")  # fmt: skip
             when = when.replace(tzinfo=None)
-            fl.append("timezone_dropped")
         prof = {}
         units = {"a1c_pct": "%", "fasting_glucose_mgdl": "mg/dl"}  # rule R21: the field's own unit is fine
         for k, v in profile.items():  # 26 Nov: name the field that is not a number ("5.2%")

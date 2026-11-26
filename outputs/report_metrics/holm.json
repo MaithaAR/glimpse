@@ -1,0 +1,76 @@
+{
+  "what": "Multiplicity check on the report's paired comparisons (26 Nov, after round-21 grading): Holm over the",
+  "family": 7,
+  "contrasts": {
+    "within-person AUROC, intercept minus raw (v1)": {
+      "point": -0.0780291990265293,
+      "ci95": [
+        -0.10994399561614472,
+        -0.04558514988063043
+      ],
+      "p_approx": 2.007771035410762e-06,
+      "p_holm": 1.4054397247875334e-05,
+      "survives_holm_0.05": true
+    },
+    "v1 minus a running spike rate": {
+      "point": 0.06346042564135534,
+      "ci95": [
+        0.030371840052379046,
+        0.11338891147456684
+      ],
+      "p_approx": 0.0027305277418281796,
+      "p_holm": 0.01638316645096908,
+      "survives_holm_0.05": true
+    },
+    "CGM removal": {
+      "point": 0.033369767890438995,
+      "ci95": [
+        0.007417393679421449,
+        0.06531318662448728
+      ],
+      "p_approx": 0.023858798286580798,
+      "p_holm": 0.11929399143290399,
+      "survives_holm_0.05": false
+    },
+    "v1 intercept minus raw, log-loss": {
+      "point": -0.029959222778246364,
+      "ci95": [
+        -0.06038940385904927,
+        -0.0011092639521915488
+      ],
+      "p_approx": 0.047579553182559416,
+      "p_holm": 0.19031821273023766,
+      "survives_holm_0.05": false
+    },
+    "v1 intercept minus raw, AUROC": {
+      "point": 0.036691742214792544,
+      "ci95": [
+        -0.004158369490019517,
+        0.07103917098079024
+      ],
+      "p_approx": 0.05578426532079393,
+      "p_holm": 0.19031821273023766,
+      "survives_holm_0.05": false
+    },
+    "v2 minus v1, AUROC": {
+      "point": -0.01472384748923039,
+      "ci95": [
+        -0.04487174850264751,
+        0.009824640925070651
+      ],
+      "p_approx": 0.29131838168881263,
+      "p_holm": 0.5826367633776253,
+      "survives_holm_0.05": false
+    },
+    "v1 minus gradient boosting, both with the intercept": {
+      "point": 0.01266636661737297,
+      "ci95": [
+        -0.02150433857276942,
+        0.042966741665389725
+      ],
+      "p_approx": 0.44121317616040523,
+      "p_holm": 0.5826367633776253,
+      "survives_holm_0.05": false
+    }
+  }
+}

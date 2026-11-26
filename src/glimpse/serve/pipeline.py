@@ -35,8 +35,10 @@ from glimpse.serve.rules import (
     out_of_scope,
     outside_training_range,
     photo_problem,
+    premeal_rule,
     profile_vector,
     sentence,
+    slope_last_30,
     window_problem,
 )
 from glimpse.serve.schemas import CARB_BINS, REQUIRED_PROFILE, Answer, MealInput, PhotoEstimate
@@ -175,11 +177,23 @@ class Pipeline:
         gets this for free because labels only exist once the window closes)."""
         t0 = time.perf_counter()
         a = self._answer(m, key, history)
-        if a.decision != "can't judge" and m.glucose_mgdl:  # rule R14, 54-69 mg/dL: wording only
+        if a.decision != "can't judge" and m.glucose_mgdl:
             last = m.glucose_mgdl[max(range(len(m.glucose_times)), key=m.glucose_times.__getitem__)]
-            if LOW_GLUCOSE_REFUSE <= last < LOW_GLUCOSE_WARN:
+            slope = slope_last_30(m.glucose_times, m.glucose_mgdl)
+            if LOW_GLUCOSE_REFUSE <= last < LOW_GLUCOSE_WARN and slope is not None and slope < 0:
+                # rule R14 amendment (26 Nov): a falling low is referred, never answered
+                a = cant_judge(f"glucose is low and falling ({last:.0f} mg/dL); treat the low first and follow your "
+                               "care plan (rule R14)", checks_failed=["glucose_low"], escalate_to="human",
+                               risk=a.risk, model_versions=a.model_versions)  # fmt: skip
+            elif LOW_GLUCOSE_REFUSE <= last < LOW_GLUCOSE_WARN:  # rule R14, steady 54-69 mg/dL: wording only
                 a.sentence = sentence(a.decision, a.risk, a.reason, low_mgdl=last)
                 a.flags.append("glucose_low")
+            if a.decision == "low risk":
+                why = premeal_rule(last, slope)
+                if why:  # rule R22: the forecast is held back on a high or fast-rising pre-meal glucose
+                    a = a.model_copy(update={"decision": "caution", "reason": why,
+                                             "sentence": sentence("caution", a.risk, why),
+                                             "flags": [*a.flags, "premeal_high_or_rising"]})  # fmt: skip
         a.latency_ms = (time.perf_counter() - t0) * 1000
         msg = "{} ({:.0f} ms): {}"
         (self.log.info if a.decision == "can't judge" else self.log.debug)(msg, a.decision, a.latency_ms, a.reason)

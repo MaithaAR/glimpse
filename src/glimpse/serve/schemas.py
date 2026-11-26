@@ -42,7 +42,12 @@ class MealInput(BaseModel):
         for key, (lo, hi) in PROFILE_RANGES.items():
             x = v.get(key)
             if x is not None and math.isfinite(x) and not lo <= x <= hi:
-                raise ValueError(f"{key} = {x} is outside the plausible range {lo}-{hi}")
+                hint = ""  # 26 Nov: SI units get the conversion, as rule R1 does for the CGM
+                if key == "a1c_pct" and 20 <= x <= 130:
+                    hint = f"; it looks like mmol/mol, which is {x / 10.929 + 2.15:.1f}% (enter the % value)"
+                elif key == "fasting_glucose_mgdl" and 2 <= x < 30:
+                    hint = f"; it looks like mmol/L, which is {x * 18:.0f} mg/dL (enter mg/dL)"
+                raise ValueError(f"{key} = {x} is outside the plausible range {lo}-{hi}{hint}")
         return v
 
     @model_validator(mode="after")

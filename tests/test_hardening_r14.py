@@ -23,13 +23,31 @@ def test_r14_very_low_glucose_is_referred_not_forecast():
     assert a.decision == "can't judge" and "treat the low first" in a.reason and a.escalate_to == "human"
 
 
-def test_r14_low_glucose_drops_the_walk_advice():
-    vals = [100.0] * 20 + [80, 72, 66, 62]
+def test_r14_steady_low_glucose_drops_the_walk_advice():
+    vals = [100.0] * 12 + [62.0, 63.0] * 6
     a = bare_pipeline(risk=0.31, table={0: PhotoEstimate(grams=45.0, bin_probs=[0.1, 0.8, 0.1, 0.0])}).answer(
         _meal(vals), key=0
     )
     assert a.decision == "caution" and "walk afterwards" not in a.sentence and "treat that first" in a.sentence
     assert "glucose_low" in a.flags
+
+
+def test_r14_amendment_falling_low_is_referred():
+    vals = [100.0] * 20 + [80, 72, 66, 62]
+    a = bare_pipeline(risk=0.31, table={0: PhotoEstimate(grams=45.0, bin_probs=[0.1, 0.8, 0.1, 0.0])}).answer(
+        _meal(vals), key=0
+    )
+    assert a.decision == "can't judge" and "low and falling" in a.reason and a.escalate_to == "human"
+
+
+def test_r22_no_clear_on_high_or_rising_premeal_glucose():
+    est = {0: PhotoEstimate(grams=45.0, bin_probs=[0.8, 0.2, 0.0, 0.0])}
+    high = bare_pipeline(risk=0.03, table=est).answer(_meal([185.0] * 24), key=0)
+    assert high.decision == "caution" and "rule R22" in high.reason and "premeal_high_or_rising" in high.flags
+    rising = bare_pipeline(risk=0.03, table=est).answer(_meal([90.0] * 18 + [90, 100, 110, 120, 130, 138]), key=0)
+    assert rising.decision == "caution" and "rising" in rising.reason
+    calm = bare_pipeline(risk=0.03, table=est).answer(_meal([100.0, 101.0] * 12), key=0)
+    assert calm.decision == "low risk"
 
 
 def test_r15_diabetes_range_is_out_of_scope():

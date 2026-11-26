@@ -320,6 +320,17 @@ Code was sometimes drafted before its registration was committed.
 | Rules R20, R21 (registered 2376328): day/month dates resolved by the meal time, refused when both or neither fit (a Libre export had been misread silently); units in profile values | a fresh grader's unseen inputs (grade 85 after the pass) | docs/rule_ledger.md |
 | v2-only stress rows, decisions per 100 meals, probe E and one quality row moved to the appendix | page limit | docs/report_appendix.md |
 
-Author sign-off on the tenth to twentieth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
+## 26 Nov 2026, twenty-first pass (two more fresh grades, 90.5 and 84; changes approved by the author)
+
+| Change | Why | Evidence |
+|---|---|---|
+| Rule R22 (no clear on a pre-meal glucose of 140 mg/dL or more, or rising faster than 1.5 mg/dL/min) and the R14 amendment (a falling 54-69 mg/dL is referred); registered 69734f7, approved before the count. On development R22 turns 22 of v1's 109 clears into caution (2 spiked): clears 18.1%, misses among clears 6.9% | a grader got "low risk" at 185 mg/dL, while rising 92 to 164, and at 58 falling | outputs/rules_r22/rules_r22.json |
+| Holm over the 7 paired development contrasts (2 survive); the intercept headline gives its interval; person-clustered locked miss interval; subgroup intervals; the served no-history point and the rules' effect on page one | statistics flagged by the adversarial grader | outputs/report_metrics/holm.json |
+| How the served cut-offs were chosen; abstention does not buy accuracy; which ablations were registered | rubric 4b, 3c | §3, §4 |
+| A meal time with a UTC offset next to local CGM times refused with the right reason; extra images flagged; SI profile units get the conversion | the grader's unseen inputs | src/glimpse/serve/ |
+| README checkpoint table (served, alternative, baseline, superseded) | rubric 6d | README.md |
+| v3 paragraph and v2's monitoring rows moved to the appendix | page limit | docs/report_appendix.md |
+
+Author sign-off on the tenth to twenty-first passes (v2, the return to v1, R13 to R16 and every registration since the tag):
 to be added here by the author, dated, in her words.
 

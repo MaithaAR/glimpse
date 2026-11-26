@@ -81,9 +81,9 @@ def find_photo(case: Path) -> tuple[Path | str | None, list[str]]:
     more than one unnamed image is present, so the caller can name them instead of guessing."""
     files = sorted(f for f in case.iterdir() if f.is_file())
     named = next((f for f in files if f.name.lower() in PHOTO_NAMES), None)
-    if named:
-        return named, []
     images = [f for f in files if f.suffix.lower() in IMAGE_SUFFIXES]
+    if named:  # 26 Nov: other images beside photo.* are ignored, and the answer says so
+        return named, (["extra_photos_ignored"] if len(images) > 1 else [])
     if len(images) == 1:
         return images[0], ["photo_name_nonstandard"]
     return ("several", []) if images else (None, [])
