@@ -774,9 +774,23 @@ def test_external_and_post_freeze_cells():
         f"within-person {v['within_person']['mean']:.3f}, against {e['v2_without_intercept']['within_person']['mean']:.3f}"  # noqa: E501
         in flat
     )
+    p2 = _load("outputs/external_bigideas/external_part2.json")
+    raw, sim = p2["raw_no_intercept"], p2["photo_sized_error_simulation"]
+    assert (
+        f"scores {raw['with_carbs']:.3f} on these meals, {raw['gain']:+.3f} ({raw['ci95'][0]:+.3f}, {raw['ci95'][1]:+.3f})"  # noqa: E501
+        in flat
+    )
+    assert (
+        f"the gain is still {sim['mean_gain']:+.3f}" in flat
+        and p2["refit_matches_frozen_v2_max_abs_logit_difference"] < 1e-6
+    )
+    assert (
+        f"lifts it to {raw['with_carbs']:.3f} ({raw['gain']:+.3f}, {raw['ci95'][0]:+.3f} to {raw['ci95'][1]:+.3f})"
+        in flat
+    )
     lc, rr = e["logged_carbs_alone"], e["running_spike_rate"]
     assert (f"| {rr['auroc']:.3f} ({rr['ci95'][0]:.3f}–{rr['ci95'][1]:.3f}) / "
-            f"{lc['auroc']:.3f} ({lc['ci95'][0]:.3f}–{lc['ci95'][1]:.3f}) |") in flat  # fmt: skip
+            f"{lc['auroc']:.3f} ({lc['ci95'][0]:.3f}–{lc['ci95'][1]:.3f}) / {raw['with_carbs']:.3f} |") in flat  # fmt: skip  # noqa: E501
     pb = _load("outputs/post_freeze/post_freeze.json")["probe_b_premise"]["spearman_slope30_vs_rise"]
     assert f"(Spearman {pb['point']:+.2f}, {pb['ci95'][0]:+.2f} to {pb['ci95'][1]:+.2f})".replace("-", "−") in flat
     o1 = _load("outputs/final_checks/final_checks.json")["o1"]

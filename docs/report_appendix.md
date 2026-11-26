@@ -452,3 +452,9 @@ Monitoring rows:
 |---|---|---|
 | CUSUM on calibration, v1 development then locked (registered) | blocks of 20 answers | no alarm (2.4 of 4), against a registered expectation of one |
 | CUSUM on the caution share (registered) | same | one alarm in the 7th locked block at the per-fold cut-offs; none at the deployed or served cut-offs |
+
+Moved from report section 5 on 27 Nov (page limit):
+
+| the course's debugging checks | evidence | status |
+|---|---|---|
+| classical and zero-shot photo baselines (check 4) | colour histogram + ridge 27.5 g, against 20.4 g for frozen summaries + ridge; zero-shot needs CLIP weights this offline build cannot fetch | classical done; zero-shot a gap |

@@ -208,3 +208,71 @@ def run_external_bigideas(cfg) -> dict:
         OUT / "external_answers.csv", index=False)  # fmt: skip
     log.info("{}", json.dumps({k: v for k, v in res.items() if k != "per_person"})[:1500])
     return res
+
+
+def run_external_part2(cfg) -> dict:
+    """Part 2 (docs/external_bigideas.md): does meal content help on free-living meals? Models fitted on CGMacros
+    only, with and without logged carbs, scored once on the BIG IDEAs meals of Part 1."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import meal_rows
+    from glimpse.training.baselines import logistic
+    from glimpse.training.fusion import logged_carbs
+
+    out_file = OUT / "external_part2.json"
+    M, X = build(cfg)
+    keep = M.scored.to_numpy()
+    s, Xs = M[keep].reset_index(drop=True), X[keep]
+    bundle = joblib.load("checkpoints/sensor_first/fusion.joblib")
+    th = json.loads(Path("checkpoints/sensor_first/thresholds.json").read_text())
+    a, b, m = *th["platt"], th["m_personal"]
+    ds = MealDataset.load(Path("data/dataset"))
+    tr = meal_rows(ds, set(bundle["train_people"]), scored_only=False)
+    ytr = ds.labels()[tr]
+    base = logistic(bundle["C"], cfg.seed).fit(trend_features(ds, tr), ytr)
+    with_c = logistic(bundle["C"], cfg.seed).fit(np.hstack([trend_features(ds, tr), logged_carbs(ds, tr)]), ytr)
+    f0 = base.decision_function(Xs)
+    drift = float(np.abs(f0 - bundle["models"]["sensor"].decision_function(Xs)).max())
+    if drift > 1e-6:
+        raise SystemExit(f"the refitted sensor model differs from the frozen v2 by {drift:.2e}; stopped")
+    carb = np.log1p(s.carbs.to_numpy(float))[:, None]
+    f1 = with_c.decision_function(np.hstack([Xs, carb]))
+    y, sid, t = s.spike.to_numpy().astype(int), s.person_id.to_numpy(), s.t.to_numpy("datetime64[s]")
+
+    def with_intercept(f: np.ndarray) -> np.ndarray:
+        fp, out = a * f + b, np.zeros(len(f))
+        for p in np.unique(sid):
+            ix = np.where(sid == p)[0]
+            ix = ix[np.argsort(t[ix])]
+            out[ix] = fp[ix] + replay_offsets(fp[ix], y[ix].astype(float), t[ix], m)
+        return out
+
+    def paired(u: np.ndarray, v: np.ndarray) -> dict:
+        def fn(i):
+            return float(roc_auc_score(y[i], u[i]) - roc_auc_score(y[i], v[i])) if len(set(y[i])) == 2 else float("nan")
+
+        pt, lo, hi = person_bootstrap_ci(sid, fn)
+        return {"with_carbs": float(roc_auc_score(y, u)), "without": float(roc_auc_score(y, v)), "gain": pt, "ci95": [lo, hi]}
+
+    def within(f: np.ndarray) -> float:
+        return float(np.mean([roc_auc_score(y[sid == p], f[sid == p]) for p in np.unique(sid) if len(set(y[sid == p])) == 2]))
+
+    ph = pd.read_csv("outputs/photo_cv/photo_oof.csv")
+    ph = ph[ph.scored]
+    err = (np.log1p(ph.photo_g) - np.log1p(ph.carbs_g)).to_numpy()
+    rng, gains = np.random.default_rng(cfg.seed), []
+    for _ in range(200):
+        noisy = carb[:, 0] + rng.choice(err, len(carb))
+        gains.append(float(roc_auc_score(y, with_c.decision_function(np.hstack([Xs, noisy[:, None]]))) - roc_auc_score(y, f0)))
+    coef = with_c[-1].coef_[0]
+    res = {"what": "External Part 2: meal content on free-living meals (fitted on CGMacros only, scored once on BIG IDEAs)",
+           "meals": len(s), "people": int(len(np.unique(sid))), "refit_matches_frozen_v2_max_abs_logit_difference": drift,
+           "raw_no_intercept": paired(f1, f0) | {"within_person_with": within(f1), "within_person_without": within(f0)},
+           "with_frozen_platt_and_intercept": paired(with_intercept(f1), with_intercept(f0)),
+           "photo_sized_error_simulation": {"draws": 200, "log_error_sd": float(err.std()), "mean_gain": float(np.mean(gains)),
+                                            "gain_p2.5_p97.5": [float(np.percentile(gains, 2.5)), float(np.percentile(gains, 97.5))]},
+           "standardised_carb_coefficient": float(coef[-1]),
+           "cgmacros_gain_for_reference": "about +0.03 at most (report section 2: true logged carbs, fusion study)"}  # fmt: skip
+    OUT.mkdir(parents=True, exist_ok=True)
+    out_file.write_text(json.dumps(res, indent=2))
+    logger.bind(stage="external").info("{}", json.dumps(res)[:1200])
+    return res

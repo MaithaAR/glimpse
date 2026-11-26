@@ -1,0 +1,37 @@
+{
+  "what": "External Part 2: meal content on free-living meals (fitted on CGMacros only, scored once on BIG IDEAs)",
+  "meals": 201,
+  "people": 12,
+  "refit_matches_frozen_v2_max_abs_logit_difference": 0.0,
+  "raw_no_intercept": {
+    "with_carbs": 0.7494117647058823,
+    "without": 0.6235294117647059,
+    "gain": 0.12588235294117645,
+    "ci95": [
+      0.060495991100005905,
+      0.18763940406760657
+    ],
+    "within_person_with": 0.7803750794659887,
+    "within_person_without": 0.6201823666529549
+  },
+  "with_frozen_platt_and_intercept": {
+    "with_carbs": 0.7202614379084968,
+    "without": 0.6275816993464052,
+    "gain": 0.09267973856209166,
+    "ci95": [
+      0.05347149122807006,
+      0.1480326924473986
+    ]
+  },
+  "photo_sized_error_simulation": {
+    "draws": 200,
+    "log_error_sd": 0.8093573997160818,
+    "mean_gain": 0.10133660130718952,
+    "gain_p2.5_p97.5": [
+      0.06677124183006541,
+      0.1427941176470588
+    ]
+  },
+  "standardised_carb_coefficient": 0.2909479294937214,
+  "cgmacros_gain_for_reference": "about +0.03 at most (report section 2: true logged carbs, fusion study)"
+}

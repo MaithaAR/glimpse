@@ -117,3 +117,29 @@ What is run, once:
 
 Expectation: a gain of +0.03 to +0.10 with carbs; about half of it left under photo-sized errors. Whatever it
 shows is reported. Nothing is refitted on BIG IDEAs, and the served model does not change.
+
+## Part 2 result (27 Nov, run once; outputs/external_bigideas/external_part2.json)
+
+The refitted sensor and profile model reproduces the frozen v2 exactly on these meals (largest logit
+difference 0.0), so the comparison isolates the carb input.
+
+| 201 meals, 12 people; both models fitted on CGMacros only | without carbs | with logged carbs | gain (95% over people) |
+|---|---|---|---|
+| raw ranking, no intercept: AUROC | 0.624 | 0.749 | +0.126 (+0.060, +0.188) |
+| the same, within-person AUROC | 0.620 | 0.780 | – |
+| with the frozen Platt map and intercept: AUROC | 0.628 | 0.720 | +0.093 (+0.053, +0.148) |
+| carbs perturbed with the photo model's own CGMacros errors (log-scale SD 0.81), 200 draws | 0.624 | – | mean +0.101 (+0.067 to +0.143 across draws) |
+
+Reading.
+- On free-living meals the carb input adds +0.126 AUROC, with an interval well above zero, to a model that
+  never saw these people or this dataset. On CGMacros the same input adds about +0.03 at most. The
+  expectation (+0.03 to +0.10) was exceeded.
+- Meal content is therefore worth far more outside CGMacros' standardised meals than inside them. The photo
+  gate's low ceiling describes the training data.
+- The simulation says carbs with photo-sized errors would keep most of the gain. It is a simulation: BIG
+  IDEAs has no photos, the errors are borrowed from CGMacros photos, and photos of free-living meals may be
+  harder to read. It is not evidence that the photo model works.
+- The intercept again costs ranking: with it the carb model scores 0.720, without it 0.749.
+
+Limits as in Part 1, plus: the carbs are self-logged; one model pair, one run, no multiplicity correction
+across Parts 1 and 2.
