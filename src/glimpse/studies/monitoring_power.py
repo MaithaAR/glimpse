@@ -62,7 +62,7 @@ def run_monitoring_power(cfg) -> dict:
             false = any(a < PRE for a in alarms)
             post = [a for a in alarms if a >= PRE]
             stats[name].append({"false_before": false, "delay": (post[0] - PRE + 1) if post else None})
-    res = {"what": __doc__.splitlines()[0], "streams": STREAMS, "block": BLOCK, "switch_after_blocks": PRE,
+    res = {"what": " ".join(__doc__.split()), "streams": STREAMS, "block": BLOCK, "switch_after_blocks": PRE,
            "burn_in_blocks": BURN, "k": K, "h": H,
            "spike_rate_all": float(df.spike.mean()), "spike_rate_after": float(pre_d.spike.mean())}  # fmt: skip
     for name, rows in stats.items():
@@ -75,7 +75,7 @@ def run_monitoring_power(cfg) -> dict:
     OUT.write_text(json.dumps(res, indent=2))
     for name in stats:
         r = res[name]
-        logger.bind(stage="monitoring-power").info("{}: false alarm {:.0%}, detected within 6 blocks {:.0%}, "
-                                                    "median delay {}", name, r["false_alarm_before_switch"],
-                                                    r["detected_within_6_blocks"], r["median_delay_blocks"])  # fmt: skip
+        log = logger.bind(stage="monitoring-power")
+        log.info("{}: false alarm {:.0%}, detected within 6 blocks {:.0%}, median delay {}", name,
+                 r["false_alarm_before_switch"], r["detected_within_6_blocks"], r["median_delay_blocks"])  # fmt: skip
     return res

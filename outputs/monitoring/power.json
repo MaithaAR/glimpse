@@ -1,0 +1,23 @@
+{
+  "what": "Monitoring replay 4 (`glimpse monitoring-power`; registered 26 Nov in docs/monitoring.md before its run): how often the two CUSUM rules catch a realistic cohort shift in simulated v2 answer streams, how often they raise a false alarm before it, and how fast. Data-free: committed v2 development answers only.",
+  "streams": 500,
+  "block": 20,
+  "switch_after_blocks": 12,
+  "burn_in_blocks": 8,
+  "k": 0.5,
+  "h": 4.0,
+  "spike_rate_all": 0.3284823284823285,
+  "spike_rate_after": 0.43190661478599224,
+  "calibration": {
+    "false_alarm_before_switch": 0.054,
+    "detected_within_6_blocks": 0.228,
+    "detected_by_end": 0.388,
+    "median_delay_blocks": 6.0
+  },
+  "caution_share": {
+    "false_alarm_before_switch": 0.01,
+    "detected_within_6_blocks": 0.134,
+    "detected_by_end": 0.292,
+    "median_delay_blocks": 7.0
+  }
+}
