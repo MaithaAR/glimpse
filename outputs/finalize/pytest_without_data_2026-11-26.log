@@ -1,5 +1,2 @@
-# pytest, fresh clone WITHOUT data/ or weights, 2026-11-26T07:16:02Z, commit a0e11ef
-...................s......s.....s.........................s............. [ 38%]
-x.................s......sssss.........s................................ [ 77%]
-......s..............s.s......ss...........                              [100%]
-170 passed, 16 skipped, 1 xfailed in 11.24s
+# pytest, fresh clone WITHOUT data/ or weights, commit 24d601e
+180 passed, 16 skipped, 1 xfailed in 10.35s

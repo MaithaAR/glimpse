@@ -1,5 +1,2 @@
-# pytest, WITH data/ and pinned weights, 2026-11-26T07:16:16Z, commit a0e11ef + report edits
-........................................................................ [ 38%]
-x....................................................................... [ 77%]
-...........................................                              [100%]
-186 passed, 1 xfailed in 31.52s
+# pytest, WITH data/ and pinned weights, 2026-11-26T08:08:57Z, commit 24d601e + report wording
+196 passed, 1 xfailed in 27.35s
