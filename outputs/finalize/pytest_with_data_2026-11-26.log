@@ -1,2 +1,2 @@
-# pytest, WITH data/ and pinned weights, 2026-11-26T08:08:57Z, commit 24d601e + report wording
-196 passed, 1 xfailed in 27.35s
+# just test (pytest), WITH data/ and pinned weights, 2026-11-26T08:23:33Z, commit 1d5cffa
+199 passed, 1 xfailed in 33.54s
