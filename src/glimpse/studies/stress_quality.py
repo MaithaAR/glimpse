@@ -1,7 +1,9 @@
 """Stress quality at the evaluated operating point (`glimpse stress-quality`; registered 26 Nov in
 docs/stress_quality.md before its run). Every development meal is answered by its fold's pipeline with
 the person's gated history, clean and under each perturbation of the current meal; history always comes
-from the clean answers. Both products: v2 (served, sensor first) and v1 (photo fusion)."""
+from the clean answers. Both products: v2 (served, sensor first) and v1 (photo fusion). CGM stress is
+compared with the evaluation's answers; photo stress with the same live photo model on the clean photo
+(fix after the first run, which compared live perturbed answers with precomputed clean estimates)."""
 
 from __future__ import annotations
 
@@ -75,7 +77,8 @@ def run_stress_quality(ds, sp, cfg) -> dict:
     res: dict = {"what": __doc__.splitlines()[0], "levels": LEVELS}
     for product, sensor_first in (("v2_sensor_first", True), ("v1_photo_fusion", False)):
         rng = np.random.default_rng(cfg.seed)
-        rows: dict[tuple, list] = {("clean", 0): []} | {(k, lv): [] for k, lvs in LEVELS.items() for lv in lvs}
+        rows: dict[tuple, list] = {("clean", 0): [], ("clean_live", 0): []}
+        rows |= {(k, lv): [] for k, lvs in LEVELS.items() for lv in lvs}
         with tempfile.TemporaryDirectory() as td:
             tmp = Path(td)
             for k, held in enumerate(sp.dev_folds):
@@ -93,6 +96,11 @@ def run_stress_quality(ds, sp, cfg) -> dict:
                             for lv in LEVELS[kind]:
                                 a = tab.answer(perturb_cgm(m, kind, rng, lv), key=int(row), history=gated)
                                 rows[(kind, lv)].append(meta | {"risk": a.risk, "decision": a.decision})
+                        # photo stress compares the live photo model with itself (clean vs perturbed photo)
+                        clean_live = clean if m.photo is None else live.answer(m, history=gated)
+                        rows[("clean_live", 0)].append(
+                            meta | {"risk": clean_live.risk, "decision": clean_live.decision}
+                        )
                         for kind in ("photo_blur", "photo_dark"):
                             for lv in LEVELS[kind]:
                                 if m.photo is None:  # no photo to perturb: the clean answer stands
@@ -103,10 +111,14 @@ def run_stress_quality(ds, sp, cfg) -> dict:
                         if clean.fusion_logit is not None:
                             hist.append((clean.fusion_logit, int(y[row]), t))
                 log.info("{} fold {} done", product, k + 1)
-        base = pd.DataFrame(rows[("clean", 0)])
-        out = {"clean": _summary(base, base, costs, targets)}
+        base, base_live = pd.DataFrame(rows[("clean", 0)]), pd.DataFrame(rows[("clean_live", 0)])
+        out = {
+            "clean": _summary(base, base, costs, targets),
+            "clean_live_photo_model": _summary(base_live, base_live, costs, targets),
+        }
         for kind, lvs in LEVELS.items():
-            out[kind] = {str(lv): _summary(base, pd.DataFrame(rows[(kind, lv)]), costs, targets) for lv in lvs}
+            ref = base_live if kind.startswith("photo") else base
+            out[kind] = {str(lv): _summary(ref, pd.DataFrame(rows[(kind, lv)]), costs, targets) for lv in lvs}
         res[product] = out
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(res, indent=2))
