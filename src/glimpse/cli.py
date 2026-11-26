@@ -172,7 +172,8 @@ def _evaluate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     from glimpse.data.splits import SplitsV2
     from glimpse.evaluation.run import evaluate_dev
 
-    evaluate_dev(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    evaluate_dev(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg,
+                 sensor_first=getattr(args, "sensor_first", False))  # fmt: skip
     return 0
 
 
@@ -436,7 +437,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("fusion", help="add photo / logged carbs to profile + trend, with controls (Step 4c-3)")
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
-    sub.add_parser("evaluate", help="dev evaluation on partition v2: every risk from Pipeline.answer per fold")
+    ev = sub.add_parser("evaluate", help="dev evaluation on partition v2: every risk from Pipeline.answer per fold")
+    ev.add_argument("--sensor-first", action="store_true", help="v2 (docs/v2_sensor_first.md) instead of v1")
     sub.add_parser("photo-seeds", help="retrain the shipped 12+2 recipe with 3 fresh seeds; validation spread only")
     sub.add_parser(
         "recalibrate", help="validation-chosen cut-offs on recalibrated risk, checked on CV (no test labels)"

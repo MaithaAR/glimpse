@@ -195,6 +195,10 @@ class PrototypeCfg(_Strict):
     ood_neighbours: int = Field(ge=1, le=50)
     ood_quantile: float = Field(gt=0.5, lt=1)
     feedback_file: str
+    # v2 (docs/v2_sensor_first.md): which product serves; v1's files stay untouched either way
+    product: Literal["photo_fusion", "sensor_first"] = "photo_fusion"
+    sensor_first_bundle: str = "checkpoints/sensor_first/fusion.joblib"
+    sensor_first_thresholds: str = "checkpoints/sensor_first/thresholds.json"
 
     @model_validator(mode="after")
     def _cutoffs_ordered(self) -> PrototypeCfg:

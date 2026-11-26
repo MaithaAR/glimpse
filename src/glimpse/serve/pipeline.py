@@ -53,13 +53,20 @@ class Pipeline:
 
     def __init__(self, cfg: GlimpseConfig, photo_table: dict[int, PhotoEstimate] | None = None, fusion=None,
                  *, calibration: tuple[float, float] | None = None, m_personal: float = float("inf"),
-                 cutoffs: tuple[float, float] | None = None):  # fmt: skip
+                 cutoffs: tuple[float, float] | None = None, sensor_first: bool | None = None):  # fmt: skip
         """Load the fusion model, the frozen cut-offs (checked against the config) and, in live mode, the photo
         model and the unfamiliar-photo reference, all from local files. Evaluation injects a fold-local fusion
         (design D2: the same decision code, one model per outer fold); the app always loads the final one."""
         torch.set_num_threads(min(cfg.training.num_threads, 4))
         self.cfg, pc = cfg, cfg.prototype
-        if fusion is None:  # serving: the frozen bundle carries the fusion AND its calibration (D3/D4 final)
+        # v2 (docs/v2_sensor_first.md): risk from trend + profile only; the photo is the carb assist
+        self.sensor_first = (pc.product == "sensor_first") if sensor_first is None else sensor_first
+        if fusion is None and self.sensor_first:
+            bundle = joblib.load(pc.sensor_first_bundle)
+            self.fusion = bundle["models"]["sensor"]
+            calibration = tuple(bundle["calibration"]) if calibration is None else calibration
+            m_personal = float(bundle["m_personal"]) if m_personal == float("inf") else m_personal
+        elif fusion is None:  # serving: the frozen bundle carries the fusion AND its calibration (D3/D4 final)
             bundle = joblib.load(FINAL)
             self.fusion = bundle["models"]["photo"]
             if calibration is None and "calibration" in bundle:
@@ -68,17 +75,26 @@ class Pipeline:
                 m_personal = float(bundle["m_personal"])
         else:
             self.fusion = fusion
-        frozen_all = load_thresholds(Path(pc.thresholds_file))
-        frozen = frozen_all["main"]
-        if max(abs(frozen["low_risk_below"] - pc.low_risk_below), abs(frozen["caution_from"] - pc.caution_from)) > 1e-9:
-            raise ValueError("prototype cut-offs in the config differ from the frozen amendment file")
-        # D4: evaluation injects each fold's inner-chosen cut-offs; the app uses the frozen config values
-        self.lo, self.hi = cutoffs if cutoffs is not None else (pc.low_risk_below, pc.caution_from)
+        if self.sensor_first and fusion is None:
+            frozen_all = load_thresholds(Path(pc.sensor_first_thresholds))
+            frozen = frozen_all["main"]
+            served = (frozen["low_risk_below"], frozen["caution_from"])
+        else:
+            frozen_all = load_thresholds(Path(pc.thresholds_file))
+            frozen = frozen_all["main"]
+            if max(abs(frozen["low_risk_below"] - pc.low_risk_below),
+                   abs(frozen["caution_from"] - pc.caution_from)) > 1e-9:  # fmt: skip
+                raise ValueError("prototype cut-offs in the config differ from the frozen amendment file")
+            served = (pc.low_risk_below, pc.caution_from)
+        # D4: evaluation injects each fold's inner-chosen cut-offs; the app uses the frozen values
+        self.lo, self.hi = cutoffs if cutoffs is not None else served
         # fix 1 (D3): Platt (slope, intercept) on the fusion logit + the personal-intercept prior precision.
         # The defaults are the identity; the frozen values come from `just finalize` (6 Nov) via the bundle.
         self.calib, self.m_personal = calibration, m_personal
         self.table = photo_table
-        self.model_versions = {"fusion": "fold-local" if fusion is not None else FINAL.name,
+        name = Path(pc.sensor_first_bundle).name if self.sensor_first else FINAL.name
+        self.model_versions = {"fusion": "fold-local" if fusion is not None else name,
+                               "product": "sensor_first" if self.sensor_first else "photo_fusion",
                                "thresholds": str(frozen_all.get("sha256", ""))[:12]}  # fmt: skip
         if photo_table is None:
             self.model, _ = load_photo_bundle(cfg, _photo_checkpoint())
@@ -139,6 +155,42 @@ class Pipeline:
         (self.log.info if a.decision == "can't judge" else self.log.debug)(msg, a.decision, a.latency_ms, a.reason)
         return a
 
+    def _answer_sensor_first(self, m: MealInput, est, g, h, history, passed: list[str], flags: list[str],
+                             base: dict) -> Answer:  # fmt: skip
+        """v2 (docs/v2_sensor_first.md): risk from the 15 trend + profile inputs; the photo estimate, when
+        usable, is returned as the carb assist for the user to confirm and never enters the risk."""
+        if isinstance(est, tuple):
+            check, _reason, extra = est
+            flags.append(f"carbs_unavailable_{check}")
+            carb = {"carb_source": "none", **{k: v for k, v in extra.items() if k == "unfamiliar_photo_score"}}
+        else:
+            probs = np.array(est.bin_probs)
+            passed += ["photo_present", "photo_readable", "photo_not_blank", "photo_familiar"]
+            carb = {"carbs_g": est.grams, "carb_bin": CARB_BINS[int(probs.argmax())],
+                    "carb_bin_prob": float(probs.max()), "unfamiliar_photo_score": est.unfamiliar_score,
+                    "carb_source": "photo"}  # fmt: skip
+        if m.user_carbs_g is not None:
+            flags.append("carbs_from_user_shown_not_used")
+        ns = SimpleNamespace(glucose=g.values[None], heart_rate=h.values[None],
+                             profile=profile_vector(m.profile, m.meal_time)[None])  # fmt: skip
+        raw = float(self.fusion.predict_proba(trend_features(ns, np.array([0])))[0, 1])
+        risk_raw, risk_platt, risk = self._risk(raw, history)
+        base |= {"fusion_logit": float(np.log(max(raw, 1e-6) / max(1.0 - raw, 1e-6))),
+                 "risk_raw": risk_raw, "risk_platt": risk_platt}  # fmt: skip
+        dec = decision(risk, self.lo, self.hi)
+        if dec == "can't judge":
+            return cant_judge(f"the risk ({risk:.1%}) is borderline, between {self.lo:.0%} and {self.hi:.0%}",
+                              risk=risk, checks_passed=passed, checks_failed=["borderline"],
+                              escalate_to="human", **base, **carb)  # fmt: skip
+        passed.append("borderline")
+        hold = no_basis_to_clear(dec, history, m.profile)
+        if hold:  # rule R13
+            return cant_judge(hold, risk=risk, checks_passed=passed, checks_failed=["personal_basis"],
+                              escalate_to="human", **base, **carb)  # fmt: skip
+        reason = decision_reason(dec, risk, self.lo, self.hi)
+        return Answer(decision=dec, sentence=sentence(dec, risk, reason), reason=reason, risk=risk,
+                      checks_passed=passed, **base, **carb)  # fmt: skip
+
     def _risk(self, raw: float, history: list[tuple[float, int]] | None) -> tuple[float, float, float]:
         """raw fusion probability -> (risk_raw, risk_platt, final risk): Platt on the logit, then the
         personal offset fitted on the (equally recalibrated) history logits (D3). Identity by default."""
@@ -185,6 +237,8 @@ class Pipeline:
                               checks_passed=passed.copy(), checks_failed=["profile"], **base)  # fmt: skip
         passed.append("profile")
         est = self.photo_estimate(m, key)
+        if getattr(self, "sensor_first", False):  # v2: the photo never blocks the answer; it only feeds the carb assist
+            return self._answer_sensor_first(m, est, g, h, history, passed, flags, base)
         if isinstance(est, tuple):
             check, reason, extra = est
             if m.user_carbs_g is not None:  # tier 2: the user's own carb estimate stands in for the photo

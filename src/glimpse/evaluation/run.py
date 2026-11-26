@@ -30,7 +30,7 @@ from glimpse.evaluation.metrics import (
     usefulness_report,
 )
 from glimpse.serve import PhotoEstimate, Pipeline
-from glimpse.training.baselines import logistic
+from glimpse.training.baselines import logistic, trend_features
 from glimpse.training.cv import _tune_sklearn
 from glimpse.training.final import cost_dict
 from glimpse.training.fusion import PHOTO_COLS, photo_table, with_table
@@ -47,22 +47,30 @@ def fold_estimates(df: pd.DataFrame) -> dict[int, PhotoEstimate]:
             for r in df.itertuples()}  # fmt: skip
 
 
-def fold_fusion(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig, k: int, pt: dict) -> tuple:
+def _features(pt: dict, sensor_first: bool):
+    """The fusion's inputs in the order Pipeline.answer builds them: v1 adds the 4 photo columns to the 15
+    trend + profile inputs; v2 (sensor first) uses the 15 alone."""
+    return trend_features if sensor_first else with_table(pt, len(PHOTO_COLS))
+
+
+def fold_fusion(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig, k: int, pt: dict,
+                sensor_first: bool = False) -> tuple:  # fmt: skip
     """Fold k's fusion: C chosen on the fold's inner folds (target holds, D1), fitted on its training meals
     with nested photo estimates -- features in exactly the order Pipeline.answer builds them."""
     y = ds.labels()
-    fx = with_table(pt, len(PHOTO_COLS))
+    fx = _features(pt, sensor_first)
     c, _ = _tune_sklearn(lambda v: logistic(v, cfg.seed), cfg.baselines.logreg_c_grid, fx, ds,
                          sp.training_people(k), sp.inner_folds[k], y)  # fmt: skip
     tr = meal_rows(ds, set(sp.training_people(k)), scored_only=False)
     return logistic(c, cfg.seed).fit(fx(ds, tr), y[tr]), c
 
 
-def inner_oof(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig, k: int, pt: dict, c: float) -> tuple:
+def inner_oof(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig, k: int, pt: dict, c: float,
+              sensor_first: bool = False) -> tuple:  # fmt: skip
     """Inner-fold out-of-fold fusion risks for fold k's training targets: the fold's recipe (same C)
     refitted without each inner fold, used on its held-out target meals. These risks feed Platt and the
     (m, lo, hi) selection; they never reach a results table."""
-    y, fx = ds.labels(), with_table(pt, len(PHOTO_COLS))
+    y, fx = ds.labels(), _features(pt, sensor_first)
     rows, risks = [], []
     for held in sp.inner_folds[k]:
         fit = meal_rows(ds, set(sp.training_people(k)) - set(held), scored_only=False)
@@ -129,8 +137,10 @@ def _fold_auroc_table(df: pd.DataFrame) -> list[dict]:
     return out
 
 
-def evaluate_dev(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
-    """Every development meal answered by its fold's Pipeline -> dev_answers.csv + dev_summary.json."""
+def evaluate_dev(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig, sensor_first: bool = False) -> dict:
+    """Every development meal answered by its fold's Pipeline -> dev_answers.csv + dev_summary.json.
+    sensor_first: v2 (docs/v2_sensor_first.md), written to outputs/evaluation_sensor_first/ instead."""
+    out_dir = Path("outputs/evaluation_sensor_first") if sensor_first else OUT
     log, pcv = logger.bind(stage="evaluate"), Path(cfg.paths.outputs) / "photo_cv"
     if not (pcv / "photo_oof.csv").is_file():
         raise FileNotFoundError("run `just photo-cv` first")
@@ -144,8 +154,8 @@ def evaluate_dev(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
                                f"rerun `just photo-cv`")  # fmt: skip
         assert_not_locked(list(sp.training_people(k)) + list(held), sp.locked, f"evaluate fold {kk}")
         pt = photo_table(nf) | photo_table(of)
-        lr, c = fold_fusion(ds, sp, cfg, k, pt)
-        rows_i, p_i = inner_oof(ds, sp, cfg, k, pt, c)
+        lr, c = fold_fusion(ds, sp, cfg, k, pt, sensor_first)
+        rows_i, p_i = inner_oof(ds, sp, cfg, k, pt, c, sensor_first)
         a_k, b_k = fit_platt(p_i, y[rows_i])
         if a_k <= 0:  # degenerate inner risks would invert the map; fall back to identity, loudly
             log.warning("fold {}: Platt slope {:.3f} <= 0; identity used instead", kk, a_k)
@@ -154,7 +164,8 @@ def evaluate_dev(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
         person_i = np.array([ds.samples[i].person_id for i in rows_i])
         sel = choose_m_and_cutoffs(apply_platt(p_i, a_k, b_k), y[rows_i], person_i, times_i, costs)
         app = Pipeline(cfg, photo_table=fold_estimates(of), fusion=lr, calibration=(a_k, b_k),
-                       m_personal=sel["m"], cutoffs=(sel["low_risk_below"], sel["caution_from"]))  # fmt: skip
+                       m_personal=sel["m"], cutoffs=(sel["low_risk_below"], sel["caution_from"]),
+                       sensor_first=sensor_first)  # fmt: skip
         rows_out += _replay_fold(app, ds, cfg, held, y, kk)
         inner_store[kk] = (sel.pop("inner_risks"), y[rows_i])
         folds.append({"fold": kk, "C": c, "platt_slope": a_k, "platt_intercept": b_k, "m": sel["m"],
@@ -163,8 +174,8 @@ def evaluate_dev(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
         log.info("fold {}: C={}, Platt ({:.2f}, {:+.2f}), m={}, cut-offs ({:.2f}, {:.2f})", kk, c, a_k, b_k,
                  sel["m"], sel["low_risk_below"], sel["caution_from"])  # fmt: skip
     df = pd.DataFrame(rows_out)
-    OUT.mkdir(parents=True, exist_ok=True)
-    df.to_csv(OUT / "dev_answers.csv", index=False)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    df.to_csv(out_dir / "dev_answers.csv", index=False)
     B, seed, targets = cfg.fusion.bootstrap_draws, cfg.seed, cfg.targets.model_dump()
     actions = df.decision.map(ACTION).to_numpy()
     answered = df.dropna(subset=["risk"])
@@ -208,7 +219,7 @@ def evaluate_dev(ds: MealDataset, sp: SplitsV2, cfg: GlimpseConfig) -> dict:
                                   "share_low_risk": rep["share_low_risk"],
                                   "share_abstain": rep["share_abstain"],
                                   "missed_among_cleared": rep["missed_among_cleared"]})  # fmt: skip
-    (OUT / "dev_summary.json").write_text(json.dumps(res, indent=2))
+    (out_dir / "dev_summary.json").write_text(json.dumps(res, indent=2))
     rp = res["risk_personal"]["auroc"]
     log.info("development: personal AUROC {:.3f} ({:.3f}-{:.3f}) | platt-only {:.3f} | raw {:.3f}; "
              "log-loss {:.3f} / {:.3f} / {:.3f}", rp["point"], *rp["ci95"],
