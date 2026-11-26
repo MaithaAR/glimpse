@@ -261,10 +261,11 @@ def _external_bigideas(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     if not (ROOT / "bigideas_cgm.csv").is_file():
         logger.bind(stage="external").error("data/bigideas/ is missing; the README has the download lines")
         return 1
-    from glimpse.studies.external_bigideas import run_external_part2
+    from glimpse.studies.external_bigideas import run_external_part2, run_external_part3
 
     run_external_bigideas(cfg)
     run_external_part2(cfg)
+    run_external_part3(cfg)
     return 0
 
 

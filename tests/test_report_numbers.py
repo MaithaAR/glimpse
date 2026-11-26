@@ -660,8 +660,8 @@ def test_round13_cells():
     assert abs(p["v2_minus_v1"] - (p["auroc_v2"] - p["auroc_v1"])) < 1e-12  # the observed point, not the bootstrap mean
     f = rm["fair_baselines"]["no-photo fusion (the gate's no-meal arm)"]
     assert (
-        f"the photo adds {f['shipped_minus_this']:.3f}\n({f['ci95'][0]:+.3f}, {f['ci95'][1]:+.3f})".replace("-", "−")
-    ) in text
+        f"the photo adds {f['shipped_minus_this']:.3f} ({f['ci95'][0]:+.3f}, {f['ci95'][1]:+.3f})".replace("-", "−")
+    ) in " ".join(text.split())
 
 
 def test_r16_counts_and_sweep():
@@ -787,6 +787,12 @@ def test_external_and_post_freeze_cells():
     assert (
         f"lifts it to {raw['with_carbs']:.3f} ({raw['gain']:+.3f}, {raw['ci95'][0]:+.3f} to {raw['ci95'][1]:+.3f})"
         in flat
+    )
+    p3 = _load("outputs/external_bigideas/external_part3.json")["external"]["usefulness"]
+    cr, cs = p3["cost_reduction"], p3["cleared_share"]
+    assert flat.count(f"{cr['point']:.1%} ({cr['ci95'][0]:.1%}–{cr['ci95'][1]:.1%})".replace("%–", "–")) >= 3
+    assert (
+        f"{p3['missed']} of its {p3['cleared']} clears spiked" in flat and f"clears {cs['point']:.1%} of meals" in flat
     )
     lc, rr = e["logged_carbs_alone"], e["running_spike_rate"]
     assert (f"| {rr['auroc']:.3f} ({rr['ci95'][0]:.3f}–{rr['ci95'][1]:.3f}) / "

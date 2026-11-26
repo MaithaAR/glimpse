@@ -175,3 +175,32 @@ does, at risk otherwise.
 
 Expectation: more meals cleared than v2 (16.9%) and a positive cost reduction with an interval that still
 includes zero; at most two targets on track. Reported whatever it shows. The served model does not change.
+
+## Part 3 result (27 Nov, run once; outputs/external_bigideas/external_part3.json)
+
+From CGMacros alone: Platt map (1.20, −0.09) and cut-offs 0.13 (low risk below) and 0.20 (caution from).
+
+| target (fixed in the proposal) | carb-aware model, 201 external meals of 12 people | label | the same recipe out of fold on CGMacros (481 meals) | v2 as frozen, external (Part 1) |
+|---|---|---|---|---|
+| cost reduction against always caution, at least 10% | 16.3% (7.9% to 27.4%) | on track; the interval is above zero | 9.6% (−7.7% to 24.6%) | 3.0% (−13.8% to 22.3%) |
+| meals cleared, at least 20% | 10.4% (4.1% to 18.1%), 21 meals | at risk | 12.1% | 16.9% |
+| meals referred, at most 20% | 14.4% (8.5% to 21.0%) | on track | 15.2% | 20.4% |
+| cleared meals that spiked, at most 10% | 4.8% (0.0% to 12.5%), 1 of 21 | on track | 10.3%, 6 of 58 | 14.7%, 5 of 34 |
+
+AUROC 0.749 (Part 2). Brier 0.167 against 0.189 for a constant forecast. ECE 0.089, mean risk 3.3 points
+above the spike rate: calibration is worse than v2's (0.053, +0.5), because the Platt map comes from a
+cohort that spikes more often.
+
+Reading.
+- For the first time a GLIMPSE model's decisions save cost on people it never saw, with an interval that
+  excludes zero: 16.3% against always caution, and 1 of its 21 clears spiked. Three of the four targets are on
+  track; none is met by the protocol's whole-interval rule.
+- It is cautious: it clears 10.4% of meals, half the target.
+- The expectation (more clears than v2, a cost interval through zero, at most two targets on track) was
+  wrong in the model's favour on cost and wrong against it on clears.
+- What differs from v2 is two things the audits pointed to: the carbs are an input, and there is no
+  per-person intercept.
+
+Limits. Third look at the same 12 people, with no correction for that. The carbs are the person's own log,
+not a photo estimate; with photos the gain would be smaller by an unknown amount. 21 cleared meals is a
+small count. Model only: the product's refusal rules are not applied. The served model is unchanged.

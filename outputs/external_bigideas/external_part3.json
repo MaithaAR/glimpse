@@ -1,0 +1,105 @@
+{
+  "what": "External Part 3: decisions of the carb-aware model (model, Platt map and cut-offs from CGMacros only)",
+  "platt_from_cgmacros": [
+    1.1971424582575532,
+    -0.09018678112260653
+  ],
+  "cutoffs_from_cgmacros": [
+    0.13,
+    0.2
+  ],
+  "cgmacros_out_of_fold": {
+    "meals": 481,
+    "auroc": 0.7204804640043893,
+    "usefulness": {
+      "cost_reduction": {
+        "point": 0.09597523219814241,
+        "ci95": [
+          -0.07729770483917218,
+          0.24626975740765203
+        ],
+        "target": 0.1,
+        "label": "at risk"
+      },
+      "cleared_share": {
+        "point": 0.12058212058212059,
+        "ci95": [
+          0.054341944287596464,
+          0.2004093215293417
+        ],
+        "target": 0.2,
+        "label": "at risk"
+      },
+      "referred_share": {
+        "point": 0.15176715176715178,
+        "ci95": [
+          0.10493794115314457,
+          0.20612563775510204
+        ],
+        "target": 0.2,
+        "label": "on track"
+      },
+      "missed_among_cleared": {
+        "point": 0.10344827586206896,
+        "ci95": [
+          0.0,
+          0.22388703036541427
+        ],
+        "target": 0.1,
+        "label": "at risk"
+      },
+      "cleared": 58,
+      "missed": 6
+    }
+  },
+  "external": {
+    "meals": 201,
+    "people": 12,
+    "auroc": 0.7494117647058823,
+    "brier": 0.16685013525938291,
+    "brier_constant": 0.1893517487190911,
+    "ece": 0.08887701797563005,
+    "mean_risk_minus_spike_rate": 0.033111512876073446,
+    "usefulness": {
+      "cost_reduction": {
+        "point": 0.16333333333333333,
+        "ci95": [
+          0.07930127041742291,
+          0.27409308314937436
+        ],
+        "target": 0.1,
+        "label": "on track"
+      },
+      "cleared_share": {
+        "point": 0.1044776119402985,
+        "ci95": [
+          0.0410958904109589,
+          0.18134715025906736
+        ],
+        "target": 0.2,
+        "label": "at risk"
+      },
+      "referred_share": {
+        "point": 0.14427860696517414,
+        "ci95": [
+          0.08450704225352113,
+          0.21025641025641026
+        ],
+        "target": 0.2,
+        "label": "on track"
+      },
+      "missed_among_cleared": {
+        "point": 0.047619047619047616,
+        "ci95": [
+          0.0,
+          0.12510080645161234
+        ],
+        "target": 0.1,
+        "label": "on track"
+      },
+      "cleared": 21,
+      "missed": 1
+    },
+    "targets_met_or_on_track": 3
+  }
+}

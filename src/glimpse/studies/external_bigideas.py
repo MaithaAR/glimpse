@@ -276,3 +276,89 @@ def run_external_part2(cfg) -> dict:
     out_file.write_text(json.dumps(res, indent=2))
     logger.bind(stage="external").info("{}", json.dumps(res)[:1200])
     return res
+
+
+def run_external_part3(cfg) -> dict:
+    """Part 3 (docs/external_bigideas.md): decisions of the carb-aware model on the external people. The model,
+    its Platt map and its cut-offs come from CGMacros only; no per-person intercept."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2, meal_rows
+    from glimpse.evaluation.metrics import fit_platt
+    from glimpse.training.baselines import logistic
+    from glimpse.training.final import cost_dict
+    from glimpse.training.fusion import logged_carbs
+
+    M, X = build(cfg)
+    keep = M.scored.to_numpy()
+    s, Xs = M[keep].reset_index(drop=True), X[keep]
+    bundle = joblib.load("checkpoints/sensor_first/fusion.joblib")
+    ds, sp = MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json"))
+    yall, costs = ds.labels(), cost_dict(cfg)
+
+    def feats(rows):
+        return np.hstack([trend_features(ds, rows), logged_carbs(ds, rows)])
+
+    # out-of-fold scores of the recipe on the 23 development people (CGMacros only)
+    f_oof, y_oof, pid_oof = [], [], []
+    for k, fold in enumerate(sp.dev_folds):
+        tr = meal_rows(ds, set(sp.training_people(k)), scored_only=False)
+        te = meal_rows(ds, set(fold), scored_only=True)
+        m = logistic(bundle["C"], cfg.seed).fit(feats(tr), yall[tr])
+        f_oof.append(m.decision_function(feats(te)))
+        y_oof.append(yall[te])
+        pid_oof.append([ds.samples[i].person_id for i in te])
+    f_oof, y_oof, pid_oof = np.concatenate(f_oof), np.concatenate(y_oof).astype(int), np.concatenate(pid_oof)
+    a, b = fit_platt(1 / (1 + np.exp(-f_oof)), y_oof)
+    r_oof = 1 / (1 + np.exp(-(a * f_oof + b)))
+    tab = np.array([costs["low_risk"], costs["caution"], costs["abstain"]], float)  # rows: clear, caution, refer
+
+    def act(r, lo, hi):
+        return np.where(r < lo, 0, np.where(r >= hi, 1, 2))
+
+    def cost(ac, y):
+        return float(tab[ac, 1 - y].sum())
+
+    grid = np.round(np.arange(0.05, 0.601, 0.01), 2)
+    lo, hi = min(((x, z) for x in grid for z in grid if x <= z), key=lambda c: cost(act(r_oof, *c), y_oof))
+
+    def usefulness(r, y, sid) -> dict:
+        ac = act(r, lo, hi)
+
+        def red(i):
+            return 1 - cost(ac[i], y[i]) / cost(np.ones(len(i), int), y[i])
+
+        def miss(i):
+            c = ac[i] == 0
+            return float(y[i][c].mean()) if c.any() else float("nan")
+
+        out = {}
+        for name, fn, target, higher in (("cost_reduction", red, 0.10, True),
+                                         ("cleared_share", lambda i: float((ac[i] == 0).mean()), 0.20, True),
+                                         ("referred_share", lambda i: float((ac[i] == 2).mean()), 0.20, False),
+                                         ("missed_among_cleared", miss, 0.10, False)):  # fmt: skip
+            pt, l, h = person_bootstrap_ci(sid, fn)
+            ok_pt = pt >= target if higher else pt <= target
+            ok_all = l >= target if higher else h <= target
+            out[name] = {"point": pt, "ci95": [l, h], "target": target,
+                         "label": "met" if ok_all else "on track" if ok_pt else "at risk"}  # fmt: skip
+        out["cleared"], out["missed"] = int((ac == 0).sum()), int(y[ac == 0].sum())
+        return out
+
+    model = logistic(bundle["C"], cfg.seed).fit(feats(meal_rows(ds, set(bundle["train_people"]), scored_only=False)),
+                                                yall[meal_rows(ds, set(bundle["train_people"]), scored_only=False)])  # fmt: skip
+    f = model.decision_function(np.hstack([Xs, np.log1p(s.carbs.to_numpy(float))[:, None]]))
+    risk = 1 / (1 + np.exp(-(a * f + b)))
+    y, sid = s.spike.to_numpy().astype(int), s.person_id.to_numpy()
+    ext = usefulness(risk, y, sid)
+    res = {"what": "External Part 3: decisions of the carb-aware model (model, Platt map and cut-offs from CGMacros only)",
+           "platt_from_cgmacros": [a, b], "cutoffs_from_cgmacros": [float(lo), float(hi)],
+           "cgmacros_out_of_fold": {"meals": len(y_oof), "auroc": float(roc_auc_score(y_oof, r_oof)),
+                                    "usefulness": usefulness(r_oof, y_oof, pid_oof)},
+           "external": {"meals": len(y), "people": int(len(np.unique(sid))), "auroc": float(roc_auc_score(y, risk)),
+                        "brier": float(np.mean((risk - y) ** 2)), "brier_constant": float(y.mean() * (1 - y.mean())),
+                        "ece": _ece(y, risk), "mean_risk_minus_spike_rate": float(risk.mean() - y.mean()),
+                        "usefulness": ext,
+                        "targets_met_or_on_track": int(sum(v["label"] != "at risk" for v in ext.values() if isinstance(v, dict)))}}  # fmt: skip
+    (OUT / "external_part3.json").write_text(json.dumps(res, indent=2))
+    logger.bind(stage="external").info("{}", json.dumps(res)[:1500])
+    return res
