@@ -1,0 +1,12 @@
+{
+  "photos": 460,
+  "carb_range_agreement": 0.9586956521739131,
+  "median_abs_grams_difference": 6.357166290283203,
+  "carb_mae_fp32_in_sample": 15.37571331297142,
+  "carb_mae_int8_in_sample": 17.703642588076384,
+  "v1_decision_agreement": 0.9695652173913043,
+  "v1_note": "frozen v1 fusion, Platt only (no history), frozen cut-offs, as the folder command serves v1",
+  "median_ms_fp32": 77.35280199995032,
+  "median_ms_int8": 55.091172999937044,
+  "machine": "cloud x86, 2 threads, whole photo model (transform excluded)"
+}

@@ -136,7 +136,7 @@ def run_photo_probes(cfg) -> dict:
             "v1_note": "frozen v1 fusion, Platt only (no history), frozen cut-offs, as the folder command serves v1",
             "median_ms_fp32": float(np.median(t32) * 1e3), "median_ms_int8": float(np.median(t8) * 1e3),
             "machine": "cloud x86, 2 threads, whole photo model (transform excluded)"}  # fmt: skip
-    out = {"what": __doc__.splitlines()[0], "probes": probes, "int8": int8}
+    out = {"what": " ".join(__doc__.split()), "probes": probes, "int8": int8}
     Path("outputs/probes").mkdir(parents=True, exist_ok=True)
     Path("outputs/probes/photo_probes.json").write_text(json.dumps({"what": out["what"], **probes}, indent=2))
     Path("outputs/efficiency").mkdir(parents=True, exist_ok=True)

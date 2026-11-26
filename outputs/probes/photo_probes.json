@@ -1,0 +1,25 @@
+{
+  "what": "Photo-model probes D (where it looks) and E (portion size), and the int8 study (`glimpse photo-probes`; registered 26 Nov in docs/photo_probes_int8.md before the run). Frozen photo model; development photos are in-sample for it, the 14 real phone photos are not.",
+  "dev_in_sample": {
+    "photos": 460,
+    "share_centre_moves_more": 0.8434782608695652,
+    "median_abs_dlog_centre": 0.604005322592694,
+    "median_abs_dlog_border": 0.14406143070708888,
+    "bin_changes_centre": 0.4260869565217391,
+    "bin_changes_border": 0.06086956521739131,
+    "hypothesis_D_holds": true,
+    "zoom_share_grams_rise": 0.40217391304347827,
+    "zoom_median_dlog": -0.06710792396242837
+  },
+  "local_unseen": {
+    "photos": 14,
+    "share_centre_moves_more": 0.8571428571428571,
+    "median_abs_dlog_centre": 0.5719279331414064,
+    "median_abs_dlog_border": 0.10030615153111166,
+    "bin_changes_centre": 0.2857142857142857,
+    "bin_changes_border": 0.07142857142857142,
+    "hypothesis_D_holds": true,
+    "zoom_share_grams_rise": 0.5714285714285714,
+    "zoom_median_dlog": 0.03069627190193125
+  }
+}
