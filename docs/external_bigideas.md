@@ -95,3 +95,25 @@ in no CGMacros table of the report.
 | people in the cohort | 45, of whom v2 trained on 37 | 16, of whom 12 usable | 4 people lost to a date mismatch in the public files | their date ranges are listed above; no shift was guessed |
 
 These checks are in outputs/external_bigideas/external_bigideas.json under `matching_checks`.
+
+## Part 2, planned on 27 Nov before it was run: does meal content help on free-living meals?
+
+Why. On CGMacros the logged carbs add at most about +0.03 AUROC to the sensor and profile model, which is why
+the photo, whose job is to supply the carbs, could not pass its gate. CGMacros meals are largely
+standardised. In Part 1 the carbs people logged ranked BIG IDEAs meals at 0.734 on their own. If meal
+content adds little on standardised meals and a lot on free-living ones, the photo channel's low ceiling is
+a property of the training data, not of the design.
+
+What is run, once:
+- Two logistic models are fitted on the 37 non-locked CGMacros people with v2's recipe and v2's own C (no
+  tuning): the 15 sensor and profile inputs, and the same plus log(1 + logged carbs). The first must
+  reproduce the frozen v2's raw scores on BIG IDEAs to 1e-6, or the run stops.
+- Both are scored on the 201 BIG IDEAs meals of Part 1, without the intercept (raw ranking) and with the
+  frozen Platt map and intercept replay.
+- Endpoint: AUROC with carbs minus without, paired bootstrap over the 12 people, 2,000 draws.
+- A simulation of photo-quality carbs: the BIG IDEAs logged carbs are perturbed with errors drawn from the
+  fine-tuned photo model's own out-of-person errors on CGMacros (log scale, outputs/photo_cv/photo_oof.csv),
+  200 times; the mean gain is reported. This is a simulation, not a photo result: BIG IDEAs has no photos.
+
+Expectation: a gain of +0.03 to +0.10 with carbs; about half of it left under photo-sized errors. Whatever it
+shows is reported. Nothing is refitted on BIG IDEAs, and the served model does not change.
