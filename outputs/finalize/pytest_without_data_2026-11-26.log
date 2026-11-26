@@ -1,2 +1,2 @@
-# just test (pytest), fresh clone WITHOUT data/ or weights, commit d24ff0e
-197 passed, 16 skipped, 1 xfailed in 11.31s
+# just test (pytest) in a fresh clone WITHOUT data/ or weights, 2026-11-26T20:50:31Z, commit fee4802
+198 passed, 16 skipped, 1 xfailed in 10.42s
