@@ -33,3 +33,10 @@ figure is given).
 
 The 19.7% cost reduction here is on the 460 answered meals with no refer band; the report's 14.4% is on all 481
 meals with each fold's own band and counts the 21 photo-less meals as referred.
+
+Probe B's premise (added after a grader asked whether the report's explanation had been tested), 481 development
+meals: the Spearman correlation of the 30-minute pre-meal slope with the measured rise is +0.04 (−0.07 to
++0.14), with the peak −0.03 (−0.15 to +0.08) and with the label −0.04 (−0.13 to +0.06). There is no
+association. Probe B expected a rising trace to raise risk, and the data do not contain that effect. The
+report's earlier explanation (a higher baseline giving a smaller measured rise) would need a negative
+correlation with the rise and is not supported; the report now says so.

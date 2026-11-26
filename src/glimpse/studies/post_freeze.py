@@ -237,12 +237,32 @@ def decision_layer(cfg) -> dict:
     return res
 
 
+def probe_b_premise(ds) -> dict:
+    """Probe B expected a rising pre-meal trace to raise risk. Is the premise in the data? Spearman correlation of
+    the 30-minute pre-meal slope with the measured rise, the peak and the label, 481 development meals,
+    person-bootstrap intervals."""
+    from glimpse.evaluation.metrics import person_bootstrap_ci
+    from glimpse.training.baselines import trend_features
+
+    d = pd.read_csv("outputs/evaluation_v2/dev_answers.csv")
+    rows = d.row.to_numpy()
+    slope = trend_features(ds, rows)[:, 1]
+    rise = np.array([ds.samples[int(r)].rise_mgdl for r in rows])
+    peak = rise + np.array([ds.samples[int(r)].baseline_mgdl for r in rows])
+    sid, ok, out = d.person_id.to_numpy(), np.isfinite(slope), {"meals": int(np.isfinite(slope).sum())}
+    for name, v in (("rise", rise), ("peak", peak), ("spike", d.spike.to_numpy().astype(float))):
+        pt, lo, hi = person_bootstrap_ci(sid[ok], lambda i, v=v: float(spearmanr(slope[ok][i], v[ok][i]).statistic))
+        out[f"spearman_slope30_vs_{name}"] = {"point": pt, "ci95": [lo, hi]}
+    return out
+
+
 def run_post_freeze(cfg, ds, sp) -> dict:
     log = logger.bind(stage="post-freeze")
     OUT.mkdir(parents=True, exist_ok=True)
     torch.set_num_threads(2)
     res = {"what": __doc__.splitlines()[0], "plan": "docs/post_freeze_checks.md"}
-    for name, fn in (("photo_average", photo_average), ("decision_layer", lambda: decision_layer(cfg)),
+    for name, fn in (("photo_average", photo_average), ("probe_b_premise", lambda: probe_b_premise(ds)),
+                     ("decision_layer", lambda: decision_layer(cfg)),
                      ("embedding_map", lambda: embedding_map(cfg, ds, sp)), ("jpeg_stress", lambda: jpeg_stress(cfg, ds, sp)),
                      ("crop_ablation", lambda: crop_ablation(cfg, ds, sp))):  # fmt: skip
         res[name] = fn()

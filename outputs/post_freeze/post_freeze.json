@@ -20,6 +20,30 @@
     },
     "note": "range F1 here bins each grams estimate; the report's 0.61 for the fine-tune uses its range head"
   },
+  "probe_b_premise": {
+    "meals": 481,
+    "spearman_slope30_vs_rise": {
+      "point": 0.035915732371500114,
+      "ci95": [
+        -0.07177417940331517,
+        0.14328526149959783
+      ]
+    },
+    "spearman_slope30_vs_peak": {
+      "point": -0.034303160309545846,
+      "ci95": [
+        -0.145385145307067,
+        0.08262320879401507
+      ]
+    },
+    "spearman_slope30_vs_spike": {
+      "point": -0.03548230665139283,
+      "ci95": [
+        -0.12727463043804152,
+        0.05548050689657863
+      ]
+    }
+  },
   "decision_layer": {
     "meals": 460,
     "no_band": {

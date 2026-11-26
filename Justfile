@@ -334,3 +334,10 @@ post-freeze:
 # external check: the frozen v2 on the BIG IDEAs dataset (docs/external_bigideas.md; needs data/bigideas/, seconds)
 external-bigideas:
     uv run glimpse external-bigideas
+
+# fetch and prepare the second dataset for `just external-bigideas` (PhysioNet open data, about 250 MB)
+download-bigideas:
+    mkdir -p data/bigideas
+    cd data/bigideas && curl -sSO https://physionet-open.s3.amazonaws.com/big-ideas-glycemic-wearable/1.1.2/Demographics.csv
+    cd data/bigideas && for i in $(seq -w 1 16); do mkdir -p 0$i; for f in Dexcom HR Food_Log; do curl -sS -o 0$i/${f}_0$i.csv https://physionet-open.s3.amazonaws.com/big-ideas-glycemic-wearable/1.1.2/0$i/${f}_0$i.csv; done; done
+    cd data/bigideas && uv run python ../../scripts/prepare_bigideas.py

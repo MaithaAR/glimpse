@@ -774,7 +774,20 @@ def test_external_and_post_freeze_cells():
         f"within-person {v['within_person']['mean']:.3f}, against {e['v2_without_intercept']['within_person']['mean']:.3f}"  # noqa: E501
         in flat
     )
-    assert f"rank meals better alone ({e['logged_carbs_alone']['auroc']:.3f})" in flat
+    lc, rr = e["logged_carbs_alone"], e["running_spike_rate"]
+    assert (f"| {rr['auroc']:.3f} ({rr['ci95'][0]:.3f}–{rr['ci95'][1]:.3f}) / "
+            f"{lc['auroc']:.3f} ({lc['ci95'][0]:.3f}–{lc['ci95'][1]:.3f}) |") in flat  # fmt: skip
+    pb = _load("outputs/post_freeze/post_freeze.json")["probe_b_premise"]["spearman_slope30_vs_rise"]
+    assert f"(Spearman {pb['point']:+.2f}, {pb['ci95'][0]:+.2f} to {pb['ci95'][1]:+.2f})".replace("-", "−") in flat
+    o1 = _load("outputs/final_checks/final_checks.json")["o1"]
+    assert f"flags {round(o1['flagged_out'] * o1['out_of_distribution'])} of the {o1['out_of_distribution']}" in flat
+    assert f"and {round(o1['flagged_in'] * o1['in_distribution'])} of the {o1['in_distribution']} meal photos" in flat
+    fw = _load("outputs/report_metrics/report_metrics.json")["falling_now_what_if"]
+    assert (
+        f"flips {fw['would_flip']} clears and avoids {fw['misses_avoided']} of the {fw['misses_total']} misses" in flat
+    )
+    v3 = _load("outputs/robustness_v3/robustness_v3.json")["r5_v3"]["carb_v3"]
+    assert f"range heads on frozen features reach {v3['bin_f1']:.2f} (v3)" in flat
     p = _load("outputs/post_freeze/post_freeze.json")
     j, c, m, a, dl = p["jpeg_stress"], p["crop_ablation"], p["embedding_map"], p["photo_average"], p["decision_layer"]
     assert (

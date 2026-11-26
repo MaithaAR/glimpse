@@ -84,7 +84,7 @@ just docker-demo                              # needs `just install` first, for 
 | `just prepare` | meal table, windows, person splits, training-only scaling, quality report | 1 min |
 | `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · the intermediate 28-person fusion (`just train` runs all three; the DEPLOYED artifacts come from `just finalize`, the pre-registered regeneration, so train-photo and train-final refuse to overwrite them unless `GLIMPSE_OVERWRITE_FROZEN=1`) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
-| `just evaluate-fast` | parameter budget, both dev evaluations (v1 and v2), v2's metrics, probes and explanation, the unfamiliar-photo check, monitoring, probes A and B, then `just report-numbers` (every other table and figure re-derived from committed outputs); `just evaluate` also recomputes the stress, int8, timing and registered-check studies; the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun) | about 15 min on a 2-CPU machine (`evaluate` about 45) |
+| `just evaluate-fast` | parameter budget, both dev evaluations (v1 and v2), v2's metrics, probes and explanation, the unfamiliar-photo check, monitoring, probes A and B, then `just report-numbers` (every other table and figure re-derived from committed outputs); `just evaluate` also recomputes the stress, int8, timing and registered-check studies; the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun) | about 15 min on a 2-CPU machine (`evaluate` about an hour) |
 | `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10-15 min |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`,
@@ -225,16 +225,8 @@ Added on 27 Nov, exploratory, with the served model unchanged:
   map (Figure A3), the photo estimate ladder and a refer-band analysis of the decision layer.
 - `just external-bigideas` (docs/external_bigideas.md, `outputs/external_bigideas/`): the frozen v2 scored on
   a second public dataset, BIG IDEAs Lab Glycemic Variability and Wearable Device Data (PhysioNet v1.1.2,
-  open access). The data are not in this repository. To fetch and prepare them (about 250 MB):
-
-```bash
-mkdir -p data/bigideas && cd data/bigideas
-B=https://physionet-open.s3.amazonaws.com/big-ideas-glycemic-wearable/1.1.2
-curl -sSO $B/Demographics.csv
-for i in $(seq -w 1 16); do mkdir -p 0$i; for f in Dexcom HR Food_Log; do curl -sS -o 0$i/${f}_0$i.csv $B/0$i/${f}_0$i.csv; done; done
-uv run python ../../scripts/prepare_bigideas.py && cd ../..
-just external-bigideas
-```
+  open access). The data are not in this repository; `just download-bigideas` fetches and prepares them
+  (about 250 MB), then `just external-bigideas` scores them in seconds. No model is trained on these data.
 
 `tests/test_report_numbers.py` checks the report's headline numbers against these files on every commit.
 
