@@ -5,11 +5,11 @@
     "low risk": 18,
     "can't judge": 8
   },
-  "latency_ms_p50": 275.56408348027617,
-  "latency_ms_p95": 289.5681352529209,
+  "latency_ms_p50": 136.6979860000015,
+  "latency_ms_p95": 166.27538099996286,
   "latency_target_ms": 300.0,
   "latency_met": true,
-  "machine": "Darwin arm64",
+  "machine": "Linux x86_64",
   "torch_threads": 4,
   "raw_window_matches_dataset": true,
   "unfamiliar_photo_check": {
