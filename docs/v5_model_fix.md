@@ -125,3 +125,33 @@ piece worth keeping is the mechanism: history as a model input (`prev_rise`) and
 recover the within-person ranking that the post-hoc intercept destroys. A served version would need the
 offset's calibration and v5's ranking together, and a new set of people to test it on. No further variant is
 scored on the confirmation people.
+
+## Part 2, registered 26 Nov before any run: v6 and a transfer check on people never scored
+
+Aim: keep v5's ranking and get v1's calibration back.
+
+Design, on the design people only (folds 1 to 3), logged as before. Allowed: the v5 photo-only model with a
+per-person offset on top (shrinkage, frozen after N labelled meals, late start), and nothing else new. A
+variant is kept only if, against v5 photo only on the design people, its Brier score is lower and the sum
+of pooled and within-person AUROC is not more than 0.01 lower. The confirmation people (folds 4 and 5) are
+not scored again.
+
+Transfer check, run once after v6 is frozen in a commit. The 14 type-2 people have never been scored by any
+model in this project; they were training data only. They are outside the product's scope (rule R15), so
+this is a check of the recipe on unseen people, not a claim for people with diabetes. They are split into
+two halves by sorted person id (odd and even positions). Each half is scored by models trained on the 23
+development people plus the other half, with the development outer folds as the inner folds. Photo inputs
+are the committed estimates from models that never saw the person (outputs/photo_cv/).
+
+Three recipes are refitted the same way and compared on the same meals: the v1 recipe (label logistic with
+v1's per-fold median m = 1.0 intercept), v5 photo only, and v6.
+
+- Endpoints: pooled AUROC, mean within-person AUROC, Brier score; v6 minus the v1 recipe, bootstrap over the
+  14 people, 2,000 draws, seed 0.
+- "Transfers": within-person AUROC higher with an interval above zero, and neither pooled AUROC nor Brier
+  worse beyond its interval (pooled interval not wholly below zero, Brier interval not wholly above zero).
+- "Direction only": within-person higher, interval includes zero, and the other two not worse as above.
+- "Does not transfer": anything else.
+
+Prediction: direction only. The type-2 people spike more often and their meals differ, so the size of any
+gain is not expected to match.
