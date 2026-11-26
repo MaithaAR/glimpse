@@ -41,7 +41,7 @@ standardised meals. 1,221 photos at most touched by fine-tuning (cap 10,000).
 |---|---|---|---|
 | AUROC (95% person-clustered) | 0.754 (0.673–0.815) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) |
 | meals answered with a risk | 481 | 460 | 150 |
-| ECE, 15 equal-width bins (target ≤ 0.05) | 0.029, below a perfect model's median 0.051: on track | 0.052, at the noise floor | 0.061 |
+| ECE, 15 equal-width bins (target ≤ 0.05) | 0.029, below a perfect model's median 0.051: on track | 0.052: misses by 0.002 (a perfectly calibrated model shows 0.058 here) | 0.061: not met |
 | low risk / caution / can't judge | 25% / 67% / 8% | 23% / 64% / 14% | 7% / 91% / 3% |
 | spikes among meals cleared (cap 10%) | 12.7%; prediabetes 6 of 30 | 7.3%; prediabetes 1 of 25 | 2 of 10 |
 | cost reduction vs always caution (target ≥ 10%) | 10.2% | 14.4% | −5.7% |

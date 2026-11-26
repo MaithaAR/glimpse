@@ -8,10 +8,11 @@ estimate with glucose trend, heart rate and profile. Frozen on 6 Nov, it is the 
 locked people, once: AUROC 0.645 (0.540–0.736), and the usefulness targets were not met; with 8 people the
 interval is wide. The photo failed its pre-registered gate, and a further check (D8) suggests its small gain
 comes from recognising repeated meals, so we do not claim the photo adds value. v2, the sensor-first product
-the gate's verdict described, was built on 26 Nov after the locked result and scored on development only. It
+the gate's verdict described, was built and frozen on 26 Nov after the locked result, scored on development only. It
 was not shown non-inferior (paired −0.015, −0.045 to +0.010) and let more spikes through its clears (12.7%
 against 7.3%; for people with prediabetes 6 of 30 against 1 of 25), so it stays as the tested alternative,
-one config line away. Serving v1 is a post-hoc decision, registered before the switch (docs/final_switch.md).
+one config line away. v2's registration said it would ship whatever the development result; serving v1
+instead is a post-hoc decision by the author, registered before the switch (docs/final_switch.md).
 In both, a per-person intercept learned from earlier meals carries most of the edge; it separates people
 well but ranks a person's own meals barely better than chance (within-person AUROC 0.60 in v1, 0.54 in v2).
 
@@ -19,9 +20,9 @@ well but ranks a person's own meals barely better than chance (within-person AUR
 |---|---|---|---|
 | AUROC (95% person-clustered) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) | 0.754 (0.673–0.815); 0.748 on v1's 460 |
 | meals answered with a risk | 460 | 150 | 481 |
-| ECE, registered 15 bins (target ≤ 0.05) | 0.052, at the noise floor | 0.061 | 0.029, below a perfect model's median 0.051: on track |
-| usefulness targets (protocol labels: met / on track / at risk) | 1 met, 3 on track | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk (spikes among cleared) |
-| spikes among cleared meals (cap 10%) | 7.3% (2.9–14.2%) | 2 of 10 | 12.7% (5.9–22.6%) |
+| ECE, registered 15 bins (target ≤ 0.05) | 0.052: misses by 0.002 (a perfectly calibrated model shows 0.058 here) | 0.061: not met | 0.029, below a perfect model's median 0.051: on track |
+| usefulness targets (protocol labels: met / on track / at risk) | 1 met, 3 on track (development labels) | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk (spikes among cleared) |
+| spikes among cleared meals (cap 10%) | 7.3% (2.9–14.2%) | 2 of 10: above the cap, too few to test | 12.7% (5.9–22.6%) |
 | the same, people with prediabetes | 1 of 25 | not split | 6 of 30 |
 | mean within-person AUROC (a person's own meals) | 0.60 (raw 0.68) | – | 0.54 (raw 0.63) |
 | the samples' path (no history, no priors), with rule R13 | – | – | 0 cleared; cost −5.3% |
@@ -36,7 +37,8 @@ every meal two hours later, so the system learns each person without logging.
 One scoring path (Figure 1): the evaluation, the demo, the app and the grader's
 `just predict-folder <in> <out>` all call `Pipeline.answer`. Plain-code rules run first and refuse with a
 named reason and who acts next: the user fixes the input, or a person reviews (docs/rule_ledger.md). Three
-safety rules followed grading, none changing an evaluated decision: below 54 mg/dL the answer is "treat the
+safety rules were added after AI cold-grading rounds found failures on unseen inputs, none changing an
+evaluated decision: below 54 mg/dL the answer is "treat the
 low first", not a walk (R14); HbA1c in the diabetes range is out of scope (R15, preventive); and a CGM or
 heart-rate input beyond the training range in the risk-lowering direction is refused (R16), since a heart
 rate of 140 to 160 bpm alone turned a prediabetic caution into low risk in either product (no development
@@ -46,8 +48,8 @@ replays them in deployment order, and the folder command takes them as an option
 profile without onboarding priors gets training medians, and rule R13 then withholds any low-risk answer:
 with neither history nor priors there is no personal basis to clear a meal, so a grader running the
 samples without `history.csv` sees caution or can't judge, never low risk. Tooling: uv with Python 3.14
-(locked), strict Pydantic, Loguru, a `just` recipe for every number, 202 tests (all pass with the data
-and weights, one an expected failure; 186 run without them; logs in outputs/finalize/), W&B offline runs
+(locked), strict Pydantic, Loguru, a `just` recipe for every number, 203 tests (202 pass with the data
+and weights, one an expected failure; 186 pass without them; logs in outputs/finalize/), W&B offline runs
 replayed from committed training histories, and a git history from 2 Nov in which every registration
 commit precedes its results commit.
 
@@ -216,7 +218,7 @@ only near the declared prices.
 | cleared as low risk | ≥20% | 22.7% (13.2–34.0%) | 6.5% (0.6–15.9%) | 24.5% (13.5–37.5%) | 11.0% |
 | can't judge | ≤20% | 13.7% (8.7–19.2%) | 2.6% (0.6–5.0%) | 8.3% (2.5–15.2%) | 18.5% |
 | missed among cleared | ≤10% | 7.3% (2.9–14.2%) | 20% (2 of 10; exact 2.5–55.6%) | 12.7% (5.9–22.6%), 15 of 118 | 15.1% (8 of 53) |
-| verdict (met / on track / at risk) | – | 1 met, 3 on track | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk | 3 of 4 at risk |
+| verdict (met / on track / at risk) | – | 1 met, 3 on track (development labels) | 1 met, 3 not met (final test) | 1 met, 2 on track, 1 at risk | 3 of 4 at risk |
 
 *v1's served point (no history) clears 15.2% with 9.6% spiking on development and 21.9% on the locked eight (report_metrics.json served_operating_point). report_metrics.json, v2_metrics.json (decisions, served_no_history), outputs/locked_eval/locked_summary.json.*
 
