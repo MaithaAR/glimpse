@@ -66,3 +66,41 @@ Prediction: B1 gains between 0 and +0.03 and is not shown; B2 gains less than B1
 - No second variant is tried after the results are seen. Any follow-up is labelled post hoc.
 - Two more items the council placed after the upload are registered separately before they run: a cold-start
   guard and per-person monitoring.
+
+## Results (26 Nov, after the registration commit 3248006; a rerun after a formatting-only edit gave identical numbers)
+
+outputs/v4_within_person/v4_within_person.json; `just v4-within-person`. Development only.
+
+Part A, label audit (460 meals, 22 people with both outcomes):
+
+| check | prediction | result |
+|---|---|---|
+| A1 logged carbs alone, within person | at least 0.65 | 0.708: met |
+| A1 last pre-meal glucose alone (lower means spike) | at least 0.55 | 0.607: met. Baseline 0.609; the 30-minute slope 0.484, no signal |
+| A2 meals within 5 mg/dL of the cut | removing them adds less than 0.03 | 9.3% of meals (0 to 27% per person); v1 raw goes from 0.680 to 0.720, +0.040: not met |
+| A3 v1 raw risk against rise and against peak, within person | peak higher | rise 0.38, peak 0.20: not met |
+
+What it says. Label noise at the cut costs more than predicted, about 0.04 of within-person AUROC. The model
+follows the rise, not the absolute level, so the weak ranking is not the model reading the wrong target. The
+largest loss is the intercept: v1 ranks at 0.680 raw and 0.602 as shipped. Logged carbs alone rank at 0.708,
+above the whole raw fusion, so the missing within-person signal is meal content, which the photo does not
+deliver.
+
+Part B, candidates:
+
+| candidate | within-person AUROC (baseline) | gain (95% over people) | pooled AUROC (baseline) | verdict |
+|---|---|---|---|---|
+| B1 person-centred fusion | 0.693 (0.680) | +0.013 (−0.002, +0.030); 11 people better, 9 worse | 0.749 (0.726) | not shown |
+| B2 SensorCNN with the ranking term | 0.612 (0.607) | +0.005 (−0.025, +0.034); 12 better, 9 worse | 0.647 (0.678) | not shown |
+
+The refitted baseline reproduced fusion_oof.csv to 7e-16. Both predictions were met: B1 gained between 0 and
++0.03 and B2 gained less. Secondary, descriptive: with the shipped intercept replayed without Platt, B1 pools
+at 0.774 against 0.763 for v1.
+
+Verdict by the registered rule: neither candidate is shown to rank meals better within a person. B1's pooled
+AUROC is 0.023 higher on the raw score, but that was not the endpoint, so it is reported as an observation and
+not as a result. The ranking term bought nothing within a person and cost 0.031 pooled.
+
+Not done, as registered: no second variant. One note for any later work: a cold-start guard was already
+counted in report_metrics.json (cold_start_what_if), including on the locked eight, so it cannot be registered
+fresh; it stays a what-if.

@@ -1,0 +1,96 @@
+{
+  "what": "v4 candidate study (docs/v4_within_person.md, registered 26 Nov before any run): a label audit, then two",
+  "registration": "docs/v4_within_person.md",
+  "A_label_audit": {
+    "meals": 460,
+    "A1_single_signals": {
+      "carbs": {
+        "mean_within_person_auroc": 0.7082502415092042,
+        "people": 22
+      },
+      "neg_last": {
+        "mean_within_person_auroc": 0.6066632470207985,
+        "people": 22
+      },
+      "neg_slope30": {
+        "mean_within_person_auroc": 0.4844092986779868,
+        "people": 22
+      },
+      "neg_baseline": {
+        "mean_within_person_auroc": 0.6085797666680581,
+        "people": 22
+      }
+    },
+    "A2_labels_near_cut": {
+      "share_within_5_of_cut": 0.09347826086956522,
+      "per_person_range": [
+        0.0,
+        0.2727272727272727
+      ],
+      "within_person_auroc_raw_all": 0.679705870555413,
+      "within_person_auroc_raw_without_them": 0.7195188732672149,
+      "within_person_auroc_shipped_all": 0.6016766715288836
+    },
+    "A3_mean_within_person_spearman": {
+      "rise": 0.3847745381227049,
+      "peak": 0.19793734272997326
+    }
+  },
+  "B1_baseline_reproduces_fusion_oof": {
+    "max_abs_difference": 6.938893903907228e-16,
+    "ok": true
+  },
+  "B1_person_centred_fusion": {
+    "people": 22,
+    "within_person_auroc": {
+      "candidate": 0.6925703542050796,
+      "baseline": 0.679705870555413
+    },
+    "gain": 0.012864483649666742,
+    "ci95": [
+      -0.0021196034490871037,
+      0.02988727463659529
+    ],
+    "people_better": 11,
+    "people_worse": 9,
+    "pooled_auroc": {
+      "candidate": 0.7485372596926637,
+      "baseline": 0.7256477849932488,
+      "difference": 0.022889474699414936
+    },
+    "verdict": "not shown",
+    "meals": 460,
+    "C_per_fold": [
+      0.01,
+      0.01,
+      0.01,
+      0.01,
+      0.01
+    ],
+    "with_intercept_replayed_no_platt": {
+      "b1": 0.7737414003729184,
+      "v1_raw": 0.7631539467198183
+    }
+  },
+  "B2_sensor_cnn_ranking_loss": {
+    "people": 22,
+    "within_person_auroc": {
+      "candidate": 0.6119894554586583,
+      "baseline": 0.6067563967226351
+    },
+    "gain": 0.005233058736023149,
+    "ci95": [
+      -0.02463377238154908,
+      0.03389710669490805
+    ],
+    "people_better": 12,
+    "people_worse": 9,
+    "pooled_auroc": {
+      "candidate": 0.6471763922091154,
+      "baseline": 0.6781165497511463,
+      "difference": -0.030940157542030944
+    },
+    "verdict": "not shown",
+    "meals": 481
+  }
+}
