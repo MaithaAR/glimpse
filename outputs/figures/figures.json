@@ -1,10 +1,10 @@
 {
   "what": "report figures rendered from committed evidence only (pre-commitment in docs/final_design.md); ece_raw/ece_personal = equal-mass ECE, 15 bins, answered dev meals; ece_equal_width_15 = the registered binning that Figure 3 draws",
-  "ece_raw": 0.05903813811230171,
+  "ece_raw": 0.05903813811230173,
   "ece_personal": 0.04904761090603793,
   "ece_equal_width_15": {
-    "raw": 0.0602000619224841,
-    "personal": 0.05209542261502841
+    "raw": 0.06020006192248409,
+    "personal": 0.052095422615028426
   },
   "shap": {
     "base_logit": -0.7146975218368059,
@@ -41,7 +41,7 @@
     ]
   },
   "ece_equal_mass_10bins": {
-    "risk_raw": 0.04939413946446653,
+    "risk_raw": 0.049394139464466504,
     "risk": 0.03531406110033508
   },
   "missed_among_cleared": {
@@ -74,6 +74,7 @@
     "f4_effects.png",
     "f5_robustness.png",
     "f6_shap.png",
-    "f7_coverage.png"
+    "f7_coverage.png",
+    "f8_v2.png"
   ]
 }

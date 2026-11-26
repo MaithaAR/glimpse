@@ -97,28 +97,28 @@
   "abstained_no_photo": 21,
   "abstained_borderline": 45,
   "calibration_by_person_personal": {
-    "corr_spike_rate_vs_gap": -0.8441959353303475,
+    "corr_spike_rate_vs_gap": -0.8441959353303476,
     "rare_spikers": {
       "people": 11,
-      "predicted": 0.20882717839131856,
+      "predicted": 0.20882717839131854,
       "observed": 0.14225941422594143
     },
     "frequent_spikers": {
       "people": 12,
-      "predicted": 0.4255376481166982,
+      "predicted": 0.42553764811669825,
       "observed": 0.5294117647058824
     }
   },
   "calibration_by_person_platt_only": {
-    "corr_spike_rate_vs_gap": -0.812779552895062,
+    "corr_spike_rate_vs_gap": -0.8127795528950619,
     "rare_spikers": {
       "people": 11,
-      "predicted": 0.2934574349500894,
+      "predicted": 0.29345743495008936,
       "observed": 0.14225941422594143
     },
     "frequent_spikers": {
       "people": 12,
-      "predicted": 0.369706695740096,
+      "predicted": 0.36970669574009596,
       "observed": 0.5294117647058824
     }
   },
@@ -126,8 +126,8 @@
     {
       "fold": 1,
       "C": 0.03,
-      "platt_slope": 0.8047269770223671,
-      "platt_intercept": -0.19771134636749454,
+      "platt_slope": 0.8047269770223674,
+      "platt_intercept": -0.19771134636749424,
       "m": 1.0,
       "low_risk_below": 0.21,
       "caution_from": 0.21,
@@ -186,8 +186,8 @@
     {
       "fold": 2,
       "C": 0.01,
-      "platt_slope": 1.168471304353664,
-      "platt_intercept": -0.11330643594434567,
+      "platt_slope": 1.1684713043536639,
+      "platt_intercept": -0.11330643594434577,
       "m": 2.0,
       "low_risk_below": 0.13,
       "caution_from": 0.23,
@@ -246,8 +246,8 @@
     {
       "fold": 3,
       "C": 0.03,
-      "platt_slope": 0.8593082755928532,
-      "platt_intercept": -0.13528100569904958,
+      "platt_slope": 0.859308275592854,
+      "platt_intercept": -0.13528100569904902,
       "m": 0.5,
       "low_risk_below": 0.13,
       "caution_from": 0.2,
@@ -306,8 +306,8 @@
     {
       "fold": 4,
       "C": 0.01,
-      "platt_slope": 1.0329113687772937,
-      "platt_intercept": -0.2805139175848583,
+      "platt_slope": 1.0329113687772935,
+      "platt_intercept": -0.28051391758485833,
       "m": 1.0,
       "low_risk_below": 0.15,
       "caution_from": 0.17,

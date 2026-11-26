@@ -26,3 +26,8 @@ photo: carb-range agreement, the median absolute difference in grams, the carb M
 for both (in-sample), and the median time per photo. For v1 (photo fusion), the decision agreement of the
 frozen v1 fusion (Platt only, frozen cut-offs) with fp32 against int8 photo inputs, on the meals with a
 photo. v2's risk does not use the photo, so int8 changes only its carb assist. int8 is not shipped.
+
+## Deviation note (26 Nov, after the run)
+Registered on "every development photo" (1,221); both studies ran on the 460 development meals that carry a
+v1 decision, one photo each, so that int8 decision agreement is per meal. The probe and int8 results are
+for those 460 photos (in-sample for the frozen model) and the 14 unseen phone photos.

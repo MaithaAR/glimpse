@@ -118,10 +118,12 @@ def f3_reliability(plt, da: pd.DataFrame) -> dict:
     from glimpse.evaluation.metrics import reliability
 
     lk = pd.read_csv("outputs/locked_eval/locked_answers.csv")
+    v2 = pd.read_csv("outputs/evaluation_sensor_first/dev_answers.csv")  # v2 panel (26 Nov, docs/v2_explain.md)
     out = {}
-    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.2), sharey=True)
-    for ax, (name, frame) in zip(axes, (("development, 460 meals", da), ("locked eight, 150 meals", lk)),
-                                 strict=True):  # fmt: skip
+    fig, axes = plt.subplots(1, 3, figsize=(13.2, 4.2), sharey=True)
+    panels = (("v1, development, 460 meals", da), ("v1, locked eight, 150 meals", lk),
+              ("v2 (served), development, 481 meals", v2))  # fmt: skip
+    for ax, (name, frame) in zip(axes, panels, strict=True):
         d = frame.dropna(subset=["risk"])
         y = d.spike.to_numpy().astype(float)
         ax.plot([0, 1], [0, 1], color=GREY, lw=0.8, ls="--")
@@ -280,6 +282,51 @@ FEATURE_NAMES = ["last glucose", "slope 30 min", "slope 60 min", "window mean", 
                  "p(bin 60-90g)", "p(bin 90g+)"]  # fmt: skip
 
 
+def f8_v2(plt) -> None:
+    """v2 explained (26 Nov, registered in docs/v2_explain.md): spikes among cleared meals as the low-risk cut
+    moves, exact linear SHAP of the frozen v2 fusion, and one false clear split into fusion terms and the
+    per-person intercept. From outputs/v2_explain/v2_explain.json."""
+    r = json.loads(Path("outputs/v2_explain/v2_explain.json").read_text())
+    fig, axes = plt.subplots(1, 3, figsize=(13.2, 3.6))
+    mc = [q for q in r["miss_curve"] if q["missed_among_cleared"] is not None and q["cleared"] >= 10]
+    x = [q["cleared_share"] for q in mc]
+    axes[0].fill_between(x, [q["missed_wilson95"][0] for q in mc], [q["missed_wilson95"][1] for q in mc],
+                         color=BLUE, alpha=0.15, lw=0)  # fmt: skip
+    axes[0].plot(x, [q["missed_among_cleared"] for q in mc], "o-", color=BLUE, ms=3)
+    axes[0].axhline(0.10, color=RED, lw=0.8, ls="--")
+    fb = r["frozen_band_in_sample"]
+    axes[0].plot([fb["cleared"] / 481], [fb["missed_among_cleared"]], "s", color=ORANGE, ms=7,
+                 label="frozen cut 0.15 (in-sample)")  # fmt: skip
+    axes[0].set_xlabel("share of development meals cleared (cut 0.05 to 0.30)")
+    axes[0].set_ylabel("spikes among cleared meals (95% Wilson)")
+    axes[0].set_title("v2: at no cut does the interval stay under the 10% cap", fontsize=9)
+    axes[0].legend(frameon=False, fontsize=7.5, loc="upper left")
+    sh = r["shap"]
+    names = list(sh["mean_abs_shap"])
+    vals = np.array([sh["mean_abs_shap"][n] for n in names])
+    order = np.argsort(vals)
+    axes[1].barh(np.arange(len(order)), vals[order],
+                 color=[ORANGE if sh["coefficients"][names[j]] < 0 else BLUE for j in order])  # fmt: skip
+    axes[1].set_yticks(np.arange(len(order)), [names[j].replace("window sd", "window spread") for j in order],
+                       fontsize=6.8)  # fmt: skip
+    axes[1].set_xlabel("mean |SHAP| (logit units); orange = higher value, lower risk")
+    axes[1].set_title(f"v2 global; the intercept moves the served logit {sh['split']['mean_abs_intercept_shift']:.2f}",
+                      fontsize=9)  # fmt: skip
+    loc = sh["local"]
+    terms = sorted(loc["terms"].items(), key=lambda kv: -abs(kv[1]))[:7]
+    labels = [k for k, _ in terms] + ["fold refit and Platt", "per-person intercept"]
+    vs = [v for _, v in terms] + [loc["fold_platt_logit"] - loc["frozen_logit"], loc["intercept_shift"]]
+    axes[2].barh(np.arange(len(vs))[::-1], vs, color=[BLUE if v > 0 else ORANGE for v in vs])
+    axes[2].set_yticks(np.arange(len(vs))[::-1], labels, fontsize=6.8)
+    axes[2].axvline(0, color=GREY, lw=0.6)
+    axes[2].set_xlabel("logit contribution (fusion terms in-sample, frozen model)")
+    axes[2].set_title(f"v2 false clear, meal {loc['row']}: risk {loc['risk']:.0%}, {loc['n_history']} labelled meal",
+                      fontsize=9)  # fmt: skip
+    fig.tight_layout()
+    fig.savefig(OUT / "f8_v2.png")
+    plt.close(fig)
+
+
 def f6_shap(plt, da: pd.DataFrame) -> dict:
     """Exact linear SHAP for the frozen fusion (pre-registered 7 Nov): coefficient times (feature minus
     background mean) in the standardised space; the local panel's terms are checked to sum to the logit."""
@@ -366,7 +413,7 @@ def _answer_stats(da: pd.DataFrame) -> dict:
 
 
 def run_figures(cfg=None) -> dict:
-    """Render F1-F7 from committed evidence; write the ECE numbers next to them."""
+    """Render F1-F8 from committed evidence; write the ECE numbers next to them."""
     import matplotlib
 
     matplotlib.use("Agg")
@@ -388,6 +435,8 @@ def run_figures(cfg=None) -> dict:
     shap_report = f6_shap(plt, da)
     if Path("outputs/report_metrics/report_metrics.json").exists():
         f7_coverage(plt)
+    if Path("outputs/v2_explain/v2_explain.json").exists():
+        f8_v2(plt)
     report = {"what": "report figures rendered from committed evidence only (pre-commitment in "
                       "docs/final_design.md); ece_raw/ece_personal = equal-mass ECE, 15 bins, answered dev meals; "
                       "ece_equal_width_15 = the registered binning that Figure 3 draws",

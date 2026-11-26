@@ -7,6 +7,11 @@ pre-registered verdict or a locked-set number; serving behaviour changed in word
 refusal reason (R12) and one output rule (R13, eighth pass), none of which alters an evaluated or locked decision (R13 changes the no-history, no-prior served path, reported as such): `checkpoints/` is byte-identical to the tag, and the locked
 eight were not rescored (new locked metrics are arithmetic on the committed `locked_answers.csv`).
 
+**Superseded on 26 Nov by the tenth pass (below):** that pass added a second product, v2, with its own frozen
+files in `checkpoints/sensor_first/`, and switched the served product to it in `configs/default.yaml`. The
+sentence above stays true of every v1 file, which is still byte-identical to the tag, and of the locked eight,
+which were not rescored.
+
 ## 26 Nov 2026
 
 | Change | Why (grader finding) | Evidence |
@@ -209,4 +214,17 @@ weights were copied from her Mac into the cloud workspace for this round (read o
 | Report rewritten around v1 and v2 (2,193 prose words); secondary tables and the previous prose moved to docs/report_appendix.md, tested the same way; model card, README, rule ledger and Figure 1 updated | readability and the product change (3 of 3) | docs/ |
 | `just evaluate` runs both evaluations and v2's metrics; `evaluate-all`, `stress-quality`, `photo-probes`, `monitoring-power`, `finalize-sensor-first` recipes; outputs/ tracked; CI re-derives the data-free outputs | `evaluate` did not rebuild every table (3 of 3) | Justfile; .github/workflows/ci.yml |
 
-Author sign-off on this round's registrations and on R13: to be added here by the author, dated, in her words.
+## 26 Nov 2026, eleventh pass (round-11 grades: 76.25, 77.0, 78.5; holistic 84)
+
+All three strict graders and the holistic one found the report explaining and charting v1 while serving v2.
+
+| Change | Why | Evidence |
+|---|---|---|
+| v2 explained, calibrated and its failures sorted (registered 10679f9 before the run): ECE noise floor and interval (0.029, 0.032-0.091: on track, not met), reliability panel in Figure 3, frozen band in-sample (refers 18%), miss curve, taxonomy of v2's 15 false clears (6 near-cut, 9 confident, 6 on people with prediabetes), exact SHAP and the intercept split (Figure 8), heart rate's within-person sign, a prediabetes what-if (not shipped), last-third check, the carb estimate's own value | the served model had no reliability diagram, attribution or taxonomy (4 of 4) | outputs/v2_explain/; docs/v2_explain.md |
+| v2 under stress on its own inputs (same registration): heart rate removed gives 17 caution to low risk flips, the largest of any condition; 25% wrong history labels cost 0.055 AUROC | v2's robustness skipped its own dependencies (3 of 3) | outputs/robustness/v2_input_stress.json |
+| Report: "calibrated" and "met" replaced by the measured verdict; the band sentence corrected (the 40 referred meals came from per-fold bands 0-10 points wide); a paragraph on v2 as the riskier product and the decision timeline; v2 taxonomy in the main table; like-for-like 0.748; parameter table without double counting; probe D and E caveats; int8 carb MAE and the 1,221 to 460 photo deviation; stress denominators; caution-share alarm stated as measured; Figure 5 to the appendix; the old v1 prose to docs/archive/ | overstatements and internal inconsistencies (3 of 3) | docs/final_report.md |
+| `just evaluate` adds the v2 explanation; `evaluate-all` adds v2 input stress, end-to-end timing and the 22 Nov levels; `just end-to-end-timing`; `verify-outputs` compares numbers to 1e-9 instead of bytes; `evaluation_v2/dev_answers.csv` regenerated under the final reason wording (decisions unchanged) | 1e-16 noise failed the byte check; recipes missing (2 of 3) | Justfile; src/glimpse/verify.py |
+| README, samples README, instructor manifest, rule ledger and model card brought up to v2 | stale statements (3 of 3) | – |
+
+Author sign-off on the tenth and eleventh passes (v2, R13 and every registration since the tag): to be
+added here by the author, dated, in her words.

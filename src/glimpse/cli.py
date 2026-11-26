@@ -185,6 +185,31 @@ def _v2_metrics(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     return 0
 
 
+def _verify_outputs(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """Data-free outputs against the committed ones, numbers to 1e-9."""
+    from glimpse.verify import verify_outputs
+
+    return verify_outputs()
+
+
+def _v2_explain(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """v2 calibration, failures and exact SHAP (docs/v2_explain.md); data-free once the features are committed."""
+    from glimpse.evaluation.v2_explain import run_v2_explain
+
+    run_v2_explain(cfg)
+    return 0
+
+
+def _v2_input_stress(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
+    """v2 under stress on heart rate, onboarding priors and history (docs/v2_explain.md, V2-S)."""
+    from glimpse.data.dataset import MealDataset
+    from glimpse.data.splits import SplitsV2
+    from glimpse.studies.v2_input_stress import run_v2_input_stress
+
+    run_v2_input_stress(MealDataset.load(Path("data/dataset")), SplitsV2.load(Path("splits/dev_splits_v2.json")), cfg)
+    return 0
+
+
 def _evaluate(cfg: GlimpseConfig, args: argparse.Namespace) -> int:
     """Development evaluation on partition v2: every risk from Pipeline.answer, one Pipeline per fold (D2)."""
     from glimpse.data.dataset import MealDataset
@@ -486,6 +511,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("final", help="28-person fusion and frozen decision thresholds (Step 5a)")
     sub.add_parser("amend-thresholds", help="freeze the amended decision cut-offs before the test is opened")
     sub.add_parser("v2-metrics", help="v2 beside v1 on development: registered endpoints and descriptive cuts")
+    sub.add_parser("verify-outputs", help="data-free outputs against the committed ones (numbers to 1e-9)")
+    sub.add_parser("v2-explain", help="v2 calibration, failure taxonomy and exact SHAP (descriptive)")
+    sub.add_parser("v2-input-stress", help="v2 under missing heart rate, missing priors and noisy history")
     sub.add_parser("finalize-sensor-first", help="v2 freeze: the sensor-first fusion, Platt, m and cut-offs")
     ev = sub.add_parser("evaluate", help="dev evaluation on partition v2: every risk from Pipeline.answer per fold")
     ev.add_argument("--sensor-first", action="store_true", help="v2 (docs/v2_sensor_first.md) instead of v1")
@@ -559,6 +587,9 @@ def main(argv: list[str] | None = None) -> int:
         "evaluate": _evaluate,
         "finalize-sensor-first": _finalize_sensor_first,
         "v2-metrics": _v2_metrics,
+        "v2-explain": _v2_explain,
+        "verify-outputs": _verify_outputs,
+        "v2-input-stress": _v2_input_stress,
         "recalibrate": _recalibrate,
         "photo-seeds": _photo_seeds,
         "demo": _demo,

@@ -18,14 +18,15 @@ jobs:
           uv run ruff format --check src tests
       - name: Tests
         run: uv run pytest
-      - name: Every report number re-derived from committed outputs, byte for byte
+      - name: Every report number re-derived from committed outputs (numbers to 1e-9)
         run: |
           uv run glimpse report-metrics
           uv run glimpse monitoring-replay
           uv run glimpse monitoring-power
           uv run glimpse probe-c
+          uv run glimpse v2-explain
           uv run glimpse figures
-          git diff --exit-code outputs/report_metrics outputs/monitoring outputs/probes outputs/figures/figures.json
+          uv run glimpse verify-outputs
   data-pipeline:
     # Downloads the CGMacros CSVs (no photos, to stay quick), rebuilds the dataset and splits, trains the SensorCNN,
     # and checks that Linux produces exactly the committed person split.

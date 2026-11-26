@@ -11,6 +11,7 @@ import pytest
 
 REPORT = Path("docs/final_report.md")
 APPENDIX = Path("docs/report_appendix.md")  # secondary tables moved out of the report (26 Nov); checked the same
+ARCHIVE = Path("docs/archive/report_v1_prose.md")  # the pre-v2 prose, archived; its numbers stay checked
 RM = Path("outputs/report_metrics/report_metrics.json")
 
 
@@ -20,7 +21,7 @@ def _load(path: str) -> dict:
 
 @pytest.fixture(scope="module")
 def text() -> str:
-    return REPORT.read_text() + ("\n" + APPENDIX.read_text() if APPENDIX.exists() else "")
+    return "\n".join(p.read_text() for p in (REPORT, APPENDIX, ARCHIVE) if p.exists())
 
 
 @pytest.fixture(scope="module")
@@ -443,9 +444,15 @@ def test_v2_cells_in_the_report():
     t = _tables(REPORT.read_text())
     v2 = _load("outputs/report_metrics/v2_metrics.json")
     a = v2["auroc"]
-    assert t["AUROC (95% person-clustered)"][2] == f"{a['point']:.3f} ({a['ci95'][0]:.3f}–{a['ci95'][1]:.3f})"
+    p460 = v2["paired_v2_minus_v1"]["auroc_v2"]
+    assert t["AUROC (95% person-clustered)"][2] == (
+        f"{a['point']:.3f} ({a['ci95'][0]:.3f}–{a['ci95'][1]:.3f}); {p460:.3f} on v1's 460"
+    )
     assert t["meals answered with a risk"][2] == str(v2["answered_with_risk"])
-    assert t["ECE, registered 15 bins (target ≤ 0.05)"][2] == f"{v2['shipped']['ece_equal_width_15']:.3f}: met"
+    c = _load("outputs/v2_explain/v2_explain.json")["calibration"]
+    lo, hi = c["observed_ci95_biased_upward"]
+    assert abs(c["observed"] - v2["shipped"]["ece_equal_width_15"]) < 1e-12
+    assert t["ECE, registered 15 bins (target ≤ 0.05)"][2] == f"{c['observed']:.3f} ({lo:.3f}–{hi:.3f}): {c['verdict']}"
     d = v2["decisions"]
     assert t["spikes among cleared meals (cap 10%)"][2] == (
         f"{_pc(d['missed_among_cleared'])} ({_iv(d['missed_ci']['ci95'], pct=True)})"
@@ -487,11 +494,12 @@ def test_v2_cells_in_the_report():
 def test_photo_probe_and_int8_cells():
     text = REPORT.read_text()
     pr, i8 = _load("outputs/probes/photo_probes.json"), _load("outputs/efficiency/int8.json")
-    assert (f"more on {pr['dev_in_sample']['share_centre_moves_more']:.0%} of development photos and "
+    assert (f"more on {pr['dev_in_sample']['share_centre_moves_more']:.0%} of development photos (in-sample) and "
             f"{pr['local_unseen']['share_centre_moves_more']:.0%} of 14 unseen") in text  # fmt: skip
     assert pr["dev_in_sample"]["hypothesis_D_holds"]
-    assert (f"grams rise on only {pr['dev_in_sample']['zoom_share_grams_rise']:.0%} of photos "
-            f"({pr['local_unseen']['zoom_share_grams_rise']:.0%} of the 14 unseen)") in text  # fmt: skip
+    assert (f"grams rise on {pr['dev_in_sample']['zoom_share_grams_rise']:.0%} of development photos (in-sample); "
+            f"{pr['local_unseen']['zoom_share_grams_rise']:.0%} of the 14 unseen, inconclusive") in text  # fmt: skip
+    assert (f"carb MAE {i8['carb_mae_fp32_in_sample']:.1f} → {i8['carb_mae_int8_in_sample']:.1f} g") in text
     assert f"{i8['v1_decision_agreement']:.1%} of v1's decisions kept" in text
     assert f"{i8['median_ms_int8']:.0f} ms against {i8['median_ms_fp32']:.0f} ms per photo" in text
 
@@ -512,10 +520,17 @@ def test_stress_quality_cells():
     v2, v1 = sq["v2_sensor_first"], sq["v1_photo_fusion"]
     lv = sq["levels"]
     row = t["CGM dropout 10 / 30 / 50 / 70%"]
+    d2, d1 = v2["cgm_dropout"], v1["cgm_dropout"]
     assert row[0].startswith(
-        " / ".join(f"{v2['cgm_dropout'][str(x)]['auroc_perturbed']:.3f}" for x in lv["cgm_dropout"])
+        " / ".join(f"{d2[str(x)]['auroc_perturbed']:.3f}" for x in lv["cgm_dropout"][:3])
+        + f"; at 70%, {d2['0.7']['auroc_perturbed']:.3f} on the {d2['0.7']['co_answered']} still answered "
+        f"(their clean {d2['0.7']['auroc_clean']:.3f})"
     )
-    assert row[2] == " / ".join(f"{v1['cgm_dropout'][str(x)]['auroc_perturbed']:.3f}" for x in lv["cgm_dropout"])
+    assert row[2] == (
+        " / ".join(f"{d1[str(x)]['auroc_perturbed']:.3f}" for x in lv["cgm_dropout"][:3])
+        + f"; at 70%, {d1['0.7']['auroc_perturbed']:.3f} on {d1['0.7']['co_answered']} "
+        f"(clean {d1['0.7']['auroc_clean']:.3f})"
+    )
     assert row[3] == " / ".join(str(v1["cgm_dropout"][str(x)]["caution_to_low_risk"]) for x in lv["cgm_dropout"])
     assert all(v2[k][str(x)]["caution_to_low_risk"] == 0 for k in ("cgm_dropout", "photo_blur", "photo_dark")
                for x in lv[k])  # fmt: skip
@@ -526,5 +541,60 @@ def test_stress_quality_cells():
         " / ".join(f"{v1['photo_blur'][str(x)]['auroc_perturbed']:.3f}" for x in lv["photo_blur"])
     )
     assert blur[3] == " / ".join(str(v1["photo_blur"][str(x)]["caution_to_low_risk"]) for x in lv["photo_blur"])
+    vs = _load("outputs/robustness/v2_input_stress.json")
     worst = max(r["caution_to_low_risk"] for p in (v1, v2) for k in lv for r in p[k].values())
-    assert f"never exceeds {worst} of 460 meals" in REPORT.read_text()
+    worst_v2_inputs = max(vs[c]["caution_to_low_risk"] for c in vs if c not in ("what", "clean"))
+    assert vs["hr_removed"]["caution_to_low_risk"] == worst_v2_inputs > worst
+    assert f"{worst_v2_inputs} cautions turned low risk" in REPORT.read_text()
+    hr = t["heart rate removed / half its readings dropped"]
+    assert hr[0] == (
+        f"{vs['hr_removed']['auroc_perturbed']:.3f} / {vs['hr_half']['auroc_perturbed']:.3f}; "
+        f"{_pc(vs['hr_removed']['missed_among_cleared'])} / {_pc(vs['hr_half']['missed_among_cleared'])}"
+    )
+    fl = t["10% / 25% of history labels flipped"]
+    a10, a25 = vs["history_labels_10pct_flipped"], vs["history_labels_25pct_flipped"]
+    assert fl[0] == (
+        f"{a10['auroc_perturbed']:.3f} / {a25['auroc_perturbed']:.3f}; "
+        f"{_pc(a10['missed_among_cleared'])} / {_pc(a25['missed_among_cleared'])}"
+    )
+    pr = t["onboarding priors removed (history kept)"]
+    q = vs["priors_removed"]
+    assert pr[0] == f"{q['auroc_perturbed']:.3f}; {_pc(q['missed_among_cleared'])}"
+
+
+def test_v2_explain_cells():
+    """docs/v2_explain.md study, against outputs/v2_explain/v2_explain.json."""
+    text = REPORT.read_text()
+    t = _tables(text)
+    r = _load("outputs/v2_explain/v2_explain.json")
+    c = r["calibration"]
+    floor = t["ECE a perfectly calibrated model shows at this size (median; 95th centile)"]
+    assert floor[2] == f"{c['perfectly_calibrated_median']:.3f}; {c['perfectly_calibrated_q95']:.3f}"
+    tax = r["taxonomy"]
+    near = t["near-cut false clear (within 0.031 of the fold's cut)"][0]
+    conf = t["confident false clear"][0]
+    assert near.endswith(f"/ {tax['by_class']['T4 near-cut']} of 118")
+    assert conf.endswith(f"/ {tax['by_class']['T5 confident']} of 118")
+    assert tax["false_clears"] == 15 and tax["by_group"]["prediabetes"] == 6 and tax["frozen_band_refers"] == 4
+    fb = r["frozen_band_in_sample"]
+    assert (
+        f"refers {fb['in_band']} meals ({fb['in_band_share']:.0%}, spike rate {fb['in_band_spike_rate']:.0%}), "
+        f"clears {fb['share_low_risk']:.0%} with {fb['missed']} of\n{fb['cleared']} spiking"
+    ) in text
+    wi = r["prediabetes_whatif"]
+    assert wi["20"]["prediabetes_missed"] == 2 and wi["20"]["prediabetes_cleared"] == 3
+    nv = wi["never"]
+    assert f"{_pc(nv['missed_among_cleared'])} misses and a {_pc(nv['cost_reduction'])} saving" in text
+    hr = r["heart_rate"]
+    assert (
+        f"({hr['within_person_coefficient']:.2f},\n{hr['within_person_ci95'][0]:.2f} to "
+        f"{hr['within_person_ci95'][1]:.2f}, person fixed effects)"
+    ).replace("-", "−") in text
+    assert f"moves the served logit by {r['shap']['split']['mean_abs_intercept_shift']:.2f}" in text
+    tp = r["temporal"]["last_third"]
+    assert f"last third of meals {tp['auroc']:.3f} ({tp['ci95'][0]:.3f}–{tp['ci95'][1]:.3f})" in text
+    cv = r["carb_value"]
+    assert t["the carb estimate's own value, 817 out-of-fold photos: MAE; carb range right"][0] == (
+        f"{cv['mae_photo_g']:.1f} g against {cv['mae_median_g']:.1f} g for typing the training median; "
+        f"{cv['range_accuracy_photo']:.0%} against {cv['range_accuracy_median']:.0%}"
+    )

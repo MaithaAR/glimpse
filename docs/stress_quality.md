@@ -21,3 +21,9 @@ recovered (refused clean, answered perturbed).
 Expected before the run: v2's risk does not move under photo perturbations (the photo is not a risk
 input); v1's does. CGM dropout changes AUROC by less than 0.01 up to 50%. Gaps above 20 minutes refuse
 almost every meal, by design. Reported as measured in outputs/robustness/stress_quality.json.
+
+## Deviation note (26 Nov, after the run)
+The first run compared live perturbed photo answers with precomputed clean estimates, so blur appeared to
+raise AUROC. It was discarded before commit; the code was fixed to compare the live photo model with
+itself (374c178) and rerun. The reported numbers are from the second run only. Heart rate, priors and
+history were not in this study; they were registered separately in docs/v2_explain.md (V2-S).

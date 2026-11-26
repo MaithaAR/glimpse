@@ -12,7 +12,7 @@
       "outcome_alerts": 7,
       "outcome_too_few_cleared": 2,
       "auroc_below_locked_value": 1,
-      "calibration_in_the_large_median": -0.02963208665584116,
+      "calibration_in_the_large_median": -0.029632086655841106,
       "weeks": 24,
       "behaviour_alerts": 0,
       "caution_share_median": 0.7
@@ -22,7 +22,7 @@
       "outcome_alerts": 1,
       "outcome_too_few_cleared": 2,
       "auroc_below_locked_value": 0,
-      "calibration_in_the_large_median": -0.046665338152272806,
+      "calibration_in_the_large_median": -0.046665338152272695,
       "weeks": 0,
       "behaviour_alerts": 0,
       "caution_share_median": null
@@ -320,7 +320,7 @@
       "outcome_alert": false,
       "auroc": 0.7604881769641495,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": 0.010483052675535065
+      "calibration_in_the_large": 0.01048305267553501
     },
     {
       "weeks": "4-7",
@@ -364,7 +364,7 @@
       "outcome_alert": false,
       "auroc": 0.6831761006289307,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": -0.02963208665584116
+      "calibration_in_the_large": -0.029632086655841106
     },
     {
       "weeks": "8-11",
@@ -397,7 +397,7 @@
       "outcome_alert": false,
       "auroc": 0.7261904761904762,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": -0.03664777125069124
+      "calibration_in_the_large": -0.0366477712506913
     },
     {
       "weeks": "11-14",
@@ -408,7 +408,7 @@
       "outcome_alert": false,
       "auroc": 0.6875,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": 0.0071868333266104645
+      "calibration_in_the_large": 0.007186833326610409
     },
     {
       "weeks": "12-15",
@@ -419,7 +419,7 @@
       "outcome_alert": true,
       "auroc": 0.6782312925170069,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": -0.06759106809325782
+      "calibration_in_the_large": -0.06759106809325777
     },
     {
       "weeks": "13-16",
@@ -452,7 +452,7 @@
       "outcome_alert": true,
       "auroc": 0.718676122931442,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": -0.07063970001456227
+      "calibration_in_the_large": -0.07063970001456232
     },
     {
       "weeks": "16-19",
@@ -463,7 +463,7 @@
       "outcome_alert": true,
       "auroc": 0.7021276595744681,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": -0.040124837539997016
+      "calibration_in_the_large": -0.04012483753999707
     },
     {
       "weeks": "17-20",
@@ -485,7 +485,7 @@
       "outcome_alert": true,
       "auroc": 0.84375,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": -0.0166980085624836
+      "calibration_in_the_large": -0.016698008562483657
     },
     {
       "weeks": "19-22",
@@ -507,7 +507,7 @@
       "outcome_alert": false,
       "auroc": 0.8388969521044993,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": 0.005250234594944114
+      "calibration_in_the_large": 0.00525023459494417
     },
     {
       "weeks": "21-24",
@@ -529,7 +529,7 @@
       "outcome_alert": "too few cleared to judge",
       "auroc": 0.7219061166429588,
       "auroc_below_locked_value": false,
-      "calibration_in_the_large": -0.046665338152272806
+      "calibration_in_the_large": -0.046665338152272695
     },
     {
       "weeks": "23-26",
@@ -612,7 +612,7 @@
         "outcome_alerts": 3,
         "outcome_too_few_cleared": 2,
         "auroc_below_locked_value": 1,
-        "calibration_in_the_large_median": -0.02963208665584116,
+        "calibration_in_the_large_median": -0.029632086655841106,
         "weeks": 24,
         "behaviour_alerts": 0,
         "caution_share_median": 0.75
@@ -622,7 +622,7 @@
         "outcome_alerts": 1,
         "outcome_too_few_cleared": 1,
         "auroc_below_locked_value": 0,
-        "calibration_in_the_large_median": -0.046665338152272806,
+        "calibration_in_the_large_median": -0.046665338152272695,
         "weeks": 0,
         "behaviour_alerts": 0,
         "caution_share_median": null
@@ -920,7 +920,7 @@
         "outcome_alert": false,
         "auroc": 0.7604881769641495,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": 0.010483052675535065
+        "calibration_in_the_large": 0.01048305267553501
       },
       {
         "weeks": "4-7",
@@ -964,7 +964,7 @@
         "outcome_alert": false,
         "auroc": 0.6831761006289307,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": -0.02963208665584116
+        "calibration_in_the_large": -0.029632086655841106
       },
       {
         "weeks": "8-11",
@@ -997,7 +997,7 @@
         "outcome_alert": false,
         "auroc": 0.7261904761904762,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": -0.03664777125069124
+        "calibration_in_the_large": -0.0366477712506913
       },
       {
         "weeks": "11-14",
@@ -1008,7 +1008,7 @@
         "outcome_alert": false,
         "auroc": 0.6875,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": 0.0071868333266104645
+        "calibration_in_the_large": 0.007186833326610409
       },
       {
         "weeks": "12-15",
@@ -1019,7 +1019,7 @@
         "outcome_alert": false,
         "auroc": 0.6782312925170069,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": -0.06759106809325782
+        "calibration_in_the_large": -0.06759106809325777
       },
       {
         "weeks": "13-16",
@@ -1052,7 +1052,7 @@
         "outcome_alert": true,
         "auroc": 0.718676122931442,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": -0.07063970001456227
+        "calibration_in_the_large": -0.07063970001456232
       },
       {
         "weeks": "16-19",
@@ -1063,7 +1063,7 @@
         "outcome_alert": true,
         "auroc": 0.7021276595744681,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": -0.040124837539997016
+        "calibration_in_the_large": -0.04012483753999707
       },
       {
         "weeks": "17-20",
@@ -1085,7 +1085,7 @@
         "outcome_alert": false,
         "auroc": 0.84375,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": -0.0166980085624836
+        "calibration_in_the_large": -0.016698008562483657
       },
       {
         "weeks": "19-22",
@@ -1107,7 +1107,7 @@
         "outcome_alert": false,
         "auroc": 0.8388969521044993,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": 0.005250234594944114
+        "calibration_in_the_large": 0.00525023459494417
       },
       {
         "weeks": "21-24",
@@ -1129,7 +1129,7 @@
         "outcome_alert": "too few cleared to judge",
         "auroc": 0.7219061166429588,
         "auroc_below_locked_value": false,
-        "calibration_in_the_large": -0.046665338152272806
+        "calibration_in_the_large": -0.046665338152272695
       },
       {
         "weeks": "23-26",
@@ -1208,29 +1208,29 @@
     "h": 4.0,
     "calibration": {
       "x": [
-        -0.16820560075779245,
-        -0.24417927527214076,
+        -0.1682056007577924,
+        -0.2441792752721408,
         -0.1681293289394586,
         -0.021021956262828212,
-        0.04767853560716517,
-        -0.10629395338072126,
+        0.047678535607165284,
+        -0.1062939533807212,
         -0.20843349275089035,
-        -0.0011062812140915645,
-        0.1697457481145952,
-        0.014417884765283717,
+        -0.00110628121409162,
+        0.16974574811459525,
+        0.014417884765283884,
         -0.08462559835906491,
-        0.05396880175690341,
-        0.028937896679300523,
-        -0.16855263988567915,
-        0.1672489295804896,
-        0.28034346651406516,
-        0.009222863429114186,
+        0.05396880175690347,
+        0.02893789667930058,
+        -0.16855263988567937,
+        0.16724892958048942,
+        0.2803434665140653,
+        0.00922286342911427,
         -0.16516823773861242,
         0.3552987095475589,
-        -0.06062713282187379,
-        0.07469206581523546,
+        -0.06062713282187371,
+        0.07469206581523552,
         0.14748442966669273,
-        -0.15320534363061633,
+        -0.15320534363061644,
         0.2139139684640381,
         0.20256111350538997,
         0.031029241881570108,
@@ -1249,20 +1249,20 @@
         0.0,
         0.0,
         0.0,
-        0.5454298575287875,
-        0.13106867752852103,
+        0.5454298575287879,
+        0.13106867752852247,
         0.0,
         0.0,
         0.0,
         0.0,
-        0.5300016915854902,
+        0.5300016915854893,
         1.7588292126246214,
-        1.3123673211955589,
+        1.3123673211955593,
         0.0,
-        1.691985700956748,
+        1.6919857009567476,
         0.8139116124142212,
-        0.7719924239454352,
-        1.1798667040706552,
+        0.7719924239454357,
+        1.1798667040706556,
         0.0,
         0.8183510264736611,
         1.566551287947914,
@@ -1271,7 +1271,7 @@
         1.2297070118265312,
         0.0,
         0.8581938593471694,
-        2.1610075814467224
+        2.161007581446722
       ],
       "alarms": [],
       "dev_false_alarms": 0,

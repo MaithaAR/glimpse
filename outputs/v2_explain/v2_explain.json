@@ -1,0 +1,798 @@
+{
+  "what": "v2 explained, calibrated and its failures sorted (`glimpse v2-explain`; registered in docs/v2_explain.md).",
+  "calibration": {
+    "observed": 0.029254775580157745,
+    "observed_ci95_biased_upward": [
+      0.03161174985048827,
+      0.09144335198269159
+    ],
+    "share_of_perfectly_calibrated_draws_at_or_above_observed": 0.9865,
+    "perfectly_calibrated_median": 0.0505454513171026,
+    "perfectly_calibrated_q95": 0.07105577321534617,
+    "verdict": "on track",
+    "bins": [
+      {
+        "lo": 0.0,
+        "hi": 0.06666666666666667,
+        "n": 12,
+        "mean_risk": 0.05109947815070311,
+        "spike_rate": 0.08333333333333333,
+        "wilson95": [
+          0.014864709450773478,
+          0.35388592179859524
+        ]
+      },
+      {
+        "lo": 0.06666666666666667,
+        "hi": 0.13333333333333333,
+        "n": 65,
+        "mean_risk": 0.10071277679759667,
+        "spike_rate": 0.09230769230769231,
+        "wilson95": [
+          0.04299450413746196,
+          0.18712216950173294
+        ]
+      },
+      {
+        "lo": 0.13333333333333333,
+        "hi": 0.2,
+        "n": 77,
+        "mean_risk": 0.1667769153313913,
+        "spike_rate": 0.18181818181818182,
+        "wilson95": [
+          0.11151152010047759,
+          0.28236489996048114
+        ]
+      },
+      {
+        "lo": 0.2,
+        "hi": 0.26666666666666666,
+        "n": 87,
+        "mean_risk": 0.23060601798215483,
+        "spike_rate": 0.22988505747126436,
+        "wilson95": [
+          0.15403115692511482,
+          0.32858473711462033
+        ]
+      },
+      {
+        "lo": 0.26666666666666666,
+        "hi": 0.3333333333333333,
+        "n": 52,
+        "mean_risk": 0.30049945620727136,
+        "spike_rate": 0.2692307692307692,
+        "wilson95": [
+          0.1676881003582587,
+          0.4025247875246099
+        ]
+      },
+      {
+        "lo": 0.3333333333333333,
+        "hi": 0.4,
+        "n": 47,
+        "mean_risk": 0.3607724158493816,
+        "spike_rate": 0.44680851063829785,
+        "wilson95": [
+          0.31410747474911305,
+          0.5875478626124176
+        ]
+      },
+      {
+        "lo": 0.4,
+        "hi": 0.4666666666666667,
+        "n": 40,
+        "mean_risk": 0.4308909201174692,
+        "spike_rate": 0.45,
+        "wilson95": [
+          0.30705075280944694,
+          0.6017117011155924
+        ]
+      },
+      {
+        "lo": 0.4666666666666667,
+        "hi": 0.5333333333333333,
+        "n": 27,
+        "mean_risk": 0.5006169292463706,
+        "spike_rate": 0.5555555555555556,
+        "wilson95": [
+          0.37312719479576884,
+          0.7241440232992717
+        ]
+      },
+      {
+        "lo": 0.5333333333333333,
+        "hi": 0.6,
+        "n": 23,
+        "mean_risk": 0.569129964694354,
+        "spike_rate": 0.5217391304347826,
+        "wilson95": [
+          0.3296242986421849,
+          0.7076313046005427
+        ]
+      },
+      {
+        "lo": 0.6,
+        "hi": 0.6666666666666666,
+        "n": 28,
+        "mean_risk": 0.6255759157450002,
+        "spike_rate": 0.7142857142857143,
+        "wilson95": [
+          0.529403642629825,
+          0.8474618415167003
+        ]
+      },
+      {
+        "lo": 0.6666666666666666,
+        "hi": 0.7333333333333333,
+        "n": 14,
+        "mean_risk": 0.7019184880248713,
+        "spike_rate": 0.7142857142857143,
+        "wilson95": [
+          0.4535045882751561,
+          0.882788120898909
+        ]
+      },
+      {
+        "lo": 0.7333333333333333,
+        "hi": 0.8,
+        "n": 8,
+        "mean_risk": 0.7610253086871416,
+        "spike_rate": 0.75,
+        "wilson95": [
+          0.40926987910258916,
+          0.9285223111419724
+        ]
+      },
+      {
+        "lo": 0.8,
+        "hi": 0.8666666666666667,
+        "n": 1,
+        "mean_risk": 0.8350722516752859,
+        "spike_rate": 1.0,
+        "wilson95": [
+          0.20654329147389294,
+          1.0
+        ]
+      }
+    ],
+    "ece_check": 0.029254775580157745
+  },
+  "frozen_band_in_sample": {
+    "share_low_risk": 0.20374220374220375,
+    "share_caution": 0.6174636174636174,
+    "share_abstain": 0.1787941787941788,
+    "cost": 0.5831600831600832,
+    "best_trivial_cost": 0.6715176715176715,
+    "cost_reduction": 0.13157894736842102,
+    "missed_among_cleared": 0.11224489795918367,
+    "n_cleared": 98,
+    "useful": false,
+    "cutoffs": [
+      0.15,
+      0.22
+    ],
+    "in_band": 86,
+    "in_band_share": 0.1787941787941788,
+    "in_band_spike_rate": 0.1511627906976744,
+    "cleared": 98,
+    "missed": 11
+  },
+  "miss_curve": [
+    {
+      "cut": 0.05,
+      "cleared_share": 0.010395010395010396,
+      "cleared": 5,
+      "missed_among_cleared": 0.2,
+      "missed_wilson95": [
+        0.03622316096978745,
+        0.6244717358814613
+      ]
+    },
+    {
+      "cut": 0.06,
+      "cleared_share": 0.02079002079002079,
+      "cleared": 10,
+      "missed_among_cleared": 0.1,
+      "missed_wilson95": [
+        0.01787574951572113,
+        0.4041563854975721
+      ]
+    },
+    {
+      "cut": 0.07,
+      "cleared_share": 0.02494802494802495,
+      "cleared": 12,
+      "missed_among_cleared": 0.08333333333333333,
+      "missed_wilson95": [
+        0.014864709450773478,
+        0.35388592179859524
+      ]
+    },
+    {
+      "cut": 0.08,
+      "cleared_share": 0.05405405405405406,
+      "cleared": 26,
+      "missed_among_cleared": 0.11538461538461539,
+      "missed_wilson95": [
+        0.04003171821149494,
+        0.28976293086898336
+      ]
+    },
+    {
+      "cut": 0.09,
+      "cleared_share": 0.06444906444906445,
+      "cleared": 31,
+      "missed_among_cleared": 0.12903225806451613,
+      "missed_wilson95": [
+        0.05134201164644764,
+        0.28852756954385356
+      ]
+    },
+    {
+      "cut": 0.1,
+      "cleared_share": 0.0893970893970894,
+      "cleared": 43,
+      "missed_among_cleared": 0.11627906976744186,
+      "missed_wilson95": [
+        0.050703529948620846,
+        0.24479448890641395
+      ]
+    },
+    {
+      "cut": 0.11,
+      "cleared_share": 0.1101871101871102,
+      "cleared": 53,
+      "missed_among_cleared": 0.11320754716981132,
+      "missed_wilson95": [
+        0.052929589110686695,
+        0.22576770301339144
+      ]
+    },
+    {
+      "cut": 0.12,
+      "cleared_share": 0.13305613305613306,
+      "cleared": 64,
+      "missed_among_cleared": 0.09375,
+      "missed_wilson95": [
+        0.04367765783128784,
+        0.1898309858327767
+      ]
+    },
+    {
+      "cut": 0.13,
+      "cleared_share": 0.158004158004158,
+      "cleared": 76,
+      "missed_among_cleared": 0.09210526315789473,
+      "missed_wilson95": [
+        0.04533342778112863,
+        0.17812902788108254
+      ]
+    },
+    {
+      "cut": 0.14,
+      "cleared_share": 0.17463617463617465,
+      "cleared": 84,
+      "missed_among_cleared": 0.10714285714285714,
+      "missed_wilson95": [
+        0.05739956319523237,
+        0.1912480024228802
+      ]
+    },
+    {
+      "cut": 0.15,
+      "cleared_share": 0.20374220374220375,
+      "cleared": 98,
+      "missed_among_cleared": 0.11224489795918367,
+      "missed_wilson95": [
+        0.0638420422031541,
+        0.18990102546271131
+      ]
+    },
+    {
+      "cut": 0.16,
+      "cleared_share": 0.22453222453222454,
+      "cleared": 108,
+      "missed_among_cleared": 0.12037037037037036,
+      "missed_wilson95": [
+        0.07170995898043295,
+        0.19511025818384223
+      ]
+    },
+    {
+      "cut": 0.17,
+      "cleared_share": 0.2494802494802495,
+      "cleared": 120,
+      "missed_among_cleared": 0.125,
+      "missed_wilson95": [
+        0.07723428880969682,
+        0.19603091448225032
+      ]
+    },
+    {
+      "cut": 0.18,
+      "cleared_share": 0.2681912681912682,
+      "cleared": 129,
+      "missed_among_cleared": 0.11627906976744186,
+      "missed_wilson95": [
+        0.07174513554570917,
+        0.18300638807339809
+      ]
+    },
+    {
+      "cut": 0.19,
+      "cleared_share": 0.29313929313929316,
+      "cleared": 141,
+      "missed_among_cleared": 0.11347517730496454,
+      "missed_wilson95": [
+        0.07106523194689557,
+        0.17638853824067482
+      ]
+    },
+    {
+      "cut": 0.2,
+      "cleared_share": 0.3201663201663202,
+      "cleared": 154,
+      "missed_among_cleared": 0.13636363636363635,
+      "missed_wilson95": [
+        0.09094960124870863,
+        0.19947827074447946
+      ]
+    },
+    {
+      "cut": 0.21,
+      "cleared_share": 0.35135135135135137,
+      "cleared": 169,
+      "missed_among_cleared": 0.13609467455621302,
+      "missed_wilson95": [
+        0.09242759174088258,
+        0.19593817205672168
+      ]
+    },
+    {
+      "cut": 0.22,
+      "cleared_share": 0.38253638253638256,
+      "cleared": 184,
+      "missed_among_cleared": 0.13043478260869565,
+      "missed_wilson95": [
+        0.08924104420325069,
+        0.1867446799387924
+      ]
+    },
+    {
+      "cut": 0.23,
+      "cleared_share": 0.4178794178794179,
+      "cleared": 201,
+      "missed_among_cleared": 0.13432835820895522,
+      "missed_wilson95": [
+        0.09398632728364927,
+        0.18838600333669353
+      ]
+    },
+    {
+      "cut": 0.24,
+      "cleared_share": 0.44282744282744285,
+      "cleared": 213,
+      "missed_among_cleared": 0.14084507042253522,
+      "missed_wilson95": [
+        0.10047165628481199,
+        0.19394417536372782
+      ]
+    },
+    {
+      "cut": 0.25,
+      "cleared_share": 0.46361746361746364,
+      "cleared": 223,
+      "missed_among_cleared": 0.16143497757847533,
+      "missed_wilson95": [
+        0.11894569969886834,
+        0.2153915647182403
+      ]
+    },
+    {
+      "cut": 0.26,
+      "cleared_share": 0.49064449064449067,
+      "cleared": 236,
+      "missed_among_cleared": 0.1652542372881356,
+      "missed_wilson95": [
+        0.12330579135860503,
+        0.21792608834866845
+      ]
+    },
+    {
+      "cut": 0.27,
+      "cleared_share": 0.5051975051975052,
+      "cleared": 243,
+      "missed_among_cleared": 0.1728395061728395,
+      "missed_wilson95": [
+        0.13048738709436486,
+        0.22537483386028778
+      ]
+    },
+    {
+      "cut": 0.28,
+      "cleared_share": 0.5239085239085239,
+      "cleared": 252,
+      "missed_among_cleared": 0.17063492063492064,
+      "missed_wilson95": [
+        0.12921848466749272,
+        0.22194254622036916
+      ]
+    },
+    {
+      "cut": 0.29,
+      "cleared_share": 0.5343035343035343,
+      "cleared": 257,
+      "missed_among_cleared": 0.17120622568093385,
+      "missed_wilson95": [
+        0.1300786996844389,
+        0.22201851180329926
+      ]
+    },
+    {
+      "cut": 0.3,
+      "cleared_share": 0.5488565488565489,
+      "cleared": 264,
+      "missed_among_cleared": 0.16666666666666666,
+      "missed_wilson95": [
+        0.12655981205077807,
+        0.21633539168157714
+      ]
+    }
+  ],
+  "taxonomy": {
+    "false_clears": 15,
+    "by_class": {
+      "T5 confident": 9,
+      "T4 near-cut": 6
+    },
+    "cold_start": 3,
+    "by_fold": {
+      "5": 6,
+      "1": 3,
+      "4": 3,
+      "2": 2,
+      "3": 1
+    },
+    "by_group": {
+      "healthy": 9,
+      "prediabetes": 6
+    },
+    "frozen_band_refers": 4,
+    "people": 8,
+    "meals": [
+      {
+        "row": 699,
+        "person_id": 19,
+        "fold": 1,
+        "risk": 0.07654508267753433,
+        "below_cut_by": 0.10345491732246566,
+        "n_history": 11,
+        "class": "T5 confident",
+        "cold_start": false,
+        "group": "healthy",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 705,
+        "person_id": 19,
+        "fold": 1,
+        "risk": 0.1409860974607379,
+        "below_cut_by": 0.039013902539262096,
+        "n_history": 16,
+        "class": "T5 confident",
+        "cold_start": false,
+        "group": "healthy",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 988,
+        "person_id": 31,
+        "fold": 1,
+        "risk": 0.13633902868180567,
+        "below_cut_by": 0.043660971318194325,
+        "n_history": 17,
+        "class": "T5 confident",
+        "cold_start": false,
+        "group": "healthy",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 335,
+        "person_id": 9,
+        "fold": 2,
+        "risk": 0.07292487312527751,
+        "below_cut_by": 0.08707512687472249,
+        "n_history": 20,
+        "class": "T5 confident",
+        "cold_start": false,
+        "group": "prediabetes",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 339,
+        "person_id": 9,
+        "fold": 2,
+        "risk": 0.09408996760177793,
+        "below_cut_by": 0.06591003239822207,
+        "n_history": 24,
+        "class": "T5 confident",
+        "cold_start": false,
+        "group": "prediabetes",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 1059,
+        "person_id": 34,
+        "fold": 3,
+        "risk": 0.13340713934281861,
+        "below_cut_by": 0.02659286065718139,
+        "n_history": 0,
+        "class": "T4 near-cut",
+        "cold_start": true,
+        "group": "healthy",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 404,
+        "person_id": 11,
+        "fold": 4,
+        "risk": 0.14758491644674115,
+        "below_cut_by": 0.022415083553258858,
+        "n_history": 7,
+        "class": "T4 near-cut",
+        "cold_start": false,
+        "group": "prediabetes",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 408,
+        "person_id": 11,
+        "fold": 4,
+        "risk": 0.15765244504313458,
+        "below_cut_by": 0.01234755495686543,
+        "n_history": 11,
+        "class": "T4 near-cut",
+        "cold_start": false,
+        "group": "prediabetes",
+        "frozen_band_refers": true
+      },
+      {
+        "row": 1010,
+        "person_id": 32,
+        "fold": 4,
+        "risk": 0.08400315454107557,
+        "below_cut_by": 0.08599684545892444,
+        "n_history": 10,
+        "class": "T5 confident",
+        "cold_start": false,
+        "group": "healthy",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 469,
+        "person_id": 13,
+        "fold": 5,
+        "risk": 0.16791652730474002,
+        "below_cut_by": 0.012083472695259972,
+        "n_history": 6,
+        "class": "T4 near-cut",
+        "cold_start": false,
+        "group": "prediabetes",
+        "frozen_band_refers": true
+      },
+      {
+        "row": 474,
+        "person_id": 13,
+        "fold": 5,
+        "risk": 0.15126951402921968,
+        "below_cut_by": 0.028730485970780317,
+        "n_history": 9,
+        "class": "T4 near-cut",
+        "cold_start": false,
+        "group": "prediabetes",
+        "frozen_band_refers": true
+      },
+      {
+        "row": 846,
+        "person_id": 27,
+        "fold": 5,
+        "risk": 0.12437245981906454,
+        "below_cut_by": 0.05562754018093545,
+        "n_history": 0,
+        "class": "T5 confident",
+        "cold_start": true,
+        "group": "healthy",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 847,
+        "person_id": 27,
+        "fold": 5,
+        "risk": 0.04789573370168559,
+        "below_cut_by": 0.1321042662983144,
+        "n_history": 1,
+        "class": "T5 confident",
+        "cold_start": true,
+        "group": "healthy",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 864,
+        "person_id": 27,
+        "fold": 5,
+        "risk": 0.1058663710018587,
+        "below_cut_by": 0.0741336289981413,
+        "n_history": 17,
+        "class": "T5 confident",
+        "cold_start": false,
+        "group": "healthy",
+        "frozen_band_refers": false
+      },
+      {
+        "row": 866,
+        "person_id": 27,
+        "fold": 5,
+        "risk": 0.16731051460634594,
+        "below_cut_by": 0.012689485393654054,
+        "n_history": 19,
+        "class": "T4 near-cut",
+        "cold_start": false,
+        "group": "healthy",
+        "frozen_band_refers": true
+      }
+    ]
+  },
+  "shap": {
+    "coefficients": {
+      "last glucose": -0.1634660920047746,
+      "slope 30 min": 0.10256276789746799,
+      "slope 60 min": 0.05725349824699342,
+      "window mean": -0.16574994320229194,
+      "window sd": -0.20426274728150076,
+      "window rise": -0.07574751390005853,
+      "heart rate": -0.22036663318469438,
+      "age": 0.17265880692822333,
+      "BMI": 0.03804534906020616,
+      "HbA1c": 0.2505642203627332,
+      "fasting glucose": 0.21505209945074605,
+      "hour (sin)": 0.12598196857382724,
+      "hour (cos)": -0.055847164332139196,
+      "prior spike rate": 0.17164159598712564,
+      "prior rise": 0.2639145876535026
+    },
+    "fusion_intercept": -0.4429969116036843,
+    "base_logit": -0.7064005386732575,
+    "mean_abs_shap": {
+      "last glucose": 0.09010558117123144,
+      "slope 30 min": 0.06655444713261414,
+      "slope 60 min": 0.034906358709097855,
+      "window mean": 0.08062234470720575,
+      "window sd": 0.12960635774657825,
+      "window rise": 0.04321808935981598,
+      "heart rate": 0.16327316694843974,
+      "age": 0.1576555872399559,
+      "BMI": 0.03371014425417779,
+      "HbA1c": 0.10585435938050075,
+      "fasting glucose": 0.09509743220414517,
+      "hour (sin)": 0.10863631105627809,
+      "hour (cos)": 0.04953962771457152,
+      "prior spike rate": 0.1508177686778191,
+      "prior rise": 0.17696712351691893
+    },
+    "local": {
+      "row": 847,
+      "frozen_logit": -2.625283167505402,
+      "terms": {
+        "last glucose": 0.007312336560798202,
+        "slope 30 min": -0.13441821085257416,
+        "slope 60 min": -0.12099342541823292,
+        "window mean": -0.21512337507547274,
+        "window sd": -0.5906468535313111,
+        "window rise": 0.24258026939018232,
+        "heart rate": -0.005382251538443337,
+        "age": -0.31655231360734015,
+        "BMI": -0.02762646817943095,
+        "HbA1c": -0.2673645561939712,
+        "fasting glucose": -0.12274508238376133,
+        "hour (sin)": -0.1351795183934915,
+        "hour (cos)": -0.07114877345262448,
+        "prior spike rate": -0.053851147046039424,
+        "prior rise": -0.10774325911043163
+      },
+      "frozen_platt_logit": -2.7364969427575003,
+      "fold_platt_logit": -3.401375580891003,
+      "served_logit": -2.989648118537179,
+      "intercept_shift": 0.41172746235382407,
+      "n_history": 1,
+      "risk": 0.04789573370168559
+    },
+    "split": {
+      "mean_abs_intercept_shift": 0.5054371807333956,
+      "mean_abs_centred_fusion_logit": 0.6362766726269624,
+      "sd_intercept_shift": 0.6126677421795071,
+      "sd_fusion_logit": 0.794340951213734
+    }
+  },
+  "heart_rate": {
+    "frozen_coefficient": -0.22036663318469438,
+    "between_person_spearman": 0.00494437713239652,
+    "people": 23,
+    "within_person_coefficient": -0.5142336767009773,
+    "within_person_ci95": [
+      -0.8828023435832787,
+      -0.24646518454357239
+    ]
+  },
+  "prediabetes_whatif": {
+    "0": {
+      "cleared": 118,
+      "missed": 15,
+      "missed_among_cleared": 0.1271186440677966,
+      "prediabetes_cleared": 30,
+      "prediabetes_missed": 6,
+      "cost_reduction": 0.10216718266253866
+    },
+    "5": {
+      "cleared": 113,
+      "missed": 15,
+      "missed_among_cleared": 0.13274336283185842,
+      "prediabetes_cleared": 25,
+      "prediabetes_missed": 6,
+      "cost_reduction": 0.09442724458204332
+    },
+    "10": {
+      "cleared": 105,
+      "missed": 12,
+      "missed_among_cleared": 0.11428571428571428,
+      "prediabetes_cleared": 17,
+      "prediabetes_missed": 3,
+      "cost_reduction": 0.11455108359133115
+    },
+    "20": {
+      "cleared": 91,
+      "missed": 11,
+      "missed_among_cleared": 0.12087912087912088,
+      "prediabetes_cleared": 3,
+      "prediabetes_missed": 2,
+      "cost_reduction": 0.10371517027863786
+    },
+    "never": {
+      "cleared": 88,
+      "missed": 9,
+      "missed_among_cleared": 0.10227272727272728,
+      "prediabetes_cleared": 0,
+      "prediabetes_missed": 0,
+      "cost_reduction": 0.1207430340557275
+    }
+  },
+  "temporal": {
+    "first_two_thirds": {
+      "meals": 313,
+      "auroc": 0.7395894428152492,
+      "ci95": [
+        0.6446361854588128,
+        0.8146955783104629
+      ],
+      "cleared": 73,
+      "missed_among_cleared": 0.0958904109589041
+    },
+    "last_third": {
+      "meals": 168,
+      "auroc": 0.7740104555638536,
+      "ci95": [
+        0.6814506898079465,
+        0.8409339846900367
+      ],
+      "cleared": 45,
+      "missed_among_cleared": 0.17777777777777778
+    }
+  },
+  "carb_value": {
+    "photos": 817,
+    "mae_photo_g": 23.51104295271912,
+    "mae_median_g": 29.00975114229962,
+    "range_accuracy_photo": 0.5960832313341493,
+    "range_accuracy_median": 0.1799265605875153
+  },
+  "cost_shipped": 0.6029106029106029
+}

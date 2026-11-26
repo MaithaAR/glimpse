@@ -39,9 +39,9 @@ standardised meals. 1,221 photos at most touched by fine-tuning (cap 10,000).
 |---|---|---|---|
 | AUROC (95% person-clustered) | 0.754 (0.673–0.815) | 0.762 (0.682–0.829) | 0.645 (0.540–0.736) |
 | meals answered with a risk | 481 | 460 | 150 |
-| ECE, 15 equal-width bins (target ≤ 0.05) | 0.029 | 0.052 | 0.061 |
+| ECE, 15 equal-width bins (target ≤ 0.05) | 0.029 (0.032–0.091), on track | 0.052, at the noise floor | 0.061 |
 | low risk / caution / can't judge | 25% / 67% / 8% | 23% / 64% / 14% | 7% / 91% / 3% |
-| spikes among meals cleared (cap 10%) | 12.7% | 7.3% | 2 of 10 |
+| spikes among meals cleared (cap 10%) | 12.7%; prediabetes 6 of 30 | 7.3%; prediabetes 1 of 25 | 2 of 10 |
 | cost reduction vs always caution (target ≥ 10%) | 10.2% | 14.4% | −5.7% |
 
 v2 minus v1 on the 460 meals both answer: −0.017 (−0.045, +0.010), not non-inferior at the registered
@@ -49,7 +49,10 @@ v2 minus v1 on the 460 meals both answer: −0.017 (−0.045, +0.010), not non-i
 development estimates carry disclosed selection pressure (fold 1 was scored at the intermediate stage).
 
 **Known limits.** The intercept learns each person's base rate and ranks a person's own meals worse
-(within-person AUROC about 0.08 lower in both products). Without history and priors (every sample),
+(within-person AUROC about 0.08 lower in both products). v2 is the riskier product for the intended users:
+6 of its 30 clears for people with prediabetes spiked; its 15 false clears are 6 near-cut and 9 confident
+(docs/v2_explain.md). A missing heart rate turns 17 development cautions into low risk; wrong history
+labels cost the most AUROC. `history.csv` is not tagged with the product that wrote it. Without history and priors (every sample),
 rule R13 refers every would-be clear. Flips under CGM dropout and short gaps stay at a handful of meals;
 gaps of 20 minutes or more refuse by design. Visually familiar but nutritionally unfamiliar dishes get a
 confident wrong carb range (R7). The label is baseline-relative, so a rising pre-meal trace lowers the

@@ -157,8 +157,9 @@ Before/after on the same approximation: clears 55 -> 0, misses 9 -> 0, can't jud
 reduction -1.5% -> -0.3%. No risk, weight, Platt map or cut-off changes; the evaluated (with-history) and
 locked answers all carry priors, so no reported decision changes (a test re-decides the locked answers).
 Before (a no-prior, no-history meal at risk 0.12): "low risk". After: "can't judge: not cleared: no earlier
-labelled meals and no onboarding priors ... (rule R13)". Unit test: tests/test_hardening.py. Not run end
-to end with the weights on this machine; the committed folder, stress and demo runs predate it.
+labelled meals and no onboarding priors ... (rule R13)". Unit test: tests/test_hardening.py. The folder,
+stress and demo runs were regenerated with it on 26 Nov (d54ded7): every no-history, no-prior sample
+answers caution or can't judge.
 
 ## v2 and the photo rules (26 Nov, docs/v2_sensor_first.md)
 In v2 (sensor first, served) the photo rules R6 and R7, the contrast rule and the unfamiliar-photo check no
@@ -168,6 +169,11 @@ withholds only the carb estimate, and a flag names why (`carbs_unavailable_photo
 can't judge. After (v2): each gets a risk and a decision, with the carb estimate withheld and the reason shown
 in the folder summary. All CGM and profile rules, and R13, are unchanged. v1 keeps the refusing behaviour.
 Tests: tests/test_sensor_first.py; outputs/folder_run (v2) against outputs/v1_photo_fusion/folder_run.
+Known limit (26 Nov): the carb estimate is not EXIF-stable and can disagree with itself. In the current
+folder run 00_clean shows 30-59 g while its rotated twin 10_exif_rotated shows "under 30 g" with 36.5 g,
+and 11_local_dish shows 32.5 g in the "under 30 g" range: grams and range come from two heads. The risk
+is identical across the twins (the photo is not a risk input in v2). The dated 1 Nov "same carb bin"
+note above was true for v1's frozen run then and is not true of the 26 Nov run.
 
 Provenance note (26 Nov): commit hashes cited above for R1-R7 (4c72a62, 5e01186, 71abb13) predate the 2 Nov squash
 and do not resolve in this repository; the dated ledger text is the record for those rules.

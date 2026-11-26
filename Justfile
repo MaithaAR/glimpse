@@ -118,6 +118,18 @@ train-final:
 stage-timing:
     uv run glimpse stage-timing
 
+# whole folder-command answers for v1 and v2, with and without a photo (report §1 timing; ~2 min with weights)
+end-to-end-timing:
+    uv run glimpse stage-timing --end-to-end
+
+# v2 under missing heart rate, missing priors and noisy history (docs/v2_explain.md, V2-S; ~1 min with data)
+v2-input-stress:
+    uv run glimpse v2-input-stress
+
+# v2 calibration, failure taxonomy and exact SHAP (docs/v2_explain.md; data-free once the features are committed)
+v2-explain:
+    uv run glimpse v2-explain
+
 # dev evaluation on partition v2 (every risk from Pipeline.answer, one Pipeline per fold), then `report-numbers`
 evaluate:
     uv run glimpse evaluate
@@ -132,7 +144,11 @@ evaluate-all:
     just promised
     just evaluate
     just stress-quality
+    just v2-input-stress
     just photo-probes
+    just end-to-end-timing
+    just robustness-levels
+    just report-numbers
 
 # v2 (docs/v2_sensor_first.md): the sensor-first freeze, written once to checkpoints/sensor_first/
 finalize-sensor-first:
@@ -174,7 +190,9 @@ reproduce-all:
     just efficiency
     just stage-timing
     just stress-quality
+    just v2-input-stress
     just photo-probes
+    just end-to-end-timing
     just photo-seeds
     just evaluate
     just selftest
@@ -186,7 +204,7 @@ reproduce-all:
 # regenerate the data-free outputs and fail if they differ from the committed ones (no dataset or weights needed)
 verify-outputs:
     just report-numbers
-    git diff --exit-code outputs/report_metrics outputs/monitoring outputs/probes outputs/figures/figures.json
+    uv run glimpse verify-outputs
 
 # re-derive every report table and figure from committed outputs (no dataset or weights needed, ~1 min)
 report-numbers:
@@ -194,6 +212,7 @@ report-numbers:
     uv run glimpse monitoring-replay
     uv run glimpse monitoring-power
     uv run glimpse probe-c
+    uv run glimpse v2-explain
     uv run glimpse figures
     just wordcount
 
