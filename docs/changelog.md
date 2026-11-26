@@ -307,6 +307,18 @@ Code was sometimes drafted before its registration was committed.
 | Smaller precision fixes: heart rate 140 bpm (v1) and 160 bpm (v2); memory measured for v1 only; the intercept's gain stated with its interval; noise-floor 95th centiles added; the locked no-history point given as 20.9% cleared, 21.9% spiking; probe B 8.5% in both products; sources added to three captions; the parameter-budget label | imprecise wording or a missing source (about 30 of 770 claims) | docs/final_report.md |
 | Figures 2, 6 and 7 narrower; the glycaemic-status table moved to the appendix | page limit | docs/report_appendix.md |
 
-Author sign-off on the tenth to nineteenth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
+## 27 Nov 2026, twentieth pass (three fresh grades, 78 to 83; items 1 to 7 of the plan that followed)
+
+| Change | Why | Evidence |
+|---|---|---|
+| Rules R17 to R19 (registered 1ba839d): semicolon CSVs read, a folder's only image used, "Low"/"High" glucose text mapped to the sensor limits | 4 of a grader's 19 unseen inputs were mishandled | docs/rule_ledger.md, tests/test_input_rules_r17_r19.py |
+| Bottom line rewritten in plain words; two status rows moved to the appendix | all three graders found page one hard to read | docs/final_report.md |
+| A "what was trained" table in §2 (start weights, trained parameters, loss and optimiser, epochs, validation result) | the deep learning read as thin | §2 |
+| Codes replaced with names (repeated-meal check, robustness checks 1 to 8, the final split); the "trained from scratch in the product" row removed and SensorCNN named as the from-scratch network | 22 undefined codes; the row read as dodging the rule | §1 to §6 |
+| Figure 5 shows v1's and v2's misses as the cut moves (v2's SHAP panel dropped); Figure 3's loss axis made readable; Figure 1 wider | v1's curve was missing; Figure 5 repeated Figure 7 | src/glimpse/figures.py |
+| §7 ends with the three weakest points and what the evidence supports | the week 13 habit; rubric 5c | §7 |
+| v2-only stress rows, decisions per 100 meals, probe E and one quality row moved to the appendix | page limit | docs/report_appendix.md |
+
+Author sign-off on the tenth to twentieth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
 to be added here by the author, dated, in her words.
 

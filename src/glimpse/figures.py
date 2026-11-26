@@ -295,48 +295,39 @@ FEATURE_NAMES = ["last glucose", "slope 30 min", "slope 60 min", "window mean", 
 
 
 def f8_v2(plt) -> None:
-    """v2 explained (26 Nov, registered in docs/v2_explain.md): spikes among cleared meals as the low-risk cut
-    moves, exact linear SHAP of the frozen v2 fusion, and one false clear split into fusion terms and the
-    per-person intercept. From outputs/v2_explain/v2_explain.json."""
+    """The products' clears as the low-risk cut moves (v1 served and v2, development, same construction as
+    E3 in docs/v2_explain.md), and one v2 false clear split into fusion terms, the fold refit and Platt, and
+    the per-person intercept. From outputs/v2_explain/v2_explain.json and v1's development answers."""
+    from glimpse.evaluation.v2_explain import miss_curve
+
     r = json.loads(Path("outputs/v2_explain/v2_explain.json").read_text())
-    fig, axes = plt.subplots(1, 3, figsize=(13.2, 3.6))
-    mc = [q for q in r["miss_curve"] if q["missed_among_cleared"] is not None and q["cleared"] >= 10]
-    x = [q["cleared_share"] for q in mc]
-    axes[0].fill_between(x, [q["missed_wilson95"][0] for q in mc], [q["missed_wilson95"][1] for q in mc],
-                         color=BLUE, alpha=0.15, lw=0)  # fmt: skip
-    axes[0].plot(x, [q["missed_among_cleared"] for q in mc], "o-", color=BLUE, ms=3)
+    fig, axes = plt.subplots(1, 2, figsize=(11.0, 3.4))
+    v1 = pd.read_csv("outputs/evaluation_v2/dev_answers.csv").dropna(subset=["risk"])
+    for curve, color, name in ((r["miss_curve"], BLUE, "v2 (alternative)"), (miss_curve(v1), GREY, "v1 (served)")):
+        mc = [q for q in curve if q["missed_among_cleared"] is not None and q["cleared"] >= 10]
+        x = [q["cleared_share"] for q in mc]
+        axes[0].fill_between(x, [q["missed_wilson95"][0] for q in mc], [q["missed_wilson95"][1] for q in mc],
+                             color=color, alpha=0.12, lw=0)  # fmt: skip
+        axes[0].plot(x, [q["missed_among_cleared"] for q in mc], "o-", color=color, ms=3, label=name)
     axes[0].axhline(0.10, color=RED, lw=0.8, ls="--")
-    fb = r["frozen_band_in_sample"]
-    axes[0].plot([fb["cleared"] / 481], [fb["missed_among_cleared"]], "s", color=ORANGE, ms=7,
-                 label="frozen cut 0.15 (in-sample)")  # fmt: skip
     ev = json.loads(Path("outputs/report_metrics/v2_metrics.json").read_text())["decisions"]
     axes[0].plot([ev["share_low_risk"]], [ev["missed_among_cleared"]], "D", color=GREEN, ms=6,
-                 label="evaluated: each fold's own cut")  # fmt: skip
+                 label="v2 evaluated: each fold's own cut")  # fmt: skip
     axes[0].set_xlabel("share of development meals cleared (cut 0.05 to 0.30)")
     axes[0].set_ylabel("spikes among cleared meals (95% Wilson)")
-    axes[0].set_title("v2: misses near or above 10% at every cut", fontsize=9)
+    axes[0].set_title("misses among clears as the cut moves; red line: the 10% cap", fontsize=9)
     axes[0].legend(frameon=False, fontsize=7.5, loc="upper left")
     sh = r["shap"]
-    names = list(sh["mean_abs_shap"])
-    vals = np.array([sh["mean_abs_shap"][n] for n in names])
-    order = np.argsort(vals)
-    axes[1].barh(np.arange(len(order)), vals[order],
-                 color=[ORANGE if sh["coefficients"][names[j]] < 0 else BLUE for j in order])  # fmt: skip
-    axes[1].set_yticks(np.arange(len(order)), [names[j].replace("window sd", "window spread") for j in order],
-                       fontsize=6.8)  # fmt: skip
-    axes[1].set_xlabel("mean |SHAP| (logit units); orange = higher value, lower risk")
-    axes[1].set_title(f"v2 global; the intercept moves the logit {sh['split']['mean_abs_intercept_shift']:.2f}",
-                      fontsize=9)  # fmt: skip
     loc = sh["local"]
     terms = sorted(loc["terms"].items(), key=lambda kv: -abs(kv[1]))[:7]
     labels = [k.replace("window sd", "window spread") for k, _ in terms] + ["fold refit and Platt",
                                                                            "per-person intercept"]  # fmt: skip
     vs = [v for _, v in terms] + [loc["fold_platt_logit"] - loc["frozen_logit"], loc["intercept_shift"]]
-    axes[2].barh(np.arange(len(vs))[::-1], vs, color=[BLUE if v > 0 else ORANGE for v in vs])
-    axes[2].set_yticks(np.arange(len(vs))[::-1], labels, fontsize=6.8)
-    axes[2].axvline(0, color=GREY, lw=0.6)
-    axes[2].set_xlabel(f"logit contribution; orange lowers risk (top 7 terms; base {sh['base_logit']:.2f})")
-    axes[2].set_title(f"v2 false clear, meal {loc['row']}: risk {loc['risk']:.0%}, {loc['n_history']} labelled meal",
+    axes[1].barh(np.arange(len(vs))[::-1], vs, color=[BLUE if v > 0 else ORANGE for v in vs])
+    axes[1].set_yticks(np.arange(len(vs))[::-1], labels, fontsize=7.5)
+    axes[1].axvline(0, color=GREY, lw=0.6)
+    axes[1].set_xlabel(f"logit contribution; orange lowers risk (top 7 terms; base {sh['base_logit']:.2f})")
+    axes[1].set_title(f"v2 false clear, meal {loc['row']}: risk {loc['risk']:.0%}, {loc['n_history']} labelled meal",
                       fontsize=9)  # fmt: skip
     fig.tight_layout()
     fig.savefig(OUT / "fig4_v2.png")
@@ -422,6 +413,7 @@ def f9_training(plt) -> None:
         ax.set_xlabel("epoch (each line one inner fold; dashed: last-stage phase)" if ax is axes[0] else "epoch")
         ax.set_ylabel("loss")
         ax.legend(frameon=False, fontsize=8)
+    axes[0].set_ylim(0.3, 1.6)  # the first two epochs (loss 3.7 to 4.2) are cut so the gap is readable
     fig.savefig(OUT / "fig_training.png")
     plt.close(fig)
 

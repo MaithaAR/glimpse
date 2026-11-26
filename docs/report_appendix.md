@@ -332,6 +332,35 @@ it is not part of the report.
 
 ## Moved from the report on 26 Nov (page limit)
 
+| v2-only stress rows (moved from report §4) | v2: AUROC, spikes among cleared | v2: caution → low risk | v1: AUROC | v1: caution → low risk |
+|---|---|---|---|---|
+| heart rate removed / half its readings dropped | 0.745 / 0.753; 11.6% / 12.7% | 17 (9 the other way) / 0 | – | – |
+| onboarding priors removed (history kept) | 0.701; 14.6% | 7 (35 the other way) | – | – |
+| history cut to the last 3 / last 10 meals | 0.740 / 0.745; 13.0% / 11.8% | 13 / 7 | – | – |
+| 10% / 25% of history labels flipped | 0.735 / 0.699; 16.9% / 11.7% | 2 / 2 (23 / 50 the other way) | – | – |
+
+
+Decisions per 100 meals (moved from report §4): Of every 100 development meals v1 clears 23, flags 64 and refers 14; of the 23 cleared, about 2 spike. v2 clears 25 with about 3 spiking. Without history both products are worse; without priors as well, v2 would clear 7% of meals with 7 of 34 spiking and cost more than always flagging. Rule R13 refers those meals instead: no misses, 21% referred, 5.3% more costly than always flagging.
+
+| Quality row (moved from §1) | | | |
+|---|---|---|---|
+| SensorCNN from scratch instead of trend features (no intercept) | 0.688 ± 0.007 (3 seeds) | 5,217 parameters |
+
+| Photo row (moved from §2) | | | |
+|---|---|---|---|
+| probe E: zoom in so the food fills more of the frame | grams rise on 40% of development photos (in-sample); 57% of the 14 unseen, inconclusive |
+
+
+| Status rows moved from page one | v1 served, development (481 meals) | v1 served, locked eight (153) | v2 alternative, development (481) |
+|---|---|---|---|
+| mean within-person AUROC (a person's own meals) | 0.60 (raw 0.68) | – | 0.54 (raw 0.63) |
+| the samples' path (no history, no priors), with rule R13 | – | – | 0 cleared; cost −5.3% |
+
+| Parameter row moved from §1 | v1 (served) | v2 (alternative) | cap |
+|---|---|---|---|
+| trained from scratch in the product: carb heads 3,845 (inside the 15.5M) + fusion | 3,865 | 3,861 | 50M |
+
+
 | by glycaemic status, development | people, meals, spike rate | v1 AUROC (95%) | v1 cleared, spikes among them | v2 AUROC | v2 cleared, spikes among them |
 |---|---|---|---|---|---|
 | healthy, both products | 11, 224, 21.0% | 0.738 (0.566–0.859) | 37.5% (84), 7 | 0.701 | 39.3% (88), 9 |

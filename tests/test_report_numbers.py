@@ -480,10 +480,9 @@ def test_v2_cells_in_the_report():
         f"/ {w['shipped_minus_raw']:+.3f} {_iv(w['ci95'])}".replace("-", "−")
     )
     r13 = v2["samples_path"]["with_r13"]
-    assert (
-        t["the samples' path (no history, no priors), with rule R13"][2]
-        == f"0 cleared; cost {_pc(r13['cost_reduction'])}"
-    )
+    assert {**t, **_tables(Path("docs/report_appendix.md").read_text())}[
+        "the samples' path (no history, no priors), with rule R13"
+    ][2] == f"0 cleared; cost {_pc(r13['cost_reduction'])}"
     sp = v2["shipped"]
     assert t["v2 dev + personal intercept (alternative)"][1:4] == [
         f"{sp['auprc']['point']:.3f} ({sp['auprc']['ci95'][0]:.3f}–{sp['auprc']['ci95'][1]:.3f})",
@@ -500,7 +499,7 @@ def test_v2_cells_in_the_report():
 
 
 def test_photo_probe_and_int8_cells():
-    text = REPORT.read_text()
+    text = REPORT.read_text() + "\n" + APPENDIX.read_text()  # probe E row moved there (page limit)
     pr, i8 = _load("outputs/probes/photo_probes.json"), _load("outputs/efficiency/int8.json")
     assert (f"more on {pr['dev_in_sample']['share_centre_moves_more']:.0%} of development photos (in-sample) and "
             f"{pr['local_unseen']['share_centre_moves_more']:.0%} of 14 unseen") in text  # fmt: skip
@@ -523,7 +522,7 @@ def test_monitoring_power_row():
 
 def test_stress_quality_cells():
     """docs/stress_quality.md study, against outputs/robustness/stress_quality.json."""
-    t = _tables(REPORT.read_text())
+    t = _tables(REPORT.read_text() + "\n" + APPENDIX.read_text())  # v2-only stress rows moved there (page limit)
     sq = _load("outputs/robustness/stress_quality.json")
     v2, v1 = sq["v2_sensor_first"], sq["v1_photo_fusion"]
     lv = sq["levels"]
@@ -638,7 +637,8 @@ def test_v2_probes_monitors_and_budget_cells():
     rows = {r["model"]: int(r["parameters"]) for r in csv.DictReader(open("outputs/param_budget.csv"))}
     assert rows["v2 fusion, alternative (logistic regression: 15 profile/trend inputs)"] == 16
     assert rows["SensorCNN (1-D CNN)"] == 5217
-    assert t["SensorCNN, trained from scratch, evaluated only (not in either product)"][:2] == ["5,217", "5,217"]
+    sc = "SensorCNN, the from-scratch network: it ties the trend features, so it is evaluated, not served"
+    assert t[sc][:2] == ["5,217", "5,217"]
 
 
 def test_round13_cells():
@@ -647,6 +647,7 @@ def test_round13_cells():
     t = _tables(text)
     rm, v2 = _load("outputs/report_metrics/report_metrics.json"), _load("outputs/report_metrics/v2_metrics.json")
     w1, w2 = rm["within_person"]["mean_within_person_auroc"], v2["within_person"]
+    t = {**t, **_tables(Path("docs/report_appendix.md").read_text())}  # status rows moved there (page limit)
     assert t["mean within-person AUROC (a person's own meals)"] == [
         f"{w1['risk']:.2f} (raw {w1['risk_raw']:.2f})",
         "–",
