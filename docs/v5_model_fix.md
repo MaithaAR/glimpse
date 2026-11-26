@@ -273,3 +273,27 @@ What cannot be said:
   product was built to avoid; it is the measured value of that information.
 
 v1 stays served. v7 is the candidate for the talk.
+
+## Part 4, registered 27 Nov before any run: does the photo help within a person under the v5 recipe?
+
+The report's photo gate (docs/gate_s8.md) tested pooled AUROC under v1's recipe and was not met. It never
+asked the within-person question, and v1's post-hoc intercept scrambles within-person ranking, which would
+hide a meal-level signal. The photo is a meal-level input, so the fair test of it is within a person, under
+a recipe without that intercept.
+
+Contrast: v5 photo only, exactly as frozen, against the same model without its 4 photo inputs. Control: the
+4 photo inputs permuted among each held-out person's own meals (seed 0), which should remove any gain.
+
+People, all reported: the 14 type-2 people (primary; they were scored once for the recipe comparison, and
+this contrast was not computed then), the 8 confirmation people, the 15 design people. The design part once
+printed a related pair (a variant with and without the photo inputs, also with a history-rate input), so the
+design people are not blind to this; the other two groups are.
+
+Endpoint: mean within-person AUROC, with photo minus without, bootstrap over people (2,000 draws, seed 0).
+Pooled AUROC is reported beside it.
+- "The photo adds within a person": the primary interval is above zero and the permuted control's is not.
+- "Direction only": the point is above zero, the interval includes zero.
+- "No": anything else.
+
+Prediction: +0.02 to +0.05 within a person on the type-2 people, direction only; pooled unchanged.
+Whatever it shows goes into the report next to the original gate, which stands as it was.
