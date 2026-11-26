@@ -219,3 +219,19 @@ R16 for v1 (26 Nov, docs/final_switch.md): with v1 served again, R16 applies to 
 v1's frozen training meals and sides from v1's coefficients (configs/v1_input_ranges.json). Before/after: no
 development or locked decision of v1 changes (re-evaluated, byte-identical answers); the heart-rate sweep
 (outputs/probes/v1_hr_sweep.json) refuses 120 bpm and above, where v1 had cleared from 140 bpm.
+
+## Input changes R17-R19 (registered 27 Nov, before the change; from the round-19 grader's unseen inputs)
+Observed: of 19 unseen inputs a grader built (scratchpad copy, not committed), four were handled badly:
+a semicolon CSV and a semicolon CSV with decimal commas were refused as "missing columns" although both
+columns are present; a photo named IMG_0412.JPEG or photo.webp gave "no meal photo was taken"; Dexcom
+"Low"/"High" text gave a raw "not a number" refusal instead of the low-glucose guidance.
+- R17: a CGM file whose header has more semicolons than commas is read with `;` as the separator, and
+  with `,` as the decimal mark when values use it; flagged `csv_semicolon`.
+- R18: when no photo.* file exists, a folder holding exactly one image (jpg, jpeg, png, heic, webp, any
+  case) uses it, flagged `photo_name_nonstandard`; several unnamed images give can't judge, naming them.
+  photo.webp is accepted as a standard name.
+- R19: glucose text "Low" or "High" (any case, as Dexcom and Libre export them) is read as the sensor's
+  limit (40 or 400 mg/dL), flagged `cgm_low_high_text`; a last reading of "Low" then meets rule R14.
+Predicted before the change: no development, locked or evaluated decision changes (the evaluation passes
+arrays, not files); the instructor folder is unchanged; stress cases 01 (semicolon) and 04 ("high"/"low")
+change from refusals to the behaviour above, and their manifest rows are updated.
