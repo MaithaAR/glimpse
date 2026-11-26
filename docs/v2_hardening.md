@@ -28,3 +28,18 @@ model and the locked answers stay as they are. The locked eight are not rescored
 
 Expected before the run: B4's watch-off week fires the heart-rate rule and the label-error week fires the
 disagreement rule; neither fires on clean development weeks more than once in 20.
+
+## Part C: rule R16, inputs outside the training range (registered 26 Nov, approved by the author before any run)
+
+Observed failure: in round-14 grading an unseen meal with a flat glucose trace and a heart rate of 120 to 180
+bpm got "low risk" from v2, for a prediabetic profile too. Training windows never exceed 119.7 bpm.
+
+Rule (v2 only): if any of v2's 15 inputs lies outside the range seen in the frozen fusion's training meals
+(minimum to maximum, written once to configs/v2_input_ranges.json; heart rate 54 to 120 bpm), the answer is
+"can't judge: input outside the range the model was trained on", naming the input, referred to a person.
+Missing inputs (imputed) are not checked. No frozen file changes.
+
+Predicted before the run: no development or evaluated decision changes (every development meal lies inside
+the training range); on the locked eight the rule is counted, not rescored. A heart-rate sweep from 40 to 200
+bpm on a prediabetic profile is refused below 54 and above 120 bpm, and inside that range the risk falls as
+heart rate rises (the within-person sign).
