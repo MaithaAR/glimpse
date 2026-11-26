@@ -255,3 +255,22 @@ arrays, not files); the instructor and stress folders are unchanged (none uses t
 Result (26 Nov): as predicted. Instructor, stress and returning-user decisions unchanged. The grader's Libre
 export is now read day-first (flag `dates_day_first`) and refused for the right reason, 15-minute readings;
 "5.9 %" and "104 mg/dL" are read as numbers. Tests: tests/test_input_rules_r17_r19.py.
+
+## R22 and an R14 amendment (registered 26 Nov, approved by the author before any run)
+Observed: in round-21 grading, three unseen meals were cleared as "low risk": glucose rising from 92 to
+164 mg/dL in the 40 min before the meal, a flat pre-meal glucose of 185 mg/dL, and 58 mg/dL and falling.
+In each, the per-person intercept pulled the risk down and no rule looked at the pre-meal level or trend.
+- R22: no low-risk answer when the last pre-meal reading is 140 mg/dL or more, or the least-squares slope of
+  the readings in the last 30 min is above +1.5 mg/dL/min; the answer becomes caution, with the reason,
+  flagged `premeal_high_or_rising`. Both products.
+- R14 amendment: a last reading of 54 to 69 mg/dL with a falling 30-min slope (below 0) gives can't judge,
+  "treat the low first", referred to a person; a steady or rising 54 to 69 keeps the answer with the
+  low-glucose wording, as before.
+Evaluation: the registered development evaluation predates both rules and is not rerun. Their effect is
+counted on the committed development answers (same windows, same risks): clears turned to caution or can't
+judge, spikes among them, and the usefulness numbers recomputed with the rules applied
+(outputs/rules_r22/rules_r22.json, `glimpse rules-r22`). On the locked eight only the number of affected
+clears is counted; their outcomes are not read.
+Predicted before the run: R22 removes some development clears, mostly spiking ones, so misses among clears
+fall and the cleared share falls by under 5 points; the R14 amendment affects no development meal (the
+lowest last reading is 67 mg/dL) or at most a handful.
