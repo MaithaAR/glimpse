@@ -168,7 +168,7 @@ withholds only the carb estimate, and a flag names why (`carbs_unavailable_photo
 `_not_blank`, `_familiar`). Before (v1): the instructor's screenshot, dark photo and zero-byte photo answered
 can't judge. After (v2): each gets a risk and a decision, with the carb estimate withheld and the reason shown
 in the folder summary. All CGM and profile rules, and R13, are unchanged. v1 keeps the refusing behaviour.
-Tests: tests/test_sensor_first.py; outputs/folder_run (v2) against outputs/v1_photo_fusion/folder_run.
+Tests: tests/test_sensor_first.py; outputs/v2_sensor_first/folder_run (v2) against outputs/folder_run (v1); the paths swapped when v1 was served again on 26 Nov.
 Known limit (26 Nov): the carb estimate is not EXIF-stable and can disagree with itself. In the current
 folder run 00_clean shows 30-59 g while its rotated twin 10_exif_rotated shows "under 30 g" with 36.5 g,
 and 11_local_dish shows 32.5 g in the "under 30 g" range: grams and range come from two heads. The risk

@@ -490,9 +490,13 @@ def test_v2_cells_in_the_report():
         f"{sp['brier']['point']:.3f} ({sp['brier']['ci95'][0]:.3f}–{sp['brier']['ci95'][1]:.3f})",
         f"{sp['log_loss']:.3f}",
     ]
+    ta = _tables(Path("docs/report_appendix.md").read_text())  # the subgroup table moved there (page limit)
     for g in ("healthy", "prediabetes"):
         r = v2["subgroups"][g]
-        assert t[g][3:] == [f"{r['auroc']:.3f}", f"{r['cleared_share'] * 100:.1f}% ({r['cleared']}), {r['missed']}"], g
+        assert ta[f"{g}, both products"][3:] == [
+            f"{r['auroc']:.3f}",
+            f"{r['cleared_share'] * 100:.1f}% ({r['cleared']}), {r['missed']}",
+        ], g
 
 
 def test_photo_probe_and_int8_cells():
@@ -615,7 +619,7 @@ def test_v2_probes_monitors_and_budget_cells():
     text = REPORT.read_text()
     t = _tables(text)
     vp = _load("outputs/probes/v2_probes.json")
-    assert f"on only 8%, and on {vp['probe_b']['share_rising_raises_risk']:.0%} in v2" in text
+    assert f"on only {vp['probe_b']['share_rising_raises_risk']:.1%} of meals in both products" in text
     pc = vp["probe_c"]
     lo, hi = sorted(pc["inputs"][n]["share_decision_differs"] for n in ("age", "prior spike rate", "prior rise"))[::2]
     assert set(pc["top_three"]) == {"age", "prior spike rate", "prior rise"}
@@ -632,7 +636,7 @@ def test_v2_probes_monitors_and_budget_cells():
     ch = _load("outputs/v2_explain/v2_explain.json")["carb_heads"]
     assert f"{ch['disagree_share']:.0%} of {ch['photos']} out-of-fold photos" in text
     rows = {r["model"]: int(r["parameters"]) for r in csv.DictReader(open("outputs/param_budget.csv"))}
-    assert rows["v2 fusion, served (logistic regression: 15 profile/trend inputs)"] == 16
+    assert rows["v2 fusion, alternative (logistic regression: 15 profile/trend inputs)"] == 16
     assert rows["SensorCNN (1-D CNN)"] == 5217
     assert t["SensorCNN, trained from scratch, evaluated only (not in either product)"][:2] == ["5,217", "5,217"]
 
@@ -724,13 +728,13 @@ def test_robustness_v3_cells(text):
     )
     v3 = r["r5_v3"]
     assert {(c["wd"], c["dropout"], c["views"]) for c in v3["chosen_per_fold"]} == {(0.1, 0.5, 2)}
-    assert f"from 0.35 to {v3['gap_v3_mean']:.2f}" in flat
+    assert f"gap is {v3['gap_v3_mean']:.2f} against v1's 0.35" in flat
     assert f"from {v3['carb_v1']['mae_g']:.1f} to {v3['carb_v3']['mae_g']:.1f} g" in flat
     d = v3["v3_minus_v1"]
     assert f"{d['point']:.3f} ({d['ci95'][0]:.3f}, {d['ci95'][1]:+.3f})".replace("-", "−") in flat
     g6 = r["r6_d8"]["photo_gain_v3_d8"]
     assert f"{g6['point']:+.3f} ({g6['ci95'][0]:.3f}, {g6['ci95'][1]:+.3f})".replace("-", "−") in flat
     s7 = r["r7_seeds"]
-    assert f"seed spread ({s7['range']:.3f})" in flat and f"ordinary gain ({s7['photo_gain']:.3f})" in flat
+    assert f"seed spread ({s7['range']:.3f})" in flat and f"ordinary gain ({s7['photo_gain']:.3f};" in flat
     r8 = r["r8_reweighted"]
     assert f"from {r8['auroc_unweighted']:.3f} to {r8['auroc_reweighted']:.3f}" in flat

@@ -297,6 +297,16 @@ Code was sometimes drafted before its registration was committed.
 | R8: development re-weighted to the locked mix: AUROC 0.762 to 0.749 | is the locked drop just cohort mix? | docs/final_report.md §6 |
 | Probes A and C detail, the glossary and two v2 paragraphs moved to the appendix | page limit | docs/report_appendix.md |
 
-Author sign-off on the tenth to eighteenth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
+## 26 Nov 2026, nineteenth pass (a line-by-line audit of about 770 claims against the evidence files)
+
+| Change | Why | Evidence |
+|---|---|---|
+| "8 people, 6 with prediabetes" corrected to 6 of the 15 false clears (3 of the 8 people have prediabetes) | a count of meals written as a count of people | outputs/v2_explain/v2_explain.json (taxonomy) |
+| R7 reworded: the seed spread is below v3's gain (prediction not met); "real, and it is meal recognition" removed | an overclaim, and a failed prediction not labelled | outputs/robustness_v3/robustness_v3.json |
+| README: no low-risk answer needs both no history and no priors (it said no history alone); figure numbers; the returning-user manifest now shows v1's answers | stale or wrong after the switch to v1 | README.md, samples/returning_user/MANIFEST.md |
+| Smaller precision fixes: heart rate 140 bpm (v1) and 160 bpm (v2); memory measured for v1 only; the intercept's gain stated with its interval; noise-floor 95th centiles added; the locked no-history point given as 20.9% cleared, 21.9% spiking; probe B 8.5% in both products; sources added to three captions; the parameter-budget label | imprecise wording or a missing source (about 30 of 770 claims) | docs/final_report.md |
+| Figures 2, 6 and 7 narrower; the glycaemic-status table moved to the appendix | page limit | docs/report_appendix.md |
+
+Author sign-off on the tenth to nineteenth passes (v2, the return to v1, R13 to R16 and every registration since the tag):
 to be added here by the author, dated, in her words.
 

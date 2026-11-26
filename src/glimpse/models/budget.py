@@ -40,10 +40,10 @@ def budget_table() -> list[BudgetRow]:
     name = "PhotoCarbModel (ConvNeXt-Tiny + 2 heads)"
     rows.append(BudgetRow(model=name, role="pretrained, fine-tuned", status="built", parameters=n,
                           limit=PER_MODEL_LIMIT, within_limit=n <= PER_MODEL_LIMIT))  # fmt: skip
-    rows.append(BudgetRow(model="v1 fusion (logistic regression: 15 profile/trend + 4 photo inputs)",
+    rows.append(BudgetRow(model="v1 fusion, served (logistic regression: 15 profile/trend + 4 photo inputs)",
                           role="trained (classical, on top of the networks)", status="built", parameters=20,
                           limit=SCRATCH_LIMIT, within_limit=True))  # fmt: skip
-    rows.append(BudgetRow(model="v2 fusion, served (logistic regression: 15 profile/trend inputs)",
+    rows.append(BudgetRow(model="v2 fusion, alternative (logistic regression: 15 profile/trend inputs)",
                           role="trained (classical)", status="built", parameters=16, limit=SCRATCH_LIMIT,
                           within_limit=True))  # fmt: skip
     rows.append(BudgetRow(model="Unfamiliar-photo check (5 nearest training photos)", role="no weights (reference set)",

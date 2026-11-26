@@ -13,8 +13,9 @@ just predict-folder samples/instructor out/instructor           # 13 meals: answ
 just predict-folder samples/returning_user out/returning_user   # the three answers: caution, can't judge, low risk
 ```
 
-Without a `history.csv` of the person's earlier labelled meals, no meal is answered "low risk": rule R13
-withholds it, by design, because there is no personal basis to clear a meal. `samples/returning_user/02_with_priors_and_history`
+With neither a `history.csv` of the person's earlier labelled meals nor onboarding priors in the profile, no
+meal is answered "low risk": rule R13 withholds it, by design, because there is no personal basis to clear a
+meal. The instructor and stress samples are in that state. `samples/returning_user/02_with_priors_and_history`
 carries one.
 
 **Final submission (report: [`docs/final_report.md`](docs/final_report.md)):**
@@ -83,14 +84,16 @@ just docker-demo                              # needs `just install` first, for 
 | `just prepare` | meal table, windows, person splits, training-only scaling, quality report | 1 min |
 | `just train-scratch` · `just train-photo` · `just train-final` | SensorCNN · photo model · the intermediate 28-person fusion (`just train` runs all three; the DEPLOYED artifacts come from `just finalize`, the pre-registered regeneration, so train-photo and train-final refuse to overwrite them unless `GLIMPSE_OVERWRITE_FROZEN=1`) | 1 · 15 · 8 min |
 | `just cv` · `just photo-cv` · `just fusion` | 5-fold person cross-validation of all models (resumable) | 2 · 90 · 2 min |
-| `just evaluate` | parameter budget, both dev evaluations (v1 and v2), v2's metrics, probes and explanation, the unfamiliar-photo check, monitoring, probes A and B, then `just report-numbers` (every other table and figure re-derived from committed outputs); `just evaluate-all` also recomputes the stress, int8 and timing studies; the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun) | about 12 min on a 2-CPU machine (`evaluate-all` about 45) |
+| `just evaluate` | parameter budget, both dev evaluations (v1 and v2), v2's metrics, probes and explanation, the unfamiliar-photo check, monitoring, probes A and B, then `just report-numbers` (every other table and figure re-derived from committed outputs); `just evaluate-all` also recomputes the stress, int8 and timing studies; the locked-8 run is committed once by design (`just evaluate-locked` refuses a rerun) | about 15 min on a 2-CPU machine (`evaluate-all` about 45) |
 | `just photo-seeds` | seed spread of the final photo model on the validation people (deployed checkpoint untouched) -> `outputs/training/photo_convnext_seeds.json` | 10-15 min |
 
 Cross-validated predictions are committed in `outputs/`, so `just evaluate` works straight after `just install`,
-and `just report-numbers` works on a bare clone. `just reproduce-all` reruns every compute study in dependency
+and `just report-numbers` works on a bare clone. `just reproduce-all` reruns the compute studies in dependency
 order (prepare → splits-v2 → params → cv → carbs-check → photo-cv → fusion → ablate → promised → robustness →
-robustness-levels → timing → probes → ood → monitoring → efficiency → stage-timing → photo-seeds → evaluate → selftest →
-instructor folder → stress → demo; about 3 h). It never reruns `just finalize` (the frozen serving artifacts,
+robustness-levels → timing → probes → ood → monitoring → efficiency → stage-timing → stress-quality →
+v2-input-stress → photo-probes → end-to-end-timing → photo-seeds → evaluate → selftest → instructor and
+returning-user folders → stress → demo; about 3 h). The registered last-day checks (`just final-checks`,
+`just robustness-v3`) run under `just evaluate-all`. It never reruns `just finalize` (the frozen serving artifacts,
 regenerated once under a pre-registered procedure) or `just evaluate-locked` (the locked eight, scored once).
 
 **What the grader's folder command does and does not do.** `just predict-folder` answers each meal folder on
@@ -149,8 +152,8 @@ src/glimpse/           data/ · models/ · training/ (incl. finalize.py, the pre
 checkpoints/           trained models, frozen cut-offs (hashed), unfamiliar-photo reference
 outputs/               evaluation tables and figures, learning curves, cross-validated predictions, demo cases
 docs/                  final report, model card, data card, evaluation protocol, design doc, changelog, monitoring
-samples/               instructor suite (13 meals), stress suite (25 hostile meals), returning_user/ (3 cases with
-                       priors and history), local_photos/ (14 unseen phone photos), example CSV
+samples/               instructor suite (13 meals), stress suite (25 hostile meals), returning_user/ (one meal at 3 stages:
+                       new user, with priors, with priors and history), local_photos/ (14 unseen phone photos), example CSV
 ```
 
 ## Promised vs delivered
@@ -179,10 +182,10 @@ version of this table is kept at `docs/archive/readme_promised_intermediate.md`.
 | §1 budget, latency | `just params`, `just efficiency`, `just stage-timing` | `outputs/param_budget.csv`, `outputs/efficiency/` |
 | §1 quality vs cost, §3 baselines | `just cv`; `just report-numbers` | `outputs/cv/cv_summary.json`, `outputs/report_metrics/` |
 | §2 photo recipe, what the photo does | `just photo-cv`, `just fusion`, `just ablate`, `just photo-seeds`, `just promised` | `outputs/photo_cv/`, `outputs/fusion/`, `outputs/ablations/`, `outputs/training/`, `outputs/promised/` |
-| §3 results table, fold cut-offs, Figures 2-3 | `just evaluate` (`evaluate-locked` once) | `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` |
+| §3 results table, fold cut-offs, Figures 2 and 4 | `just evaluate` (`evaluate-locked` once) | `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` |
 | §4 cost sweep, usefulness targets | `just evaluate` | `outputs/evaluation_v2/dev_summary.json`, `outputs/report_metrics/` |
 | §1 end-to-end timing, int8 | `just end-to-end-timing`, `just photo-probes` | `outputs/efficiency/end_to_end.json`, `int8.json` |
-| §3-§5 v2 calibration, taxonomy, SHAP, Figures 3 and 4 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
+| §3-§5 v2 calibration, taxonomy, SHAP, Figures 4 and 5 | `just v2-explain` (inside `just evaluate`) | `outputs/v2_explain/` |
 | §3-§5 course checks, OOD AUROC, monitoring power, calibration null | `just final-checks` | `outputs/final_checks/final_checks.json` |
 | §5 debugging table R1-R4, v3 candidate (R5-R7), §6 re-weighted test (R8) | `just robustness-v3` | `outputs/robustness_v3/robustness_v3.json` |
 | §4 stress table | `just stress-quality`, `just v2-input-stress` | `outputs/robustness/stress_quality.json`, `v2_input_stress.json` |

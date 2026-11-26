@@ -55,7 +55,7 @@ development estimates carry disclosed selection pressure (fold 1 was scored at t
 that repeat a held-out person's exact macros are removed (D8), so its value is unproven. v2 is the riskier product for the intended users:
 6 of its 30 clears for people with prediabetes spiked; its 15 false clears are 6 near-cut and 9 confident
 (docs/v2_explain.md). A missing heart rate turns 17 development cautions into low risk; wrong history
-labels cost the most AUROC. History rows carry the product that wrote them; rows from the other product are skipped. Without history and priors (every sample),
+labels cost the most AUROC. History rows carry the product that wrote them; rows from the other product are skipped. Without history and priors (the instructor and stress samples),
 rule R13 refers every would-be clear. Flips under CGM dropout and short gaps stay at a handful of meals;
 gaps of 20 minutes or more refuse by design. Visually familiar but nutritionally unfamiliar dishes get a
 confident wrong carb range (R7). The label is baseline-relative, so a rising pre-meal trace lowers the

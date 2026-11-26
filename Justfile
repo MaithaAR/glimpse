@@ -172,6 +172,7 @@ evaluate-all:
     just end-to-end-timing
     just robustness-levels
     just final-checks
+    just robustness-v3
     just report-numbers
 
 # v2 (docs/v2_sensor_first.md): the sensor-first freeze, written once to checkpoints/sensor_first/

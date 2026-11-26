@@ -478,7 +478,7 @@ def run_figures(cfg=None) -> dict:
         f8_v2(plt)
     report = {"what": "report figures rendered from committed evidence only (pre-commitment in "
                       "docs/final_design.md); ece_raw/ece_personal = equal-mass ECE, 15 bins, answered dev meals; "
-                      "ece_equal_width_15 = the registered binning that Figure 3 draws",
+                      "ece_equal_width_15 = the registered binning that Figure 4 draws",
               "ece_raw": ece["risk_raw"], "ece_personal": ece["risk"],
               "ece_equal_width_15": {"raw": ece["risk_raw_equal_width"], "personal": ece["risk_equal_width"]},
               "shap": shap_report,

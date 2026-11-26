@@ -332,6 +332,13 @@ it is not part of the report.
 
 ## Moved from the report on 26 Nov (page limit)
 
+| by glycaemic status, development | people, meals, spike rate | v1 AUROC (95%) | v1 cleared, spikes among them | v2 AUROC | v2 cleared, spikes among them |
+|---|---|---|---|---|---|
+| healthy, both products | 11, 224, 21.0% | 0.738 (0.566–0.859) | 37.5% (84), 7 | 0.701 | 39.3% (88), 9 |
+| prediabetes, both products | 12, 257, 43.2% | 0.736 (0.648–0.796) | 9.7% (25), 1 | 0.739 | 11.7% (30), 6 |
+
+*v1's AUROC is on its answered meals (217 and 243). report_metrics.json (subgroups), v2_metrics.json (subgroups).*
+
 ![Figure A2 (moved from the report on 26 Nov): coverage, misses and cost when abstaining on the meals closest to the low-risk cut (development at each fold's cut, v1 and v2; v1 locked at 0.15), descriptive](../outputs/figures/fig5_coverage.png)
 
 | Glossary | meaning |
