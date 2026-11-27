@@ -139,6 +139,10 @@ def _plain(e: Exception) -> str:
         return "the CGM file could not be read as a table of readings"
     if "float() argument" in t:
         return "a profile value is not a number"
+    if "No columns to parse" in t:
+        return "the CGM file is empty"
+    if "Is a directory" in t:
+        return "the CGM path is a folder, not a file"
     if "Mixed timezones" in t:  # pandas >= 2 raises before the object-dtype branch below is reached
         return "the timestamps mix different UTC offsets; export the file in one timezone"
     return t

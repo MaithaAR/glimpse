@@ -11,3 +11,4 @@ logs/
 outputs/feedback/
 .pytest_cache/
 .ruff_cache/
+/out/

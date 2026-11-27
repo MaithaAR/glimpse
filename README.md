@@ -138,7 +138,7 @@ that folder is v1; product v2 lives in `outputs/evaluation_sensor_first/`.
   photos sit just below its line; replayed on logged answers, the outcome rule is too noisy at 80-answer windows
   to serve as an alarm (`outputs/monitoring/replay.json`).
 - Full tables: `outputs/evaluation_v2/`, `outputs/locked_eval/`, `outputs/report_metrics/` and `just report-numbers`.
-- Submitted state: tag `submission-v1` (25 Nov), then a dated improvement round listed in `docs/changelog.md`.
+- Submitted state: tag `submission-final` (27 Nov). Tag `submission-v1` is the 25 Nov state; the dated rounds between them are listed in `docs/changelog.md`.
 
 ## Repository
 ```

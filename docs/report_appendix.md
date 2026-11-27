@@ -61,7 +61,7 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 | heads epochs per outer fold → shipped | 12–16 → 12 (median) | early stopping on 4 inner folds |
 | last stage: keep, epochs → shipped | kept in 5 of 5 folds; 2–3 → 2 | kept only if inner MAE drops ≥0.5 g (it fell from 27.5–29.8 g to 24.2–26.1 g) |
 | loss | Huber on log(1+grams) + 0.5 × bin cross-entropy | fixed in code |
-| augmentation | flips, crops keeping 80% of the image area, brightness and contrast ±10%, no hue change; 2 saved views per photo, last-stage phase only | fixed in code, not ablated |
+| augmentation | flips, crops keeping 80% of the image area, brightness and contrast ±10%, no hue change; 2 saved views per photo, last-stage phase only | fixed in code; the crop was ablated on 27 Nov (docs/post_freeze_checks.md) |
 
 *Per-fold values in outputs/report_metrics/report_metrics.json (photo_recipe), from outputs/photo_cv/; settings in configs/default.yaml, src/glimpse/data/photos.py and src/glimpse/training/photo.py.*
 
@@ -199,7 +199,7 @@ v1, the photo-fusion model frozen on 6 Nov and measured once on the locked eight
 | synthetic non-meal pictures (monitoring week 4) | 6 | 0.709 | the week's median is above the cut |
 | instructor screenshot / dark photo / local dish | 3 | 0.771 / 0.613 / 0.318 | screenshot only (the dark photo is refused by the contrast rule) |
 
-*No realistic labelled out-of-distribution set exists, so no detection AUROC is claimed; local meals are food the check should accept. outputs/ood/, outputs/monitoring/monitoring.json.*
+*No realistic labelled out-of-distribution set exists, so the detection AUROC (0.988, study O1) rests on mostly synthetic pictures; local meals are food the check should accept. outputs/ood/, outputs/monitoring/monitoring.json.*
 
 | monitoring signal (docs/monitoring.md) | demonstration | result |
 |---|---|---|
@@ -395,7 +395,7 @@ Decisions per 100 meals (moved from report §4): Of every 100 development meals 
 | optimiser and rates | AdamW; heads 1e-3 (warm-up + cosine), last stage 1e-4 | fixed in the config (taught differential rates) |
 | heads epochs per outer fold → shipped | 12–16 → 12 (median) | early stopping on 4 inner folds |
 | last stage: keep, epochs → shipped | kept in 5 of 5 folds; 2–3 → 2 | kept only if inner MAE drops ≥0.5 g (it fell from 27.5–29.8 g to 24.2–26.1 g) |
-| loss; augmentation | Huber on log(1+grams) + 0.5 × range cross-entropy; flips, crops keeping 80% of the area, brightness and contrast ±10%, no hue change | fixed in code, not ablated |
+| loss; augmentation | Huber on log(1+grams) + 0.5 × range cross-entropy; flips, crops keeping 80% of the area, brightness and contrast ±10%, no hue change | fixed in code; the crop was ablated on 27 Nov (docs/post_freeze_checks.md) |
 | seed spread of the recipe (intermediate split, 3 seeds) | carb MAE 24.9 ± 1.9 g, range F1 0.55 ± 0.04 | outputs/training/photo_convnext_seeds.json |
 
 | unfamiliar-photo check at the 0.614 cut | photos | median kNN distance | flagged |
@@ -460,3 +460,31 @@ Moved from report section 5 on 27 Nov (page limit):
 | classical and zero-shot photo baselines (check 4) | colour histogram + ridge 27.5 g, against 20.4 g for frozen summaries + ridge; zero-shot needs CLIP weights this offline build cannot fetch | classical done; zero-shot a gap |
 
 Moved from report sections 1 and 3 on 27 Nov (word limit): as first shipped, rules R14 to R16 changed no development or locked decision; the later R14 amendment refers one development meal. A stricter null (study C1) finds v1's 0.052 typical (33% of draws at or below) and v2's 0.029 lower than all but 1.5%, an anomaly the adaptive intercept does not explain. On the external data, with carb errors the size of the photo model's (a simulation with errors drawn independently of the meal) the carb gain is still +0.101 (docs/external_bigideas.md, Part 2).
+
+Moved from the report on 27 Nov (space for the feedback table); each row keeps its original columns.
+
+| the course's debugging checks | evidence | status |
+|---|---|---|
+| photo estimate ladder (27 Nov) | fine-tuned 22.6 g, ridge on frozen features 20.4 g, their average 20.1 g | done: ridge beats the fine-tune on grams; v3's range heads match its F1 (0.62 against 0.61); not served |
+
+| risk (answered meals) | AUROC (95% person-clustered) | AUPRC (base rate) | Brier (constant forecast) | log-loss | ECE, 15 bins: equal-width / equal-mass |
+|---|---|---|---|---|---|
+| the same baselines on v2's 481 meals | 0.403 / 0.672 / 0.686 / 0.689 / 0.689 | 0.285 / 0.487 / 0.547 / 0.531 / 0.551 | 0.231 / 0.204 / 0.199 / 0.204 / 0.201 | – | – |
+
+| stress at the evaluated operating point (with history) | v2: AUROC, spikes among cleared | v2: caution → low risk | v1: AUROC | v1: caution → low risk |
+|---|---|---|---|---|
+| removed for 20 min or more (a gap over the rule's 20) | every meal refused | – | every meal refused | – |
+
+| What the photo does (gate first) | result |
+|---|---|
+| secondary endpoint: log-loss gain | +0.016, one-sided p = 0.094 |
+| seed spread of the recipe (3 seeds, intermediate split) | carb MAE 24.9 ± 1.9 g; range F1 0.55 ± 0.04 |
+
+| Status at a glance | v1 served, development (481 meals) | v1 served, locked eight (153) | v2 alternative, development (481) |
+|---|---|---|---|
+| the same, people with prediabetes | 1 of 25 | not split | 6 of 30 |
+
+| the course's debugging checks | evidence | status |
+|---|---|---|
+| embedding map (Figure A3; 27 Nov) | of a photo's 10 nearest neighbours 49% share its carb range (chance 28%) and 14% its person (chance 3%) | done: carb range at 1.8× chance, person at 4×; the carb-range share holds across people |
+

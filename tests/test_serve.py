@@ -141,6 +141,17 @@ def test_predict_folder_finishes_with_per_item_entries(tmp_path):
     (bad / "profile.json").write_text("{not json")
     results = predict_folder(bare_pipeline(risk=0.45, table={}), tmp_path / "in", tmp_path / "out")
     lines = [json.loads(ln) for ln in results.read_text().splitlines()]
+    odd = tmp_path / "in2" / "c_list_profile"  # 27 Nov: a profile that is valid JSON but not an object
+    odd.mkdir(parents=True)
+    (odd / "profile.json").write_text("[1, 2, 3]")
+    empty = tmp_path / "in2" / "d_empty_cgm"
+    empty.mkdir()
+    (empty / "cgm.csv").write_text("")
+    (empty / "profile.json").write_text(json.dumps({"age": 42, "meal_time": "2024-06-01T12:00"}))
+    more = predict_folder(bare_pipeline(risk=0.45, table={}), tmp_path / "in2", tmp_path / "out2")
+    extra = [json.loads(ln) for ln in more.read_text().splitlines()]
+    assert [r["decision"] for r in extra] == ["can't judge", "can't judge"]
+    assert "must be a JSON object" in extra[0]["reason"] and "No columns" not in extra[1]["reason"]
     assert [r["meal_id"] for r in lines] == ["a_good", "b_broken"]
     assert lines[0]["decision"] == "can't judge"  # no photo estimate in the bare pipeline -> confirm-carbs
     assert lines[0]["escalate_to"] == "confirm_carbs"

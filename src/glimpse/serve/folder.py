@@ -57,6 +57,9 @@ def _one_case(app: Pipeline, case: Path) -> dict:
         except OSError as e:  # rule R11: an unreadable profile file is named too
             a = cant_judge(f"profile.json cannot be read ({e.strerror or e})", checks_failed=["input_valid"])
             return {"meal_id": case.name, **a.model_dump(mode="json")}
+        if not isinstance(raw, dict):  # 27 Nov: a list or a bare value is named, not a raw error row (rule R9)
+            a = cant_judge("profile.json must be a JSON object of named fields", checks_failed=["input_valid"])
+            return {"meal_id": case.name, **a.model_dump(mode="json")}
         meal_time = raw.pop("meal_time", None)
         profile = {PROFILE_KEYS[k]: v for k, v in raw.items() if k in PROFILE_KEYS}
         photo, pflags = find_photo(case)
