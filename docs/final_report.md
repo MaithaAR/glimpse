@@ -28,7 +28,7 @@ check of v2 are in the table's last two rows.
 
 | Intermediate feedback (1 Nov) | response | where |
 |---|---|---|
-| product claim statistically fragile | an interval on every claim; the claim is withdrawn where not established | §2, §3 |
+| product claim statistically fragile | intervals on the main claims; the claim is withdrawn where not established | §2, §3 |
 | thresholds not validation-chosen | evaluated cut-offs chosen on inner folds | §4 |
 | test set of 5 people | 8 locked people scored once; 12 external people | §3, §6 |
 | scratch CNN adds nothing | it still ties the trend features (+0.002): a baseline, not served | §2 |
@@ -39,7 +39,7 @@ check of v2 are in the table's last two rows.
 
 ## 1. System and tooling
 The user is an adult with prediabetes in a CGM programme who wants fewer spikes but stops logging food
-within days. Before a meal they photograph it and get one plain sentence with its reason. A spike is a rise
+within days. Before a meal they photograph it and get one sentence with its reason. A spike is a rise
 of at least 50 mg/dL above the 30-minute
 pre-meal mean within 2 hours. The CGM labels
 every meal two hours later, so the system learns each person without logging. The adopter would be the
@@ -362,9 +362,10 @@ harder (42.0% of 150 scored meals spiked). A development-only challenge (27 Nov,
 docs/locked_challenge.md, two predictions not met): of 5,000 draws of 8 development people, 16.8% meet at most
 1 of 4 targets (48.9% at a spike rate of 40% or more), but only 2.8% have AUROC at or below 0.645.
 Re-weighting development to a 42% spike rate cuts its cost reduction from 14.4% to 2.8%, and no cut-off rule
-we tried repairs that. The targets were never secure at eight people; the ranking drop is not chance; the
-locked result stands. Re-weighting to the locked mix of sex and glycaemic status moves AUROC only from 0.762
-to 0.749 (docs/robustness_v3.md). The design also registered the photo gate on the locked eight as the primary
+we tried repairs that. The targets were never secure at eight people; the ranking drop is unlikely to be
+sampling alone; the locked result stands (`just locked-challenge`). Re-weighting to the locked mix of sex and
+glycaemic status moves AUROC only from 0.762
+to 0.749 (docs/robustness_v3.md). The design registered the photo gate on the locked eight as the primary
 test;
 that run scored only v1, so the endpoint was never computed and cannot be now.
 

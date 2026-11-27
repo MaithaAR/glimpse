@@ -760,6 +760,17 @@ def test_rules_r22_and_holm_cells(text):
 def test_external_and_post_freeze_cells():
     """27 Nov additions: the external check of the frozen v2 and the post-freeze checks, against their outputs."""
     flat = " ".join((REPORT.read_text() + "\n" + APPENDIX.read_text()).split())  # rows moved there on 27 Nov
+    lc = _load("outputs/locked_challenge/locked_challenge.json")  # the development-only challenge of the locked result
+    al, hd, rw = (
+        lc["all_draws"],
+        lc["draws_with_spike_rate_at_least_40pct"],
+        lc["development_reweighted_to_locked_spike_rate"],
+    )
+    assert (
+        f"{al['at_most_1_of_4_targets']:.1%} meet at most 1 of 4 targets ({hd['at_most_1_of_4_targets']:.1%} at" in flat
+    )
+    assert f"only {al['auroc_at_or_below_locked']:.1%} have AUROC at or below 0.645" in flat
+    assert f"from {lc['all_development']['cost_reduction']:.1%} to {rw['cost_reduction']:.1%}" in flat
     e = _load("outputs/external_bigideas/external_bigideas.json")
     v = e["v2_frozen"]
     cell = f"{v['auroc']:.3f} ({v['ci95'][0]:.3f}–{v['ci95'][1]:.3f})"

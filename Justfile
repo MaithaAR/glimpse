@@ -342,3 +342,8 @@ download-bigideas:
     cd data/bigideas && curl -sSO https://physionet-open.s3.amazonaws.com/big-ideas-glycemic-wearable/1.1.2/Demographics.csv
     cd data/bigideas && for i in $(seq -w 1 16); do mkdir -p 0$i; for f in Dexcom HR Food_Log; do curl -sS -o 0$i/${f}_0$i.csv https://physionet-open.s3.amazonaws.com/big-ideas-glycemic-wearable/1.1.2/0$i/${f}_0$i.csv; done; done
     cd data/bigideas && uv run python ../../scripts/prepare_bigideas.py
+
+# development-only challenge of the locked result (docs/locked_challenge.md); reads committed answers, about 1 minute
+locked-challenge:
+    uv run python scripts/locked_challenge.py
+    uv run python scripts/locked_challenge_rules.py
