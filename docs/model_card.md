@@ -5,7 +5,7 @@ docs/final_report.md or docs/report_appendix.md with its evidence file.
 
 **What it does.** Before a meal it estimates the chance that glucose rises by at least 50 mg/dL above the
 30-minute pre-meal mean within 2 h, and answers *low risk*, *caution* or *can't judge* (between the
-cut-offs, or when a rule fails), always with a one-sentence reason.
+cut-offs, which for v1 are 0.01 apart, or when a rule fails), always with a one-sentence reason.
 
 **Intended use.** A wellness nudge for adults with prediabetes who already wear a CGM. Not a medical
 device. Not for type 1 diabetes, insulin dosing or treatment decisions. No claim for type 2 diabetes:
@@ -74,8 +74,8 @@ that repeat a held-out person's exact macros are removed (D8), so its value is u
 labels cost the most AUROC. History rows carry the product that wrote them; rows from the other product are skipped. Without history and priors (the instructor and stress samples),
 rule R13 refers every would-be clear. Flips under CGM dropout and short gaps stay at a handful of meals;
 gaps of 20 minutes or more refuse by design. Visually familiar but nutritionally unfamiliar dishes get a
-confident wrong carb range (R7). The label is baseline-relative, so a rising pre-meal trace lowers the
-predicted risk (probe B).
+confident wrong carb range (R7). A rising pre-meal trace lowers the predicted risk (probe B); the pre-meal slope shows no
+association with the measured rise (docs/post_freeze_checks.md), so the earlier explanation is withdrawn.
 
 **Monitoring and feedback.** docs/monitoring.md. Photo drift is demonstrated on a synthetic week. The
 outcome and calibration rules are too noisy at these volumes: a simulated cohort shift is caught within

@@ -60,8 +60,7 @@ cost reduction against always caution 3.0% (−13.8%, +22.3%).
 Reading.
 - The expectation written before scoring (0.60 to 0.70, targets not met) held. The interval excludes 0.5.
 - The external AUROC, 0.628 on 12 new people, is close to the locked test's 0.645 on 8 (that was v1; v2 has
-  no locked number). Two independent small tests now put the honest discrimination of this family of models
-  between 0.62 and 0.65, well under the development 0.75 to 0.76. They are different models (v1 and v2).
+  no locked number). Two small tests of two different models give 0.63 and 0.65, well under the development 0.75 to 0.76. They are different models (v1 and v2).
 - The mean risk carried over to a different study, device and food log: it is 0.5 points above the spike
   rate. ECE is 0.053, just above the 0.05 target, and no noise floor was computed for this set.
 - The intercept did not help ranking here (0.628 against 0.624) and again scrambled the order of a person's
@@ -99,7 +98,7 @@ These checks are in outputs/external_bigideas/external_bigideas.json under `matc
 
 ## Part 2, planned on 27 Nov before it was run: does meal content help on free-living meals?
 
-Why. On CGMacros the logged carbs add at most about +0.03 AUROC to the sensor and profile model, which is why
+Why. On CGMacros the logged carbs add about +0.02 to +0.03 AUROC (two harnesses: +0.024 in the fusion study, +0.031 in the carbs check) to the sensor and profile model, which is why
 the photo, whose job is to supply the carbs, could not pass its gate. CGMacros meals are largely
 standardised. In Part 1 the carbs people logged ranked BIG IDEAs meals at 0.734 on their own. If meal
 content adds little on standardised meals and a lot on free-living ones, the photo channel's low ceiling is

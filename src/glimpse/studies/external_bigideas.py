@@ -251,10 +251,17 @@ def run_external_part2(cfg) -> dict:
             return float(roc_auc_score(y[i], u[i]) - roc_auc_score(y[i], v[i])) if len(set(y[i])) == 2 else float("nan")
 
         pt, lo, hi = person_bootstrap_ci(sid, fn)
-        return {"with_carbs": float(roc_auc_score(y, u)), "without": float(roc_auc_score(y, v)), "gain": pt, "ci95": [lo, hi]}
+        return {
+            "with_carbs": float(roc_auc_score(y, u)),
+            "without": float(roc_auc_score(y, v)),
+            "gain": pt,
+            "ci95": [lo, hi],
+        }
 
     def within(f: np.ndarray) -> float:
-        return float(np.mean([roc_auc_score(y[sid == p], f[sid == p]) for p in np.unique(sid) if len(set(y[sid == p])) == 2]))
+        return float(
+            np.mean([roc_auc_score(y[sid == p], f[sid == p]) for p in np.unique(sid) if len(set(y[sid == p])) == 2])
+        )
 
     ph = pd.read_csv("outputs/photo_cv/photo_oof.csv")
     ph = ph[ph.scored]
@@ -262,7 +269,9 @@ def run_external_part2(cfg) -> dict:
     rng, gains = np.random.default_rng(cfg.seed), []
     for _ in range(200):
         noisy = carb[:, 0] + rng.choice(err, len(carb))
-        gains.append(float(roc_auc_score(y, with_c.decision_function(np.hstack([Xs, noisy[:, None]]))) - roc_auc_score(y, f0)))
+        gains.append(
+            float(roc_auc_score(y, with_c.decision_function(np.hstack([Xs, noisy[:, None]]))) - roc_auc_score(y, f0))
+        )
     coef = with_c[-1].coef_[0]
     res = {"what": "External Part 2: meal content on free-living meals (fitted on CGMacros only, scored once on BIG IDEAs)",
            "meals": len(s), "people": int(len(np.unique(sid))), "refit_matches_frozen_v2_max_abs_logit_difference": drift,
@@ -394,15 +403,20 @@ def run_external_checks(cfg) -> dict:
     bundle = joblib.load("checkpoints/sensor_first/fusion.joblib")
     ds = MealDataset.load(Path("data/dataset"))
     tr = meal_rows(ds, set(bundle["train_people"]), scored_only=False)
-    with_c = logistic(bundle["C"], cfg.seed).fit(np.hstack([trend_features(ds, tr), logged_carbs(ds, tr)]), ds.labels()[tr])
+    with_c = logistic(bundle["C"], cfg.seed).fit(
+        np.hstack([trend_features(ds, tr), logged_carbs(ds, tr)]), ds.labels()[tr]
+    )
     f1 = with_c.decision_function(np.hstack([Xs, np.log1p(s.carbs.to_numpy(float))[:, None]]))
     f0 = bundle["models"]["sensor"].decision_function(Xs)
     per = {}
     for p in np.unique(sid):
         k = sid == p
         if len(set(y[k])) == 2:
-            per[int(p)] = {"v2_frozen": float(roc_auc_score(y[k], r_int[k])), "without_carbs": float(roc_auc_score(y[k], f0[k])),
-                           "with_carbs": float(roc_auc_score(y[k], f1[k]))}
+            per[int(p)] = {
+                "v2_frozen": float(roc_auc_score(y[k], r_int[k])),
+                "without_carbs": float(roc_auc_score(y[k], f0[k])),
+                "with_carbs": float(roc_auc_score(y[k], f1[k])),
+            }
     big = s.kcal.to_numpy(float) >= 200
     res = {"what": "External follow-up checks (27 Nov), same 201 meals of 12 people",
            "intercept_minus_no_intercept_auroc": paired(r_int, r_raw),

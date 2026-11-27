@@ -782,7 +782,7 @@ def test_external_and_post_freeze_cells():
     )
     assert 0.05 < sim["mean_gain"] < raw["gain"] and p2["refit_matches_frozen_v2_max_abs_logit_difference"] < 1e-6
     assert (
-        f"scores {raw['with_carbs']:.3f} there, {raw['gain']:+.3f} ({raw['ci95'][0]:+.3f} to {raw['ci95'][1]:+.3f})"
+        f"scores {raw['with_carbs']:.3f} on these meals, {raw['gain']:+.3f} ({raw['ci95'][0]:+.3f}, {raw['ci95'][1]:+.3f})"  # noqa: E501
         in flat
     )
     ck = _load("outputs/external_bigideas/external_checks.json")
@@ -797,7 +797,7 @@ def test_external_and_post_freeze_cells():
     assert f"saves {cg['point']:.1%} ({cg['ci95'][0]:+.1%} to {cg['ci95'][1]:+.1%})".replace("-", "−") in flat
     p3 = _load("outputs/external_bigideas/external_part3.json")["external"]["usefulness"]
     cr, cs = p3["cost_reduction"], p3["cleared_share"]
-    assert flat.count(f"{cr['point']:.1%} ({cr['ci95'][0]:.1%}–{cr['ci95'][1]:.1%})".replace("%–", "–")) >= 3
+    assert flat.count(f"{cr['point']:.1%} ({cr['ci95'][0]:.1%}–{cr['ci95'][1]:.1%})".replace("%–", "–")) >= 2
     assert (
         f"{p3['missed']} of its {p3['cleared']} clears spiked" in flat and f"clears {cs['point']:.1%} of meals" in flat
     )

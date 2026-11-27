@@ -122,7 +122,7 @@ that folder is v1; product v2 lives in `outputs/evaluation_sensor_first/`.
 
 **What the results show (details and evidence in [`docs/final_report.md`](docs/final_report.md)):**
 
-- Per-person calibration improves every development fold (5/5) and log-loss (paired interval below zero); the pooled
+- Per-person calibration improves every development fold (5/5) and log-loss (paired interval below zero, not significant after Holm); the pooled
   AUROC gain, +0.037 (−0.004, +0.071), is not established; given the same intercept, gradient boosting on sensors
   and profile reaches 0.750. Development ECE (0.052) equals what a perfectly calibrated model shows at this size, so
   the registered 0.05 target cannot be judged at n = 460. On the locked test it improves AUROC,
@@ -131,7 +131,7 @@ that folder is v1; product v2 lives in `outputs/evaluation_sensor_first/`.
   estimate as 4 of its 19 inputs; v2, built on 26 Nov to the gate's pre-written verdict, uses it only as a carb estimate.
 - v2 is not shown non-inferior to v1 (−0.015, −0.045 to +0.010) and lets 12.7% of its clears spike (6 of 30 for people
   with prediabetes, against 1 of 25 in v1).
-- v1: usefulness targets hold at the point on development (23% cleared, 14% cost saving, 7.3% missed vs a 10% cap) and FAIL on
+- v1: usefulness targets hold at the point on development before rule R22 (18.1% cleared with it, target missed; 23% cleared, 14% cost saving, 7.3% missed vs a 10% cap) and FAIL on
   the locked test (10 of 153 cleared, 2 spiked, cost reduction −5.7%), reported unadjusted, per the pre-registration.
 - The 8 locked people were scored exactly once, on 25 Nov, from the frozen artifacts (`just evaluate-locked` refuses a rerun).
 - Monitoring: the photo-drift rule fires on the drifted (synthetic) week of a simulated stream, but real phone
@@ -232,7 +232,7 @@ Added on 27 Nov, exploratory, with the served model unchanged:
 
 History note: the GitHub history runs from the proposal (27 Sep) to the final commit. Proposal-era pilot
 analyses (`pilot/`, `scripts/`, `results/`) were removed from the tree on 1 Nov and live at the git tag
-`proposal-era`. From 2 Nov every registration commit precedes the commit with its results.
+`proposal-era`. From 2 Nov every registration commit precedes the commit with its results, often by minutes; the 27 Nov checks share one commit with their plan.
 
 ## Data and licence
 CGMacros v1.0.0 (PhysioNet, CC BY-NC-SA 4.0) is downloaded by `just install` and never committed.

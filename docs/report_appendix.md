@@ -330,7 +330,7 @@ Referral band (moved from report §4): v2's referral tier is unstable: the folds
 The report's v1 prose as it stood before the v2 rewrite is kept for the record in docs/archive/report_v1_prose.md;
 it is not part of the report.
 
-## Moved from the report on 26 Nov (page limit)
+## Secondary detail for sections 2 to 5
 
 The v3 candidate (moved from report §5): A regularised photo branch (v3: heads only on frozen summaries; checks 5 to 7) picked the strongest setting in every fold (weight decay 0.1, dropout 0.5, two augmented views). Its train-validation gap is 0.13 against v1's 0.35, carb error rose from 22.6 to 26.0 g (prediction not met) and AUROC moved −0.007 (−0.019, +0.006). Without repeated meals (check 6) its photo gain is +0.009 (−0.010, +0.031). The seed spread (0.005) is well below v3's ordinary gain (0.030; prediction not met), so the gain is not seed noise; with check 6 it points to meal recognition. v3 stays a candidate.
 
