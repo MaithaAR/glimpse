@@ -1,2 +1,2 @@
-# just test (pytest), WITH data/ and pinned weights, started 2026-11-27T16:08:41Z, commit b810bd4
-214 passed, 1 xfailed in 28.51s
+# just test (pytest), WITH data/ and pinned weights, started 2026-11-27T16:19:32Z, commit 41f3f4c
+214 passed, 1 xfailed in 25.93s
