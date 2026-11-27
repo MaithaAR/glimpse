@@ -1,0 +1,48 @@
+{
+  "what": "8 of 23 development people, 5,000 draws without replacement; served answers before R22",
+  "people": 23,
+  "meals": 481,
+  "all_development": {
+    "auroc": 0.7623395272080413,
+    "cleared": 0.22661122661122662,
+    "cost_reduction": 0.14396284829721362,
+    "missed": 0.07339449541284404,
+    "met": 4,
+    "spike_rate": 0.3284823284823285
+  },
+  "reference_locked": {
+    "auroc": 0.645,
+    "cleared": 0.065,
+    "cost_reduction": -0.057,
+    "spike_rate": 0.4
+  },
+  "all_draws": {
+    "draws": 5000,
+    "at_most_1_of_4_targets": 0.168,
+    "auroc_at_or_below_locked": 0.0282,
+    "cleared_at_or_below_locked": 0.011,
+    "cost_reduction_at_or_below_locked": 0.0876,
+    "auroc_median": 0.7534965034965035,
+    "auroc_p2_5": 0.6414560664152646,
+    "auroc_p97_5": 0.8458343091334896,
+    "targets_met_mean": 2.919
+  },
+  "development_reweighted_to_locked_spike_rate": {
+    "spike_rate": 0.42,
+    "cost_reduction": 0.027963102353670943,
+    "cleared": 0.20262805188697725,
+    "missed": 0.10495004312962485,
+    "cant_judge": 0.13490261394364542
+  },
+  "draws_with_spike_rate_at_least_40pct": {
+    "draws": 749,
+    "at_most_1_of_4_targets": 0.4886515353805073,
+    "auroc_at_or_below_locked": 0.00801068090787717,
+    "cleared_at_or_below_locked": 0.07076101468624833,
+    "cost_reduction_at_or_below_locked": 0.34579439252336447,
+    "auroc_median": 0.7420178799489144,
+    "auroc_p2_5": 0.6583624951426968,
+    "auroc_p97_5": 0.8276141499142902,
+    "targets_met_mean": 1.7543391188251
+  }
+}

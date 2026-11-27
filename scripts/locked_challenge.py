@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Development-only challenge of the locked result (docs/locked_challenge.md): how often do 8 of the 23
 development people give a result as poor as the locked eight? Reads committed answers; changes nothing."""
 
@@ -50,9 +51,16 @@ def main() -> None:
     rng = np.random.default_rng(20260927)
     rows = [one(df[df.person_id.isin(rng.choice(people, 8, replace=False))], c, u) for _ in range(5000)]
     d = pd.DataFrame(rows)
+    w = np.where(df.spike == 1, 0.42 / df.spike.mean(), 0.58 / (1 - df.spike.mean()))  # added after the first run
+    yy, aa = df.spike.to_numpy().astype(int), df.decision.map(ACTION).to_numpy()
+    wc = lambda act: float(np.average(c[act, np.where(yy == 1, 0, 1)], weights=w))  # noqa: E731
+    cl = aa == 0
+    rew = dict(spike_rate=0.42, cost_reduction=1 - wc(aa) / min(wc(np.zeros_like(yy)), wc(np.ones_like(yy))),
+               cleared=float(np.average(cl, weights=w)), missed=float(np.average(yy[cl], weights=w[cl])),
+               cant_judge=float(np.average(aa == 2, weights=w)))
     out = dict(what="8 of 23 development people, 5,000 draws without replacement; served answers before R22",
                people=int(len(people)), meals=int(len(df)), all_development=one(df, c, u), reference_locked=REF,
-               all_draws=shares(d), draws_with_spike_rate_at_least_40pct=shares(d[d.spike_rate >= REF["spike_rate"]]))  # fmt: skip
+               all_draws=shares(d), development_reweighted_to_locked_spike_rate=rew, draws_with_spike_rate_at_least_40pct=shares(d[d.spike_rate >= REF["spike_rate"]]))  # fmt: skip
     Path("outputs/locked_challenge").mkdir(parents=True, exist_ok=True)
     Path("outputs/locked_challenge/locked_challenge.json").write_text(json.dumps(out, indent=2) + "\n")
 

@@ -488,3 +488,4 @@ Moved from the report on 27 Nov (space for the feedback table); each row keeps i
 |---|---|---|
 | embedding map (Figure A3; 27 Nov) | of a photo's 10 nearest neighbours 49% share its carb range (chance 28%) and 14% its person (chance 3%) | done: carb range at 1.8× chance, person at 4×; the carb-range share holds across people |
 
+Moved from report section 3 on 27 Nov (word limit): on external meals of 200 kcal or more the gain is +0.081 (+0.004, +0.155).

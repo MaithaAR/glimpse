@@ -23,3 +23,33 @@ people give and the development estimate was never as firm as its point values.
 
 Limits. Subsets of the people the system was tuned on can only show sampling noise, not shift; the draws overlap,
 so the shares are descriptive, not a test.
+
+## Results (27 Nov, outputs/locked_challenge/locked_challenge.json)
+
+| share of draws | all 5,000 | the 749 with spike rate of 40% or more | predicted |
+|---|---|---|---|
+| (a) at most 1 of 4 targets met | 16.8% | 48.9% | under 15%: not met |
+| (b) AUROC at or below 0.645 | 2.8% | 0.8% | under 10%: met; "higher among harder draws": not met |
+| (c) cleared at most 6.5% | 1.1% | 7.1% | under 5%: met |
+| (d) cost reduction at or below -5.7% | 8.8% | 34.6% | under 15%: met |
+
+Mean targets met per draw: 2.9 of 4 (1.75 among the harder draws). AUROC over draws: median 0.753, 95% range 0.641 to 0.846.
+
+Reading. The usefulness verdict "4 of 4 at the point" on development was never secure at eight people: one draw in
+six meets at most one target, and half of the draws with a spike rate like the locked cohort's. The drop in AUROC
+is a different matter: sampling eight development people almost never gives 0.645, and harder draws do not rank
+worse. So chance and a harder cohort can account for much of the usefulness failure, but not for the loss of
+ranking. The locked result stands as the test result.
+
+## Added after the first run (post hoc, same day)
+
+- Base rate alone (same script): re-weighting the 481 development meals to a 42% spike rate, with every decision
+  unchanged, cuts the cost reduction from 14.4% to 2.8%, the cleared share from 22.7% to 20.3%, and raises misses
+  among clears from 7.3% to 10.5%. It does not explain the locked cohort clearing only 6.5% of meals.
+- Is there a cut-off rule that survives a harder cohort? (`scripts/locked_challenge_rules.py`,
+  outputs/locked_challenge/rules.json; parameters chosen leave-one-fold-out.) No. The best candidate, clearing each
+  person's lowest-risk 10% of meals so far, lowers the share of harder draws meeting at most 1 of 4 targets from
+  48.9% to 39.7% but raises it from 16.8% to 19.1% over all draws. The people who spike often spike on about a
+  quarter of their own lowest-risk meals, above the 16.7% break-even at 5:1, so the shortfall is in ranking meals
+  within such people, which a threshold cannot repair. Nothing here is served or scored on the locked people.
+
