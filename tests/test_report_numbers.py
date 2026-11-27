@@ -633,7 +633,7 @@ def test_v2_probes_monitors_and_budget_cells():
     )
     assert mo["clean_false_alarms_hr"] == 0 and mo["watch_off_block_fires"]
     ch = _load("outputs/v2_explain/v2_explain.json")["carb_heads"]
-    assert f"{ch['disagree_share']:.0%} of {ch['photos']} out-of-fold photos" in text
+    assert f"{ch['disagree_share']:.0%} of {ch['photos']} out-of-fold photos" in text + appendix  # row moved 27 Nov
     rows = {r["model"]: int(r["parameters"]) for r in csv.DictReader(open("outputs/param_budget.csv"))}
     assert rows["v2 fusion, alternative (logistic regression: 15 profile/trend inputs)"] == 16
     assert rows["SensorCNN (1-D CNN)"] == 5217

@@ -489,3 +489,27 @@ Moved from the report on 27 Nov (space for the feedback table); each row keeps i
 | embedding map (Figure A3; 27 Nov) | of a photo's 10 nearest neighbours 49% share its carb range (chance 28%) and 14% its person (chance 3%) | done: carb range at 1.8× chance, person at 4×; the carb-range share holds across people |
 
 Moved from report section 3 on 27 Nov (word limit): on external meals of 200 kcal or more the gain is +0.081 (+0.004, +0.155).
+
+## Rows and one figure moved from the report on 27 Nov (to shorten it); headers as in the report
+
+| risk (answered meals) | AUROC (95% person-clustered) | AUPRC (base rate) | Brier (constant forecast) | log-loss | ECE, 15 bins: equal-width / equal-mass |
+|---|---|---|---|---|---|
+| v1 dev + per-fold Platt | 0.714 pooled (= raw within every fold) | 0.541 | 0.194 | 0.572 | 0.023 / 0.056 |
+| v1 dev, excluding fold 1 (370) | 0.757 (0.651–0.833) | 0.586 (0.335) | 0.185 (0.223) | 0.547 | 0.070 / 0.057 |
+| v2 dev raw (481) | 0.694 | 0.545 (0.328) | 0.198 (0.221) | 0.585 | 0.059 / 0.062 |
+
+| stress at the evaluated operating point (with history) | v2: AUROC, spikes among cleared | v2: caution → low risk | v1: AUROC | v1: caution → low risk |
+|---|---|---|---|---|
+| photo brightness ×0.5 / 0.25 / 0.2 / 0.15 | unchanged | 0 | within 0.002 on the meals still answered: 460 / 453 / 418 / 228 (×0.1: 3 answered) | 1 / 1 / 0 / 0 |
+
+| failure class | count: v1 / v2 | corpus | root cause | action |
+|---|---|---|---|---|
+| missing-photo refusal | 21 of 481 / none | development meals | input | v1 asks the user for a photo; v2 answers them |
+| implausible carb range for a local dish (1 Nov; now flagged "range unsure") | 1 dish | instructor case 11, 14 real phone photos | the embedding measures look, not nutrition | v1: a recorded limitation (rule R7); v2 shows it as an estimate to confirm |
+| carb heads disagree (grams outside the shown range) | 47% of 817 out-of-fold photos; instructor 10 and 11 | development photos; instructor cases | two heads trained jointly but read separately | shown as "about N g; range unsure", flagged |
+
+| Parameters and cost | v1 (served) | v2 (alternative) | cap |
+|---|---|---|---|
+| parameters a served risk depends on | 27.8M photo model + 20 | 16 | – |
+
+![Figure A5: exact linear SHAP for the frozen v1 fusion, in-sample; the local panel is row 847, a confident false clear, raw fusion risk](../outputs/figures/fig7_shap.png){width=45%}

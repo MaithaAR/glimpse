@@ -204,12 +204,12 @@ served files (unless `GLIMPSE_OVERWRITE_FROZEN=1`); the served files came from `
 | §4 stress table | `just stress-quality`, `just v2-input-stress` | `outputs/robustness/stress_quality.json`, `v2_input_stress.json` |
 | appendix stress levels, Figure A1 | `just robustness-levels`, `just timing`, `just promised` | `outputs/robustness/`, `outputs/promised/` |
 | §4 monitoring | `just monitoring`, `just monitoring-replay` | `outputs/monitoring/` |
-| §5 taxonomy, probes, Figure 6 | `just predict-folder`, `just stress`, `just probes`, `just ood`, `just figures` | `outputs/folder_run/`, `outputs/stress_run/`, `outputs/probes/`, `outputs/ood/`, `outputs/figures/` |
+| §5 taxonomy, probes, Figure A5 | `just predict-folder`, `just stress`, `just probes`, `just ood`, `just figures` | `outputs/folder_run/`, `outputs/stress_run/`, `outputs/probes/`, `outputs/ood/`, `outputs/figures/` |
 
 Figure numbers and files (the file names keep their first numbering, so earlier commits still resolve): Figure 1
 `fig1_system.png` · 2 `fig_training.png` · 3 `fig6_effects.png` · 4 `fig3_reliability.png` · 5 `fig4_v2.png` ·
-6 `fig7_shap.png` · A1 `figA1_robustness.png` · A2 `fig5_coverage.png` · A3 `figA3_embedding.png` · A4
-`fig2_per_fold_auroc.png` (the report's Figure 2 until 27 Nov). Documents written before 27 Nov use the
+A1 `figA1_robustness.png` · A2 `fig5_coverage.png` · A3 `figA3_embedding.png` · A4
+`fig2_per_fold_auroc.png` (the report's Figure 2 until 27 Nov) · A5 `fig7_shap.png` (Figure 6 until the last 27 Nov edit). Documents written before 27 Nov use the
 figure numbers of their date.
 
 Rules added after the tag, all in docs/rule_ledger.md with the commit that registered each: R14 (a low is
