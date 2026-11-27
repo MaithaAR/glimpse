@@ -6,7 +6,7 @@ the runs are the same day, so they are reported as exploratory. The served model
 frozen files and every locked number are unchanged. `just post-freeze` reruns all of it (about 20 minutes with
 the data and weights); results go to outputs/post_freeze/post_freeze.json.
 
-Why: the course's lecture tests include several the submission had not run, and the report did not show what
+Why: the course's tests include several the submission had not run, and the report did not show what
 the decision layer does when it refers more meals.
 
 | check | what is measured | what would count as a problem |

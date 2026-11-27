@@ -1,5 +1,5 @@
 # ruff: noqa: E501, E741
-"""Post-freeze exploratory checks, 27 Nov (docs/post_freeze_checks.md): lecture tests the submission had skipped
+"""Post-freeze exploratory checks, 27 Nov (docs/post_freeze_checks.md): course tests the submission had skipped
 and an analysis of the decision layer. The served model, its cut-offs and every locked number are unchanged;
 nothing here is pre-registered beyond the plan file written the same day (`glimpse post-freeze`)."""
 

@@ -7,8 +7,8 @@ Maitha Alhosani · MAAI7103 · November 2026 · `just install` → `just predict
 model's carb estimate with the glucose trend, heart rate and a short profile. Scored once on 8 held-out
 people, it reached AUROC 0.645 (0.540–0.736) and met 1 of 4 usefulness targets; with 8 people the interval
 is wide. The photo failed its pre-registered test, and the repeated-meal check (D8) suggests its small
-gain comes from recognising meals the cohort eats again and again, so we do not claim it adds value. A
-sensor-first alternative, v2, let more spikes through on development and is not served. After grading,
+gain comes from recognising meals the cohort eats repeatedly, so we do not claim it adds value. A
+sensor-first alternative, v2, let more spikes through on development and is not served. On 26 Nov,
 rule R22 stopped clears on a high or fast-rising pre-meal glucose; with it v1 clears 18.1% of development
 meals, under its 20% target, with 6.9% of them missed (§4). On 27 Nov the sensor-first v2, as frozen, was
 scored on 12 people from a second public dataset: AUROC 0.628 (0.535–0.704), with the mean risk 0.5 points
@@ -45,12 +45,12 @@ One scoring path (Figure 1): the evaluation, the demo, the app and the grader's
 
 Plain-code rules run first and refuse with a
 named reason and who acts next: the user fixes the input, or a person reviews (docs/rule_ledger.md). Three
-safety rules were added after AI cold-grading rounds found failures on unseen inputs: below 54 mg/dL the
+safety rules were added after AI review rounds found failures on unseen inputs: below 54 mg/dL the
 answer is "treat the
 low first", not a walk (R14); HbA1c in the diabetes range is out of scope (R15); and a CGM or
 heart-rate input beyond the training range in the risk-lowering direction is refused (R16), since a heart
 rate of 140 bpm in v1, or 160 bpm in v2, alone turned a prediabetic caution into low risk. Their effect on
-scored decisions is in docs/rule_ledger.md. Input rules R17 to R21 came from AI grading rounds' unseen files
+scored decisions is in docs/rule_ledger.md. Input rules R17 to R21 came from AI review rounds' unseen files
 (formats,
 Low/High text, dates, units).
 `prototype.product` selects v1 (served) or v2; v1's frozen files are byte-identical to the tag. The
@@ -142,13 +142,13 @@ meals (32.8%) spiked, with per-person rates
 from 0% to 68%. In the final split, 23 development people form five outer folds, with four inner folds
 choosing everything (fusion C, Platt map, intercept shrinkage m, cut-offs); 14 T2D people only train;
 8 people were locked at the proposal. Each development meal is scored once; the primary metric is AUROC.
-One caveat: fold 1 holds the five people the intermediate evaluation scored, and the calibration fix was
+Fold 1 holds the five people the intermediate evaluation scored, and the calibration fix was
 designed after a diagnosis on them, so development carries selection pressure the locked eight do not.
 v2, chosen after v1's locked result, carries more; its development number is likely optimistic.
 
 Postprandial response is person-specific (Zeevi et al. 2015; Berry et al. 2020). The calibration fix is a
 per-fold Platt map plus a penalised per-person intercept fitted only on that person's earlier meals whose
-2-hour label window has closed. (Figure A4, appendix).
+2-hour label window has closed (Figure A4, appendix).
 
 | risk (answered meals) | AUROC (95% person-clustered) | AUPRC (base rate) | Brier (constant forecast) | log-loss | ECE, 15 bins: equal-width / equal-mass |
 |---|---|---|---|---|---|
@@ -215,6 +215,8 @@ the harder locked cohort by 11 points, the clearest calibration failure. v1's di
 across glycaemic status (0.738 healthy, 0.736 prediabetes); usefulness is not
 (page one; appendix table).
 
+![Figure 4: reliability in the registered binning, v1 development, v1 locked and v2 development (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals, bars the 95% Wilson interval of each shipped bin)](../outputs/figures/fig3_reliability.png){width=65%}
+
 External check (exploratory, 27 Nov; docs/external_bigideas.md lists IDs and dates). The frozen v2, model
 only, was scored on a second public dataset (BIG IDEAs, PhysioNet), with age, BMI and fasting glucose
 imputed. Four of its 16 people have no usable meal (food-log dates not overlapping their CGM); the other 12
@@ -228,8 +230,6 @@ cut-offs from CGMacros alone, its decisions cut cost by 16.3% (7.9–27.4%) and 
 clears 10.4% of meals against a 20% target, and out of fold on CGMacros the same
 recipe saves 9.6% (−7.7% to +24.6%). This is a third look at the same 12 people.
 
-![Figure 4: reliability in the registered binning, v1 development, v1 locked and v2 development (15 equal-width bins, meals per bin printed, hollow markers for bins under 5 meals, bars the 95% Wilson interval of each shipped bin)](../outputs/figures/fig3_reliability.png){width=65%}
-
 ## 4. Trust and safety
 Decisions are priced: a missed spike costs 5× an unnecessary caution; abstaining costs 2 if the meal
 spikes and 0.5 if not. These are declared assumptions (5:1 means five needless cautions are accepted to
@@ -241,7 +241,7 @@ Referring more meals buys little: before R22, across six ways of referring more,
 from 4.9% to 8.4% against 7.3% with no band (intervals overlap); a refer band of 0.05 around the cut refers
 22% of meals and leaves 4.9% (0.0–11.6%) missed, while clears fall from 23.7% to 13.3% of the 460 meals.
 
-Rule R22, added after grading, withholds a clear when the last pre-meal
+Rule R22, added on 26 Nov, withholds a clear when the last pre-meal
 reading is 140 mg/dL or more or glucose rises faster than 1.5 mg/dL/min. It turns 22 of v1's 109
 development clears into caution, only 2 of which spiked,
 so clears fall to 18.1%, below the 20% target, and the cost reduction to 10.7%; the author kept it, since
@@ -353,11 +353,11 @@ each person's missed clears. This is not dosing or medical advice.
 
 ## 6. Reproducibility
 The 8 locked people were scored once, on 25 Nov, with v1 (10 low risk, 139 caution, 4 can't judge). The
-development estimate lies above the locked interval; selection pressure and the harder cohort (42.0% of
-150 scored meals spiked) both act, inseparable at n=8. Re-weighting development to the locked eight's mix
-of sex and glycaemic status (check 8) moves AUROC only from 0.762 to 0.749, so the mix alone does not explain
-the drop. Design decision D7 also registered the photo gate on the locked eight as the primary test; that
-run scored only v1, so the endpoint was never computed and cannot be now.
+development estimate lies above the locked interval; selection pressure and the harder cohort (42.0% of 150
+scored meals spiked) both act, inseparable at n=8. Re-weighting development to the locked eight's mix of sex and
+glycaemic status (check 8, docs/robustness_v3.md) moves AUROC only from 0.762 to 0.749, so the mix alone does
+not explain the drop. Design decision D7 also registered the photo gate on the locked eight as the primary test;
+that run scored only v1, so the endpoint was never computed and cannot be now.
 
 `just evaluate` reruns every evaluation and study behind the tables (60 to 90 minutes; `just evaluate-fast`,
 15 minutes, skips the stress, timing, int8 and check studies; the external check needs the second dataset);
