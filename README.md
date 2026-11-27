@@ -2,7 +2,7 @@
 
 A before-meal photo, the last 2 hours of CGM (continuous glucose monitor) and heart rate, and a short profile give
 one of three answers: **low risk**, **caution**, or **can't judge** (always with the reason). The answer comes in
-under 0.3 s (265 ms median on the author's Mac, 7 Nov; 116 ms on a 2-CPU cloud machine) and runs offline on local weights. It is a research prototype for adults with
+under 0.3 s once warm (first answer 1.57 s; 265 ms median on the author's Mac, 7 Nov; 116 ms on a 2-CPU cloud machine) and runs offline on local weights. It is a research prototype for adults with
 prediabetes: a second look before eating, not a medical device. MAAI7103 course project (Maitha Alhosani).
 
 **Grader path (three commands, about 10 minutes):**

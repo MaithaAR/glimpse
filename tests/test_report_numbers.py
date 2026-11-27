@@ -814,7 +814,10 @@ def test_external_and_post_freeze_cells():
         f"flips {fw['would_flip']} clears and avoids {fw['misses_avoided']} of the {fw['misses_total']} misses" in flat
     )
     v3 = _load("outputs/robustness_v3/robustness_v3.json")["r5_v3"]["carb_v3"]
-    assert f"range heads on frozen features reach {v3['bin_f1']:.2f} (v3, heads only, appendix)" in flat
+    assert (
+        f"range heads on frozen features reach {v3['bin_f1']:.2f} (v3, a regularised heads-only candidate, appendix)"
+        in flat
+    )
     p = _load("outputs/post_freeze/post_freeze.json")
     j, c, m, a, dl = p["jpeg_stress"], p["crop_ablation"], p["embedding_map"], p["photo_average"], p["decision_layer"]
     assert (

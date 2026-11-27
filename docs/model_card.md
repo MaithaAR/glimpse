@@ -1,4 +1,4 @@
-# Model card: GLIMPSE pre-meal spike warning (final, 26 Nov 2026)
+# Model card: GLIMPSE pre-meal spike warning (final, 27 Nov 2026)
 
 The intermediate card is kept at docs/archive/model_card_intermediate.md. Every number here is in
 docs/final_report.md or docs/report_appendix.md with its evidence file.

@@ -98,7 +98,7 @@ monitoring:
 finalize:
     uv run glimpse finalize
 
-# the nine figures (seven in the report, two in the appendix; README maps numbers to files), rendered from committed evidence only (pre-commitment: nothing retuned from their look)
+# the figures (six in the report, four in the appendix; README maps numbers to files), rendered from committed evidence only (pre-commitment: nothing retuned from their look)
 figures:
     uv run glimpse figures
 
